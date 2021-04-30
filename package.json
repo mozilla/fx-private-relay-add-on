@@ -1,26 +1,36 @@
 {
-  "name": "fx-private-relay",
-  "description": "Private Relay provides generated email addresses to use in place of personal email addresses.",
-  "version": "1.0.0",
-  "author": "Mozilla",
-  "bugs": {
-    "url": "https://github.com/mozilla/fx-private-relay/issues"
+  "name": "fx-private-relay-add-on",
+  "version": "1.5.1",
+  "description": "Firefox Relay",
+  "main": "index.js",
+  "dependencies": {
+    "web-ext": "^5.2.0"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "eslint": "^7.8.1"
+  "devDependencies": {},
+  "scripts": {
+    "build": "web-ext build -s src/ && npm run build:clean",
+    "build:clean": "git checkout src/manifest.json src/js/background.js src/popup.html",
+    "build:dev": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
+    "build:stage": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
+    "build:prod": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://relay.firefox.com@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
+    "dev": "web-ext run -s src/",
+    "lint": "web-ext lint -s src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/mozilla/fx-private-relay#readme",
-  "keywords": [],
-  "license": "MPL-2.0",
-  "private": true,
+  "private": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mozilla/fx-private-relay.git"
+    "url": "git+https://github.com/mozilla/fx-private-relay-add-on.git"
   },
-  "scripts": {
-    "lint": "npm run lint:js",
-    "lint:js": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  "keywords": [
+    "firefox",
+    "privacy",
+    "email"
+  ],
+  "author": "Mozilla",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mozilla/fx-private-relay-add-on/issues"
+  },
+  "homepage": "https://github.com/mozilla/fx-private-relay-add-on#readme"
 }

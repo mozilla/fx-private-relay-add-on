@@ -4,7 +4,7 @@
 
  module.exports = {
   // Global options:
-  sourceDir: ".",
+  sourceDir: "./src",
   verbose: false,
 
   // Command options:
