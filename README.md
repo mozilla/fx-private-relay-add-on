@@ -49,3 +49,26 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
  * `npm run build:dev`: https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/
  * `npm run build:stage`: https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net/
  * `npm run build:prod`: https://relay.firefox.com/
+
+### Distributing
+#### Make the new version
+
+1. Bump the version number in `package.json` and `manifest.json`
+2. Commit the version number bump
+3. Create a git tag for the version: `git tag <version>`
+4. Push the tag up to GitHub: `git push --tags`
+
+#### Publish to AMO
+
+1. `npm run-script build`
+2. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
+
+#### Publish to GitHub
+Finally, we also publish the release to GitHub for those followers.
+
+1. Download the signed `.xpi` from [the addon versions page](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions)
+2. [Make the new release on
+   GitHub](https://github.com/mozilla/fx-private-relay-add-on/releases/new)
+   * Use the version number for "Tag version" and "Release title"
+   * Release notes: copy the output of `git log --no-merges --pretty=format:"%h %s" <previous-version>..<new-version>`
+   * Attach binaries: select the signed `.xpi` file
