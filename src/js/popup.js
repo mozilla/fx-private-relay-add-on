@@ -2,23 +2,23 @@ function getOnboardingPanels() {
   return {
     "panel1": {
       "imgSrc": "tip1-icon.svg",
-      "tipHeadline": "Welcome!",
-      "tipBody": "When the Firefox Relay icon appears on a website, select it to generate a new alias.",
+      "tipHeadline": browser.i18n.getMessage("popupSignUpPanelWelcome"),
+      "tipBody": browser.i18n.getMessage("popupOnboardingPanel1Body"),
     },
     "panel2": {
       "imgSrc": "tip2-icon.svg",
-      "tipHeadline": "Don't see the icon?",
-      "tipBody":"Right-click (Windows) or Control-click (macOS) on form fields to access the context menu and generate an alias from there.",
+      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel2Headline"),
+      "tipBody": browser.i18n.getMessage("popupOnboardingPanel2Body"),
     },
     "panel3": {
       "imgSrc": "tip3-icon.svg",
-      "tipHeadline": "Getting too many emails?",
-      "tipBody":"Manage your Relay aliases and easily toggle Forwarding to Blocking.",
+      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel3Headline"),
+      "tipBody": browser.i18n.getMessage("popupOnboardingPanel3Body"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
-      "tipHeadline": "High five!",
-      "tipBody": "You’re a Firefox Relay power user!",
+      "tipHeadline": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelHeadline"),
+      "tipBody": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelBody"),
     },
   };
 }

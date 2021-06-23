@@ -18,4 +18,5 @@ document.addEventListener("DOMContentLoaded", async () => {
       return window.open(`${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=first-run&utm_content=first-run-sign-up-btn`);
     });
   });
+
 });
