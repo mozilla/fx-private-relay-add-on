@@ -52,12 +52,9 @@ async function showRelayPanel(tipPanelToShow) {
   };
 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
-  const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  const numRemainingEl = remainingAliasMessage.querySelector(".num-aliases-remaining");
   const numRemaining = maxNumAliases - relayAddresses.length;
-  const maxNumAliasesEl = remainingAliasMessage.querySelector(".max-num-aliases");
-  maxNumAliasesEl.textContent = `/${maxNumAliases}`;
-  numRemainingEl.textContent = numRemaining;
+  const remainingAliasMessage = document.querySelector(".aliases-remaining");
+  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases", [numRemaining, maxNumAliases]);
 
   document.body.classList.add("relay-panel");
   updatePanel(numRemaining, tipPanelToShow);

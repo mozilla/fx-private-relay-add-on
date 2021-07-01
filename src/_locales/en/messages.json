@@ -48,6 +48,18 @@
     "popupSignUpPanelContinue": {
         "message": "Continue"
     },
+    "popupRemainingAliases": {
+        "message": "You have $REMAINING$/$MAX$ remaining aliases",
+        "description": "Tells the user how many more aliases they can make.",
+        "placeholders": {
+            "remaining": {
+                "content": "$1"
+            },
+            "max": {
+                "content": "$2"
+            }
+        }
+    },
     "popupOnboardingShowPrevious": {
         "message": "Show previous panel"
     },
