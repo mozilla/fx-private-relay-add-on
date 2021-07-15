@@ -173,11 +173,11 @@ async function addRelayIconToInput(emailInput) {
 
     if (!signedInUser) {
       const signUpMessageEl = createElementWithClassList("span", "fx-relay-menu-sign-up-message");
-      signUpMessageEl.textContent = "Visit the Firefox Relay website to sign in or create an account.";
+      signUpMessageEl.textContent = browser.i18n.getMessage("pageInputIconSignUpText");
 
       relayInPageMenu.appendChild(signUpMessageEl);
       const signUpButton = createElementWithClassList("button", "fx-relay-menu-sign-up-btn");
-      signUpButton.textContent = "Go to Firefox Relay";
+      signUpButton.textContent = browser.i18n.getMessage("pageInputIconSignUpButton");
 
       signUpButton.addEventListener("click", async(clickEvt) => {
         preventDefaultBehavior(clickEvt);
@@ -197,7 +197,7 @@ async function addRelayIconToInput(emailInput) {
     sendInPageEvent("viewed-menu", "authenticated-user-input-menu")
     // Create "Generate Relay Address" button
     const generateAliasBtn = createElementWithClassList("button", "fx-relay-menu-generate-alias-btn");
-    generateAliasBtn.textContent = "Generate New Alias";
+    generateAliasBtn.textContent = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
 
 
 
@@ -208,7 +208,7 @@ async function addRelayIconToInput(emailInput) {
 
     const numAliasesRemaining = maxNumAliases - relayAddresses.length;
     const aliases = (numAliasesRemaining === 1) ? "alias" : "aliases";
-    remainingAliasesSpan.textContent = `You have ${numAliasesRemaining} ${aliases} remaining`;
+    remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases", [numAliasesRemaining, maxNumAliases]);
 
     const maxNumAliasesReached = numAliasesRemaining === 0;
     if (maxNumAliasesReached) {
@@ -219,7 +219,7 @@ async function addRelayIconToInput(emailInput) {
 
     // Create "Manage All Aliases" link
     const relayMenuDashboardLink = createElementWithClassList("a", "fx-relay-menu-dashboard-link");
-    relayMenuDashboardLink.textContent = "Manage All Aliases";
+    relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");
     relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
     relayMenuDashboardLink.target = "_blank";
     relayMenuDashboardLink.addEventListener("click", () => {
@@ -260,7 +260,7 @@ async function addRelayIconToInput(emailInput) {
         });
 
         const errorMessage = createElementWithClassList("p", "fx-relay-error-message");
-        errorMessage.textContent = `You have already created ${maxNumAliases} aliases`;
+        errorMessage.textContent = browser.i18n.getMessage("pageInputIconMaxAliasesError");
 
         relayInPageMenu.insertBefore(errorMessage, relayMenuDashboardLink);
         return;

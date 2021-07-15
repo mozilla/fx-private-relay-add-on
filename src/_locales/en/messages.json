@@ -66,7 +66,7 @@
     "popupOnboardingShowNext": {
         "message": "Go to next panel"
     },
-    "popupOnboardingManageAll": {
+    "ManageAllAliases": {
         "message": "Manage All Aliases"
     },
     "popupOnboardingPanel1Body": {
@@ -89,5 +89,29 @@
     },
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
+    },
+    "pageInputIconSignUpText": {
+        "message": "Visit the Firefox Relay website to sign in or create an account."
+    },
+    "pageInputIconSignUpButton": {
+        "message": "Go to Firefox Relay"
+    },
+    "pageInputIconGenerateNewAlias": {
+        "message": "Generate New Alias"
+    },
+    "pageInputIconMaxAliasesError": {
+        "message": "You have already created $MAX$ aliases",
+        "description": "Tells the user they have already created the max number of aliases.",
+        "placeholders": {
+            "max": {
+                "content": "$1"
+            }
+        }
+    },
+    "pageFillRelayAddressLimit": {
+        "message": "You've reached the alias limit."
+    },
+    "close": {
+        "message": "Close"
     }
 }
