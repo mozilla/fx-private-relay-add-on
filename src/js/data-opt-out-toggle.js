@@ -8,7 +8,7 @@ async function enableDataOptOut() {
   const stylePrefToggle = (userPref) => {
     if (userPref === "data-enabled") {
       dataCollectionPrefToggle.classList.remove("data-disabled");
-      dataCollectionPrefToggle.title = "Disable data collection";
+      dataCollectionPrefToggle.title = browser.i18n.getMessage("disableDataCollection");
       dataCollectionPrefToggle.dataset.collectionPreference = "data-disabled";
       return;
     }

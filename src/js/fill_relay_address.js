@@ -23,12 +23,12 @@ async function showModal(modalType) {
   sendModalEvent("viewed-modal", "modal-max-aliases");
   const modalMessage = document.createElement("span");
 
-  modalMessage.textContent = "You've reached the alias limit.";
+  modalMessage.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit");
   modalMessage.classList = ["fx-relay-modal-message"];
   modalContent.appendChild(modalMessage);
 
   const manageAliasesLink = document.createElement("a");
-  manageAliasesLink.textContent = "Manage All Aliases";
+  manageAliasesLink.textContent = browser.i18n.getMessage("ManageAllAliases");
   manageAliasesLink.classList = ["fx-relay-new-tab fx-relay-modal-manage-aliases"];
   manageAliasesLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=context-menu-modal&utm_content=manage-relay-addresses`;
 
@@ -42,7 +42,7 @@ async function showModal(modalType) {
 
   const modalCloseButton = document.createElement("button");
   modalCloseButton.classList = ["fx-relay-modal-close-button"];
-  modalCloseButton.textContent = "Close";
+  modalCloseButton.textContent = browser.i18n.getMessage("close");
 
   // Remove relay modal on button click
   modalCloseButton.addEventListener("click", () => {

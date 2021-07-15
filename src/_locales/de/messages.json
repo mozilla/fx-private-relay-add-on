@@ -1,0 +1,117 @@
+{
+    "extensionDescription": {
+        "message": "Firefox Relay makes it easy to create email aliases that forward to your real inbox. Use it to protect your online accounts from hackers and unwanted messages.",
+        "description": "Description of the extension. DO NOT TRANSLATE \"Firefox Relay\"."
+    },
+    "firstRunP": {
+        "message": "Sie haben das Firefox Relay-Add-on erfolgreich installiert. Melden Sie sich zunächst mit Ihrem Firefox-Konto bei Relay an."
+    },
+    "firstRunCollectDataLabel": {
+        "message": "Erlauben Sie Mozilla, Informationen darüber zu sammeln, wie Sie diese Erweiterung verwenden."
+    },
+    "disableDataCollection": {
+        "message": "Datensammlung deaktivieren"
+    },
+    "firstRunPrefP": {
+        "message": "Das Sammeln von Interaktionsdaten, wenn Sie beispielsweise auf das Relais-Symbol in Ihrer Symbolleiste klicken oder einen neuen Alias erstellen, hilft uns zu erfahren, was gut funktioniert und wo wir uns verbessern können. Sie können dies jederzeit im Einstellungsfenster deaktivieren."
+    },
+    "firstRunSignInButton": {
+        "message": "Anmelden"
+    },
+    "popupSettingsTitle": {
+        "message": "die Einstellungen"
+    },
+    "popupSettingsReturn": {
+        "message": "Zurück zum Hauptfenster"
+    },
+    "popupSettingsShowIcon": {
+        "message": "Relaissymbol in E-Mail-Feldern auf Websites anzeigen"
+    },
+    "popupSettingsCollectData": {
+        "message": "Erlauben Sie Mozilla, Interaktionsdaten zu sammeln"
+    },
+    "popupSettingsLeaveFeedback": {
+        "message": "Hinterlasse Kommentar"
+    },
+    "popupSettingsPrivacy": {
+        "message": "Privatsphäre"
+    },
+    "popupSettingsTermsOfService": {
+        "message": "Nutzungsbedingungen"
+    },
+    "popupSignUpPanelWelcome": {
+        "message": "Willkommen"
+    },
+    "popupSignUpPanelIntro": {
+        "message": "Melden Sie sich zunächst mit Ihrem Firefox-Konto bei Relay an."
+    },
+    "popupSignUpPanelContinue": {
+        "message": "Fortsetzen"
+    },
+    "popupRemainingAliases": {
+        "message": "Sie haben $REMAINING$/$MAX$ verbleibende Aliasse",
+        "description": "Tells the user how many more aliases they can make.",
+        "placeholders": {
+            "remaining": {
+                "content": "$1"
+            },
+            "max": {
+                "content": "$2"
+            }
+        }
+    },
+    "popupOnboardingShowPrevious": {
+        "message": "Vorheriges Panel anzeigen"
+    },
+    "popupOnboardingShowNext": {
+        "message": "Gehe zum nächsten Panel"
+    },
+    "ManageAllAliases": {
+        "message": "Alle Aliase verwalten"
+    },
+    "popupOnboardingPanel1Body": {
+        "message": "Wenn das Firefox Relay-Symbol auf einer Website angezeigt wird, wählen Sie es aus, um einen neuen Alias zu generieren."
+    },
+    "popupOnboardingPanel2Headline": {
+        "message": "Sie sehen das Symbol nicht?"
+    },
+    "popupOnboardingPanel2Body": {
+        "message": "Klicken Sie mit der rechten Maustaste (Windows) bzw. bei gedrückter Strg-Taste (macOS) auf Formularfelder, um auf das Kontextmenü zuzugreifen und von dort aus einen Alias zu generieren."
+    },
+    "popupOnboardingPanel3Headline": {
+        "message": "Erhalten Sie zu viele E-Mails?"
+    },
+    "popupOnboardingPanel3Body": {
+        "message": "Verwalten Sie Ihre Relay-Aliasnamen und schalten Sie die Weiterleitung einfach auf Blockieren um."
+    },
+    "popupOnboardingMaxAliasesPanelHeadline": {
+        "message": "Gib mir fünf!"
+    },
+    "popupOnboardingMaxAliasesPanelBody": {
+        "message": "Sie sind ein Firefox Relay-Power-User!"
+    },
+    "pageInputIconSignUpText": {
+        "message": "Besuchen Sie die Firefox Relay-Website, um sich anzumelden oder ein Konto zu erstellen."
+    },
+    "pageInputIconSignUpButton": {
+        "message": "Gehe zu Firefox Relay"
+    },
+    "pageInputIconGenerateNewAlias": {
+        "message": "Neuen Alias generieren"
+    },
+    "pageInputIconMaxAliasesError": {
+        "message": "Sie haben bereits $MAX$-Aliasnamen erstellt",
+        "description": "Tells the user they have already created the max number of aliases.",
+        "placeholders": {
+            "max": {
+                "content": "$1"
+            }
+        }
+    },
+    "pageFillRelayAddressLimit": {
+        "message": "Sie haben das Alias-Limit erreicht."
+    },
+    "close": {
+        "message": "Schließen"
+    }
+}
