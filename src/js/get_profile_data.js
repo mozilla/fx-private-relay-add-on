@@ -8,8 +8,11 @@
   const addonStorageRelayAddresses = await browser.storage.local.get("relayAddresses");
   const addonRelayAddresses = (Object.keys(addonStorageRelayAddresses).length === 0) ? {relayAddresses: []} : addonStorageRelayAddresses;
 
-  // Loop over the addresses on the page
+  // Check if user is premium
+  const isPremiumUser = document.querySelector("body").classList.contains("is-premium");
+  browser.storage.local.set({"premium": isPremiumUser});
 
+  // Loop over the addresses on the page    
   const dashboardRelayAliasCards = document.querySelectorAll("[data-relay-address]");
   const relayAddresses = [];
 

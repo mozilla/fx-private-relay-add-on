@@ -200,6 +200,8 @@ async function addRelayIconToInput(emailInput) {
     generateAliasBtn.textContent = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
 
 
+    // If the user has a premium accout, they may create unlimited aliases. 
+    const { premium } = await browser.storage.local.get("premium");
 
     // Create "You have .../.. remaining relay address" message
     const remainingAliasesSpan = createElementWithClassList("span", "fx-relay-menu-remaining-aliases");
@@ -210,8 +212,13 @@ async function addRelayIconToInput(emailInput) {
     const aliases = (numAliasesRemaining === 1) ? "alias" : "aliases";
     remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases", [numAliasesRemaining, maxNumAliases]);
 
+    if (premium) {
+      remainingAliasesSpan.textContent = browser.i18n.getMessage("popupUnlimitedAliases", [relayAddresses.length]);
+    }
+
     const maxNumAliasesReached = numAliasesRemaining === 0;
-    if (maxNumAliasesReached) {
+
+    if (maxNumAliasesReached && !premium) {
       generateAliasBtn.disabled = true;
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message")
     }
