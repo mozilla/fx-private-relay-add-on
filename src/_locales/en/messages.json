@@ -60,6 +60,15 @@
             }
         }
     },
+    "popupUnlimitedAliases": {
+        "message": "You have created $COUNT$ aliases",
+        "description": "Tells the aliases these premium user has created.",
+        "placeholders": {
+            "count": {
+                "content": "$1"
+            }
+        }
+    },
     "popupOnboardingShowPrevious": {
         "message": "Show previous panel"
     },

@@ -200,6 +200,8 @@ async function addRelayIconToInput(emailInput) {
     generateAliasBtn.textContent = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
 
 
+    // If the user has a premium accout, they may create unlimited aliases. 
+    const { premium } = await browser.storage.local.get("premium");
 
     // Create "You have .../.. remaining relay address" message
     const remainingAliasesSpan = createElementWithClassList("span", "fx-relay-menu-remaining-aliases");
@@ -207,11 +209,24 @@ async function addRelayIconToInput(emailInput) {
     const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
 
     const numAliasesRemaining = maxNumAliases - relayAddresses.length;
-    const aliases = (numAliasesRemaining === 1) ? "alias" : "aliases";
+
+    // Free user: Set text informing them how many aliases they can create
     remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases", [numAliasesRemaining, maxNumAliases]);
 
-    const maxNumAliasesReached = numAliasesRemaining === 0;
-    if (maxNumAliasesReached) {
+    // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
+    if (numAliasesRemaining < 0) {
+      console.log("too many for free");
+      remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit");
+    }
+    
+    // Premium user: Set text informing them how many aliases they have created so far
+    if (premium) {
+      remainingAliasesSpan.textContent = browser.i18n.getMessage("popupUnlimitedAliases", [relayAddresses.length]);
+    }
+
+    const maxNumAliasesReached = (numAliasesRemaining <= 0);
+
+    if (maxNumAliasesReached && !premium) {
       generateAliasBtn.disabled = true;
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message")
     }
@@ -260,7 +275,7 @@ async function addRelayIconToInput(emailInput) {
         });
 
         const errorMessage = createElementWithClassList("p", "fx-relay-error-message");
-        errorMessage.textContent = browser.i18n.getMessage("pageInputIconMaxAliasesError");
+        errorMessage.textContent = browser.i18n.getMessage("pageInputIconMaxAliasesError", [relayAddresses.length]);
 
         relayInPageMenu.insertBefore(errorMessage, relayMenuDashboardLink);
         return;
