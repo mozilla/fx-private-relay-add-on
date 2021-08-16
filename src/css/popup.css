@@ -271,14 +271,31 @@ main-panel {
   font-weight: 700;
 }
 
-.aliases-remaining {
-  font-family: var(--relayMetropolis);
-  font-weight: 300;
-  font-size: 14px;
-  margin: 0;
-  padding: 8px;
-  background: white;
+.panel-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 15px;
+  line-height: 150%;
+  font-size: 1rem;
   border-bottom: 1px solid var(--relayGrey20);
+}
+
+.aliases-remaining {
+  margin: 0;
+  font-family: var(--InterUI);
+  background: white;
+}
+
+.premium-cta {
+  margin: 0;
+  font-family: var(--InterUI);
+  color: var(--relayBlue3);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.premium-cta a {
+  margin: 0 !important;
 }
 
 .num-aliases-remaining,

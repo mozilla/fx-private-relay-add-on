@@ -90,6 +90,12 @@ async function getRemainingAliases() {
   return { relayAddresses, maxNumAliases };
 }
 
+async function getPremiumUrlFragments() {
+  const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
+  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
+  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
+  return { fxaSubscriptionsUrl, premiumProdId, premiumPriceId };
+}
 
 function enableSettingsPanel() {
   const settingsToggles = document.querySelectorAll(".settings-toggle");

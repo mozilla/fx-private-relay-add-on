@@ -48,7 +48,17 @@
       </sign-up-panel>
 
       <main-panel class="signed-in-panel hidden">
-        <p class="fx-relay-font-met aliases-remaining remaining-plural"></p>
+        <span class="panel-status">
+          <p class="aliases-remaining remaining-plural"></p>
+          <a 
+            data-fxa-subscriptions-url="fxaSubscriptionsUrl"
+            data-premium-prod-id="premiumProdId"
+            data-premium-price-id="premiumPriceId"
+            class="premium-cta i18n-content" 
+            data-event-action="click"
+            data-i18n-message-id="popupGetUnlimitedAliases">
+          </a>
+      </span>
         <onboarding-panel>
           <img class="onboarding-img">
           <h1 class="onboarding-h1"></h1>

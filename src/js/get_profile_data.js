@@ -16,6 +16,12 @@
   const dashboardRelayAliasCards = document.querySelectorAll("[data-relay-address]");
   const relayAddresses = [];
 
+   // Get FXA Stuff
+   const fxaSubscriptionsUrl = document.querySelector("body").dataset.fxaSubscriptionsUrl;
+   const premiumProdId = document.querySelector("body").dataset.premiumProdId;
+   const premiumPriceId = document.querySelector("body").dataset.premiumPriceId;
+   browser.storage.local.set({fxaSubscriptionsUrl, premiumProdId, premiumPriceId});
+
   for (const aliasCard of dashboardRelayAliasCards) {
     // Add the domain note from the addon storage to the page
 
