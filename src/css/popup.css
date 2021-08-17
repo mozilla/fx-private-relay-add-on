@@ -34,6 +34,13 @@ sign-up-panel::after {
   background-size: 120%;
 }
 
+
+@font-face {
+  font-family: "InterUI";
+  font-style: normal;
+  src: url("/fonts/Inter/Inter-UI-Regular.woff2") format("woff2");
+}
+
 ::-moz-focus-inner {
   border: 0;
 }
@@ -282,15 +289,15 @@ main-panel {
 
 .aliases-remaining {
   margin: 0;
-  font-family: var(--InterUI);
+  font-family: 'InterUI';
   background: white;
 }
 
 .premium-cta {
   margin: 0;
-  font-family: var(--InterUI);
+  font-family: 'InterUI';
   color: var(--relayBlue3);
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -302,6 +309,31 @@ main-panel {
 .max-num-aliases {
   font-weight: 700;
 }
+
+/*upgrade banner*/
+
+.upgrade-banner-wrapper {
+  background: var(--relayGrey20);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+}
+
+.upgrade-banner-wrapper img {
+  width: 30px;
+  height: 30px;
+  margin: auto;
+}
+
+.upgrade-banner {
+  font-family: 'InterUI';
+  padding-left: 10px;
+  color: #5953F3;
+  margin: auto;
+  font-weight: 700;
+}
+
 
 footer {
   display: flex;
@@ -335,7 +367,7 @@ footer {
 
 onboarding-panel {
   font-size: 14px !important;
-  padding: 24px 30px 50px 30px;
+  padding: 24px 30px 30px 30px;
   display: flex;
   align-items: flex-start;
   height: 100%;
@@ -379,7 +411,7 @@ onboarding-panel p {
   right: 30px;
 }
 
-.maxAliasesPanel img {
+.maxAliasesPanel .onboarding-img {
   position: absolute;
   right: 0;
   left: 0;

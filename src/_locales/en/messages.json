@@ -102,6 +102,9 @@
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
     },
+    "popupUpgradeToPremiumBanner": {
+        "message": "Upgrade to Mozilla Premium Relay for more protection!"
+    },
     "pageInputIconSignUpText": {
         "message": "Visit the Firefox Relay website to sign in or create an account."
     },

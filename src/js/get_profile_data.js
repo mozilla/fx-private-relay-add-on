@@ -17,9 +17,9 @@
   const relayAddresses = [];
 
    // Get FXA Stuff
-   const fxaSubscriptionsUrl = document.querySelector("body").dataset.fxaSubscriptionsUrl;
-   const premiumProdId = document.querySelector("body").dataset.premiumProdId;
-   const premiumPriceId = document.querySelector("body").dataset.premiumPriceId;
+   const fxaSubscriptionsUrl = document.querySelector("firefox-private-relay-addon-data").dataset.fxaSubscriptionsUrl;
+   const premiumProdId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumProdId;
+   const premiumPriceId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumPriceId;
    browser.storage.local.set({fxaSubscriptionsUrl, premiumProdId, premiumPriceId});
 
   for (const aliasCard of dashboardRelayAliasCards) {

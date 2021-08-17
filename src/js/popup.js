@@ -19,6 +19,8 @@ function getOnboardingPanels() {
       "imgSrc": "high-five.svg",
       "tipHeadline": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelHeadline"),
       "tipBody": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelBody"),
+      "upgradeButton": browser.i18n.getMessage("popupUpgradeToPremiumBanner"),
+      "upgradeButtonIcon": "/icons/placeholder-logo.png",
     },
   };
 }
@@ -37,6 +39,8 @@ async function showRelayPanel(tipPanelToShow) {
   const tipHeadlineEl = onboardingPanelWrapper.querySelector("h1");
   const tipBodyEl = onboardingPanelWrapper.querySelector("p");
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
+  const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
+  const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const onboardingPanelStrings = getOnboardingPanels();
 
   const updatePanel = (numRemaining, panelId) => {
@@ -48,6 +52,8 @@ async function showRelayPanel(tipPanelToShow) {
     tipHeadlineEl.textContent = panelStrings.tipHeadline;
     tipBodyEl.textContent = panelStrings.tipBody;
     currentPanel.textContent = `${panelId}`;
+    upgradeButtonEl.textContent = panelStrings.upgradeButton;
+    upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
     return;
   };
 
@@ -73,6 +79,9 @@ async function showRelayPanel(tipPanelToShow) {
   relayPanel.classList.remove("hidden");
 
   if (numRemaining === 0) {
+    const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
+    upgradeButton.classList.remove("hidden");
+
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
@@ -90,12 +99,6 @@ async function getRemainingAliases() {
   return { relayAddresses, maxNumAliases };
 }
 
-async function getPremiumUrlFragments() {
-  const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
-  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
-  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
-  return { fxaSubscriptionsUrl, premiumProdId, premiumPriceId };
-}
 
 function enableSettingsPanel() {
   const settingsToggles = document.querySelectorAll(".settings-toggle");
@@ -170,7 +173,11 @@ async function popup() {
     });
   });
 
+
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
+  const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
+  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
+  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
@@ -179,6 +186,16 @@ async function popup() {
   document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
     dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
   });
+
+  const premiumLink = document.querySelector(".get-premium-link");
+  premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+
+  const { premium } = await browser.storage.local.get("premium");
+
+  if (!premium) {  
+    const panelStatus = document.querySelector(".panel-status");
+    panelStatus.classList.remove("hidden");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", popup);
