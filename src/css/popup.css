@@ -34,13 +34,6 @@ sign-up-panel::after {
   background-size: 120%;
 }
 
-
-@font-face {
-  font-family: "InterUI";
-  font-style: normal;
-  src: url("/fonts/Inter/Inter-UI-Regular.woff2") format("woff2");
-}
-
 ::-moz-focus-inner {
   border: 0;
 }
@@ -318,6 +311,7 @@ main-panel {
   padding: 10px;
   margin-top: 10px;
   display: flex;
+  text-decoration: none;
 }
 
 .upgrade-banner-wrapper img {
@@ -333,7 +327,6 @@ main-panel {
   margin: auto;
   font-weight: 700;
 }
-
 
 footer {
   display: flex;

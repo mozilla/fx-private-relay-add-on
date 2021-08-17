@@ -187,8 +187,10 @@ async function popup() {
     dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
   });
 
-  const premiumLink = document.querySelector(".get-premium-link");
-  premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+
+  document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
+    premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+  });
 
   const { premium } = await browser.storage.local.get("premium");
 
