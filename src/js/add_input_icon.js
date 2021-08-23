@@ -231,7 +231,6 @@ async function addRelayIconToInput(emailInput) {
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message")
     }
 
-    
     // Create "Manage All Aliases" link
     const relayMenuDashboardLink = createElementWithClassList("a", "fx-relay-menu-dashboard-link");
     relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");

@@ -54,9 +54,6 @@
         "placeholders": {
             "remaining": {
                 "content": "$1"
-            },
-            "max": {
-                "content": "$2"
             }
         }
     },

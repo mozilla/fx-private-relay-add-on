@@ -80,7 +80,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   if (numRemaining === 0) {
     const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-    upgradeButton.classList.remove("hidden");
+    upgradeButton.classList.remove("is-hidden");
 
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
@@ -179,6 +179,9 @@ async function popup() {
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");
   const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
 
+  console.log(fxaSubscriptionsUrl, premiumProdId, premiumPriceId);
+
+
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
   });
@@ -196,7 +199,7 @@ async function popup() {
 
   if (!premium) {  
     const panelStatus = document.querySelector(".panel-status");
-    panelStatus.classList.remove("hidden");
+    panelStatus.classList.remove("is-hidden");
   }
 }
 

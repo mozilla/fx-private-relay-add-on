@@ -198,6 +198,13 @@ fx-relay-logo-wrapper,
   pointer-events: none;
 }
 
+.is-hidden {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .hidden,
 panel-content {
   transition: all 0.2s ease;
@@ -274,7 +281,7 @@ main-panel {
 .panel-status {
   display: flex;
   justify-content: space-between;
-  padding: 8px 15px;
+  padding: 8px 16px;
   line-height: 150%;
   font-size: 1rem;
   border-bottom: 1px solid var(--relayGrey20);
@@ -295,7 +302,7 @@ main-panel {
 }
 
 .premium-cta a {
-  margin: 0 !important;
+  margin: 0;
 }
 
 .num-aliases-remaining,
@@ -309,7 +316,7 @@ main-panel {
   background: var(--relayGrey20);
   border-radius: 8px;
   padding: 10px;
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   text-decoration: none;
 }
