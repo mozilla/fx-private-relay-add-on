@@ -50,19 +50,43 @@
       <main-panel class="signed-in-panel hidden">
         <p class="fx-relay-font-met aliases-remaining remaining-plural"></p>
         <onboarding-panel>
-          <img class="onboarding-img">
-          <h1 class="onboarding-h1"></h1>
-          <p class="onboarding-p"></p>
+          <!--Non Premium Panel-->
+          <div class="content-wrapper">
+            <img class="onboarding-img">
+            <h1 class="onboarding-h1"></h1>
+            <p class="onboarding-p"></p>
 
-          <div class="onboarding-pagination">
-            <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
-            <span class="panel-num fx-relay-font-met">
-              <span class="current-panel"></span>/
-                <span class="total-panels">3</span>
-            </span>
-            <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+            <div class="onboarding-pagination">
+              <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
+              <span class="panel-num fx-relay-font-met">
+                <span class="current-panel"></span>/
+                  <span class="total-panels">3</span>
+              </span>
+              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+            </div>
           </div>
-        </onboarding-panel>
+          <!-- Premium Panel-->
+          <div class="premium-wrapper">
+            <div class="premium-dashboard">
+              <ul>
+                <li class="dashboard-info">
+                  Email aliases used
+                  <div class="dashboard-stats aliases-used"></div>
+                </li>
+                <li class="dashboard-info">
+                  Email blocked
+                  <div class="dashboard-stats emails-blocked"></div>
+                </li>
+                <li class="dashboard-info">
+                  Email forwarded
+                  <div class="dashboard-stats emails-forwarded"></div>
+                </li>
+              </ul>
+            </div>
+            <img class="email-domain-illustration">
+            <a class="register-domain-cta i18n-content button sign-in-btn blue-primary-btn close-popup-after-click register-cta" data-event-action="click" data-i18n-message-id="registerDomainButton" href=""></a> 
+          </div>
+       </onboarding-panel>
         <footer>
           <a class="button fx-relay-new-tab close-popup-after-click footer-button dashboard-link i18n-content" href="" data-event-action="click" data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases"></a>
         </footer>

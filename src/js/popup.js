@@ -20,6 +20,10 @@ function getOnboardingPanels() {
       "tipHeadline": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelHeadline"),
       "tipBody": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelBody"),
     },
+    "premiumPanel": {
+      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
+      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
+    },
   };
 }
 
@@ -30,8 +34,19 @@ function showSignUpPanel() {
   return signUpOrInPanel.classList.remove("hidden");
 }
 
+function choosePanel(numRemaining, panelId, premium){
+  if (premium){
+    document.getElementsByClassName("content-wrapper")[0].remove();
+    return 'premiumPanel';
+  }
+  else {
+    document.getElementsByClassName("premium-wrapper")[0].remove();
+    return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
+  }
+}
 
 async function showRelayPanel(tipPanelToShow) {
+  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
   const tipHeadlineEl = onboardingPanelWrapper.querySelector("h1");
@@ -39,18 +54,43 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const onboardingPanelStrings = getOnboardingPanels();
 
+  const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
+  const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
+  const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
+
+  //Premium Panel
+  const registerDomainButtonEl = premiumPanelWrapper.querySelector(".register-domain-cta");
+  const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
+
+  const { premium } = await browser.storage.local.get("premium");
+
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`;
+    const panelToShow = choosePanel(numRemaining, panelId, premium);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
+    registerDomainButtonEl.textContent = panelStrings.registerDomainButton;
     tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
+
     tipHeadlineEl.textContent = panelStrings.tipHeadline;
     tipBodyEl.textContent = panelStrings.tipBody;
     currentPanel.textContent = `${panelId}`;
+
+    //Premium Panel
+    aliasesUsedValEl.textContent = aliasesUsedVal;
+    emailsBlockedValEl.textContent = emailsBlockedVal;
+    emailsForwardedValEl.textContent = emailsForwardedVal;
+    registerDomainImgEl.src = panelStrings.registerDomainImg;
+
     return;
   };
 
+  //Dashboard Data
+  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+
+  //Remaining aliases
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
@@ -59,6 +99,7 @@ async function showRelayPanel(tipPanelToShow) {
   document.body.classList.add("relay-panel");
   updatePanel(numRemaining, tipPanelToShow);
 
+  //Carousel
   document.querySelectorAll(".panel-nav").forEach(navBtn => {
     navBtn.addEventListener("click", () => {
       sendRelayEvent("Panel", "click", "panel-navigation-arrow");
@@ -88,6 +129,14 @@ async function getRemainingAliases() {
   const { relayAddresses } = await getAllAliases();
   const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
   return { relayAddresses, maxNumAliases };
+}
+
+
+async function getDashboardData() {
+  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+  return { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal };
 }
 
 
@@ -168,6 +217,10 @@ async function popup() {
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
+  });
+
+  document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
+    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
   document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
