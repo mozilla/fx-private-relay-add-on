@@ -16,6 +16,12 @@
   const dashboardRelayAliasCards = document.querySelectorAll("[data-relay-address]");
   const relayAddresses = [];
 
+   // Get FXA Stuff
+   const fxaSubscriptionsUrl = document.querySelector("firefox-private-relay-addon-data").dataset.fxaSubscriptionsUrl;
+   const premiumProdId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumProdId;
+   const premiumPriceId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumPriceId;
+   browser.storage.local.set({fxaSubscriptionsUrl, premiumProdId, premiumPriceId});
+
   for (const aliasCard of dashboardRelayAliasCards) {
     // Add the domain note from the addon storage to the page
 

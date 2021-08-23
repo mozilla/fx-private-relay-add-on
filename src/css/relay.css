@@ -19,6 +19,12 @@
   src: url("/fonts/Metropolis/Metropolis-Light.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "InterUI";
+  font-style: normal;
+  src: url("/fonts/Inter/Inter-UI-Regular.woff2") format("woff2");
+}
+
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
 .fx-relay-panel,

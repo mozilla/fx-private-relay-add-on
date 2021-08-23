@@ -49,16 +49,16 @@
         "message": "Continue"
     },
     "popupRemainingAliases": {
-        "message": "You have $REMAINING$/$MAX$ remaining aliases",
+        "message": "$REMAINING$ aliases remaining.",
         "description": "Tells the user how many more aliases they can make.",
         "placeholders": {
             "remaining": {
                 "content": "$1"
-            },
-            "max": {
-                "content": "$2"
             }
         }
+    },
+    "popupGetUnlimitedAliases": {
+        "message": "Get unlimited aliases"
     },
     "popupUnlimitedAliases": {
         "message": "You have created $COUNT$ aliases",
@@ -98,6 +98,9 @@
     },
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
+    },
+    "popupUpgradeToPremiumBanner": {
+        "message": "Upgrade to Mozilla Premium Relay for more protection!"
     },
     "pageInputIconSignUpText": {
         "message": "Visit the Firefox Relay website to sign in or create an account."
