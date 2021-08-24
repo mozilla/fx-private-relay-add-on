@@ -99,6 +99,9 @@
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
     },
+    "popupRegisterDomainHeadline": {
+        "message": "Get a custom domain for Relay email aliases"
+    },
     "popupRegisterDomainButton": {
         "message": "Register email domain"
     },

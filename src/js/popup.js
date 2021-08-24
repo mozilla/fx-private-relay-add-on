@@ -24,6 +24,7 @@ function getOnboardingPanels() {
     },
     "premiumPanel": {
       "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
+      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
       "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
@@ -65,6 +66,7 @@ async function showRelayPanel(tipPanelToShow) {
    //Premium Panel
    const premiumPanelWrapper = document.querySelector(".premium-wrapper");
    const registerDomainButtonEl = premiumPanelWrapper.querySelector(".register-domain-cta");
+   const registerDomainHeadlineEl = premiumPanelWrapper.querySelector(".register-domain-headline");
    const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
 
    const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
@@ -92,6 +94,7 @@ async function showRelayPanel(tipPanelToShow) {
     //Premium Panel
     registerDomainImgEl.src = panelStrings.registerDomainImg;
     registerDomainButtonEl.textContent = panelStrings.registerDomainButton;
+    registerDomainHeadlineEl.textContent = panelStrings.registerDomainHeadline;
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
