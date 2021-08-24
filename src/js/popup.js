@@ -238,8 +238,6 @@ async function popup() {
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");
   const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
 
-  console.log(fxaSubscriptionsUrl, premiumProdId, premiumPriceId);
-
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
