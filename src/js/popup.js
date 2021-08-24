@@ -22,6 +22,13 @@ function getOnboardingPanels() {
       "upgradeButton": browser.i18n.getMessage("popupUpgradeToPremiumBanner"),
       "upgradeButtonIcon": "/icons/placeholder-logo.png",
     },
+    "premiumPanel": {
+      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
+      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
+      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
+      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
+      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
+    },
   };
 }
 
@@ -30,6 +37,18 @@ function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
   document.body.classList.add("sign-up");
   return signUpOrInPanel.classList.remove("hidden");
+}
+
+
+function choosePanel(numRemaining, panelId, premium){
+  if (premium){
+    document.getElementsByClassName("content-wrapper")[0].remove();
+    return 'premiumPanel';
+  }
+  else {
+    document.getElementsByClassName("premium-wrapper")[0].remove();
+    return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
+  }
 }
 
 
@@ -43,8 +62,23 @@ async function showRelayPanel(tipPanelToShow) {
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const onboardingPanelStrings = getOnboardingPanels();
 
+   //Premium Panel
+   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+   const registerDomainButtonEl = premiumPanelWrapper.querySelector(".register-domain-cta");
+   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
+
+   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
+   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
+   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
+  
+   const aliasesUsedTextEl = premiumPanelWrapper.querySelector(".aliases-used-text");
+   const emailsBlockedTextEl = premiumPanelWrapper.querySelector(".emails-blocked-text");
+   const emailsForwardedTextEl = premiumPanelWrapper.querySelector(".emails-forwarded-text");
+ 
+   const { premium } = await browser.storage.local.get("premium");
+
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`;
+    const panelToShow = choosePanel(numRemaining, panelId, premium);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -54,8 +88,25 @@ async function showRelayPanel(tipPanelToShow) {
     currentPanel.textContent = `${panelId}`;
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
+
+    //Premium Panel
+    registerDomainImgEl.src = panelStrings.registerDomainImg;
+    registerDomainButtonEl.textContent = panelStrings.registerDomainButton;
+    aliasesUsedValEl.textContent = aliasesUsedVal;
+    emailsBlockedValEl.textContent = emailsBlockedVal;
+    emailsForwardedValEl.textContent = emailsForwardedVal;
+    aliasesUsedTextEl.textContent = panelStrings.aliasesUsedText;
+    emailsBlockedTextEl.textContent = panelStrings.emailsBlockedText;
+    emailsForwardedTextEl.textContent = panelStrings.emailsForwardedText;
+
     return;
   };
+
+
+  //Dashboard Data
+  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
@@ -86,6 +137,11 @@ async function showRelayPanel(tipPanelToShow) {
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
 }
+
+async function getDashboardData() {
+  const { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal } = await browser.storage.local.get();
+  return { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal };
+} 
 
 
 async function getAllAliases() {
@@ -193,6 +249,10 @@ async function popup() {
 
   document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
     premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+  });
+
+  document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
+    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
   const { premium } = await browser.storage.local.get("premium");

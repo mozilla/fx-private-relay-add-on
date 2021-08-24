@@ -99,6 +99,18 @@
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
     },
+    "popupRegisterDomainButton": {
+        "message": "Register email domain"
+    },
+    "popupAliasesUsed": {
+        "message": "Email aliases used"
+    },
+    "popupEmailsBlocked": {
+        "message": "Emails blocked"
+    },
+    "popupEmailsForwarded": {
+        "message": "Emails forwarded"
+    },
     "popupUpgradeToPremiumBanner": {
         "message": "Upgrade to Mozilla Premium Relay for more protection!"
     },
