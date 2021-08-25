@@ -22,24 +22,6 @@ function getOnboardingPanels() {
       "upgradeButton": browser.i18n.getMessage("popupUpgradeToPremiumBanner"),
       "upgradeButtonIcon": "/icons/placeholder-logo.png",
     },
-    "premiumPanel": {
-      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
-      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
-      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
-      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
-      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
-      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    },
-  };
-}
-
-function getEducationalStrings() {
-  return {
-    "educationalComponent1": {
-      "img": "/images/panel-images/educational-matrix/educationalImg1.png",
-      "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
-      "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
-    }
   };
 }
 
@@ -51,29 +33,6 @@ function showSignUpPanel() {
 }
 
 
-function choosePanel(numRemaining, panelId, premium){
-  if (premium){
-    document.getElementsByClassName("content-wrapper")[0].remove();
-    return 'premiumPanel';
-  }
-  else {
-    const premiumWrapper = document.getElementsByClassName("premium-wrapper")
-    if (premiumWrapper.length) {
-      premiumWrapper[0].remove();
-    }
-    return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
-  }
-}
-
-function checkUserSubdomain(premiumSubdomainSet){
-  if(premiumSubdomainSet != "None"){
-    document.getElementsByClassName("register-domain-component")[0].remove();
-  }
-  else {
-    document.getElementsByClassName("educational-component")[0].remove();
-  }
-}
-
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
@@ -83,20 +42,9 @@ async function showRelayPanel(tipPanelToShow) {
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const onboardingPanelStrings = getOnboardingPanels();
-  const educationalStrings = getEducationalStrings();
-
-  //Premium Panel
-  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-
-  const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
-  const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
-  const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
-
-  const { premium } = await browser.storage.local.get("premium");
 
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium);
+    const panelToShow = (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`;
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -106,29 +54,8 @@ async function showRelayPanel(tipPanelToShow) {
     currentPanel.textContent = `${panelId}`;
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
-
-    //Premium Panel
-    registerDomainImgEl.src = panelStrings.registerDomainImg;
-    aliasesUsedValEl.textContent = aliasesUsedVal;
-    emailsBlockedValEl.textContent = emailsBlockedVal;
-    emailsForwardedValEl.textContent = emailsForwardedVal;
-
     return;
   };
-
-  //Educational Matrix
-  const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSet);
-  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const educationalModuleToShow = educationalStrings["educationalComponent1"];
-  const educationalComponentStrings = educationalModuleToShow;
-  educationalImgEl.src = educationalComponentStrings.img;
-
-
-  //Dashboard Data
-  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
-  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
-  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
@@ -159,11 +86,6 @@ async function showRelayPanel(tipPanelToShow) {
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
 }
-
-async function getDashboardData() {
-  const { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal } = await browser.storage.local.get();
-  return { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal };
-} 
 
 
 async function getAllAliases() {
@@ -257,6 +179,8 @@ async function popup() {
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");
   const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
 
+  console.log(fxaSubscriptionsUrl, premiumProdId, premiumPriceId);
+
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
@@ -269,10 +193,6 @@ async function popup() {
 
   document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
     premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
-  });
-
-  document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
-    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
   const { premium } = await browser.storage.local.get("premium");
