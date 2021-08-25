@@ -99,8 +99,29 @@
     "popupOnboardingMaxAliasesPanelBody": {
         "message": "You’re a Firefox Relay power user!"
     },
+    "popupRegisterDomainHeadline": {
+        "message": "Get a custom domain for Relay email aliases"
+    },
+    "popupRegisterDomainButton": {
+        "message": "Register email domain"
+    },
+    "popupAliasesUsed": {
+        "message": "Email aliases used"
+    },
+    "popupEmailsBlocked": {
+        "message": "Emails blocked"
+    },
+    "popupEmailsForwarded": {
+        "message": "Emails forwarded"
+    },
     "popupUpgradeToPremiumBanner": {
         "message": "Upgrade to Mozilla Premium Relay for more protection!"
+    },
+    "popupEducationalComponent1Headline": {
+        "message": "A worldwide protection tool"
+    },
+    "popupEducationalComponent1Body": {
+        "message": "Relay is currently only available in English, but you can use the service anywhere."
     },
     "pageInputIconSignUpText": {
         "message": "Visit the Firefox Relay website to sign in or create an account."

@@ -58,28 +58,58 @@
           </a>
       </span>
         <onboarding-panel>
-          <img class="onboarding-img">
-          <h1 class="onboarding-h1"></h1>
-          <p class="onboarding-p"></p>
-          <a 
-            class="upgrade-banner-wrapper close-popup-after-click button get-premium-link is-hidden"  
-            data-event-action="click" 
-            >
-            <img class="upgrade-banner-icon">
-            <p class="upgrade-banner"></p>
-          </a>
-        
-          <div class="onboarding-pagination">
-            <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
-            <span class="panel-num fx-relay-font-met">
-              <span class="current-panel"></span>/
-                <span class="total-panels">3</span>
-            </span>
-            <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+          <!--Non Premium Panel-->
+          <div class="content-wrapper">
+            <img class="onboarding-img">
+            <h1 class="onboarding-h1"></h1>
+            <p class="onboarding-p"></p>
+            <a class="upgrade-banner-wrapper close-popup-after-click button get-premium-link is-hidden" data-event-action="click">
+              <img class="upgrade-banner-icon">
+              <p class="upgrade-banner"></p>
+            </a>
+            <div class="onboarding-pagination">
+              <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
+              <span class="panel-num fx-relay-font-met">
+                <span class="current-panel"></span>/
+                  <span class="total-panels">3</span>
+              </span>
+              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+            </div>
+          </div>
+          <!-- Premium Panel-->
+          <div class="premium-wrapper">
+            <div class="premium-dashboard">
+              <ul>
+                <li class="dashboard-info">
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed"></span>
+                  <div class="dashboard-stats aliases-used"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
+                </li>
+              </ul>
+            </div>
+            <div class="register-domain-component">
+              <img class="email-domain-illustration">
+              <p class="register-domain-headline i18n-content" data-i18n-message-id="popupRegisterDomainHeadline"></p>
+              <a class="register-domain-cta i18n-content button sign-in-btn blue-primary-btn close-popup-after-click" data-event-action="click" data-i18n-message-id="popupRegisterDomainButton"></a> 
+            </div>
+            <div class="educational-component">
+              <img class="education-img">
+              <div class="education-description">
+                <h1 class="education-headline i18n-content" data-i18n-message-id="popupEducationalComponent1Headline"></h1>
+                <p class="education-body i18n-content" data-i18n-message-id="popupEducationalComponent1Body"></p>
+              </div>
+            </div>
           </div>
         </onboarding-panel>
         <footer>
-          <a class="button fx-relay-new-tab close-popup-after-click footer-button dashboard-link i18n-content" href="" data-event-action="click" data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases"></a>
+          <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click" data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases"></a>
         </footer>
       </main-panel>
     </panel-content>
