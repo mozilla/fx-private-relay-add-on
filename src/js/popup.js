@@ -57,7 +57,10 @@ function choosePanel(numRemaining, panelId, premium){
     return 'premiumPanel';
   }
   else {
-    document.getElementsByClassName("premium-wrapper")[0].remove();
+    const premiumWrapper = document.getElementsByClassName("premium-wrapper")
+    if (premiumWrapper.length) {
+      premiumWrapper[0].remove();
+    }
     return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
   }
 }
