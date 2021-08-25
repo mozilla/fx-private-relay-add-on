@@ -33,6 +33,16 @@ function getOnboardingPanels() {
   };
 }
 
+function getEducationalStrings() {
+  return {
+    "educationalComponent1": {
+      "img": "/images/panel-images/educational-matrix/educationalImg1.png",
+      "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
+      "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
+    }
+  };
+}
+
 
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
@@ -52,6 +62,14 @@ function choosePanel(numRemaining, panelId, premium){
   }
 }
 
+function checkUserSubdomain(premiumSubdomainSet){
+  if(premiumSubdomainSet != "None"){
+    document.getElementsByClassName("register-domain-component")[0].remove();
+  }
+  else {
+    document.getElementsByClassName("educational-component")[0].remove();
+  }
+}
 
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
@@ -62,22 +80,17 @@ async function showRelayPanel(tipPanelToShow) {
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const onboardingPanelStrings = getOnboardingPanels();
+  const educationalStrings = getEducationalStrings();
 
-   //Premium Panel
-   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-   const registerDomainButtonEl = premiumPanelWrapper.querySelector(".register-domain-cta");
-   const registerDomainHeadlineEl = premiumPanelWrapper.querySelector(".register-domain-headline");
-   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
+  //Premium Panel
+  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+  const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
 
-   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
-   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
-   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
-  
-   const aliasesUsedTextEl = premiumPanelWrapper.querySelector(".aliases-used-text");
-   const emailsBlockedTextEl = premiumPanelWrapper.querySelector(".emails-blocked-text");
-   const emailsForwardedTextEl = premiumPanelWrapper.querySelector(".emails-forwarded-text");
- 
-   const { premium } = await browser.storage.local.get("premium");
+  const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
+  const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
+  const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
+
+  const { premium } = await browser.storage.local.get("premium");
 
   const updatePanel = (numRemaining, panelId) => {
     const panelToShow = choosePanel(numRemaining, panelId, premium);
@@ -93,17 +106,20 @@ async function showRelayPanel(tipPanelToShow) {
 
     //Premium Panel
     registerDomainImgEl.src = panelStrings.registerDomainImg;
-    registerDomainButtonEl.textContent = panelStrings.registerDomainButton;
-    registerDomainHeadlineEl.textContent = panelStrings.registerDomainHeadline;
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
-    aliasesUsedTextEl.textContent = panelStrings.aliasesUsedText;
-    emailsBlockedTextEl.textContent = panelStrings.emailsBlockedText;
-    emailsForwardedTextEl.textContent = panelStrings.emailsForwardedText;
 
     return;
   };
+
+  //Educational Matrix
+  const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
+  checkUserSubdomain(premiumSubdomainSet);
+  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
+  const educationalModuleToShow = educationalStrings["educationalComponent1"];
+  const educationalComponentStrings = educationalModuleToShow;
+  educationalImgEl.src = educationalComponentStrings.img;
 
 
   //Dashboard Data

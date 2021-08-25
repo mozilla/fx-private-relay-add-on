@@ -460,11 +460,18 @@ onboarding-panel {
 
 .email-domain-illustration {
   margin: 0 auto;
+  display: block;
+  width: 200px;
   margin-top: 30px;
+}
+
+.register-domain-component {
+  margin: 0 auto;
 }
 
 .register-domain-cta {
   margin: 10px auto;
+  max-width: 200px;
 }
 
 .register-domain-headline {
@@ -472,6 +479,23 @@ onboarding-panel {
   font-weight: 700;
   font-size: 14px;
   padding-top: 8px;
+}
+
+.educational-component {
+  display: flex;
+  flex-direction: row;
+  padding-top: 32px;
+  justify-content: space-between;
+}
+
+.education-img {
+  padding-right: 8px;
+}
+
+.education-headline {
+  font-family: 'InterUI';
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .onboarding-h1 {

@@ -117,6 +117,12 @@
     "popupUpgradeToPremiumBanner": {
         "message": "Upgrade to Mozilla Premium Relay for more protection!"
     },
+    "popupEducationalComponent1Headline": {
+        "message": "A worldwide protection tool"
+    },
+    "popupEducationalComponent1Body": {
+        "message": "Relay is currently only available in English, but you can use the service anywhere."
+    },
     "pageInputIconSignUpText": {
         "message": "Visit the Firefox Relay website to sign in or create an account."
     },
