@@ -461,8 +461,7 @@ onboarding-panel {
 .email-domain-illustration {
   margin: 0 auto;
   display: block;
-  width: 200px;
-  margin-top: 30px;
+  width: 280px;
 }
 
 .register-domain-component {
@@ -470,15 +469,14 @@ onboarding-panel {
 }
 
 .register-domain-cta {
-  margin: 10px auto;
+  margin: 16px auto;
   max-width: 200px;
 }
 
 .register-domain-headline {
-  margin: 0 auto;
+  margin: 24px auto 16px auto;
   font-weight: 700;
   font-size: 14px;
-  padding-top: 8px;
 }
 
 .educational-component {
