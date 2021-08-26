@@ -22,7 +22,7 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
 1. Clone, change to the directory, install dependencies:
 
     ```
-    git clone git@github.com:mozilla/fx-private-relay-add-on.git
+    git clone --recurse-submodules git@github.com:mozilla/fx-private-relay-add-on.git
     npm install
     ```
 
@@ -41,6 +41,31 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
 
 3. Visit http://127.0.0.1:8000
 
+
+### Working with translations
+#### Getting the latest translations
+We use a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+for translated message files. The `--recurse-submodules` step of installation
+should bring the message files into your working directory already, but you may
+want also want to udpate the translations after install. The easiest way to do
+that is:
+
+* `git submodule update --remote`
+
+#### Add/update messages for translation
+The `privaterelay/locales` directory is a git repository like any other, so to
+make changes to the messages:
+
+1. Make whatever changes you need in `src/_locales/en` as you work.
+
+2. `cd src/_locales/en`
+
+3. `git branch message-updates-yyyymmdd`
+
+4. `git push -u origin message-updates-yyyymmdd`
+
+You can then open a pull request from the `message-updates-yyyymmdd` branch to
+[the l10n repo](https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/) `main` branch.
 
 ## Build for other environments
 
