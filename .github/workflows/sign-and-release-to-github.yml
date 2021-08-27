@@ -1,4 +1,4 @@
-name: build-sign-upload-to-github
+name: continuous prerelease to GitHub
 
 on:
   push:
@@ -7,25 +7,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  sign-tag-release:
     runs-on: ubuntu-latest
 
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
 
+      - name: "Update translations"
+        run: git submodule update --init --recursive --remote
+
       - name: "Set up node"
         uses: actions/setup-node@v2.4.0
 
       - name: "Install"
-        run: | 
-              git submodule update --init --recursive --remote
-              npm install
+        run: npm install
 
       - name: "Lint"
         run: npm run lint
 
-      - name: "Set version"
+      - name: "Set YYYY.MM.DD.minutes version"
         id: version
         run: |
           export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
@@ -34,10 +35,18 @@ jobs:
           git diff
           echo ::set-output name=version::$(echo $VERSION)
 
+      - name: "Configure add-on for prod site"
+        run: npm run config:prod
+
       - name: "Sign"
+        run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
+
+      - name: "Tag"
         run: |
-              npm run config:prod
-              ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
+              git config user.name "GitHub Action: Sign, Tag, Release"
+              git config user.email "<>"
+              git tag ${{ steps.version.outputs.version }}
+              git push origin --tags
 
       - name: "Release"
         uses: softprops/action-gh-release@v1
@@ -45,5 +54,5 @@ jobs:
           files: ./web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
           fail_on_unmatched_files: true
           prerelease: true
-          name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.version.outputs.version }}
           body: git log --no-merges --pretty=format:"%h %s" main^..main
