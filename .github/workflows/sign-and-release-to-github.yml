@@ -48,6 +48,10 @@ jobs:
               git tag ${{ steps.version.outputs.version }}
               git push origin --tags
 
+      - name: "Make release notes"
+        id: release_notes
+        run: echo ::set-output name=release_notes::$(git log --no-merges --pretty=format:"%h %s" ${{ steps.version.outputs.version}}^..${{ steps.version.outputs.version})
+
       - name: "Release"
         uses: softprops/action-gh-release@v1
         with:
@@ -55,4 +59,4 @@ jobs:
           fail_on_unmatched_files: true
           prerelease: true
           tag_name: ${{ steps.version.outputs.version }}
-          body: git log --no-merges --pretty=format:"%h %s" main^..main
+          body: ${{ steps.release_notes.outputs.release_notes }}
