@@ -13,9 +13,9 @@
     "build:dev": "npm run build:clean && npm run config:dev  && npm run build",
     "build:stage": "npm run build:clean && npm run config:stage && npm run build",
     "build:prod": "npm run build:clean && npm run config:prod && npm run build",
-    "config:dev": "sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html",
-    "config:stage": "sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html",
-    "config:prod": "sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://relay.firefox.com@g' src/manifest.json src/js/background.js src/popup.html",
+    "config:dev": "./config-domain.sh https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net",
+    "config:stage": "./config-domain.sh https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net",
+    "config:prod": "./config-domain.sh https://relay.firefox.com",
     "dev": "web-ext run -s src/",
     "lint": "web-ext lint -s src/",
     "test": "echo \"Error: no test specified\" && exit 1"
