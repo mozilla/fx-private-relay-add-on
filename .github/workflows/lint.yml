@@ -1,0 +1,28 @@
+name: lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "Set up node"
+        uses: actions/setup-node@v2.4.0
+
+      - name: "Install"
+        run: | 
+              git submodule update --init --recursive --remote
+              npm install
+
+      - name: "Lint"
+        run: npm run lint

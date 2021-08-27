@@ -1,0 +1,39 @@
+name: build-sign-upload-to-github
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "Set up node"
+        uses: actions/setup-node@v2.4.0
+
+      - name: "Install"
+        run: | 
+              git submodule update --init --recursive --remote
+              npm install
+
+      - name: "Lint"
+        run: npm run lint
+
+      - name: "Bump version"
+        run: |
+          export VERSION="$(date +%Y.%m.%d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
+          jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~
+          mv manifest.json~ src/manifest.json
+          git diff
+
+      - name: "Build"
+        run: ./node_modules/.bin/web-ext build -s src
+
+      - name: "Sign"
+        run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
