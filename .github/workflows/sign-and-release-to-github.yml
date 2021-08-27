@@ -25,15 +25,25 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
-      - name: "Bump version"
+      - name: "Set version"
+        id: version
         run: |
           export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
           jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~
           mv manifest.json~ src/manifest.json
           git diff
-
-      - name: "Build"
-        run: ./node_modules/.bin/web-ext build -s src
+          echo ::set-output name=version::$(echo $VERSION)
 
       - name: "Sign"
-        run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
+        run: |
+              npm run config:prod
+              ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
+
+      - name: "Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
+          fail_on_unmatched_files: true
+          prerelease: true
+          name: ${{ steps.version.outputs.version }}
+          body: git log --no-merges --pretty=format:"%h %s" main^..main
