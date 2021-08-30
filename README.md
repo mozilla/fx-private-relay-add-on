@@ -94,6 +94,20 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
  * `npm run build:prod`: https://relay.firefox.com/
 
 ### Distributing
+#### Continuous Pre-releases
+The `sign-and-release-to-github` action creates a signed add-on after every
+merge to `main`. These pre-releases are available on the [GitHub Releases
+page](https://github.com/mozilla/fx-private-relay-add-on/releases).
+
+To comply with [WebExtension
+version](https://developer.chrome.com/docs/extensions/mv3/manifest/version/)
+requirements for AMO signing, the pre-release versions are [Calendar
+Versioned](https://calver.org/) as `YYYY.MM.DD.minutes-since-midnight`
+
+The signed `.xpi` file is named
+`firefox_relay-${{ YYYY.MM.DD.minutes }}-an+fx.xpi` and automatically attached
+to each release, under the release "Assets" section.
+
 #### Make the new version
 
 1. Bump the version number in `package.json` and `manifest.json`
