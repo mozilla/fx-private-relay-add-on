@@ -45,12 +45,16 @@ that is:
 
 * `git submodule update --init --remote`
 
-#### Running with a translation
+#### Running with the latest translations
 
-To run a translated version of the add-on, you will need to 
+To run the latest translated version of the add-on, you will need to 
 
 1. Create a Firefox profile set to use the target language
-2. Run `npm run web-ext-run` with that profile
+2. Either:
+   * Run `npm run web-ext-run` with that profile
+   * Install the latest
+     [pre-release](https://github.com/mozilla/fx-private-relay-add-on/releases)
+     in that profile
 
 ##### Create a Firefox profile set to use the target language
 1. Make a new Firefox profile - e.g., "swedish"
