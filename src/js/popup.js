@@ -51,11 +51,12 @@ function showSignUpPanel() {
 }
 
 
-function choosePanel(numRemaining, panelId, premium){
-  if (premium){
+function choosePanel(numRemaining, panelId, premium, premiumEnabledString){
+  if(premium && premiumEnabledString === "True") {
     document.getElementsByClassName("content-wrapper")[0].remove();
     return 'premiumPanel';
   }
+
   else {
     const premiumWrapper = document.getElementsByClassName("premium-wrapper")
     if (premiumWrapper.length) {
@@ -66,11 +67,15 @@ function choosePanel(numRemaining, panelId, premium){
 }
 
 function checkUserSubdomain(premiumSubdomainSet){
-  if(premiumSubdomainSet != "None"){
-    document.getElementsByClassName("register-domain-component")[0].remove();
+  const educationalComponent = document.querySelector(".educational-component");
+  const registerDomainComponent = document.querySelector(".register-domain-component");
+
+  if(premiumSubdomainSet != "None") {
+    registerDomainComponent.classList.add("is-hidden");
   }
+
   else {
-    document.getElementsByClassName("educational-component")[0].remove();
+    educationalComponent.classList.add("is-hidden");
   }
 }
 
@@ -88,15 +93,19 @@ async function showRelayPanel(tipPanelToShow) {
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-
   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
 
+  //Setting premium logic
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+  const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
+  const premiumSubdomainSetString = premiumSubdomainSet.premiumSubdomainSet;
   const { premium } = await browser.storage.local.get("premium");
 
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium);
+    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -113,12 +122,20 @@ async function showRelayPanel(tipPanelToShow) {
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
 
+    //Show premium panel state
+    if(premium && premiumEnabledString === "True"){
+      premiumPanelWrapper.classList.remove("is-hidden");
+      premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
+        premiumFeature.classList.remove("is-hidden") 
+      );
+      //Toggle register domain or education module
+      checkUserSubdomain(premiumSubdomainSetString);
+    }
+
     return;
   };
 
   //Educational Matrix
-  const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSet);
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
   const educationalModuleToShow = educationalStrings["educationalComponent1"];
   const educationalComponentStrings = educationalModuleToShow;
@@ -159,6 +176,7 @@ async function showRelayPanel(tipPanelToShow) {
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
 }
+
 
 async function getDashboardData() {
   const { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal } = await browser.storage.local.get();
@@ -256,7 +274,7 @@ async function popup() {
   const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");
   const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
-
+  const { premium } = await browser.storage.local.get("premium");
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
     loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
@@ -275,8 +293,7 @@ async function popup() {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
-  const { premium } = await browser.storage.local.get("premium");
-
+  //Remove status bar when user is premium
   if (!premium) {  
     const panelStatus = document.querySelector(".panel-status");
     panelStatus.classList.remove("is-hidden");
