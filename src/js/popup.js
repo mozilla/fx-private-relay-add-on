@@ -52,7 +52,7 @@ function showSignUpPanel() {
 
 
 function choosePanel(numRemaining, panelId, premium, premiumEnabledString){
-  if(premium && premiumEnabledString === "True") {
+  if (premium && premiumEnabledString === "True") {
     document.getElementsByClassName("content-wrapper")[0].remove();
     return 'premiumPanel';
   }
