@@ -70,7 +70,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if(premiumSubdomainSet != "None") {
+  if (premiumSubdomainSet != "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -92,7 +92,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
+  const registerDomainImgEl = premiumPanelWrapper.querySelector(".register-domain-illustration");
   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
@@ -123,7 +123,7 @@ async function showRelayPanel(tipPanelToShow) {
     emailsForwardedValEl.textContent = emailsForwardedVal;
 
     //Show premium panel state
-    if(premium && premiumEnabledString === "True"){
+    if (premium && premiumEnabledString === "True"){
       premiumPanelWrapper.classList.remove("is-hidden");
       premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
         premiumFeature.classList.remove("is-hidden") 

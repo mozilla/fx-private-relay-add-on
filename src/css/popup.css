@@ -458,8 +458,8 @@ onboarding-panel {
   align-items: right;
 }
 
-.email-domain-illustration {
-  margin: 0 auto;
+.register-domain-illustration {
+  margin: 16px auto;
   display: block;
   width: 280px;
 }
