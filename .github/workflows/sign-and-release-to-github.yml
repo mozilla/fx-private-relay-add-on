@@ -26,6 +26,9 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
+      - name: "Configure add-on for prod site"
+        run: npm run config:prod
+
       - name: "Set YYYY.MM.DD.minutes version"
         id: version
         run: |
@@ -34,9 +37,6 @@ jobs:
           mv manifest.json~ src/manifest.json
           git diff
           echo ::set-output name=version::$(echo $VERSION)
-
-      - name: "Configure add-on for prod site"
-        run: npm run config:prod
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
