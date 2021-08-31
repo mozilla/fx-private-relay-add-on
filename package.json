@@ -16,9 +16,11 @@
     "config:dev": "./config-domain.sh https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:stage": "./config-domain.sh https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:prod": "./config-domain.sh https://relay.firefox.com",
-    "dev": "web-ext run -s src/",
-    "lint": "web-ext lint -s src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run web-ext-run",
+    "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml" ,
+    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/"
   },
   "private": false,
   "repository": {
