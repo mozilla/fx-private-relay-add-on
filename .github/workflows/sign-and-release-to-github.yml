@@ -26,8 +26,8 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
-      - name: "Configure add-on for prod site"
-        run: npm run config:prod
+      - name: "Configure add-on for stage site"
+        run: npm run config:stage
 
       - name: "Set YYYY.MM.DD.minutes version"
         id: version
