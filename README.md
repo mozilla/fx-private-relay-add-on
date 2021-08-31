@@ -45,12 +45,16 @@ that is:
 
 * `git submodule update --init --remote`
 
-#### Running with a translation
+#### Running with the latest translations
 
-To run a translated version of the add-on, you will need to 
+To run the latest translated version of the add-on, you will need to 
 
 1. Create a Firefox profile set to use the target language
-2. Run `npm run web-ext-run` with that profile
+2. Either:
+   * Run `npm run web-ext-run` with that profile
+   * Install the latest
+     [pre-release](https://github.com/mozilla/fx-private-relay-add-on/releases)
+     in that profile
 
 ##### Create a Firefox profile set to use the target language
 1. Make a new Firefox profile - e.g., "swedish"
@@ -94,6 +98,20 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
  * `npm run build:prod`: https://relay.firefox.com/
 
 ### Distributing
+#### Continuous Pre-releases
+The `sign-and-release-to-github` action creates a signed add-on after every
+merge to `main`. These pre-releases are available on the [GitHub Releases
+page](https://github.com/mozilla/fx-private-relay-add-on/releases).
+
+To comply with [WebExtension
+version](https://developer.chrome.com/docs/extensions/mv3/manifest/version/)
+requirements for AMO signing, the pre-release versions are [Calendar
+Versioned](https://calver.org/) as `YYYY.MM.DD.minutes-since-midnight`
+
+The signed `.xpi` file is named
+`firefox_relay-${{ YYYY.MM.DD.minutes }}-an+fx.xpi` and automatically attached
+to each release, under the release "Assets" section.
+
 #### Make the new version
 
 1. Bump the version number in `package.json` and `manifest.json`
