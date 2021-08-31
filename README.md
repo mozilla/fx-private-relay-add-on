@@ -26,17 +26,10 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
     npm install
     ```
 
-2. Run with
-   [`web-ext`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext):
+2. Run with `npm`:
 
     ```
-    web-ext run -s src/
-    ```
-    
-    or via npm:
-
-    ```
-    npm run dev
+    npm run web-ext-run
     ```
 
 3. Visit http://127.0.0.1:8000
@@ -50,7 +43,32 @@ should bring the message files into your working directory already, but you may
 want also want to udpate the translations after install. The easiest way to do
 that is:
 
-* `git submodule update --remote`
+* `git submodule update --init --remote`
+
+#### Running with a translation
+
+To run a translated version of the add-on, you will need to 
+
+1. Create a Firefox profile set to use the target language
+2. Run `npm run web-ext-run` with that profile
+
+##### Create a Firefox profile set to use the target language
+1. Make a new Firefox profile - e.g., "swedish"
+2. In the profile, install the [language
+   pack](https://addons.mozilla.org/en-US/firefox/language-tools/) for one of 
+   the add-on's [supported
+   languages](https://pontoon.mozilla.org/projects/firefox-relay-add-on/)
+   * Note: language packs only work on Release & Beta channels of Firefox - not
+     Nightly
+3. In `about:preferences`, go to the "Language" section, and click the "Set
+   Alternatives" button next to "Choose the languages used to display menus,
+   messages, and notifications from Firefox."
+4. Pick the language pack you installed.
+5. Quit Firefox so the profile is saved.
+
+##### Run `web-ext` with that profile
+Use `npm run web-ext-run` to run the add-on, and pass the profile argument. 
+E.g., `npm run web-ext-run -- -p "swedish"`
 
 #### Add/update messages for translation
 The `privaterelay/locales` directory is a git repository like any other, so to
