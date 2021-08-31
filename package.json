@@ -13,9 +13,11 @@
     "build:dev": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
     "build:stage": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
     "build:prod": "npm run build:clean && sed -i '' 's/:8000//g'  src/manifest.json src/js/background.js src/popup.html && sed -i '' 's@http://127.0.0.1@https://relay.firefox.com@g' src/manifest.json src/js/background.js src/popup.html && npm run build",
-    "dev": "web-ext run -s src/",
-    "lint": "web-ext lint -s src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run web-ext-run",
+    "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml" ,
+    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/"
   },
   "private": false,
   "repository": {
