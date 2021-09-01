@@ -13,7 +13,7 @@ async function enableDataOptOut() {
       return;
     }
     dataCollectionPrefToggle.classList.add("data-disabled");
-    dataCollectionPrefToggle.title = "Allow data collection";
+    dataCollectionPrefToggle.title = browser.i18n.getMessage("allowDataCollection");
     dataCollectionPrefToggle.dataset.collectionPreference = "data-enabled";
   };
 
