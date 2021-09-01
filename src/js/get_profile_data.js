@@ -34,7 +34,7 @@
     const aliasId = aliasCardData.relayAddressId;
     const addonRelayAddress = addonRelayAddresses.relayAddresses.filter(address => address.id == aliasId)[0];
 
-    const defaultAliasLabelText = "Add account name";
+    const defaultAliasLabelText = browser.i18n.getMessage("profilePageDefaulAliasLabelText");
     const storedAliasLabel = (addonRelayAddress && addonRelayAddress.hasOwnProperty("domain")) ? addonRelayAddress.domain : "";
 
     const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
