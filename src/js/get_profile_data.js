@@ -25,7 +25,16 @@
    const emailsBlockedVal = document.querySelector("firefox-private-relay-addon-data").dataset.emailsBlockedVal;
    const premiumSubdomainSet = document.querySelector("firefox-private-relay-addon-data").dataset.premiumSubdomainSet;
    const premiumEnabled = document.querySelector("firefox-private-relay-addon-data").dataset.premiumEnabled;
-   browser.storage.local.set({fxaSubscriptionsUrl, premiumProdId, premiumPriceId, aliasesUsedVal, emailsForwardedVal, emailsBlockedVal, premiumSubdomainSet, premiumEnabled});
+   browser.storage.local.set({
+    fxaSubscriptionsUrl,
+    premiumProdId,
+    premiumPriceId,
+    aliasesUsedVal,
+    emailsForwardedVal,
+    emailsBlockedVal,
+    premiumSubdomainSet,
+    premiumEnabled
+   });
 
   for (const aliasCard of dashboardRelayAliasCards) {
     // Add the domain note from the addon storage to the page
