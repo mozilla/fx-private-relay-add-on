@@ -211,7 +211,7 @@ async function addRelayIconToInput(emailInput) {
     const numAliasesRemaining = maxNumAliases - relayAddresses.length;
 
     // Free user: Set text informing them how many aliases they can create
-    remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases", [numAliasesRemaining, maxNumAliases]);
+    remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases-2", [numAliasesRemaining, maxNumAliases]);
 
     // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
     if (numAliasesRemaining < 0) {
