@@ -137,7 +137,7 @@ async function showRelayPanel(tipPanelToShow) {
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
   remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases-2", [numRemaining, maxNumAliases]);
   const getUnlimitedAliases = document.querySelector(".premium-cta");
-  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases", [numRemaining, maxNumAliases]);
+  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
 
   document.body.classList.add("relay-panel");
   updatePanel(numRemaining, tipPanelToShow);
