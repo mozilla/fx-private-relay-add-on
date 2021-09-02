@@ -280,20 +280,35 @@ button.fx-relay-menu-sign-up-btn,
 
 button.fx-relay-menu-generate-alias-btn {
   background-color: var(--relayBlue3) !important;
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  padding-left: 28px !important;
-  padding-right: 28px !important;
-  max-width: 260px;
-  width: 100%;
+  padding: 12px !important;
+  width: 260px !important;
+  border-radius: 4px !important;
   font-family: var(--relayMetropolis) !important;
   color: rgba(255, 255, 255, 1) !important;
   border: none !important;
-  border-radius: 2px !important;
   font-size: 16px !important;
   margin: auto !important;
   text-align: center !important;
   font-weight: 500 !important;
+}
+
+.fx-relay-menu-get-unlimited-aliases {
+  background-color: var(--relayBlue3) !important;
+  padding: 12px !important;
+  width: 260px !important;
+  border-radius: 4px !important;
+  font-family: var(--relayMetropolis) !important;
+  color: rgba(255, 255, 255, 1) !important;
+  border: none !important;
+  font-size: 16px !important;
+  margin: auto !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+}
+
+.fx-relay-menu-get-unlimited-aliases:hover {
+  text-decoration: none;
+  background-color: var(--relayBlueHover) !important;
 }
 
 button.fx-relay-menu-generate-alias-btn[disabled] {
