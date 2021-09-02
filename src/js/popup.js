@@ -66,11 +66,16 @@ function choosePanel(numRemaining, panelId, premium){
 }
 
 function checkUserSubdomain(premiumSubdomainSet){
-  if(premiumSubdomainSet != "None"){
-    document.getElementsByClassName("register-domain-component")[0].remove();
+  const educationalComponent = document.querySelector(".educational-component");
+  const registerDomainComponent = document.querySelector(".register-domain-component");
+
+  if (premiumSubdomainSet != "None") {
+    registerDomainComponent.classList.add("is-hidden");
   }
+
   else {
     document.getElementsByClassName("educational-component")[0].remove();
+    educationalComponent.classList.add("is-hidden");
   }
 }
 
@@ -117,8 +122,6 @@ async function showRelayPanel(tipPanelToShow) {
   };
 
   //Educational Matrix
-  const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSet);
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
   const educationalModuleToShow = educationalStrings["educationalComponent1"];
   const educationalComponentStrings = educationalModuleToShow;
@@ -129,6 +132,11 @@ async function showRelayPanel(tipPanelToShow) {
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+
+
+  //Subdomain Data
+  const { premiumSubdomainSetString } = await browser.storage.local.get("premiumSubdomainSet");
+  checkUserSubdomain(premiumSubdomainSetString);
 
 
   //Nonpremium panel status 
