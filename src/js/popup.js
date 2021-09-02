@@ -134,8 +134,8 @@ async function showRelayPanel(tipPanelToShow) {
 
 
   //Subdomain Data
-  const { premiumSubdomainSetString } = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSetString);
+  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+  checkUserSubdomain(premiumSubdomainSet);
 
 
   //Nonpremium panel status 
