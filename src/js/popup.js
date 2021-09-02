@@ -74,7 +74,6 @@ function checkUserSubdomain(premiumSubdomainSet){
   }
 
   else {
-    document.getElementsByClassName("educational-component")[0].remove();
     educationalComponent.classList.add("is-hidden");
   }
 }
