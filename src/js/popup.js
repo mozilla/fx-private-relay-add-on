@@ -130,10 +130,14 @@ async function showRelayPanel(tipPanelToShow) {
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
+
+  //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases", [numRemaining, maxNumAliases]);
+  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases-2", [numRemaining, maxNumAliases]);
+  const getUnlimitedAliases = document.querySelector(".premium-cta");
+  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
 
   document.body.classList.add("relay-panel");
   updatePanel(numRemaining, tipPanelToShow);
