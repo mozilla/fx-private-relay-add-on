@@ -51,8 +51,8 @@ function showSignUpPanel() {
 }
 
 
-function choosePanel(numRemaining, panelId, premium){
-  if (premium){
+function choosePanel(numRemaining, panelId, premium, premiumEnabledString){
+  if (premium && premiumEnabledString === "True"){
     document.getElementsByClassName("content-wrapper")[0].remove();
     return 'premiumPanel';
   }
@@ -92,15 +92,19 @@ async function showRelayPanel(tipPanelToShow) {
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-
   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
 
+  //Check if premium features are available
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+
+  //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
 
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium);
+    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -117,6 +121,15 @@ async function showRelayPanel(tipPanelToShow) {
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
 
+    //Show premium panel state
+    if (premium && premiumEnabledString === "True"){
+      premiumPanelWrapper.classList.remove("is-hidden");
+      premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
+        premiumFeature.classList.remove("is-hidden") 
+        );
+      //Toggle register domain or education module
+      checkUserSubdomain(premiumSubdomainSet);
+    }
     return;
   };
 
@@ -135,7 +148,6 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Subdomain Data
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSet);
 
 
   //Nonpremium panel status 
