@@ -247,7 +247,16 @@ button.fx-relay-modal-close-button {
   text-align: center;
   margin-top: 8px;
   margin-bottom: 24px;
-  font-weight: 600 !important;
+  font-weight: 600;
+}
+
+.max-num-aliases {
+  background: var(--relayGrey30);
+  color: var(--relayGrey60);
+  padding: 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin: 12px 16px;
 }
 
 button.fx-relay-menu-sign-up-btn,
@@ -293,13 +302,12 @@ button.fx-relay-menu-generate-alias-btn {
 }
 
 .fx-relay-menu-get-unlimited-aliases {
-  background-color: var(--relayBlue3) !important;
+  border: 2px solid var(--relayBlue3) !important;
   padding: 12px !important;
-  width: 260px !important;
+  width: 240px !important;
   border-radius: 4px !important;
-  font-family: var(--relayMetropolis) !important;
-  color: rgba(255, 255, 255, 1) !important;
-  border: none !important;
+  font-family: var(--InterUI) !important;
+  color: var(--relayBlue3) !important;
   font-size: 16px !important;
   margin: auto !important;
   text-align: center !important;
