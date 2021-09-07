@@ -48,7 +48,7 @@
 
     const aliasLabelForm = aliasCard.querySelector("form.relay-email-address-label-form");
     const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
-    const aliasLabelWrapper = aliasLabelForm.parentElement;
+    const aliasLabelWrapper = (aliasLabelForm ?? aliasLabelInput).parentElement;
     aliasLabelWrapper.classList.add("show-label"); // Field is visible only to users who have the addon installed
 
     aliasLabelInput.dataset.label = storedAliasLabel;
@@ -155,7 +155,7 @@
 
     };
     aliasLabelInput.addEventListener("focusout", saveAliasLabel);
-    aliasLabelForm.addEventListener("submit", (event) => {
+    aliasLabelForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       saveAliasLabel();
       aliasLabelInput.blur();
