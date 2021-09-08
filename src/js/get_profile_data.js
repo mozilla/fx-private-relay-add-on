@@ -46,8 +46,9 @@
     const defaultAliasLabelText = browser.i18n.getMessage("profilePageDefaulAliasLabelText");
     const storedAliasLabel = (addonRelayAddress && addonRelayAddress.hasOwnProperty("domain")) ? addonRelayAddress.domain : "";
 
+    const aliasLabelForm = aliasCard.querySelector("form.relay-email-address-label-form");
     const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
-    const aliasLabelWrapper = aliasLabelInput.parentElement;
+    const aliasLabelWrapper = (aliasLabelForm ?? aliasLabelInput).parentElement;
     aliasLabelWrapper.classList.add("show-label"); // Field is visible only to users who have the addon installed
 
     aliasLabelInput.dataset.label = storedAliasLabel;
@@ -115,7 +116,7 @@
       }
     });
 
-    aliasLabelInput.addEventListener("focusout", () => {
+    const saveAliasLabel = () => {
       const newAliasLabel = aliasLabelInput.value;
 
       // Don't save labels containing forbidden characters
@@ -148,10 +149,16 @@
       }
 
       aliasLabelInput.dataset.label = newAliasLabel;
-      setTimeout(()=> {
+      setTimeout(() => {
         aliasLabelWrapper.classList.remove("show-saved-confirmation");
       }, 1000);
 
+    };
+    aliasLabelInput.addEventListener("focusout", saveAliasLabel);
+    aliasLabelForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveAliasLabel();
+      aliasLabelInput.blur();
     });
 
     // Get and store the relay addresses from the account profile page,
