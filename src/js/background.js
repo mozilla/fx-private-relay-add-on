@@ -134,15 +134,30 @@ if (browser.menus) {
     contexts: ["editable"]
   });
 
+  browser.menus.create({
+    id: "fx-private-relay-get-unlimited-aliases",
+    title: "Get Unlimited Aliases",
+  });
+
   browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
-      case "fx-private-relay-generate-alias":
+      case "fx-private-relay-generate-alias": 
         sendMetricsEvent({
           category: "Extension: Context Menu",
           action: "click",
           label: "context-menu-generate-alias"
         });
         await makeRelayAddressForTargetElement(info, tab);
+        break;
+      case "fx-private-relay-get-unlimited-aliases":
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-get-unlimited-aliases"
+        });
+        const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } = await browser.storage.local.get();
+        const urlPremium = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+        await browser.tabs.create({ url: urlPremium });
         break;
     }
   });
