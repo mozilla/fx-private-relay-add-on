@@ -286,6 +286,13 @@ async function addRelayIconToInput(emailInput) {
       getUnlimitedAliasesBtn.remove();
     }
 
+    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+    const premiumEnabledString = premiumEnabled.premiumEnabled;
+
+    if(premiumEnabledString != "True") {
+      getUnlimitedAliasesBtn.remove();
+    }
+
 
     // Handle "Generate New Alias" clicks
     generateAliasBtn.addEventListener("click", async(generateClickEvt) => {
