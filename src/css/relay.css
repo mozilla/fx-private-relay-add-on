@@ -242,21 +242,15 @@ button.fx-relay-modal-close-button {
 
 .fx-relay-menu-remaining-aliases {
   font-size: 14px;
-  padding: 0 24px;
-  color: var(--relayInk70);
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 24px;
-  font-weight: 600;
-}
-
-.max-num-aliases {
-  background: var(--relayGrey30);
+  width: 260px;
+  padding: 12px 0;
+  background: var(--relayGrey20);
   color: var(--relayGrey60);
-  padding: 16px;
+  text-align: center;
+  font-weight: 600;
   font-size: 14px;
   border-radius: 4px;
-  margin: 12px 16px;
+  margin: auto auto 12px auto;
 }
 
 button.fx-relay-menu-sign-up-btn,
@@ -296,7 +290,7 @@ button.fx-relay-menu-generate-alias-btn {
   color: rgba(255, 255, 255, 1) !important;
   border: none !important;
   font-size: 16px !important;
-  margin: auto !important;
+  margin: auto auto 16px auto !important;
   text-align: center !important;
   font-weight: 500 !important;
 }
@@ -309,9 +303,9 @@ button.fx-relay-menu-generate-alias-btn {
   font-family: var(--InterUI) !important;
   color: var(--relayBlue3) !important;
   font-size: 16px !important;
-  margin: auto !important;
   text-align: center !important;
   font-weight: 500 !important;
+  margin: auto auto 16px auto !important;
 }
 
 .fx-relay-menu-get-unlimited-aliases:hover {

@@ -265,16 +265,16 @@ async function addRelayIconToInput(emailInput) {
     restrictOrRestorePageTabbing(-1);
 
     // Append menu elements to the menu
-    [getUnlimitedAliasesBtn, generateAliasBtn, remainingAliasesSpan, relayMenuDashboardLink].forEach(el => {
+    [remainingAliasesSpan, getUnlimitedAliasesBtn, generateAliasBtn, relayMenuDashboardLink].forEach(el => {
       relayInPageMenu.appendChild(el);
     });
 
     //Show get unlimited aliases btn
     if (!premium) {
       if (maxNumAliasesReached) {
-        remainingAliasesSpan.classList.add("max-num-aliases");
         generateAliasBtn.remove();
-        sendInPageEvent("viewed-menu", "input-menu-max-aliases-message")
+        sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
+        remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
       }
 
       else {
