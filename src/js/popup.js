@@ -298,8 +298,17 @@ async function popup() {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
   const { premium } = await browser.storage.local.get("premium");
 
+  //If Premium features are available, show upgrade CTA
+  if (premiumEnabledString === "True") {
+    const premiumCTA = document.querySelector(".premium-cta");
+    premiumCTA.classList.remove("is-hidden");
+  }
+
+  //if user is premium, hide panel status
   if (!premium) {  
     const panelStatus = document.querySelector(".panel-status");
     panelStatus.classList.remove("is-hidden");
