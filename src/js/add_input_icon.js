@@ -117,6 +117,14 @@ function addPaddingRight(element, paddingInPixels) {
   }
 }
 
+function premiumFeaturesAvailable(premiumEnabledString) {
+  if (premiumEnabledString === "True") {
+    return true;
+  }
+  return false;
+}
+
+
 async function addRelayIconToInput(emailInput) {
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
   // remember the input's original parent element;
@@ -270,26 +278,16 @@ async function addRelayIconToInput(emailInput) {
     });
 
     //Show get unlimited aliases btn
-    if (!premium) {
-      if (maxNumAliasesReached) {
-        generateAliasBtn.remove();
-        sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
-        remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
-      }
-
-      else {
-        getUnlimitedAliasesBtn.remove();
-      }
-    }
-
-    else {
-      getUnlimitedAliasesBtn.remove();
+    if (!premium && maxNumAliasesReached) {
+      generateAliasBtn.remove();
+      sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
+      remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
     }
 
     const premiumEnabled = await browser.storage.local.get("premiumEnabled");
     const premiumEnabledString = premiumEnabled.premiumEnabled;
-
-    if(premiumEnabledString != "True") {
+  
+    if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
       getUnlimitedAliasesBtn.remove();
     }
 
