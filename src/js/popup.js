@@ -157,9 +157,7 @@ async function showRelayPanel(tipPanelToShow) {
     //If Premium features are not available, do not show upgrade CTA on the panel
     if (!premiumFeaturesAvailable(premiumEnabledString)) {
       const premiumCTA = document.querySelector(".premium-cta");
-      const upgradeBanner = document.querySelector(".upgrade-banner-wrapper");
       premiumCTA.classList.add("is-hidden");
-      upgradeBanner.classList.add("is-hidden");
     }
 
     // Remove panel status if user has unlimited aliases, so no negative alias left count
@@ -209,8 +207,11 @@ async function showRelayPanel(tipPanelToShow) {
   relayPanel.classList.remove("hidden");
 
   if (numRemaining === 0) {
-    const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-    upgradeButton.classList.remove("is-hidden");
+    
+    if (premiumFeaturesAvailable(premiumEnabledString)) {
+      const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
+      upgradeButton.classList.remove("is-hidden");
+    }
 
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
