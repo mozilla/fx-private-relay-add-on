@@ -51,11 +51,39 @@ function showSignUpPanel() {
 }
 
 
-function choosePanel(numRemaining, panelId, premium, premiumEnabledString){
-  if (premium && premiumEnabledString === "True"){
+function premiumFeaturesAvailable(premiumEnabledString) {
+  if (premiumEnabledString === "True") {
+    return Boolean(true);
+  }
+  else {
+    return Boolean(false);
+  }
+}
+
+function enablePremium(premium, premiumEnabledString) {
+  if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
+    return Boolean(true);
+  }
+  else {
+    return Boolean(false);
+  }
+}
+
+
+function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
+  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+
+  if (enablePremium(premium, premiumEnabledString)){
     document.getElementsByClassName("content-wrapper")[0].remove();
+    premiumPanelWrapper.classList.remove("is-hidden");
+    premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
+      premiumFeature.classList.remove("is-hidden") 
+      );
+    //Toggle register domain or education module
+    checkUserSubdomain(premiumSubdomainSet);
     return 'premiumPanel';
   }
+
   else {
     const premiumWrapper = document.getElementsByClassName("premium-wrapper")
     if (premiumWrapper.length) {
@@ -102,9 +130,13 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
+  
+  //Check if user has a subdomain set
+  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+
 
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString);
+    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -115,21 +147,27 @@ async function showRelayPanel(tipPanelToShow) {
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
 
-    //Premium Panel
+    //Premium Panel content
     registerDomainImgEl.src = panelStrings.registerDomainImg;
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
 
-    //Show premium panel state
-    if (premium && premiumEnabledString === "True"){
-      premiumPanelWrapper.classList.remove("is-hidden");
-      premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
-        premiumFeature.classList.remove("is-hidden") 
-        );
-      //Toggle register domain or education module
-      checkUserSubdomain(premiumSubdomainSet);
+
+    //If Premium features are not available, do not show upgrade CTA on the panel
+    if (!premiumFeaturesAvailable(premiumEnabledString)) {
+      const premiumCTA = document.querySelector(".premium-cta");
+      const upgradeBanner = document.querySelector(".upgrade-banner-wrapper");
+      premiumCTA.classList.add("is-hidden");
+      upgradeBanner.classList.add("is-hidden");
     }
+
+    // Remove panel status if user has unlimited aliases, so no negative alias left count
+    if (premium) {
+      const panelStatus = document.querySelector(".panel-status");
+      panelStatus.classList.add("is-hidden");
+    }
+
     return;
   };
 
@@ -144,10 +182,6 @@ async function showRelayPanel(tipPanelToShow) {
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-
-
-  //Subdomain Data
-  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
 
   //Nonpremium panel status 
@@ -298,21 +332,6 @@ async function popup() {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
-  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
-  const premiumEnabledString = premiumEnabled.premiumEnabled;
-  const { premium } = await browser.storage.local.get("premium");
-
-  //If Premium features are available, show upgrade CTA
-  if (premiumEnabledString === "True") {
-    const premiumCTA = document.querySelector(".premium-cta");
-    premiumCTA.classList.remove("is-hidden");
-  }
-
-  //if user is premium, hide panel status
-  if (!premium) {  
-    const panelStatus = document.querySelector(".panel-status");
-    panelStatus.classList.remove("is-hidden");
-  }
 }
 
 document.addEventListener("DOMContentLoaded", popup);
