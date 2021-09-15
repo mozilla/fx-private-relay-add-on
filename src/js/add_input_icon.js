@@ -99,6 +99,23 @@ async function isUserSignedIn() {
   return (userApiToken.hasOwnProperty("apiToken"));
 }
 
+function addPaddingRight(element, paddingInPixels) {
+  const computedElementStyles = getComputedStyle(element);
+  const existingPaddingRight = computedElementStyles.getPropertyValue("padding-right");
+  const existingPaddingRightInPixels = Number.parseInt(existingPaddingRight.replace("px", ""), 10);
+  const newPaddingRight = existingPaddingRightInPixels + paddingInPixels;
+  element.style.paddingRight = newPaddingRight.toString() + "px";
+
+  // If the element's box-sizing is content-box, adding padding will increase the element's width.
+  // Therefore, we'll have to decrease the set width with the same amount to keep the effective
+  // width the same.
+  if (computedElementStyles.getPropertyValue("box-sizing") === "content-box") {
+    const existingWidth = computedElementStyles.getPropertyValue("width");
+    const existingWidthInPixels = Number.parseInt(existingWidth.replace("px", ""), 10);
+    const newWidth = existingWidthInPixels - paddingInPixels;
+    element.style.width = newWidth.toString() + "px";
+  }
+}
 
 async function addRelayIconToInput(emailInput) {
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
@@ -111,7 +128,7 @@ async function addRelayIconToInput(emailInput) {
 
   // add padding to the input so that input text
   // is not covered up by the Relay icon
-  emailInput.style.paddingRight = "50px";
+  addPaddingRight(emailInput, 50);
   emailInputWrapper.appendChild(emailInput);
 
   const computedInputStyles = getComputedStyle(emailInput);
