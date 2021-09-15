@@ -88,7 +88,10 @@ async function makeRelayAddress(domain=null) {
   }
   let newRelayAddressJson = await newRelayAddressResponse.json();
   if (domain) {
+    // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.domain = domain;
+    // Store the domain in which the alias was generated, separate from the label 
+    newRelayAddressJson.siteOrigin = domain;
   }
   // TODO: put this into an updateLocalAddresses() function
   const localStorageRelayAddresses = await browser.storage.local.get("relayAddresses");

@@ -45,6 +45,10 @@
 
     const defaultAliasLabelText = browser.i18n.getMessage("profilePageDefaulAliasLabelText");
     const storedAliasLabel = (addonRelayAddress && addonRelayAddress.hasOwnProperty("domain")) ? addonRelayAddress.domain : "";
+    
+    // Cache the siteOrigin alias attribute when updating local storage data.
+    // Note that this data attribute only exists in aliases generated through the add-on
+    const storedAliasSiteOrigin = (addonRelayAddress && addonRelayAddress.hasOwnProperty("siteOrigin")) ? addonRelayAddress.siteOrigin : "";
 
     const aliasLabelForm = aliasCard.querySelector("form.relay-email-address-label-form");
     const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
@@ -168,6 +172,7 @@
       "id": aliasId,
       "address": aliasCardData.relayAddress,
       "domain": storedAliasLabel,
+      "siteOrigin": storedAliasSiteOrigin,
     };
 
     relayAddresses.push(relayAddress);
