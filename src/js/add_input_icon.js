@@ -128,7 +128,7 @@ async function addRelayIconToInput(emailInput) {
 
   // add padding to the input so that input text
   // is not covered up by the Relay icon
-  addPaddingRight(emailInput, 50);
+  addPaddingRight(emailInput, 30);
   emailInputWrapper.appendChild(emailInput);
 
   const computedInputStyles = getComputedStyle(emailInput);
