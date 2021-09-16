@@ -53,27 +53,16 @@ function showSignUpPanel() {
 
 function premiumFeaturesAvailable(premiumEnabledString) {
   if (premiumEnabledString === "True") {
-    return Boolean(true);
+    return true;
   }
-  else {
-    return Boolean(false);
-  }
-}
-
-function enablePremium(premium, premiumEnabledString) {
-  if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
-    return Boolean(true);
-  }
-  else {
-    return Boolean(false);
-  }
+  return false;
 }
 
 
 function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
 
-  if (enablePremium(premium, premiumEnabledString)){
+  if (premium && premiumFeaturesAvailable(premiumEnabledString)){
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
