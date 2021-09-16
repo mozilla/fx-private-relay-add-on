@@ -51,11 +51,28 @@ function showSignUpPanel() {
 }
 
 
-function choosePanel(numRemaining, panelId, premium){
-  if (premium){
+function premiumFeaturesAvailable(premiumEnabledString) {
+  if (premiumEnabledString === "True") {
+    return true;
+  }
+  return false;
+}
+
+
+function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
+  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+
+  if (premium && premiumFeaturesAvailable(premiumEnabledString)){
     document.getElementsByClassName("content-wrapper")[0].remove();
+    premiumPanelWrapper.classList.remove("is-hidden");
+    premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
+      premiumFeature.classList.remove("is-hidden") 
+      );
+    //Toggle register domain or education module
+    checkUserSubdomain(premiumSubdomainSet);
     return 'premiumPanel';
   }
+
   else {
     const premiumWrapper = document.getElementsByClassName("premium-wrapper")
     if (premiumWrapper.length) {
@@ -92,15 +109,23 @@ async function showRelayPanel(tipPanelToShow) {
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-
   const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
   const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
   const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
 
+  //Check if premium features are available
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+
+  //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
+  
+  //Check if user has a subdomain set
+  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+
 
   const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium);
+    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -111,11 +136,24 @@ async function showRelayPanel(tipPanelToShow) {
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
 
-    //Premium Panel
+    //Premium Panel content
     registerDomainImgEl.src = panelStrings.registerDomainImg;
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
+
+
+    //If Premium features are not available, do not show upgrade CTA on the panel
+    if (!premiumFeaturesAvailable(premiumEnabledString)) {
+      const premiumCTA = document.querySelector(".premium-cta");
+      premiumCTA.classList.add("is-hidden");
+    }
+
+    // Remove panel status if user has unlimited aliases, so no negative alias left count
+    if (premium) {
+      const panelStatus = document.querySelector(".panel-status");
+      panelStatus.classList.add("is-hidden");
+    }
 
     return;
   };
@@ -131,11 +169,6 @@ async function showRelayPanel(tipPanelToShow) {
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-
-
-  //Subdomain Data
-  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
-  checkUserSubdomain(premiumSubdomainSet);
 
 
   //Nonpremium panel status 
@@ -163,8 +196,11 @@ async function showRelayPanel(tipPanelToShow) {
   relayPanel.classList.remove("hidden");
 
   if (numRemaining === 0) {
-    const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-    upgradeButton.classList.remove("is-hidden");
+    
+    if (premiumFeaturesAvailable(premiumEnabledString)) {
+      const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
+      upgradeButton.classList.remove("is-hidden");
+    }
 
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
@@ -286,12 +322,6 @@ async function popup() {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
   });
 
-  const { premium } = await browser.storage.local.get("premium");
-
-  if (!premium) {  
-    const panelStatus = document.querySelector(".panel-status");
-    panelStatus.classList.remove("is-hidden");
-  }
 }
 
 document.addEventListener("DOMContentLoaded", popup);
