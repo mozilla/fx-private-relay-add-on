@@ -277,20 +277,24 @@ async function addRelayIconToInput(emailInput) {
       relayInPageMenu.appendChild(el);
     });
 
-    //Show get unlimited aliases btn
-    if (!premium && maxNumAliasesReached) {
-      generateAliasBtn.remove();
-      sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
-      remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
-    }
-
+    //Check if premium features are available
     const premiumEnabled = await browser.storage.local.get("premiumEnabled");
     const premiumEnabledString = premiumEnabled.premiumEnabled;
   
-    if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
+    if (!premium) {
+      if (maxNumAliasesReached) {
+        generateAliasBtn.remove();
+        sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
+        remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
+      }  
+    }
+    else {
       getUnlimitedAliasesBtn.remove();
     }
 
+    if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
+      getUnlimitedAliasesBtn.remove();
+    }
 
     // Handle "Generate New Alias" clicks
     generateAliasBtn.addEventListener("click", async(generateClickEvt) => {
@@ -346,6 +350,7 @@ function getEmailInputsAndAddIcon(domRoot) {
     }
   }
 }
+
 
 (async function() {
   const inputIconsAreEnabled = await areInputIconsEnabled();

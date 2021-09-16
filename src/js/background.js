@@ -3,7 +3,6 @@ const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
 browser.storage.local.set({ "maxNumAliases": 5 });
 browser.storage.local.set({ "relaySiteOrigin": RELAY_SITE_ORIGIN });
 
-
 browser.runtime.onInstalled.addListener(async () => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
   if (firstRunShown) {
@@ -127,19 +126,39 @@ async function makeRelayAddressForTargetElement(info, tab) {
   );
 }
 
-if (browser.menus) {
-  browser.menus.create({
-    id: "fx-private-relay-generate-alias",
-    title: "Generate New Alias",
-    contexts: ["editable"]
-  });
 
-  browser.menus.create({
-    id: "fx-private-relay-get-unlimited-aliases",
-    title: "Get Unlimited Aliases",
-  });
 
-  browser.menus.onClicked.addListener( async (info, tab) => {
+async function premiumFeaturesAvailable(premiumEnabledString) {
+  if (premiumEnabledString === "True") {
+    return true;
+  }
+  return false;
+}
+
+async function createMenu(){
+  if (browser.menus) {
+    browser.menus.create({
+      id: "fx-private-relay-generate-alias",
+      title: "Generate New Alias",
+      contexts: ["editable"]
+    });
+
+    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+    const premiumEnabledString = premiumEnabled.premiumEnabled;
+    const { premium } = await browser.storage.local.get("premium");
+
+    if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
+      browser.menus.create({
+        id: "fx-private-relay-get-unlimited-aliases",
+        title: "Get Unlimited Aliases",
+      });
+    }
+  }
+}
+
+createMenu();
+
+browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
       case "fx-private-relay-generate-alias": 
         sendMetricsEvent({
@@ -160,8 +179,8 @@ if (browser.menus) {
         await browser.tabs.create({ url: urlPremium });
         break;
     }
-  });
-}
+});
+
 
 browser.runtime.onMessage.addListener(async (m) => {
   let response;
