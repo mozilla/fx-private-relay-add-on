@@ -48,7 +48,7 @@
     
     // Cache the siteOrigin alias attribute when updating local storage data.
     // Note that this data attribute only exists in aliases generated through the add-on
-    const storedAliasSiteOrigin = (addonRelayAddress && addonRelayAddress.hasOwnProperty("siteOrigin")) ? addonRelayAddress.siteOrigin : "";
+    const storedAliasSiteOrigin = addonRelayAddress?.siteOrigin ?? "";
 
     const aliasLabelForm = aliasCard.querySelector("form.relay-email-address-label-form");
     const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
