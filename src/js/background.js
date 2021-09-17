@@ -127,12 +127,90 @@ async function makeRelayAddressForTargetElement(info, tab) {
   );
 }
 
+async function fillInAddressWithAliasId(info, tab) {
+  // Trim the context menu id to get the alias reference ID
+  const selectedAliasId = info.menuItemId.replace("fx-private-relay-use-existing-alias_", "");
+
+  // Get stored alias data
+  const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+
+  // Select the correct alias from the stored alias data
+  const selectedAliasObject = relayAddresses.filter(obj => {
+    return obj.id === selectedAliasId
+  })
+
+  // console.log({
+  //   tabId: tab.id,
+  //   targetElementId: info.targetElementId,
+  //   relayAddress: selectedEmailAddress,
+  //   frameId: info.frameId
+  // });
+
+  browser.tabs.sendMessage(
+      tab.id,
+      {
+        type: "fillTargetWithRelayAddress",
+        targetElementId : info.targetElementId,
+        relayAddress: selectedAliasObject[0],
+      },
+      {
+        frameId: info.frameId,
+    },
+  );
+
+}
+
+async function buildAliasContextMenu() {
+  const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+  const selectableAddressesArray = [];
+
+  const sortableAddress = relayAddresses;
+
+  // TODO: Build out function to create list based on site/alias origin
+  // Add a type:separator in between site-origin items: 
+  for (let index = 0; index < 5; index++) {
+    const element = relayAddresses[index];
+    console.log(element);
+    const id = "fx-private-relay-use-existing-alias_" + element.id; 
+    selectableAddressesArray.push(id);
+    // const id = "fx-private-relay-use-existing" + element.id
+    let title = element.address;
+    if (element.domain) {
+      title = element.domain
+    }
+    
+    browser.menus.create({
+      id,
+      type: "radio",
+      title,
+      parentId: "fx-private-relay-use-existing-aliases"
+    });
+  }
+
+  browser.menus.onClicked.addListener( async (info, tab) => {
+    if ( selectableAddressesArray.includes(info.menuItemId) ) {
+      await fillInAddressWithAliasId(info, tab);
+    }
+  });
+
+}
+
 if (browser.menus) {
+
+  // TODO: Set enabled to false if max aliases reached on free tier 
   browser.menus.create({
     id: "fx-private-relay-generate-alias",
     title: "Generate New Alias",
     contexts: ["editable"]
   });
+
+  // TODO: Set l10n for title
+  browser.menus.create({
+    id: "fx-private-relay-use-existing-aliases",
+    title: "Use existing alias",
+  });
+
+  buildAliasContextMenu();
 
   browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
@@ -146,6 +224,15 @@ if (browser.menus) {
         break;
     }
   });
+
+  browser.menus.onShown.addListener( async (info, tab) => {
+    switch (info.menuItemId) {
+      case "fx-private-relay-use-existing-aliases":
+        console.log("fx-private-relay-use-existing-aliases", info.contexts);
+        break;
+    }
+  });
+
 }
 
 browser.runtime.onMessage.addListener(async (m) => {
