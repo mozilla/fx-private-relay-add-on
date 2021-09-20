@@ -135,7 +135,7 @@ async function addRelayIconToInput(emailInput) {
 
   // create new wrapping element;
   const emailInputWrapper = createElementWithClassList(
-    "div",
+    "span",
     "fx-relay-email-input-wrapper"
   );
   emailInputOriginalParentEl.insertBefore(emailInputWrapper, emailInput);

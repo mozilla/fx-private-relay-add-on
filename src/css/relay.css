@@ -348,6 +348,7 @@ button.fx-relay-menu-generate-alias-btn[disabled] {
 }
 
 .fx-relay-email-input-wrapper {
+  display: inline-block;
   position: relative;
   pointer-events: none;
   padding: 0 !important;
