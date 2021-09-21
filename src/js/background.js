@@ -128,7 +128,7 @@ async function makeRelayAddressForTargetElement(info, tab) {
 
 
 
-async function premiumFeaturesAvailable(premiumEnabledString) {
+function premiumFeaturesAvailable(premiumEnabledString) {
   if (premiumEnabledString === "True") {
     return true;
   }
