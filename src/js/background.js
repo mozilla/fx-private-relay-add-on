@@ -160,31 +160,94 @@ async function fillInAddressWithAliasId(info, tab) {
 
 }
 
-async function buildAliasContextMenu() {
+function addAliasToExistingAliasContextMenu(alias, parentId) {
+  
+  // If there's a label. Set the context menu item title accordingly.
+  const title = (alias.domain ? alias.domain : alias.address);
+  const id = "fx-private-relay-use-existing-alias_" + alias.id; 
+  
+  browser.menus.create({
+    id,
+    type: "radio",
+    title,
+    parentId,
+  });
+}
+
+async function generateAliasesContextMenu(aliases, opts) {
+  
+  if ( opts?.siteOrigin ) {
+
+    const parentSiteOriginId = "fx-private-relay-use-existing-aliases-from-this-site";
+
+    browser.menus.create({
+      id: parentSiteOriginId,
+      title: "Use existing alias from this site…",
+    });
+
+    for (const alias of aliases) {
+      addAliasToExistingAliasContextMenu(alias, parentSiteOriginId);
+    }
+
+    // WIP Code - If adding a separator.
+    // browser.menus.create({
+    //   id: parentSiteOriginId,
+    //   type: "separator",
+    //   title: "Use existing alias from this site…",
+    // });
+
+  } else {
+
+    const parentNonSiteOriginId = "fx-private-relay-use-existing-aliases";
+
+    // TODO: Set l10n for title
+    browser.menus.create({
+      id: parentNonSiteOriginId,
+      title: "Use existing alias",
+    });
+
+    for (const alias of aliases) {
+      addAliasToExistingAliasContextMenu(alias, parentNonSiteOriginId);
+    }
+  }
+}
+
+async function initExistingAliasContextMenu() {
   const { relayAddresses } = await browser.storage.local.get("relayAddresses");
   const selectableAddressesArray = [];
+  const siteOriginAddressesArray = [];
+  const nonSiteOriginAddressesArray = [];
 
   const sortableAddress = relayAddresses;
 
-  // TODO: Build out function to create list based on site/alias origin
-  // Add a type:separator in between site-origin items: 
+  // BUG: We need to query all aliases to see if any items siteOrigin attr 
+  // match the current site, rather than looping over the first five items. 
+  // This will change this forLoop dramatically.
+
   for (let index = 0; index < 5; index++) {
-    const element = relayAddresses[index];
-    console.log(element);
+    const element = sortableAddress[index];
+
+    // The ID (regardless of site origin) needs to be generated and stored during this first loop. 
+    // The selectableAddressesArray is used to add the event listener to fillInAddressWithAliasId;
     const id = "fx-private-relay-use-existing-alias_" + element.id; 
     selectableAddressesArray.push(id);
-    // const id = "fx-private-relay-use-existing" + element.id
-    let title = element.address;
-    if (element.domain) {
-      title = element.domain
-    }
+
     
-    browser.menus.create({
-      id,
-      type: "radio",
-      title,
-      parentId: "fx-private-relay-use-existing-aliases"
-    });
+    if (element.siteOrigin) {
+      siteOriginAddressesArray.push(element);
+    } else {
+      nonSiteOriginAddressesArray.push(element);
+    }   
+  }
+
+  // If there are aliases generated on the current site, add those first.
+  if (siteOriginAddressesArray.length > 0) {
+    generateAliasesContextMenu(siteOriginAddressesArray, {"siteOrigin": true});
+  }
+
+  // Add rest of the available aliases to the context menu
+  if (nonSiteOriginAddressesArray.length > 0) {
+    generateAliasesContextMenu(nonSiteOriginAddressesArray);
   }
 
   browser.menus.onClicked.addListener( async (info, tab) => {
@@ -204,13 +267,7 @@ if (browser.menus) {
     contexts: ["editable"]
   });
 
-  // TODO: Set l10n for title
-  browser.menus.create({
-    id: "fx-private-relay-use-existing-aliases",
-    title: "Use existing alias",
-  });
-
-  buildAliasContextMenu();
+  initExistingAliasContextMenu();
 
   browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
