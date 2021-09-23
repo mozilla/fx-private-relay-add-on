@@ -227,6 +227,8 @@ async function addRelayIconToInput(emailInput) {
     // Create "Get unlimited aliases" button
     const getUnlimitedAliasesBtn = createElementWithClassList("a", "fx-relay-menu-get-unlimited-aliases");
     getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
+    getUnlimitedAliasesBtn.setAttribute("target", "_blank");
+    getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
 
     // If the user has a premium accout, they may create unlimited aliases. 
     const { premium } = await browser.storage.local.get("premium");
@@ -276,10 +278,6 @@ async function addRelayIconToInput(emailInput) {
     [remainingAliasesSpan, getUnlimitedAliasesBtn, generateAliasBtn, relayMenuDashboardLink].forEach(el => {
       relayInPageMenu.appendChild(el);
     });
-
-    //Check if premium features are available
-    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
-    const premiumEnabledString = premiumEnabled.premiumEnabled;
   
     if (!premium) {
       if (maxNumAliasesReached) {
@@ -291,6 +289,10 @@ async function addRelayIconToInput(emailInput) {
     else {
       getUnlimitedAliasesBtn.remove();
     }
+
+    //Check if premium features are available
+    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+    const premiumEnabledString = premiumEnabled.premiumEnabled;
 
     if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
       getUnlimitedAliasesBtn.remove();

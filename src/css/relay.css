@@ -341,7 +341,8 @@ button.fx-relay-menu-generate-alias-btn[disabled] {
 .fx-relay-menu-dashboard-link:focus,
 .fx-relay-menu button.fx-relay-menu-generate-alias-btn:focus,
 .fx-relay-menu-sign-up-btn:focus,
-.fx-relay-modal-close-button:focus {
+.fx-relay-modal-close-button:focus,
+.fx-relay-menu-get-unlimited-aliases:focus {
   box-shadow: var(--relayButtonFocus) !important;
 }
 

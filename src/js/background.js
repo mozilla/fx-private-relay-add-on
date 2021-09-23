@@ -129,10 +129,7 @@ async function makeRelayAddressForTargetElement(info, tab) {
 
 
 function premiumFeaturesAvailable(premiumEnabledString) {
-  if (premiumEnabledString === "True") {
-    return true;
-  }
-  return false;
+  return (premiumEnabledString === "True");
 }
 
 async function createMenu(){
@@ -174,7 +171,7 @@ browser.menus.onClicked.addListener( async (info, tab) => {
           action: "click",
           label: "context-menu-get-unlimited-aliases"
         });
-        const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } = await browser.storage.local.get();
+        const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } = await browser.storage.local.get([ "fxaSubscriptionsUrl", "premiumProdId", "premiumPriceId" ]);
         const urlPremium = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
         await browser.tabs.create({ url: urlPremium });
         break;
