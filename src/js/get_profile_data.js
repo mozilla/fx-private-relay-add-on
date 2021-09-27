@@ -16,6 +16,18 @@
   const dashboardRelayAliasCards = document.querySelectorAll("[data-relay-address]");
   const relayAddresses = [];
 
+
+  const apiRequestedAliases = await fetch("http://127.0.0.1:8000/api/relayaddresses/", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    // body: `api_token=${apiToken.apiToken}`
+  });
+
+  console.log( apiRequestedAliases );
+  console.log( await apiRequestedAliases.response );
+
    // Get FXA Stuff
    const fxaSubscriptionsUrl = document.querySelector("firefox-private-relay-addon-data").dataset.fxaSubscriptionsUrl;
    const premiumProdId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumProdId;

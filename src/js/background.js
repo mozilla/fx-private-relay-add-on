@@ -4,6 +4,35 @@ browser.storage.local.set({ "maxNumAliases": 5 });
 browser.storage.local.set({ "relaySiteOrigin": RELAY_SITE_ORIGIN });
 
 
+async function apiRequestedAliasesCall(){
+
+  console.log("apiRequestedAliasesCall");
+
+  const response = await fetch("http://127.0.0.1:8000/api/relayaddresses/?format=json", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // body: `api_token=${apiToken.apiToken}`
+  });
+
+  if (!response.ok) {
+      const message = `An error has occured: ${response.status}`;
+      throw new Error(message);
+  }
+
+  console.log(response);
+
+  const status = await response.json();
+
+  console.log(status);
+
+}
+
+apiRequestedAliasesCall();
+
+
+
 browser.runtime.onInstalled.addListener(async () => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
   if (firstRunShown) {
