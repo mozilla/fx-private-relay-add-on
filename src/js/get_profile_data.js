@@ -157,6 +157,8 @@
         aliasLabelWrapper.classList.remove("show-saved-confirmation");
       }, 1000);
 
+      updateBackgroundScript(updatedRelayAddress.id);
+
     };
     aliasLabelInput.addEventListener("focusout", saveAliasLabel);
     aliasLabelForm?.addEventListener("submit", (event) => {
@@ -178,4 +180,18 @@
     relayAddresses.push(relayAddress);
   }
   browser.storage.local.set({relayAddresses});
+
+  // await browser.runtime.sendMessage({
+  //   method: "createExistingAliasContextMenu",
+  // });
+
+
+  async function updateBackgroundScript(id) {
+    console.log("updateBackgroundScript", id);
+    await browser.runtime.sendMessage({
+      method: "updateExistingAliasContextMenu",
+      id,
+    });
+  }
+
 })();
