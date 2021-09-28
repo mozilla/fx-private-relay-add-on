@@ -139,21 +139,40 @@ async function createMenu(){
       title: "Generate New Alias",
       contexts: ["editable"]
     });
-
-    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
-    const premiumEnabledString = premiumEnabled.premiumEnabled;
-    const { premium } = await browser.storage.local.get("premium");
-
-    if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
-      browser.menus.create({
-        id: "fx-private-relay-get-unlimited-aliases",
-        title: "Get Unlimited Aliases",
-      });
-    }
   }
 }
 
 createMenu();
+
+async function createUpgradeContextMenuItem() {
+  browser.menus.create({
+    id: "fx-private-relay-get-unlimited-aliases",
+    title: "Get Unlimited Aliases",
+  });
+}
+
+async function removeUpgradeContextMenuItem() {
+  browser.menus.remove("fx-private-relay-get-unlimited-aliases");
+}
+
+async function updateUpgradeContextMenuItem() {
+  // Check for status
+  // Update
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+  const { premium } = await browser.storage.local.get("premium");
+
+  if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
+    await createUpgradeContextMenuItem();
+  }
+
+  // Remove the upgrade item, if the user is upgraded
+  if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
+    await removeUpgradeContextMenuItem();
+  }
+
+}
+
 
 browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
@@ -196,6 +215,9 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "sendMetricsEvent":
       response = await sendMetricsEvent(m.eventData);
+      break;
+    case "rebuildContextMenuUpgrade":
+      await updateUpgradeContextMenuItem();
       break;
   }
   return response;
