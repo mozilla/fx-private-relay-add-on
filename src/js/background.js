@@ -162,15 +162,17 @@ async function updateUpgradeContextMenuItem() {
   const premiumEnabledString = premiumEnabled.premiumEnabled;
   const { premium } = await browser.storage.local.get("premium");
 
-  if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
-    await createUpgradeContextMenuItem();
-  }
+  if (premiumFeaturesAvailable(premiumEnabledString)) {
 
-  // Remove the upgrade item, if the user is upgraded
-  if (!premium && premiumFeaturesAvailable(premiumEnabledString)) {
-    await removeUpgradeContextMenuItem();
-  }
+    if (!premium) {
+      await createUpgradeContextMenuItem();
+    }
 
+    // Remove the upgrade item, if the user is upgraded
+    else {
+      await removeUpgradeContextMenuItem();
+    }
+  }
 }
 
 
