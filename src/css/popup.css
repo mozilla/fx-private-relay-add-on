@@ -386,8 +386,8 @@ onboarding-panel {
 
 .content-wrapper, .premium-wrapper {
   display: flex;
-  align-items: flex-start;
   height: 100%;
+  width: 100%;
   flex-direction: column;
 }
 
@@ -497,7 +497,6 @@ onboarding-panel {
 }
 
 .onboarding-h1 {
-  margin: auto auto 8px 0;
   font-size: 16px;
   font-family: var(--relayMetropolis);
 }
@@ -508,34 +507,10 @@ onboarding-panel p {
 }
 
 .onboarding-img {
-  max-height: 150px;
-  position: absolute;
-  right: 40px;
-  top: 20px;
-}
-
-.panel1 img {
-  right: 30px;
-}
-
-.panel2 img {
-  max-height: 127px;
-  left: 0;
-  right: 0;
-  top: 30px;
-  margin: auto;
-}
-
-.panel3 img {
-  max-height: 155px;
-  right: 30px;
+  padding: 16px;
 }
 
 .maxAliasesPanel .onboarding-img {
-  position: absolute;
-  right: 0;
-  left: 0;
-  top: 44px;
   margin: auto;
   max-height: 140px;
 }
