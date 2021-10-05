@@ -27,6 +27,27 @@ async function showModal(modalType) {
   modalMessage.classList = ["fx-relay-modal-message"];
   modalContent.appendChild(modalMessage);
 
+
+  // Create "Get unlimited aliases" button
+  const getUnlimitedAliasesBtn = createElementWithClassList("a", "fx-relay-menu-get-unlimited-aliases");
+  getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
+  getUnlimitedAliasesBtn.setAttribute("target", "_blank");
+  getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
+    
+  //Create "Get unlimited aliases" link
+  const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
+  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
+  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
+  getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+
+  if (premiumEnabledString === "True"){
+    modalContent.appendChild(getUnlimitedAliasesBtn);
+  }
+  
+
   const manageAliasesLink = document.createElement("a");
   manageAliasesLink.textContent = browser.i18n.getMessage("ManageAllAliases");
   manageAliasesLink.classList = ["fx-relay-new-tab fx-relay-modal-manage-aliases"];
@@ -38,7 +59,7 @@ async function showModal(modalType) {
     return window.open(e.target.href);
   });
   modalContent.appendChild(manageAliasesLink);
-  
+
 
   const modalCloseButton = document.createElement("button");
   modalCloseButton.classList = ["fx-relay-modal-close-button"];
@@ -47,7 +68,7 @@ async function showModal(modalType) {
   // Remove relay modal on button click
   modalCloseButton.addEventListener("click", () => {
     sendModalEvent("closed-modal", "modal-closed-btn");
-    modalWrapper.remove();
+    modalContent.remove();
   });
 
   // Remove relay modal on clicks outside of modal.
@@ -59,7 +80,6 @@ async function showModal(modalType) {
     }
   });
 
-  modalContent.appendChild(modalCloseButton);
   modalWrapper.appendChild(modalContent);
   document.body.appendChild(modalWrapper);
   return;

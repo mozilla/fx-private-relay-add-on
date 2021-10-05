@@ -117,6 +117,14 @@ function addPaddingRight(element, paddingInPixels) {
   }
 }
 
+function premiumFeaturesAvailable(premiumEnabledString) {
+  if (premiumEnabledString === "True") {
+    return true;
+  }
+  return false;
+}
+
+
 async function addRelayIconToInput(emailInput) {
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
   // remember the input's original parent element;
@@ -216,6 +224,11 @@ async function addRelayIconToInput(emailInput) {
     const generateAliasBtn = createElementWithClassList("button", "fx-relay-menu-generate-alias-btn");
     generateAliasBtn.textContent = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
 
+    // Create "Get unlimited aliases" button
+    const getUnlimitedAliasesBtn = createElementWithClassList("a", "fx-relay-menu-get-unlimited-aliases");
+    getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
+    getUnlimitedAliasesBtn.setAttribute("target", "_blank");
+    getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
 
     // If the user has a premium accout, they may create unlimited aliases. 
     const { premium } = await browser.storage.local.get("premium");
@@ -243,11 +256,6 @@ async function addRelayIconToInput(emailInput) {
 
     const maxNumAliasesReached = (numAliasesRemaining <= 0);
 
-    if (maxNumAliasesReached && !premium) {
-      generateAliasBtn.disabled = true;
-      sendInPageEvent("viewed-menu", "input-menu-max-aliases-message")
-    }
-
     // Create "Manage All Aliases" link
     const relayMenuDashboardLink = createElementWithClassList("a", "fx-relay-menu-dashboard-link");
     relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");
@@ -257,14 +265,38 @@ async function addRelayIconToInput(emailInput) {
       sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
     });
 
+    //Create "Get unlimited aliases" link
+    const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
+    const { premiumProdId } = await browser.storage.local.get("premiumProdId");
+    const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
+    getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+
     // Restrict tabbing to relay menu elements
     restrictOrRestorePageTabbing(-1);
 
     // Append menu elements to the menu
-    [generateAliasBtn, remainingAliasesSpan, relayMenuDashboardLink].forEach(el => {
+    [remainingAliasesSpan, getUnlimitedAliasesBtn, generateAliasBtn, relayMenuDashboardLink].forEach(el => {
       relayInPageMenu.appendChild(el);
     });
+  
+    if (!premium) {
+      if (maxNumAliasesReached) {
+        generateAliasBtn.remove();
+        sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
+        remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
+      }  
+    }
+    else {
+      getUnlimitedAliasesBtn.remove();
+    }
 
+    //Check if premium features are available
+    const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+    const premiumEnabledString = premiumEnabled.premiumEnabled;
+
+    if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
+      getUnlimitedAliasesBtn.remove();
+    }
 
     // Handle "Generate New Alias" clicks
     generateAliasBtn.addEventListener("click", async(generateClickEvt) => {
@@ -320,6 +352,7 @@ function getEmailInputsAndAddIcon(domRoot) {
     }
   }
 }
+
 
 (async function() {
   const inputIconsAreEnabled = await areInputIconsEnabled();

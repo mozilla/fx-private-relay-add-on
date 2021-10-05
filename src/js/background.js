@@ -3,7 +3,6 @@ const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
 browser.storage.local.set({ "maxNumAliases": 5 });
 browser.storage.local.set({ "relaySiteOrigin": RELAY_SITE_ORIGIN });
 
-
 browser.runtime.onInstalled.addListener(async () => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
   if (firstRunShown) {
@@ -127,16 +126,59 @@ async function makeRelayAddressForTargetElement(info, tab) {
   );
 }
 
-if (browser.menus) {
-  browser.menus.create({
-    id: "fx-private-relay-generate-alias",
-    title: "Generate New Alias",
-    contexts: ["editable"]
-  });
 
-  browser.menus.onClicked.addListener( async (info, tab) => {
+
+function premiumFeaturesAvailable(premiumEnabledString) {
+  return (premiumEnabledString === "True");
+}
+
+async function createMenu(){
+  if (browser.menus) {
+    browser.menus.create({
+      id: "fx-private-relay-generate-alias",
+      title: "Generate New Alias",
+      contexts: ["editable"]
+    });
+  }
+}
+
+createMenu();
+
+async function createUpgradeContextMenuItem() {
+  browser.menus.create({
+    id: "fx-private-relay-get-unlimited-aliases",
+    title: "Get Unlimited Aliases",
+  });
+}
+
+async function removeUpgradeContextMenuItem() {
+  browser.menus.remove("fx-private-relay-get-unlimited-aliases");
+}
+
+async function updateUpgradeContextMenuItem() {
+  // Check for status
+  // Update
+  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
+  const premiumEnabledString = premiumEnabled.premiumEnabled;
+  const { premium } = await browser.storage.local.get("premium");
+
+  if (premiumFeaturesAvailable(premiumEnabledString)) {
+
+    if (!premium) {
+      await createUpgradeContextMenuItem();
+    }
+
+    // Remove the upgrade item, if the user is upgraded
+    else {
+      await removeUpgradeContextMenuItem();
+    }
+  }
+}
+
+
+browser.menus.onClicked.addListener( async (info, tab) => {
     switch (info.menuItemId) {
-      case "fx-private-relay-generate-alias":
+      case "fx-private-relay-generate-alias": 
         sendMetricsEvent({
           category: "Extension: Context Menu",
           action: "click",
@@ -144,9 +186,19 @@ if (browser.menus) {
         });
         await makeRelayAddressForTargetElement(info, tab);
         break;
+      case "fx-private-relay-get-unlimited-aliases":
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-get-unlimited-aliases"
+        });
+        const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } = await browser.storage.local.get([ "fxaSubscriptionsUrl", "premiumProdId", "premiumPriceId" ]);
+        const urlPremium = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+        await browser.tabs.create({ url: urlPremium });
+        break;
     }
-  });
-}
+});
+
 
 browser.runtime.onMessage.addListener(async (m) => {
   let response;
@@ -165,6 +217,9 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "sendMetricsEvent":
       response = await sendMetricsEvent(m.eventData);
+      break;
+    case "rebuildContextMenuUpgrade":
+      await updateUpgradeContextMenuItem();
       break;
   }
   return response;

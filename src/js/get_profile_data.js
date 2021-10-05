@@ -178,4 +178,9 @@
     relayAddresses.push(relayAddress);
   }
   browser.storage.local.set({relayAddresses});
+
+  await browser.runtime.sendMessage({
+    method: "rebuildContextMenuUpgrade",
+  });
+
 })();
