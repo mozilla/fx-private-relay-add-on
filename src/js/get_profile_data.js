@@ -179,7 +179,6 @@
   }
   browser.storage.local.set({relayAddresses});
 
-  console.log("get_profile_data--sendMessage");
   await browser.runtime.sendMessage({
     method: "rebuildContextMenuUpgrade",
   });
