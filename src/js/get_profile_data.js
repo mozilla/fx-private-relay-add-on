@@ -2,7 +2,53 @@
   // Get the api token from the account profile page
   const profileMainElement = document.querySelector("#profile-main");
   const apiToken = profileMainElement.dataset.apiToken;
-  browser.storage.local.set({apiToken});
+  browser.storage.local.set({ apiToken });
+
+  // API URL is ${RELAY_SITE_ORIGIN}/api/v1/
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
+
+  const apiProfileURL = `${relayApiSource}profiles`;
+
+  async function getProfileData() {
+    const cookieString =
+      typeof document.cookie === "string" ? document.cookie : "";
+    const cookieStringArray = cookieString
+      .split(";")
+      .map((individualCookieString) => individualCookieString.split("="))
+      .map(([cookieKey, cookieValue]) => [
+        cookieKey.trim(),
+        cookieValue.trim(),
+      ]);
+
+    const [_csrfCookieKey, csrfCookieValue] = cookieStringArray.find(
+      ([cookieKey, _cookieValue]) => cookieKey === "csrftoken"
+    );
+
+    const headers = new Headers(undefined);
+
+    headers.set("X-CSRFToken", csrfCookieValue);
+    headers.set("Content-Type", "application/json");
+    headers.set("Accept", "application/json");
+
+    const response = await fetch(apiProfileURL, {
+      mode: "same-origin",
+      method: "GET",
+      headers: headers,
+    });
+
+    answer = await response.json();
+
+    return answer[0].server_storage;
+
+  }
+
+  const isSiteStorageEnabled = await getProfileData();
+
+  if (isSiteStorageEnabled) {
+    console.log( "Fetch Profile Data from API" );
+  } else {
+    console.log("Scrape alias data from Profile page (Local)");
+  }
 
   // Get the relay address objects from the addon storage
   const addonStorageRelayAddresses = await browser.storage.local.get("relayAddresses");
