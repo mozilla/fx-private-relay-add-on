@@ -1,6 +1,6 @@
 {
   "name": "fx-private-relay-add-on",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Firefox Relay",
   "main": "index.js",
   "dependencies": {
@@ -19,7 +19,7 @@
     "dev": "npm run web-ext-run",
     "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml" ,
+    "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
     "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/"
   },
   "private": false,
