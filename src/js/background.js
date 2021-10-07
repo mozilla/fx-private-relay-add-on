@@ -2,7 +2,7 @@ const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
 
 browser.storage.local.set({ "maxNumAliases": 5 });
 browser.storage.local.set({ "relaySiteOrigin": RELAY_SITE_ORIGIN });
-browser.storage.local.set({ "relayApiSource": `${RELAY_SITE_ORIGIN}/api/v1/` });
+browser.storage.local.set({ "relayApiSource": `${RELAY_SITE_ORIGIN}/api/v1` });
 
 browser.runtime.onInstalled.addListener(async () => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
@@ -64,6 +64,9 @@ async function sendMetricsEvent(eventData) {
 
 
 async function makeRelayAddress(domain=null) {
+
+  console.log("makeRelayAddress");
+  
   const apiToken = await browser.storage.local.get("apiToken");
 
   if (!apiToken.apiToken) {
@@ -74,25 +77,55 @@ async function makeRelayAddress(domain=null) {
     return;
   }
 
-  const newRelayAddressUrl = `${RELAY_SITE_ORIGIN}/emails/`;
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
+  const { csrfCookieValue } = await browser.storage.local.get("csrfCookieValue");
+  // const { apiToken } = await browser.storage.local.get("apiToken");
+
+  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+
+  const newRelayAddressUrl = apiMakeRelayAddressesURL;
+
+  let apiBody = {};
+
+  if (domain) {
+    apiBody = JSON.stringify({
+      "enabled": true,
+      "description": domain,
+      "generated_for": domain,
+    });
+  }
+
+  console.log("test");
+  console.log(apiMakeRelayAddressesURL);
+  console.log(apiToken.apiToken);
+  
+  const headers = new Headers(undefined);
+
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  headers.set("Authorization", `Token ${apiToken.apiToken}`);
+
   const newRelayAddressResponse = await fetch(newRelayAddressUrl, {
+    mode: "same-origin",
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `api_token=${apiToken.apiToken}`
+    headers: headers,
+    body: apiBody,
   });
   if (newRelayAddressResponse.status === 402) {
     // FIXME: can this just return newRelayAddressResponse ?
     return {status: 402};
   }
+  
   let newRelayAddressJson = await newRelayAddressResponse.json();
+  
   if (domain) {
     // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.domain = domain;
-    // Store the domain in which the alias was generated, separate from the label 
+    // Store the domain in which the alias was generated, separate from the label
     newRelayAddressJson.siteOrigin = domain;
   }
+
   // TODO: put this into an updateLocalAddresses() function
   const localStorageRelayAddresses = await browser.storage.local.get("relayAddresses");
   const localRelayAddresses = (Object.keys(localStorageRelayAddresses).length === 0) ? {relayAddresses: []} : localStorageRelayAddresses;
@@ -166,12 +199,12 @@ async function updateUpgradeContextMenuItem() {
   if (premiumFeaturesAvailable(premiumEnabledString)) {
 
     if (!premium) {
-      await createUpgradeContextMenuItem();
+      // await createUpgradeContextMenuItem();
     }
 
     // Remove the upgrade item, if the user is upgraded
     else {
-      await removeUpgradeContextMenuItem();
+      // await removeUpgradeContextMenuItem();
     }
   }
 }

@@ -7,9 +7,12 @@
   // API URL is ${RELAY_SITE_ORIGIN}/api/v1/
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
 
-  const apiProfileURL = `${relayApiSource}profiles`;
+  const apiProfileURL = `${relayApiSource}/profiles/`;
+  const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
-  async function getProfileData() {
+  console.log(apiProfileURL);
+
+  async function getProfileData(url) {
     const cookieString =
       typeof document.cookie === "string" ? document.cookie : "";
     const cookieStringArray = cookieString
@@ -24,54 +27,90 @@
       ([cookieKey, _cookieValue]) => cookieKey === "csrftoken"
     );
 
+    browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
+
     const headers = new Headers(undefined);
 
-    headers.set("X-CSRFToken", csrfCookieValue);
+    // headers.set("X-CSRFToken", csrfCookieValue);
     headers.set("Content-Type", "application/json");
     headers.set("Accept", "application/json");
 
-    const response = await fetch(apiProfileURL, {
+    const response = await fetch(url, {
       mode: "same-origin",
       method: "GET",
       headers: headers,
     });
-
+    
     answer = await response.json();
-
-    return answer[0].server_storage;
+    
+    return answer;
 
   }
 
-  const isSiteStorageEnabled = await getProfileData();
+  const isSiteStorageEnabled = await getProfileData(apiProfileURL);
+  const getRelayAliasesFromDatabase = await getProfileData(
+    apiRelayAddressesURL
+  );
 
-  if (isSiteStorageEnabled) {
-    console.log( "Fetch Profile Data from API" );
+    console.log(isSiteStorageEnabled[0]);
+
+  if (isSiteStorageEnabled[0].server_storage) {
+    console.log("Fetch Profile Data from API");
   } else {
     console.log("Scrape alias data from Profile page (Local)");
   }
 
+  console.log(getRelayAliasesFromDatabase);
+
+  
   // Get the relay address objects from the addon storage
-  const addonStorageRelayAddresses = await browser.storage.local.get("relayAddresses");
-  const addonRelayAddresses = (Object.keys(addonStorageRelayAddresses).length === 0) ? {relayAddresses: []} : addonStorageRelayAddresses;
+  const addonStorageRelayAddresses = await browser.storage.local.get(
+    "relayAddresses"
+  );
+  
+  const addonRelayAddresses =
+    Object.keys(addonStorageRelayAddresses).length === 0
+      ? { relayAddresses: [] }
+      : addonStorageRelayAddresses;
 
   // Check if user is premium
-  const isPremiumUser = document.querySelector("body").classList.contains("is-premium");
-  browser.storage.local.set({"premium": isPremiumUser});
+  const isPremiumUser = document
+    .querySelector("body")
+    .classList.contains("is-premium");
+  browser.storage.local.set({ premium: isPremiumUser });
 
-  // Loop over the addresses on the page    
-  const dashboardRelayAliasCards = document.querySelectorAll("[data-relay-address]");
+  // Loop over the addresses on the page
+  const dashboardRelayAliasCards = document.querySelectorAll(
+    "[data-relay-address]"
+  );
   const relayAddresses = [];
 
-   // Get FXA Stuff
-   const fxaSubscriptionsUrl = document.querySelector("firefox-private-relay-addon-data").dataset.fxaSubscriptionsUrl;
-   const premiumProdId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumProdId;
-   const premiumPriceId = document.querySelector("firefox-private-relay-addon-data").dataset.premiumPriceId;
-   const aliasesUsedVal = document.querySelector("firefox-private-relay-addon-data").dataset.aliasesUsedVal;
-   const emailsForwardedVal = document.querySelector("firefox-private-relay-addon-data").dataset.emailsForwardedVal;
-   const emailsBlockedVal = document.querySelector("firefox-private-relay-addon-data").dataset.emailsBlockedVal;
-   const premiumSubdomainSet = document.querySelector("firefox-private-relay-addon-data").dataset.premiumSubdomainSet;
-   const premiumEnabled = document.querySelector("firefox-private-relay-addon-data").dataset.premiumEnabled;
-   browser.storage.local.set({
+  // Get FXA Stuff
+  const fxaSubscriptionsUrl = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.fxaSubscriptionsUrl;
+  const premiumProdId = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.premiumProdId;
+  const premiumPriceId = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.premiumPriceId;
+  const aliasesUsedVal = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.aliasesUsedVal;
+  const emailsForwardedVal = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.emailsForwardedVal;
+  const emailsBlockedVal = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.emailsBlockedVal;
+  const premiumSubdomainSet = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.premiumSubdomainSet;
+  const premiumEnabled = document.querySelector(
+    "firefox-private-relay-addon-data"
+  ).dataset.premiumEnabled;
+  browser.storage.local.set({
     fxaSubscriptionsUrl,
     premiumProdId,
     premiumPriceId,
@@ -79,25 +118,36 @@
     emailsForwardedVal,
     emailsBlockedVal,
     premiumSubdomainSet,
-    premiumEnabled
-   });
+    premiumEnabled,
+  });
 
   for (const aliasCard of dashboardRelayAliasCards) {
     // Add the domain note from the addon storage to the page
 
     const aliasCardData = aliasCard.dataset;
     const aliasId = aliasCardData.relayAddressId;
-    const addonRelayAddress = addonRelayAddresses.relayAddresses.filter(address => address.id == aliasId)[0];
+    const addonRelayAddress = addonRelayAddresses.relayAddresses.filter(
+      (address) => address.id == aliasId
+    )[0];
 
-    const defaultAliasLabelText = browser.i18n.getMessage("profilePageDefaulAliasLabelText");
-    const storedAliasLabel = (addonRelayAddress && addonRelayAddress.hasOwnProperty("domain")) ? addonRelayAddress.domain : "";
-    
+    const defaultAliasLabelText = browser.i18n.getMessage(
+      "profilePageDefaulAliasLabelText"
+    );
+    const storedAliasLabel =
+      addonRelayAddress && addonRelayAddress.hasOwnProperty("domain")
+        ? addonRelayAddress.domain
+        : "";
+
     // Cache the siteOrigin alias attribute when updating local storage data.
     // Note that this data attribute only exists in aliases generated through the add-on
     const storedAliasSiteOrigin = addonRelayAddress?.siteOrigin ?? "";
 
-    const aliasLabelForm = aliasCard.querySelector("form.relay-email-address-label-form");
-    const aliasLabelInput = aliasCard.querySelector("input.relay-email-address-label");
+    const aliasLabelForm = aliasCard.querySelector(
+      "form.relay-email-address-label-form"
+    );
+    const aliasLabelInput = aliasCard.querySelector(
+      "input.relay-email-address-label"
+    );
     const aliasLabelWrapper = (aliasLabelForm ?? aliasLabelInput).parentElement;
     aliasLabelWrapper.classList.add("show-label"); // Field is visible only to users who have the addon installed
 
@@ -112,25 +162,30 @@
 
     // eslint-disable-next-line quotes
     const forbiddenCharacters = `{}()=;'-<>"`;
-    const showInputErrorMessage =(errorMessageContent) => {
+    const showInputErrorMessage = (errorMessageContent) => {
       aliasLabelInput.classList.add("input-has-error");
-      aliasLabelWrapper.querySelector(".input-error").textContent = errorMessageContent;
+      aliasLabelWrapper.querySelector(".input-error").textContent =
+        errorMessageContent;
       aliasLabelWrapper.classList.add("show-input-error");
       return;
     };
 
     const pluralSingularErrorMessage = (badCharactersInValue) => {
-      const newErrorMessage = badCharactersInValue.length === 1 ?
-      `${badCharactersInValue} is not an allowed character` :
-      `${badCharactersInValue.join(" ")} are not allowed characters`;
+      const newErrorMessage =
+        badCharactersInValue.length === 1
+          ? `${badCharactersInValue} is not an allowed character`
+          : `${badCharactersInValue.join(" ")} are not allowed characters`;
       return newErrorMessage;
     };
 
     const checkValueForErrors = (inputValue) => {
       // Catch copy/paste forbidden characters
       const forbiddenCharsInLabelValue = [];
-      forbiddenCharacters.split("").forEach(badChar => {
-        if (inputValue.includes(badChar) && !forbiddenCharsInLabelValue.includes(badChar)) {
+      forbiddenCharacters.split("").forEach((badChar) => {
+        if (
+          inputValue.includes(badChar) &&
+          !forbiddenCharsInLabelValue.includes(badChar)
+        ) {
           forbiddenCharsInLabelValue.push(badChar);
         }
       });
@@ -141,7 +196,12 @@
       // Limit keystrokes when the input has errors
       const keyChar = e.key;
       if (aliasLabelInput.classList.contains("input-has-error")) {
-        const charactersToAllowWhileInputHasError = ["Tab", "Backspace", "ArrowLeft", "ArrowRight"];
+        const charactersToAllowWhileInputHasError = [
+          "Tab",
+          "Backspace",
+          "ArrowLeft",
+          "ArrowRight",
+        ];
         if (!charactersToAllowWhileInputHasError.includes(keyChar)) {
           e.preventDefault();
           return;
@@ -156,13 +216,18 @@
     aliasLabelInput.addEventListener("keyup", (e) => {
       const keyChar = e.key;
       const forbiddenCharsInValue = checkValueForErrors(aliasLabelInput.value);
-      if (forbiddenCharsInValue.length === 0 && !forbiddenCharacters.includes(keyChar)) {
+      if (
+        forbiddenCharsInValue.length === 0 &&
+        !forbiddenCharacters.includes(keyChar)
+      ) {
         aliasLabelInput.classList.remove("input-has-error");
         aliasLabelWrapper.classList.remove("show-input-error");
         return;
       }
       if (forbiddenCharsInValue.length > 0) {
-        return showInputErrorMessage(pluralSingularErrorMessage(forbiddenCharsInValue));
+        return showInputErrorMessage(
+          pluralSingularErrorMessage(forbiddenCharsInValue)
+        );
       }
     });
 
@@ -176,7 +241,9 @@
 
       const forbiddenCharsInValue = checkValueForErrors(newAliasLabel);
       if (forbiddenCharsInValue.length > 0) {
-        return showInputErrorMessage(pluralSingularErrorMessage(forbiddenCharsInValue));
+        return showInputErrorMessage(
+          pluralSingularErrorMessage(forbiddenCharsInValue)
+        );
       }
 
       // Don't show saved confirmation message if the label hasn't changed
@@ -185,9 +252,11 @@
       }
 
       // Save new alias label
-      const updatedRelayAddress = relayAddresses.filter(address => address.id == aliasId)[0];
+      const updatedRelayAddress = relayAddresses.filter(
+        (address) => address.id == aliasId
+      )[0];
       updatedRelayAddress.domain = newAliasLabel;
-      browser.storage.local.set({relayAddresses});
+      browser.storage.local.set({ relayAddresses });
 
       // show placeholder text if the label is blank
       if (aliasLabelInput.value === "") {
@@ -202,7 +271,6 @@
       setTimeout(() => {
         aliasLabelWrapper.classList.remove("show-saved-confirmation");
       }, 1000);
-
     };
     aliasLabelInput.addEventListener("focusout", saveAliasLabel);
     aliasLabelForm?.addEventListener("submit", (event) => {
@@ -215,18 +283,17 @@
     // so they can be used later, even if the API endpoint is down
 
     const relayAddress = {
-      "id": aliasId,
-      "address": aliasCardData.relayAddress,
-      "domain": storedAliasLabel,
-      "siteOrigin": storedAliasSiteOrigin,
+      id: aliasId,
+      address: aliasCardData.relayAddress,
+      domain: storedAliasLabel,
+      siteOrigin: storedAliasSiteOrigin,
     };
 
     relayAddresses.push(relayAddress);
   }
-  browser.storage.local.set({relayAddresses});
+  browser.storage.local.set({ relayAddresses });
 
   await browser.runtime.sendMessage({
     method: "rebuildContextMenuUpgrade",
   });
-
 })();
