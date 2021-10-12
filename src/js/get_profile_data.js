@@ -10,7 +10,8 @@
   const apiProfileURL = `${relayApiSource}/profiles/`;
   const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
-  async function apiRequest(url) {
+  async function apiRequest(url, method = "GET", body = null) {
+
     const cookieString =
       typeof document.cookie === "string" ? document.cookie : "";
     const cookieStringArray = cookieString
@@ -29,18 +30,18 @@
 
     const headers = new Headers(undefined);
 
-    // headers.set("X-CSRFToken", csrfCookieValue);
+    headers.set("X-CSRFToken", csrfCookieValue);
     headers.set("Content-Type", "application/json");
     headers.set("Accept", "application/json");
 
     const response = await fetch(url, {
       mode: "same-origin",
-      method: "GET",
+      method,
       headers: headers,
+      body,
     });
 
     answer = await response.json();
-
     return answer;
   }
 
@@ -48,6 +49,7 @@
 
   browser.storage.local.set({
     profileID: parseInt(serverProfileData[0].id, 10),
+    server_storage: serverProfileData[0].server_storage,
   });
 
   // Get the relay address objects from the addon storage
@@ -72,7 +74,8 @@
   const dashboardRelayAliasCards = document.querySelectorAll(
     "[data-relay-address]"
   );
-  const relayAddresses = [];
+
+  const localStorageRelayAddresses = [];
 
   // Get FXA Stuff
   const fxaSubscriptionsUrl = document.querySelector(
@@ -111,7 +114,7 @@
   });
 
   function mergeLocalStorageDataWithServer(localAliases, serverAliases) {
-    // TODO: Function that compares fields between both data sets and description/siteOrigin if existing in local
+    // TODO: Function that compares fields between both data sets and description/generated_for if existing in local
     // TODO: Add loop with local labels pushed to server via PATCH request
 
     const map = new Map();
@@ -123,13 +126,69 @@
     return Array.from(map.values());
   }
 
+  // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
+  function aliasesHaveStoredMetadata(aliases) {
+    for (const alias of aliases) {
+      if (alias.description !== null && alias.description.length > 0) {
+        return true;
+      }
+
+      if (alias.generated_for !== null && alias.generated_for.length > 0) {
+        return true;
+      }
+    }
+  }
+
+  // Loop through local storage aliases and sync any metadata they have with the server dataset
+  async function sendMetaDataToServer(aliases) {
+    for (const alias of aliases) {
+      let body = {
+        enabled: true,
+        description: "",
+        generated_for: "",
+      };
+
+      if (alias.description.length > 0) {
+        body.description = alias.description;
+      }
+
+      if (alias.generated_for.length > 0) {
+        body.generated_for = alias.generated_for;
+      }
+
+      if (body.description.length > 0 || body.generated_for.length > 0) {
+        body = JSON.stringify(body);
+        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PUT", body);
+      }
+    }
+  }
+
+  // Loop through the temp array that is about to be synced with the server dataset and 
+  // be sure it matches the local storage metadata dataset
+  function updateAliasArrToMatchProd(aliases, aliasesToBeSynced) {
+    for (const alias of aliases) {
+      if (alias.description.length > 0) {
+        aliasesToBeSynced.find(
+          (newAlias) => newAlias.id === alias.id
+        ).description = alias.description;
+      }
+
+      if (alias.generated_for.length > 0) {
+        aliasesToBeSynced.find(
+          (newAlias) => newAlias.id === alias.id
+        ).generated_for = alias.generated_for;
+      }
+    }
+
+    return aliasesToBeSynced;
+  }
+
   if (siteStorageEnabled) {
+    // Sync alias data from server page.
+    // If local storage items exist AND have label metadata stored, sync it to the server.
     const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
 
-    // console.log("Fetch Profile Data from API");
-
     // let usage: This data may be overwritten when merging the
-    // local storage items with the items pulled from the server.
     let localStorageData = serverRelayAddresses;
 
     // Check/cache local storage
@@ -137,27 +196,26 @@
       "relayAddresses"
     );
 
-    if (relayAddresses && relayAddresses.length > 0) {
-      // console.log("User is pulling from server but has local storage items");
-      // localStorageData = mergeLocalStorageDataWithServer(
-      //   relayAddresses,
-      //   getRelayAliasesFromDatabase
-      // );
+    if (
+      relayAddresses &&
+      relayAddresses.length > 0 &&
+      aliasesHaveStoredMetadata(relayAddresses) && // Make sure there is meta data in the local dataset
+      !aliasesHaveStoredMetadata(localStorageData) // Make sure there is no meta data in the server dataset
+    ) {
+      await sendMetaDataToServer(relayAddresses);
+      localStorageData = updateAliasArrToMatchProd(
+        relayAddresses,
+        localStorageData
+      );
     }
 
     browser.storage.local.set({ relayAddresses: localStorageData });
   } else {
-    // console.log("Scrape alias data from Profile page (Local)");
+    // Scrape alias data from Profile page (Local)
 
     const { relayAddresses } = await browser.storage.local.get(
       "relayAddresses"
     );
-
-    // if (relayAddresses && relayAddresses.length > 0) {
-    //   console.log("User is scraping local but has previously set labels");
-    //   // TODO: Function that sets
-    // }
-
     // Scrape data from /accounts/profile/ page
     for (const aliasCard of dashboardRelayAliasCards) {
       // Add the description (previoulsy domain) note from the addon storage to the page
@@ -178,26 +236,32 @@
       // This variable checks for three truths:
       //   - Does the alias exists?
       //   - Does it have an entry for "domain"?
-      //   - Is the entry NOT an interger? 
-      // If all three of these are true, this user has a legacy label stored locally 
+      //   - Is the entry NOT an interger?
+      // If all three of these are true, this user has a legacy label stored locally
       // that needs to be ported to the "description" entry
       const storedLegacyAliasLabel =
         addonRelayAddress &&
         addonRelayAddress.hasOwnProperty("domain") &&
         !Number.isInteger(addonRelayAddress.domain);
 
-      const storedAliasLabel =
+      let storedAliasLabel =
         addonRelayAddress && addonRelayAddress.hasOwnProperty("description")
           ? addonRelayAddress.description
           : "";
 
-      // Cache the siteOrigin alias attribute when updating local storage data.
+      // Cache the generated_for alias attribute when updating local storage data.
       // Note that this data attribute only exists in aliases generated through the add-on
-      const storedAliasSiteOrigin = addonRelayAddress?.siteOrigin ?? "";
+      let storedAliasGeneratedFor = addonRelayAddress?.generated_for ?? "";
 
+      // This covers any legacy label field and remaps them.
       if (storedLegacyAliasLabel) {
-        // TODO: Map current legacy domain item to new description field
-        // console.log("Alias has legacy label data field");
+        storedAliasLabel = addonRelayAddress.domain;
+      }
+
+      // This covers any legacy siteOrigin field and remaps them.
+      const storedLegacyAliasSiteOrigin = addonRelayAddress?.siteOrigin;
+      if (storedLegacyAliasSiteOrigin) {
+        storedAliasGeneratedFor = addonRelayAddress.generated_for;
       }
 
       const aliasLabelForm = aliasCard.querySelector(
@@ -206,8 +270,8 @@
       const aliasLabelInput = aliasCard.querySelector(
         "input.relay-email-address-label"
       );
-      const aliasLabelWrapper = (aliasLabelForm ?? aliasLabelInput)
-        .parentElement;
+
+      const aliasLabelWrapper = aliasLabelForm.parentElement;
       aliasLabelWrapper.classList.add("show-label"); // Field is visible only to users who have the addon installed
 
       aliasLabelInput.dataset.label = storedAliasLabel;
@@ -315,11 +379,13 @@
         }
 
         // Save new alias label
-        const updatedRelayAddress = relayAddresses.filter(
+        const updatedRelayAddress = localStorageRelayAddresses.filter(
           (address) => address.id == aliasId
         )[0];
         updatedRelayAddress.description = newAliasLabel;
-        browser.storage.local.set({ relayAddresses });
+        browser.storage.local.set({
+          relayAddresses: localStorageRelayAddresses,
+        });
 
         // show placeholder text if the label is blank
         if (aliasLabelInput.value === "") {
@@ -348,15 +414,14 @@
       const relayAddress = {
         id: aliasId,
         address: aliasCardData.relayAddress,
-        // domain: storedAliasLabel,
         description: storedAliasLabel,
-        siteOrigin: storedAliasSiteOrigin,
+        generated_for: storedAliasGeneratedFor,
       };
 
-      relayAddresses.push(relayAddress);
+      localStorageRelayAddresses.push(relayAddress);
     }
 
-    browser.storage.local.set({ relayAddresses });
+    browser.storage.local.set({ relayAddresses: localStorageRelayAddresses });
   }
 
   await browser.runtime.sendMessage({

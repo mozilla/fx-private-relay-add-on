@@ -1,14 +1,10 @@
 const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
-const ADDON_VERSION = "1.7.1";
-//
-browser.storage.local.set({ addOnVersion: null });
+
 browser.storage.local.set({ maxNumAliases: 5 });
 browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
 browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
 
 browser.runtime.onInstalled.addListener(async () => {
-  await runDataMigrationCheck();
-
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
   if (firstRunShown) {
     return;
@@ -21,72 +17,6 @@ browser.runtime.onInstalled.addListener(async () => {
     browser.storage.local.set({ firstRunShown: true });
   }
 });
-
-// async function labelDataMigration() {
-
-//   const { dataMigrationCompleted } = await browser.storage.local.get(
-//     "dataMigrationCompleted"
-//   );
-
-//   if (dataMigrationCompleted == true) {
-//     return;
-//   }
-
-//   browser.storage.local.set({ dataMigrationCompleted: false });
-// }
-
-async function runDataMigrationCheck() {
-  const { addOnVersion } = await browser.storage.local.get("addOnVersion");
-
-  if (!addOnVersion) {
-    // console.log("No previous data version");
-    browser.storage.local.set({ addOnVersion: ADDON_VERSION });
-    // await labelDataMigration();
-  }
-
-  switch (addOnVersion) {
-    case "1.7.1":
-      // await labelDataMigration();
-      break;
-  }
-}
-
-// https://stackoverflow.com/a/6832706
-function compareVersion(a, b) {
-  if (a === b) {
-    return 0;
-  }
-
-  var a_components = a.split(".");
-  var b_components = b.split(".");
-
-  var len = Math.min(a_components.length, b_components.length);
-
-  // loop while the components are equal
-  for (var i = 0; i < len; i++) {
-    // A bigger than B
-    if (parseInt(a_components[i]) > parseInt(b_components[i])) {
-      return 1;
-    }
-
-    // B bigger than A
-    if (parseInt(a_components[i]) < parseInt(b_components[i])) {
-      return -1;
-    }
-  }
-
-  // If one's a prefix of the other, the longer one is greater.
-  if (a_components.length > b_components.length) {
-    return 1;
-  }
-
-  if (a_components.length < b_components.length) {
-    return -1;
-  }
-
-  // Otherwise they are the same.
-  return 0;
-}
 
 async function updateServerStoragePref(pref) {
   const { profileID } = await browser.storage.local.get("profileID");
@@ -102,6 +32,10 @@ async function updateServerStoragePref(pref) {
   const settings = {
     server_storage: pref,
   };
+
+  await browser.storage.local.set({
+    server_storage: pref
+  });
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
   const url = `${relayApiSource}/profiles/${profileID}/`;
@@ -181,20 +115,23 @@ async function makeRelayAddress(description = null) {
   const { csrfCookieValue } = await browser.storage.local.get(
     "csrfCookieValue"
   );
+  const { server_storage } = await browser.storage.local.get("server_storage");
   // const { apiToken } = await browser.storage.local.get("apiToken");
 
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
   const newRelayAddressUrl = apiMakeRelayAddressesURL;
 
-  let apiBody = {};
+  let apiBody = {
+    enabled: true,
+    description: "",
+    generated_for: "",
+  };
 
-  if (description) {
-    apiBody = JSON.stringify({
-      enabled: true,
-      description: description,
-      generated_for: description,
-    });
+  // Only send description/generated_for fields in the request if the user is opt'd into server storage
+  if (description && server_storage) {
+    apiBody.description = description;
+    apiBody.generated_for = description;
   }
 
   const headers = new Headers(undefined);
@@ -208,7 +145,7 @@ async function makeRelayAddress(description = null) {
     mode: "same-origin",
     method: "POST",
     headers: headers,
-    body: apiBody,
+    body: JSON.stringify(apiBody),
   });
 
   if (newRelayAddressResponse.status === 402) {
@@ -222,7 +159,7 @@ async function makeRelayAddress(description = null) {
     // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.description = description;
     // Store the domain in which the alias was generated, separate from the label
-    newRelayAddressJson.siteOrigin = description;
+    newRelayAddressJson.generated_for = description;
   }
 
   // TODO: put this into an updateLocalAddresses() function

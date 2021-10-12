@@ -30,7 +30,7 @@ function getOnboardingPanels() {
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     },
-    // "severStoragePanel": {
+    // "serverStoragePanel": {
     //   "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
     //   "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
     //   "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
@@ -67,12 +67,12 @@ function premiumFeaturesAvailable(premiumEnabledString) {
 }
 
 async function showServerStoragePromptPanel() {
-  const { severStoragePrompt } = await browser.storage.local.get(
-    "severStoragePrompt"
+  const { serverStoragePrompt } = await browser.storage.local.get(
+    "serverStoragePrompt"
     );
     
   // Only show the server prompt panel if not set/set to false
-  return !severStoragePrompt;
+  return !serverStoragePrompt;
 }
 
 const serverStoragePanel = {
@@ -91,7 +91,7 @@ const serverStoragePanel = {
       .forEach((childDiv) => childDiv.classList.add("is-hidden"));
   },
   init: () => {
-    // Sever Storage Prompt Panel
+    // Server Storage Prompt Panel
     const serverStoragePanelWrapper = document.querySelector(
       ".server-storage-wrapper"
     );
@@ -154,7 +154,7 @@ const serverStoragePanel = {
       window.close();
     },
     dontShowPanelAgain: ()=> {
-      browser.storage.local.set({ severStoragePrompt: true });
+      browser.storage.local.set({ serverStoragePrompt: true });
     }
   },
 };
