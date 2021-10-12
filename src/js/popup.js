@@ -30,6 +30,14 @@ function getOnboardingPanels() {
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     },
+    // "severStoragePanel": {
+    //   "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
+    //   "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
+    //   "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
+    //   "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
+    //   "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
+    //   "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
+    // },
   };
 }
 
@@ -58,9 +66,110 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return false;
 }
 
+async function showServerStoragePromptPanel() {
+  const { severStoragePrompt } = await browser.storage.local.get(
+    "severStoragePrompt"
+    );
+    
+  // Only show the server prompt panel if not set/set to false
+  return !severStoragePrompt;
+}
 
-function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
+const serverStoragePanel = {
+  hide: () => {
+    const serverStoragePanelWrapper = document.querySelector(
+      ".server-storage-wrapper"
+    );
+
+    document.querySelectorAll(".content-wrapper").forEach((div) => {
+      div.classList.remove("is-hidden");
+    });
+
+    serverStoragePanelWrapper.classList.add("is-hidden");
+    serverStoragePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.add("is-hidden"));
+  },
+  init: () => {
+    // Sever Storage Prompt Panel
+    const serverStoragePanelWrapper = document.querySelector(
+      ".server-storage-wrapper"
+    );
+
+    // document.getElementsByClassName("content-wrapper")[0].remove();
+    document.querySelectorAll(".content-wrapper").forEach(div => {
+      div.classList.add("is-hidden");
+    });
+    serverStoragePanelWrapper.classList.remove("is-hidden");
+    serverStoragePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
+    const serverStoragePanelLearnMore = document.querySelector(
+      ".server-storage-learn-more"
+    );
+    const serverStoragePanelButtonDismiss =
+      document.querySelector(".server-storage-button-dismiss");
+
+    const serverStoragePanelButtonAllow =
+      document.querySelector(".server-storage-button-allow");
+
+    serverStoragePanelLearnMore.addEventListener(
+      "click",
+      serverStoragePanel.event.learnMore,
+      false
+    );
+
+    serverStoragePanelButtonDismiss.addEventListener(
+      "click",
+      serverStoragePanel.event.dismiss,
+      false
+    );
+    serverStoragePanelButtonAllow.addEventListener(
+      "click",
+      serverStoragePanel.event.allow,
+      false
+    );
+  },
+  event: {
+    dismiss: async (e) => {
+      e.preventDefault();
+      updateServerStoragePref(false);
+      serverStoragePanel.event.dontShowPanelAgain();
+      serverStoragePanel.hide();
+      showRelayPanel(1);
+    },
+    allow: async (e) => {
+      e.preventDefault();
+      updateServerStoragePref(true)
+      serverStoragePanel.event.dontShowPanelAgain();
+      serverStoragePanel.hide();
+      showRelayPanel(1);
+    },
+    learnMore: async (e) => {
+      e.preventDefault();
+      browser.tabs.create({
+        url: e.target.href,
+        active: true
+      });
+      window.close();
+    },
+    dontShowPanelAgain: ()=> {
+      browser.storage.local.set({ severStoragePrompt: true });
+    }
+  },
+};
+
+async function updateServerStoragePref(pref) {
+  await browser.runtime.sendMessage({
+    method: "updateServerStoragePref",
+    pref
+  });
+}
+
+async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+
+  const shouldShowServerStoragePromptPanel = await showServerStoragePromptPanel();
 
   if (premium && premiumFeaturesAvailable(premiumEnabledString)){
     document.getElementsByClassName("content-wrapper")[0].remove();
@@ -72,9 +181,11 @@ function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premi
     checkUserSubdomain(premiumSubdomainSet);
     return 'premiumPanel';
   }
+  else if (shouldShowServerStoragePromptPanel) {
+    serverStoragePanel.init();
 
-  else {
-    const premiumWrapper = document.getElementsByClassName("premium-wrapper")
+  } else {
+    const premiumWrapper = document.getElementsByClassName("premium-wrapper");
     if (premiumWrapper.length) {
       premiumWrapper[0].remove();
     }
@@ -93,7 +204,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   else {
     educationalComponent.classList.add("is-hidden");
   }
-}
+} 
 
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
@@ -123,9 +234,8 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
-
-  const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
+  const updatePanel = async (numRemaining, panelId) => {
+    const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
@@ -297,8 +407,7 @@ async function popup() {
       window.close();
     });
   });
-
-
+  
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
   const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");

@@ -384,6 +384,10 @@ onboarding-panel {
   font-family: 'InterUI';
 }
 
+.content-wrapper.is-hidden, .premium-wrapper.is-hidden {
+  display: none;
+}
+
 .content-wrapper, .premium-wrapper {
   display: flex;
   height: 100%;
@@ -662,4 +666,8 @@ onboarding-panel p {
   .view-dashboard {
     margin: auto auto 0 auto;
   }
+}
+
+.server-storage-wrapper.is-hidden, .server-storage-wrapper .is-hidden {
+  display: none;
 }

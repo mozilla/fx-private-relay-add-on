@@ -88,6 +88,41 @@ function compareVersion(a, b) {
   return 0;
 }
 
+async function updateServerStoragePref(pref) {
+  const { profileID } = await browser.storage.local.get("profileID");
+  const { csrfCookieValue } = await browser.storage.local.get(
+    "csrfCookieValue"
+  );
+  const headers = new Headers(undefined);
+
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+
+  const settings = {
+    server_storage: pref,
+  };
+
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
+  const url = `${relayApiSource}/profiles/${profileID}/`;
+
+  const response = await fetch(url, {
+    mode: "same-origin",
+    method: "PATCH",
+    body: JSON.stringify(settings),
+    headers: headers,
+  });
+
+  if (response.ok) {
+    // Refresh any open profile pages (/accounts/settings or /accounts/profile)
+    browser.tabs.query({ url: "*://127.0.0.1/*" }, function (tabs) {
+      for (let tab of tabs) {
+        browser.tabs.sendMessage(tab.id, { message: "refreshSettingsPage" });
+      }
+    });
+  }
+}
+
 // https://stackoverflow.com/a/2117523
 function uuidv4() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -323,6 +358,9 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "rebuildContextMenuUpgrade":
       await updateUpgradeContextMenuItem();
+      break;
+    case "updateServerStoragePref":
+      await updateServerStoragePref(m.pref);
       break;
   }
   return response;

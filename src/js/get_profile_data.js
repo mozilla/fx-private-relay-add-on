@@ -46,6 +46,10 @@
 
   const isSiteStorageEnabled = await getProfileData(apiProfileURL);
 
+  browser.storage.local.set({
+    profileID: parseInt(isSiteStorageEnabled[0].id),
+  });
+
   // Get the relay address objects from the addon storage
   const addonStorageRelayAddresses = await browser.storage.local.get(
     "relayAddresses"
