@@ -116,10 +116,7 @@ async function makeRelayAddress(description = null) {
     "csrfCookieValue"
   );
   const { server_storage } = await browser.storage.local.get("server_storage");
-  // const { apiToken } = await browser.storage.local.get("apiToken");
-
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
-
   const newRelayAddressUrl = apiMakeRelayAddressesURL;
 
   let apiBody = {
@@ -237,12 +234,12 @@ async function updateUpgradeContextMenuItem() {
 
   if (premiumFeaturesAvailable(premiumEnabledString)) {
     if (!premium) {
-      // await createUpgradeContextMenuItem();
+      await createUpgradeContextMenuItem();
     }
 
     // Remove the upgrade item, if the user is upgraded
     else {
-      // await removeUpgradeContextMenuItem();
+      await removeUpgradeContextMenuItem();
     }
   }
 }
