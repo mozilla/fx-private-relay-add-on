@@ -237,6 +237,11 @@ async function showRelayPanel(tipPanelToShow) {
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
+    if (!panelStrings) {
+      // Exit early if on a non-onboarding
+      return;
+    }
+
     tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
     tipHeadlineEl.textContent = panelStrings.tipHeadline;
     tipBodyEl.textContent = panelStrings.tipBody;

@@ -10,7 +10,7 @@
   const apiProfileURL = `${relayApiSource}/profiles/`;
   const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
-  async function getProfileData(url) {
+  async function apiRequest(url) {
     const cookieString =
       typeof document.cookie === "string" ? document.cookie : "";
     const cookieStringArray = cookieString
@@ -44,16 +44,18 @@
     return answer;
   }
 
-  const isSiteStorageEnabled = await getProfileData(apiProfileURL);
+  const serverProfileData = await apiRequest(apiProfileURL);
 
   browser.storage.local.set({
-    profileID: parseInt(isSiteStorageEnabled[0].id),
+    profileID: parseInt(serverProfileData[0].id, 10),
   });
 
   // Get the relay address objects from the addon storage
   const addonStorageRelayAddresses = await browser.storage.local.get(
     "relayAddresses"
   );
+
+  const siteStorageEnabled = serverProfileData[0].server_storage;
 
   const addonRelayAddresses =
     Object.keys(addonStorageRelayAddresses).length === 0
@@ -121,16 +123,14 @@
     return Array.from(map.values());
   }
 
-  if (isSiteStorageEnabled[0].server_storage) {
-    const getRelayAliasesFromDatabase = await getProfileData(
-      apiRelayAddressesURL
-    );
+  if (siteStorageEnabled) {
+    const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
 
     // console.log("Fetch Profile Data from API");
 
     // let usage: This data may be overwritten when merging the
     // local storage items with the items pulled from the server.
-    let localStorageData = getRelayAliasesFromDatabase;
+    let localStorageData = serverRelayAddresses;
 
     // Check/cache local storage
     const { relayAddresses } = await browser.storage.local.get(
