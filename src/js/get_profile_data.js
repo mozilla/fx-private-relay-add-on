@@ -172,7 +172,15 @@
         "profilePageDefaulAliasLabelText"
       );
 
-      // The Number.isInteger check confirms that this field was set by the add-on/user, rather than the server
+      // The labels (previously ONLY in local storage of the add-on) were set
+      // as a string entry for "domain". With the new alias object from the server,
+      // it already has an entry named "domain", which is an interger.
+      // This variable checks for three truths:
+      //   - Does the alias exists?
+      //   - Does it have an entry for "domain"?
+      //   - Is the entry NOT an interger? 
+      // If all three of these are true, this user has a legacy label stored locally 
+      // that needs to be ported to the "description" entry
       const storedLegacyAliasLabel =
         addonRelayAddress &&
         addonRelayAddress.hasOwnProperty("domain") &&
