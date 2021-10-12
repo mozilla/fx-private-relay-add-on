@@ -171,7 +171,9 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
 
   const shouldShowServerStoragePromptPanel = await showServerStoragePromptPanel();
 
-  if (premium && premiumFeaturesAvailable(premiumEnabledString)){
+  if (shouldShowServerStoragePromptPanel) {
+    serverStoragePanel.init();
+  } else if (premium && premiumFeaturesAvailable(premiumEnabledString)){
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
@@ -180,10 +182,6 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
     //Toggle register domain or education module
     checkUserSubdomain(premiumSubdomainSet);
     return 'premiumPanel';
-  }
-  else if (shouldShowServerStoragePromptPanel) {
-    serverStoragePanel.init();
-
   } else {
     const premiumWrapper = document.getElementsByClassName("premium-wrapper");
     if (premiumWrapper.length) {
