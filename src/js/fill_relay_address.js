@@ -103,6 +103,7 @@ function fillInputWithAlias(emailInput, relayAlias) {
       break;
     case 2:
       emailInput.value = relayAlias.address + "@mozmail.com";
+      break;
     default:
       break;
   }
