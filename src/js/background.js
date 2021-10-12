@@ -117,7 +117,7 @@ async function updateServerStoragePref(pref) {
     // Refresh any open profile pages (/accounts/settings or /accounts/profile)
     browser.tabs.query({ url: "*://127.0.0.1/*" }, function (tabs) {
       for (let tab of tabs) {
-        browser.tabs.sendMessage(tab.id, { message: "refreshSettingsPage" });
+        browser.tabs.reload(tab.id);
       }
     });
   }
