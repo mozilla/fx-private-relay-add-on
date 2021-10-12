@@ -163,7 +163,7 @@
       // Add the description (previoulsy domain) note from the addon storage to the page
 
       const aliasCardData = aliasCard.dataset;
-      const aliasId = parseInt(aliasCardData.relayAddressId);
+      const aliasId = parseInt(aliasCardData.relayAddressId, 10);
       const addonRelayAddress = addonRelayAddresses.relayAddresses.filter(
         (address) => address.id == aliasId
       )[0];
