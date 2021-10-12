@@ -202,7 +202,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   else {
     educationalComponent.classList.add("is-hidden");
   }
-} 
+}
 
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
