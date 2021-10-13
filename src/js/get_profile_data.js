@@ -140,7 +140,6 @@
   async function sendMetaDataToServer(aliases) {
     for (const alias of aliases) {
       let body = {
-        enabled: true,
         description: "",
         generated_for: "",
       };
@@ -155,7 +154,7 @@
 
       if (body.description.length > 0 || body.generated_for.length > 0) {
         body = JSON.stringify(body);
-        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PUT", body, {auth: true});
+        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PATCH", body, {auth: true});
       }
     }
   }
