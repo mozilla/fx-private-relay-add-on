@@ -154,11 +154,6 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
 
   const shouldShowServerStoragePromptPanel = await isServerStoragePromptPanelRelevant();
 
-  console.log(
-    "shouldShowServerStoragePromptPanel",
-    shouldShowServerStoragePromptPanel
-  );
-
   if (shouldShowServerStoragePromptPanel) {
     serverStoragePanel.init();
   } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
