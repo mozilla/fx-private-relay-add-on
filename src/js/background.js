@@ -23,19 +23,14 @@ async function updateServerStoragePref(pref) {
   const { csrfCookieValue } = await browser.storage.local.get(
     "csrfCookieValue"
   );
-  const headers = new Headers(undefined);
 
-  headers.set("X-CSRFToken", csrfCookieValue);
-  headers.set("Content-Type", "application/json");
-  headers.set("Accept", "application/json");
+  const headers = await createNewHeadersObject();
 
   const settings = {
     server_storage: pref,
   };
 
-  await browser.storage.local.set({
-    server_storage: pref
-  });
+  await browser.storage.local.set(settings);
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
   const url = `${relayApiSource}/profiles/${profileID}/`;
@@ -101,6 +96,26 @@ async function sendMetricsEvent(eventData) {
   });
 }
 
+async function createNewHeadersObject(opts) {
+  const headers = new Headers();
+  const { csrfCookieValue } = await browser.storage.local.get(
+    "csrfCookieValue"
+  );
+
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  
+  if (opts && opts.auth) {
+    const apiToken = await browser.storage.local.get("apiToken");
+    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  }
+
+
+  return headers;
+
+}
+
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
@@ -112,10 +127,8 @@ async function makeRelayAddress(description = null) {
   }
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
-  const { csrfCookieValue } = await browser.storage.local.get(
-    "csrfCookieValue"
-  );
-  const { server_storage } = await browser.storage.local.get("server_storage");
+  
+  const { settings } = await browser.storage.local.get("settings");
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
   const newRelayAddressUrl = apiMakeRelayAddressesURL;
 
@@ -126,17 +139,12 @@ async function makeRelayAddress(description = null) {
   };
 
   // Only send description/generated_for fields in the request if the user is opt'd into server storage
-  if (description && server_storage) {
+  if (description && settings.server_storage) {
     apiBody.description = description;
     apiBody.generated_for = description;
   }
 
-  const headers = new Headers(undefined);
-
-  headers.set("X-CSRFToken", csrfCookieValue);
-  headers.set("Content-Type", "application/json");
-  headers.set("Accept", "application/json");
-  headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  const headers = await createNewHeadersObject({auth: true});
 
   const newRelayAddressResponse = await fetch(newRelayAddressUrl, {
     mode: "same-origin",
@@ -234,6 +242,8 @@ async function updateUpgradeContextMenuItem() {
 
   if (premiumFeaturesAvailable(premiumEnabledString)) {
     if (!premium) {
+      // Remove any previous upgrade menu items first!
+      await removeUpgradeContextMenuItem();
       await createUpgradeContextMenuItem();
     }
 

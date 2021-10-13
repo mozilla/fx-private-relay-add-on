@@ -10,7 +10,7 @@
   const apiProfileURL = `${relayApiSource}/profiles/`;
   const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
-  async function apiRequest(url, method = "GET", body = null) {
+  async function apiRequest(url, method = "GET", body = null, opts=null) {
 
     const cookieString =
       typeof document.cookie === "string" ? document.cookie : "";
@@ -28,11 +28,19 @@
 
     browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
 
-    const headers = new Headers(undefined);
 
+    const headers = new Headers();
+
+    
     headers.set("X-CSRFToken", csrfCookieValue);
     headers.set("Content-Type", "application/json");
     headers.set("Accept", "application/json");
+    
+    if (opts && opts.auth) {
+      const apiToken = await browser.storage.local.get("apiToken");
+      headers.set("Authorization", `Token ${apiToken.apiToken}`);
+    }
+
 
     const response = await fetch(url, {
       mode: "same-origin",
@@ -49,7 +57,9 @@
 
   browser.storage.local.set({
     profileID: parseInt(serverProfileData[0].id, 10),
-    server_storage: serverProfileData[0].server_storage,
+    settings: {
+      server_storage: serverProfileData[0].server_storage,
+    },
   });
 
   // Get the relay address objects from the addon storage
@@ -113,19 +123,6 @@
     premiumEnabled,
   });
 
-  function mergeLocalStorageDataWithServer(localAliases, serverAliases) {
-    // TODO: Function that compares fields between both data sets and description/generated_for if existing in local
-    // TODO: Add loop with local labels pushed to server via PATCH request
-
-    const map = new Map();
-    localAliases.forEach((alias) => map.set(alias.id, alias));
-    serverAliases.forEach((alias) =>
-      map.set(alias.id, { ...map.get(alias.id), ...alias })
-    );
-
-    return Array.from(map.values());
-  }
-
   // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
   function aliasesHaveStoredMetadata(aliases) {
     for (const alias of aliases) {
@@ -143,7 +140,6 @@
   async function sendMetaDataToServer(aliases) {
     for (const alias of aliases) {
       let body = {
-        enabled: true,
         description: "",
         generated_for: "",
       };
@@ -158,7 +154,7 @@
 
       if (body.description.length > 0 || body.generated_for.length > 0) {
         body = JSON.stringify(body);
-        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PUT", body);
+        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PATCH", body, {auth: true});
       }
     }
   }
@@ -188,7 +184,7 @@
     // If local storage items exist AND have label metadata stored, sync it to the server.
     const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
 
-    // let usage: This data may be overwritten when merging the
+    // let usage: This data may be overwritten when merging the local storage dataset with the server set. 
     let localStorageData = serverRelayAddresses;
 
     // Check/cache local storage
