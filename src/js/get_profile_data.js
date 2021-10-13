@@ -126,11 +126,14 @@
   // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
   function aliasesHaveStoredMetadata(aliases) {
     for (const alias of aliases) {
-      if (alias.description !== null && alias.description.length > 0) {
+      if (
+        typeof alias.description === "string" &&
+        alias.description.length > 0
+      ) {
         return true;
       }
 
-      if (alias.generated_for !== null && alias.generated_for.length > 0) {
+      if (typeof alias.generated_for === "string" && alias.generated_for.length > 0) {
         return true;
       }
     }
@@ -139,45 +142,29 @@
   // Loop through local storage aliases and sync any metadata they have with the server dataset
   async function sendMetaDataToServer(aliases) {
     for (const alias of aliases) {
-      let body = {
-        description: "",
-        generated_for: "",
+      const body = {
+        description: alias.description ?? "",
+        generated_for: alias.generated_for ?? "",
       };
 
-      if (alias.description.length > 0) {
-        body.description = alias.description;
-      }
-
-      if (alias.generated_for.length > 0) {
-        body.generated_for = alias.generated_for;
-      }
-
       if (body.description.length > 0 || body.generated_for.length > 0) {
-        body = JSON.stringify(body);
-        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PATCH", body, {auth: true});
+        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
       }
     }
   }
 
   // Loop through the temp array that is about to be synced with the server dataset and 
   // be sure it matches the local storage metadata dataset
-  function updateAliasArrToMatchProd(aliases, aliasesToBeSynced) {
-    for (const alias of aliases) {
-      if (alias.description.length > 0) {
-        aliasesToBeSynced.find(
-          (newAlias) => newAlias.id === alias.id
-        ).description = alias.description;
-      }
-
-      if (alias.generated_for.length > 0) {
-        aliasesToBeSynced.find(
-          (newAlias) => newAlias.id === alias.id
-        ).generated_for = alias.generated_for;
-      }
+  function getAliasesWithUpdatedMetadata(updatedAliases, prevAliases) {
+    return prevAliases.map(prevAlias => {
+      const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id);
+      return {
+        ...prevAlias,
+        description: updatedAlias.description.length > 0 ? updatedAlias.description : prevAlias.description,
+        generated_for: updatedAlias.generated_for.length > 0 ? updatedAlias.generated_for : prevAlias.generated_for,
+      };
     }
-
-    return aliasesToBeSynced;
-  }
+  )};
 
   if (siteStorageEnabled) {
     // Sync alias data from server page.
@@ -199,9 +186,9 @@
       !aliasesHaveStoredMetadata(localStorageData) // Make sure there is no meta data in the server dataset
     ) {
       await sendMetaDataToServer(relayAddresses);
-      localStorageData = updateAliasArrToMatchProd(
-        relayAddresses,
-        localStorageData
+      localStorageData = getAliasesWithUpdatedMetadata(
+        localStorageData,
+        relayAddresses
       );
     }
 
@@ -228,11 +215,11 @@
 
       // The labels (previously ONLY in local storage of the add-on) were set
       // as a string entry for "domain". With the new alias object from the server,
-      // it already has an entry named "domain", which is an interger.
+      // it already has an entry named "domain", which is an integer.
       // This variable checks for three truths:
       //   - Does the alias exists?
       //   - Does it have an entry for "domain"?
-      //   - Is the entry NOT an interger?
+      //   - Is the entry NOT an integer?
       // If all three of these are true, this user has a legacy label stored locally
       // that needs to be ported to the "description" entry
       const storedLegacyAliasLabel =
