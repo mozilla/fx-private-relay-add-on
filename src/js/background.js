@@ -33,9 +33,7 @@ async function updateServerStoragePref(pref) {
     server_storage: pref,
   };
 
-  await browser.storage.local.set({
-    server_storage: pref
-  });
+  await browser.storage.local.set(settings);
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
   const url = `${relayApiSource}/profiles/${profileID}/`;
@@ -115,7 +113,7 @@ async function makeRelayAddress(description = null) {
   const { csrfCookieValue } = await browser.storage.local.get(
     "csrfCookieValue"
   );
-  const { server_storage } = await browser.storage.local.get("server_storage");
+  const { settings } = await browser.storage.local.get("settings");
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
   const newRelayAddressUrl = apiMakeRelayAddressesURL;
 
@@ -126,7 +124,7 @@ async function makeRelayAddress(description = null) {
   };
 
   // Only send description/generated_for fields in the request if the user is opt'd into server storage
-  if (description && server_storage) {
+  if (description && settings.server_storage) {
     apiBody.description = description;
     apiBody.generated_for = description;
   }

@@ -49,7 +49,9 @@
 
   browser.storage.local.set({
     profileID: parseInt(serverProfileData[0].id, 10),
-    server_storage: serverProfileData[0].server_storage,
+    settings: {
+      server_storage: serverProfileData[0].server_storage,
+    },
   });
 
   // Get the relay address objects from the addon storage
