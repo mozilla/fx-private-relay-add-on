@@ -43,13 +43,11 @@ function getEducationalStrings() {
   };
 }
 
-
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
   document.body.classList.add("sign-up");
   return signUpOrInPanel.classList.remove("hidden");
 }
-
 
 function premiumFeaturesAvailable(premiumEnabledString) {
   if (premiumEnabledString === "True") {
@@ -58,13 +56,20 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return false;
 }
 
-async function showServerStoragePromptPanel() {
+async function isServerStoragePromptPanelRelevant() {
   const { serverStoragePrompt } = await browser.storage.local.get(
     "serverStoragePrompt"
-    );
-    
-  // Only show the server prompt panel if not set/set to false
-  return !serverStoragePrompt;
+  );
+
+  const { settings } = await browser.storage.local.get("settings");
+
+  // Only show the server prompt panel the user has not already opt'd in,
+  // or if they have not interacted with the panel before.
+  if (!settings.server_storage || !serverStoragePrompt) {
+    return true;
+  }
+
+  return false;
 }
 
 const serverStoragePanel = {
@@ -88,34 +93,28 @@ const serverStoragePanel = {
       ".server-storage-wrapper"
     );
 
-    // document.getElementsByClassName("content-wrapper")[0].remove();
     document.querySelectorAll(".content-wrapper").forEach(div => {
       div.classList.add("is-hidden");
     });
+
     serverStoragePanelWrapper.classList.remove("is-hidden");
+    
     serverStoragePanelWrapper
       .querySelectorAll(".is-hidden")
       .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
-    const serverStoragePanelLearnMore = document.querySelector(
-      ".server-storage-learn-more"
-    );
+    
     const serverStoragePanelButtonDismiss =
       document.querySelector(".server-storage-button-dismiss");
 
     const serverStoragePanelButtonAllow =
       document.querySelector(".server-storage-button-allow");
 
-    serverStoragePanelLearnMore.addEventListener(
-      "click",
-      serverStoragePanel.event.learnMore,
-      false
-    );
-
     serverStoragePanelButtonDismiss.addEventListener(
       "click",
       serverStoragePanel.event.dismiss,
       false
     );
+    
     serverStoragePanelButtonAllow.addEventListener(
       "click",
       serverStoragePanel.event.allow,
@@ -137,14 +136,6 @@ const serverStoragePanel = {
       serverStoragePanel.hide();
       showRelayPanel(1);
     },
-    learnMore: async (e) => {
-      e.preventDefault();
-      browser.tabs.create({
-        url: e.target.href,
-        active: true
-      });
-      window.close();
-    },
     dontShowPanelAgain: ()=> {
       browser.storage.local.set({ serverStoragePrompt: true });
     }
@@ -161,25 +152,32 @@ async function updateServerStoragePref(pref) {
 async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
 
-  const shouldShowServerStoragePromptPanel = await showServerStoragePromptPanel();
+  const shouldShowServerStoragePromptPanel = await isServerStoragePromptPanelRelevant();
+
+  console.log(
+    "shouldShowServerStoragePromptPanel",
+    shouldShowServerStoragePromptPanel
+  );
 
   if (shouldShowServerStoragePromptPanel) {
     serverStoragePanel.init();
-  } else if (premium && premiumFeaturesAvailable(premiumEnabledString)){
+  } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
-    premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
-      premiumFeature.classList.remove("is-hidden") 
+    premiumPanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((premiumFeature) =>
+        premiumFeature.classList.remove("is-hidden")
       );
     //Toggle register domain or education module
     checkUserSubdomain(premiumSubdomainSet);
-    return 'premiumPanel';
+    return "premiumPanel";
   } else {
     const premiumWrapper = document.getElementsByClassName("premium-wrapper");
     if (premiumWrapper.length) {
       premiumWrapper[0].remove();
     }
-    return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
+    return numRemaining === 0 ? "maxAliasesPanel" : `panel${panelId}`;
   }
 }
 
