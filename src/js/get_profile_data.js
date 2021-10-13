@@ -123,19 +123,6 @@
     premiumEnabled,
   });
 
-  function mergeLocalStorageDataWithServer(localAliases, serverAliases) {
-    // TODO: Function that compares fields between both data sets and description/generated_for if existing in local
-    // TODO: Add loop with local labels pushed to server via PATCH request
-
-    const map = new Map();
-    localAliases.forEach((alias) => map.set(alias.id, alias));
-    serverAliases.forEach((alias) =>
-      map.set(alias.id, { ...map.get(alias.id), ...alias })
-    );
-
-    return Array.from(map.values());
-  }
-
   // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
   function aliasesHaveStoredMetadata(aliases) {
     for (const alias of aliases) {
