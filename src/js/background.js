@@ -18,38 +18,21 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
-async function updateServerStoragePref(pref) {
+async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
-  const { csrfCookieValue } = await browser.storage.local.get(
-    "csrfCookieValue"
-  );
-
   const headers = await createNewHeadersObject();
-
-  const settings = {
-    server_storage: pref,
-  };
-
-  await browser.storage.local.set(settings);
-
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
   const url = `${relayApiSource}/profiles/${profileID}/`;
 
   const response = await fetch(url, {
     mode: "same-origin",
-    method: "PATCH",
-    body: JSON.stringify(settings),
+    method: "GET",
     headers: headers,
   });
 
-  if (response.ok) {
-    // Refresh any open profile pages (/accounts/settings or /accounts/profile)
-    browser.tabs.query({ url: "*://127.0.0.1/*" }, function (tabs) {
-      for (let tab of tabs) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  }
+  answer = await response.json();
+
+  return answer.server_storage;
 }
 
 // https://stackoverflow.com/a/2117523
@@ -119,6 +102,7 @@ async function createNewHeadersObject(opts) {
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
+  
   if (!apiToken.apiToken) {
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
@@ -126,9 +110,8 @@ async function makeRelayAddress(description = null) {
     return;
   }
 
-  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
-  
-  const { settings } = await browser.storage.local.get("settings");
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  const serverStoragePermission = await getServerStoragePref();
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
   const newRelayAddressUrl = apiMakeRelayAddressesURL;
 
@@ -139,7 +122,7 @@ async function makeRelayAddress(description = null) {
   };
 
   // Only send description/generated_for fields in the request if the user is opt'd into server storage
-  if (description && settings.server_storage) {
+  if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
   }
@@ -303,8 +286,8 @@ browser.runtime.onMessage.addListener(async (m) => {
     case "rebuildContextMenuUpgrade":
       await updateUpgradeContextMenuItem();
       break;
-    case "updateServerStoragePref":
-      await updateServerStoragePref(m.pref);
+    case "getServerStoragePref":
+      response = await getServerStoragePref();
       break;
   }
   return response;

@@ -61,11 +61,16 @@ async function isServerStoragePromptPanelRelevant() {
     "serverStoragePrompt"
   );
 
-  const { settings } = await browser.storage.local.get("settings");
+
+  const serverStoragePref = await browser.runtime.sendMessage({
+    method: "getServerStoragePref"
+  });
+  
+
 
   // Only show the server prompt panel the user has not already opt'd in,
   // or if they have not interacted with the panel before.
-  if (!settings.server_storage || !serverStoragePrompt) {
+  if (!serverStoragePref && !serverStoragePrompt) {
     return true;
   }
 
@@ -124,30 +129,33 @@ const serverStoragePanel = {
   event: {
     dismiss: async (e) => {
       e.preventDefault();
-      updateServerStoragePref(false);
       serverStoragePanel.event.dontShowPanelAgain();
       serverStoragePanel.hide();
       showRelayPanel(1);
     },
+    
     allow: async (e) => {
       e.preventDefault();
-      updateServerStoragePref(true)
+
+      const { relaySiteOrigin } = await browser.storage.local.get(
+        "relaySiteOrigin"
+      );
+
       serverStoragePanel.event.dontShowPanelAgain();
-      serverStoragePanel.hide();
-      showRelayPanel(1);
+      
+      browser.tabs.create({
+        url: `${relaySiteOrigin}/accounts/settings/`,
+        active: true,
+      });
+
+      window.close();
     },
+
     dontShowPanelAgain: ()=> {
       browser.storage.local.set({ serverStoragePrompt: true });
     }
   },
 };
-
-async function updateServerStoragePref(pref) {
-  await browser.runtime.sendMessage({
-    method: "updateServerStoragePref",
-    pref
-  });
-}
 
 async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
