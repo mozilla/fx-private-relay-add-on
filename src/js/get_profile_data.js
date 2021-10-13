@@ -10,7 +10,7 @@
   const apiProfileURL = `${relayApiSource}/profiles/`;
   const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
-  async function apiRequest(url, method = "GET", body = null) {
+  async function apiRequest(url, method = "GET", body = null, opts=null) {
 
     const cookieString =
       typeof document.cookie === "string" ? document.cookie : "";
@@ -28,11 +28,19 @@
 
     browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
 
-    const headers = new Headers(undefined);
 
+    const headers = new Headers();
+
+    
     headers.set("X-CSRFToken", csrfCookieValue);
     headers.set("Content-Type", "application/json");
     headers.set("Accept", "application/json");
+    
+    if (opts && opts.auth) {
+      const apiToken = await browser.storage.local.get("apiToken");
+      headers.set("Authorization", `Token ${apiToken.apiToken}`);
+    }
+
 
     const response = await fetch(url, {
       mode: "same-origin",
@@ -160,7 +168,7 @@
 
       if (body.description.length > 0 || body.generated_for.length > 0) {
         body = JSON.stringify(body);
-        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PUT", body);
+        await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PUT", body, {auth: true});
       }
     }
   }
