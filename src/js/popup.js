@@ -29,7 +29,7 @@ function getOnboardingPanels() {
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    },
+    }
   };
 }
 
@@ -43,13 +43,11 @@ function getEducationalStrings() {
   };
 }
 
-
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
   document.body.classList.add("sign-up");
   return signUpOrInPanel.classList.remove("hidden");
 }
-
 
 function premiumFeaturesAvailable(premiumEnabledString) {
   if (premiumEnabledString === "True") {
@@ -58,27 +56,131 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return false;
 }
 
+async function isServerStoragePromptPanelRelevant() {
+  const { serverStoragePrompt } = await browser.storage.local.get(
+    "serverStoragePrompt"
+  );
 
-function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
+
+  const serverStoragePref = await browser.runtime.sendMessage({
+    method: "getServerStoragePref"
+  });
+  
+
+
+  // Only show the server prompt panel the user has not already opt'd in,
+  // or if they have not interacted with the panel before.
+  if (!serverStoragePref && !serverStoragePrompt) {
+    return true;
+  }
+
+  return false;
+}
+
+const serverStoragePanel = {
+  hide: () => {
+    const serverStoragePanelWrapper = document.querySelector(
+      ".server-storage-wrapper"
+    );
+
+    document.querySelectorAll(".content-wrapper").forEach((div) => {
+      div.classList.remove("is-hidden");
+    });
+
+    serverStoragePanelWrapper.classList.add("is-hidden");
+    serverStoragePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.add("is-hidden"));
+  },
+  init: () => {
+    // Server Storage Prompt Panel
+    const serverStoragePanelWrapper = document.querySelector(
+      ".server-storage-wrapper"
+    );
+
+    document.querySelectorAll(".content-wrapper").forEach(div => {
+      div.classList.add("is-hidden");
+    });
+
+    serverStoragePanelWrapper.classList.remove("is-hidden");
+    
+    serverStoragePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
+    
+    const serverStoragePanelButtonDismiss =
+      document.querySelector(".server-storage-button-dismiss");
+
+    const serverStoragePanelButtonAllow =
+      document.querySelector(".server-storage-button-allow");
+
+    serverStoragePanelButtonDismiss.addEventListener(
+      "click",
+      serverStoragePanel.event.dismiss,
+      false
+    );
+    
+    serverStoragePanelButtonAllow.addEventListener(
+      "click",
+      serverStoragePanel.event.allow,
+      false
+    );
+  },
+  event: {
+    dismiss: async (e) => {
+      e.preventDefault();
+      serverStoragePanel.event.dontShowPanelAgain();
+      serverStoragePanel.hide();
+      showRelayPanel(1);
+    },
+    
+    allow: async (e) => {
+      e.preventDefault();
+
+      const { relaySiteOrigin } = await browser.storage.local.get(
+        "relaySiteOrigin"
+      );
+
+      serverStoragePanel.event.dontShowPanelAgain();
+      
+      browser.tabs.create({
+        url: `${relaySiteOrigin}/accounts/settings/`,
+        active: true,
+      });
+
+      window.close();
+    },
+
+    dontShowPanelAgain: ()=> {
+      browser.storage.local.set({ serverStoragePrompt: true });
+    }
+  },
+};
+
+async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
 
-  if (premium && premiumFeaturesAvailable(premiumEnabledString)){
+  const shouldShowServerStoragePromptPanel = await isServerStoragePromptPanelRelevant();
+
+  if (shouldShowServerStoragePromptPanel) {
+    serverStoragePanel.init();
+  } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
-    premiumPanelWrapper.querySelectorAll(".is-hidden").forEach(premiumFeature => 
-      premiumFeature.classList.remove("is-hidden") 
+    premiumPanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((premiumFeature) =>
+        premiumFeature.classList.remove("is-hidden")
       );
     //Toggle register domain or education module
     checkUserSubdomain(premiumSubdomainSet);
-    return 'premiumPanel';
-  }
-
-  else {
-    const premiumWrapper = document.getElementsByClassName("premium-wrapper")
+    return "premiumPanel";
+  } else {
+    const premiumWrapper = document.getElementsByClassName("premium-wrapper");
     if (premiumWrapper.length) {
       premiumWrapper[0].remove();
     }
-    return (numRemaining === 0) ? "maxAliasesPanel" : `panel${panelId}`
+    return numRemaining === 0 ? "maxAliasesPanel" : `panel${panelId}`;
   }
 }
 
@@ -123,11 +225,15 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
-
-  const updatePanel = (numRemaining, panelId) => {
-    const panelToShow = choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
+  const updatePanel = async (numRemaining, panelId) => {
+    const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
+
+    if (!panelStrings) {
+      // Exit early if on a non-onboarding
+      return;
+    }
 
     tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
     tipHeadlineEl.textContent = panelStrings.tipHeadline;
@@ -297,8 +403,7 @@ async function popup() {
       window.close();
     });
   });
-
-
+  
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
   const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
   const { premiumProdId } = await browser.storage.local.get("premiumProdId");

@@ -10,7 +10,6 @@ function closeRelayInPageMenu() {
   return;
 }
 
-
 function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
@@ -21,7 +20,6 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
   return;
 }
 
-
 function preventDefaultBehavior(clickEvt) {
   clickEvt.stopPropagation();
   clickEvt.stopImmediatePropagation();
@@ -29,20 +27,17 @@ function preventDefaultBehavior(clickEvt) {
   return;
 }
 
-
 function getRelayMenuEl() {
   return document.querySelector(".fx-relay-menu");
 }
-
 
 function positionRelayMenu() {
   const relayInPageMenu = getRelayMenuEl();
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
-  relayInPageMenu.style.left = (newIconPosition.x - 255) + "px";
-  relayInPageMenu.style.top = (newIconPosition.top + 40) + "px";
+  relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+  relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
 }
-
 
 let activeElemIndex = -1;
 function handleKeydownEvents(e) {
@@ -62,12 +57,12 @@ function handleKeydownEvents(e) {
     activeElemIndex += 1;
   }
 
-  if (e.key === "ArrowUp"|| (e.key === "Tab" && e.shiftKey === true)) {
+  if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey === true)) {
     preventDefaultBehavior(e);
     activeElemIndex -= 1;
   }
 
-  if ((clickableElsInMenu[activeElemIndex] !== undefined) && watchedKeyClicked) {
+  if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
     return clickableElsInMenu[activeElemIndex].focus();
   }
 
@@ -77,12 +72,13 @@ function handleKeydownEvents(e) {
   }
 }
 
-
 // When restricting tabbing to Relay menu... tabIndexValue = -1
 // When restoring tabbing to page elements... tabIndexValue = 0
 function restrictOrRestorePageTabbing(tabIndexValue) {
-  const allClickableEls = document.querySelectorAll("button, a, input, select, option, textarea, [tabindex]");
-  allClickableEls.forEach(el => {
+  const allClickableEls = document.querySelectorAll(
+    "button, a, input, select, option, textarea, [tabindex]"
+  );
+  allClickableEls.forEach((el) => {
     el.tabIndex = tabIndexValue;
   });
 }
@@ -93,16 +89,19 @@ function createElementWithClassList(elemType, elemClass) {
   return newElem;
 }
 
-
 async function isUserSignedIn() {
   const userApiToken = await browser.storage.local.get("apiToken");
-  return (userApiToken.hasOwnProperty("apiToken"));
+  return userApiToken.hasOwnProperty("apiToken");
 }
 
 function addPaddingRight(element, paddingInPixels) {
   const computedElementStyles = getComputedStyle(element);
-  const existingPaddingRight = computedElementStyles.getPropertyValue("padding-right");
-  const existingPaddingRightInPixels = Number.parseInt(existingPaddingRight.replace("px", ""), 10);
+  const existingPaddingRight =
+    computedElementStyles.getPropertyValue("padding-right");
+  const existingPaddingRightInPixels = Number.parseInt(
+    existingPaddingRight.replace("px", ""),
+    10
+  );
   const newPaddingRight = existingPaddingRightInPixels + paddingInPixels;
   element.style.paddingRight = newPaddingRight.toString() + "px";
 
@@ -111,7 +110,10 @@ function addPaddingRight(element, paddingInPixels) {
   // width the same.
   if (computedElementStyles.getPropertyValue("box-sizing") === "content-box") {
     const existingWidth = computedElementStyles.getPropertyValue("width");
-    const existingWidthInPixels = Number.parseInt(existingWidth.replace("px", ""), 10);
+    const existingWidthInPixels = Number.parseInt(
+      existingWidth.replace("px", ""),
+      10
+    );
     const newWidth = existingWidthInPixels - paddingInPixels;
     element.style.width = newWidth.toString() + "px";
   }
@@ -124,14 +126,18 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return false;
 }
 
-
 async function addRelayIconToInput(emailInput) {
-  const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
+  const { relaySiteOrigin } = await browser.storage.local.get(
+    "relaySiteOrigin"
+  );
   // remember the input's original parent element;
   const emailInputOriginalParentEl = emailInput.parentElement;
 
   // create new wrapping element;
-  const emailInputWrapper = createElementWithClassList("div", "fx-relay-email-input-wrapper");
+  const emailInputWrapper = createElementWithClassList(
+    "div",
+    "fx-relay-email-input-wrapper"
+  );
   emailInputOriginalParentEl.insertBefore(emailInputWrapper, emailInput);
 
   // add padding to the input so that input text
@@ -144,14 +150,20 @@ async function addRelayIconToInput(emailInput) {
 
   const divEl = createElementWithClassList("div", "fx-relay-icon");
 
-  const bottomMargin = parseInt(computedInputStyles.getPropertyValue("margin-bottom"), 10);
-  const topMargin = parseInt(computedInputStyles.getPropertyValue("margin-top"), 10);
+  const bottomMargin = parseInt(
+    computedInputStyles.getPropertyValue("margin-bottom"),
+    10
+  );
+  const topMargin = parseInt(
+    computedInputStyles.getPropertyValue("margin-top"),
+    10
+  );
 
-  divEl.style.height = computedInputStyles.height - bottomMargin - topMargin + "px"
+  divEl.style.height =
+    computedInputStyles.height - bottomMargin - topMargin + "px";
 
-  divEl.style.top = topMargin ;
+  divEl.style.top = topMargin;
   divEl.style.bottom = `${bottomMargin}px`;
-
 
   const relayIconBtn = createElementWithClassList("button", "fx-relay-button");
   relayIconBtn.id = "fx-relay-button";
@@ -170,12 +182,10 @@ async function addRelayIconToInput(emailInput) {
 
   const sendInPageEvent = (evtAction, evtLabel) => {
     sendRelayEvent("In-page", evtAction, evtLabel);
-  }
+  };
 
-
-  relayIconBtn.addEventListener("click", async(e) => {
-
-    sendInPageEvent("input-icon-clicked", "input-icon")
+  relayIconBtn.addEventListener("click", async (e) => {
+    sendInPageEvent("input-icon-clicked", "input-icon");
 
     preventDefaultBehavior(e);
     window.addEventListener("resize", positionRelayMenu);
@@ -183,7 +193,10 @@ async function addRelayIconToInput(emailInput) {
     document.addEventListener("keydown", handleKeydownEvents);
 
     const relayInPageMenu = createElementWithClassList("div", "fx-relay-menu");
-    const relayMenuWrapper = createElementWithClassList("div", "fx-relay-menu-wrapper");
+    const relayMenuWrapper = createElementWithClassList(
+      "div",
+      "fx-relay-menu-wrapper"
+    );
 
     // Close menu if the user clicks outside of the menu
     relayMenuWrapper.addEventListener("click", closeRelayInPageMenu);
@@ -197,14 +210,24 @@ async function addRelayIconToInput(emailInput) {
     const signedInUser = await isUserSignedIn();
 
     if (!signedInUser) {
-      const signUpMessageEl = createElementWithClassList("span", "fx-relay-menu-sign-up-message");
-      signUpMessageEl.textContent = browser.i18n.getMessage("pageInputIconSignUpText");
+      const signUpMessageEl = createElementWithClassList(
+        "span",
+        "fx-relay-menu-sign-up-message"
+      );
+      signUpMessageEl.textContent = browser.i18n.getMessage(
+        "pageInputIconSignUpText"
+      );
 
       relayInPageMenu.appendChild(signUpMessageEl);
-      const signUpButton = createElementWithClassList("button", "fx-relay-menu-sign-up-btn");
-      signUpButton.textContent = browser.i18n.getMessage("pageInputIconSignUpButton");
+      const signUpButton = createElementWithClassList(
+        "button",
+        "fx-relay-menu-sign-up-btn"
+      );
+      signUpButton.textContent = browser.i18n.getMessage(
+        "pageInputIconSignUpButton"
+      );
 
-      signUpButton.addEventListener("click", async(clickEvt) => {
+      signUpButton.addEventListener("click", async (clickEvt) => {
         preventDefaultBehavior(clickEvt);
         await browser.runtime.sendMessage({
           method: "openRelayHomepage",
@@ -215,50 +238,77 @@ async function addRelayIconToInput(emailInput) {
       relayInPageMenu.appendChild(signUpButton);
 
       addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
-      sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu")
+      sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
       return;
     }
 
-    sendInPageEvent("viewed-menu", "authenticated-user-input-menu")
+    sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
     // Create "Generate Relay Address" button
-    const generateAliasBtn = createElementWithClassList("button", "fx-relay-menu-generate-alias-btn");
-    generateAliasBtn.textContent = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
+    const generateAliasBtn = createElementWithClassList(
+      "button",
+      "fx-relay-menu-generate-alias-btn"
+    );
+    generateAliasBtn.textContent = browser.i18n.getMessage(
+      "pageInputIconGenerateNewAlias"
+    );
 
     // Create "Get unlimited aliases" button
-    const getUnlimitedAliasesBtn = createElementWithClassList("a", "fx-relay-menu-get-unlimited-aliases");
-    getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
+    const getUnlimitedAliasesBtn = createElementWithClassList(
+      "a",
+      "fx-relay-menu-get-unlimited-aliases"
+    );
+    getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
+      "popupGetUnlimitedAliases"
+    );
     getUnlimitedAliasesBtn.setAttribute("target", "_blank");
     getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
 
-    // If the user has a premium accout, they may create unlimited aliases. 
+    // If the user has a premium accout, they may create unlimited aliases.
     const { premium } = await browser.storage.local.get("premium");
 
     // Create "You have .../.. remaining relay address" message
-    const remainingAliasesSpan = createElementWithClassList("span", "fx-relay-menu-remaining-aliases");
-    const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+    const remainingAliasesSpan = createElementWithClassList(
+      "span",
+      "fx-relay-menu-remaining-aliases"
+    );
+    const { relayAddresses } = await browser.storage.local.get(
+      "relayAddresses"
+    );
     const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
 
     const numAliasesRemaining = maxNumAliases - relayAddresses.length;
 
     // Free user: Set text informing them how many aliases they can create
-    remainingAliasesSpan.textContent = browser.i18n.getMessage("popupRemainingAliases-2", [numAliasesRemaining, maxNumAliases]);
+    remainingAliasesSpan.textContent = browser.i18n.getMessage(
+      "popupRemainingAliases-2",
+      [numAliasesRemaining, maxNumAliases]
+    );
 
     // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
     if (numAliasesRemaining < 0) {
       console.log("too many for free");
-      remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit");
+      remainingAliasesSpan.textContent = browser.i18n.getMessage(
+        "pageFillRelayAddressLimit"
+      );
     }
-    
+
     // Premium user: Set text informing them how many aliases they have created so far
     if (premium) {
-      remainingAliasesSpan.textContent = browser.i18n.getMessage("popupUnlimitedAliases", [relayAddresses.length]);
+      remainingAliasesSpan.textContent = browser.i18n.getMessage(
+        "popupUnlimitedAliases",
+        [relayAddresses.length]
+      );
     }
 
-    const maxNumAliasesReached = (numAliasesRemaining <= 0);
+    const maxNumAliasesReached = numAliasesRemaining <= 0;
 
     // Create "Manage All Aliases" link
-    const relayMenuDashboardLink = createElementWithClassList("a", "fx-relay-menu-dashboard-link");
-    relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");
+    const relayMenuDashboardLink = createElementWithClassList(
+      "a",
+      "fx-relay-menu-dashboard-link"
+    );
+    relayMenuDashboardLink.textContent =
+      browser.i18n.getMessage("ManageAllAliases");
     relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
     relayMenuDashboardLink.target = "_blank";
     relayMenuDashboardLink.addEventListener("click", () => {
@@ -266,27 +316,38 @@ async function addRelayIconToInput(emailInput) {
     });
 
     //Create "Get unlimited aliases" link
-    const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
+    const { fxaSubscriptionsUrl } = await browser.storage.local.get(
+      "fxaSubscriptionsUrl"
+    );
     const { premiumProdId } = await browser.storage.local.get("premiumProdId");
-    const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
+    const { premiumPriceId } = await browser.storage.local.get(
+      "premiumPriceId"
+    );
     getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
 
     // Restrict tabbing to relay menu elements
     restrictOrRestorePageTabbing(-1);
 
     // Append menu elements to the menu
-    [remainingAliasesSpan, getUnlimitedAliasesBtn, generateAliasBtn, relayMenuDashboardLink].forEach(el => {
+    [
+      remainingAliasesSpan,
+      getUnlimitedAliasesBtn,
+      generateAliasBtn,
+      relayMenuDashboardLink,
+    ].forEach((el) => {
       relayInPageMenu.appendChild(el);
     });
-  
+
     if (!premium) {
       if (maxNumAliasesReached) {
         generateAliasBtn.remove();
         sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
-        remainingAliasesSpan.textContent = browser.i18n.getMessage("pageFillRelayAddressLimit", [numAliasesRemaining, maxNumAliases]);
-      }  
-    }
-    else {
+        remainingAliasesSpan.textContent = browser.i18n.getMessage(
+          "pageFillRelayAddressLimit",
+          [numAliasesRemaining, maxNumAliases]
+        );
+      }
+    } else {
       getUnlimitedAliasesBtn.remove();
     }
 
@@ -294,19 +355,22 @@ async function addRelayIconToInput(emailInput) {
     const premiumEnabled = await browser.storage.local.get("premiumEnabled");
     const premiumEnabledString = premiumEnabled.premiumEnabled;
 
-    if(!premiumFeaturesAvailable(premiumEnabledString) || !maxNumAliasesReached){
+    if (
+      !premiumFeaturesAvailable(premiumEnabledString) ||
+      !maxNumAliasesReached
+    ) {
       getUnlimitedAliasesBtn.remove();
     }
 
     // Handle "Generate New Alias" clicks
-    generateAliasBtn.addEventListener("click", async(generateClickEvt) => {
+    generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
       sendInPageEvent("click", "input-menu-generate-alias");
       preventDefaultBehavior(generateClickEvt);
 
       // Attempt to create a new alias
       const newRelayAddressResponse = await browser.runtime.sendMessage({
         method: "makeRelayAddress",
-        domain: document.location.hostname,
+        description: document.location.hostname,
       });
 
       relayInPageMenu.classList.add("fx-relay-alias-loading");
@@ -318,12 +382,18 @@ async function addRelayIconToInput(emailInput) {
         // preserve menu height before removing child elements
         relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
 
-        [generateAliasBtn, remainingAliasesSpan].forEach(el => {
+        [generateAliasBtn, remainingAliasesSpan].forEach((el) => {
           el.remove();
         });
 
-        const errorMessage = createElementWithClassList("p", "fx-relay-error-message");
-        errorMessage.textContent = browser.i18n.getMessage("pageInputIconMaxAliasesError", [relayAddresses.length]);
+        const errorMessage = createElementWithClassList(
+          "p",
+          "fx-relay-error-message"
+        );
+        errorMessage.textContent = browser.i18n.getMessage(
+          "pageInputIconMaxAliasesError",
+          [relayAddresses.length]
+        );
 
         relayInPageMenu.insertBefore(errorMessage, relayMenuDashboardLink);
         return;
@@ -347,14 +417,17 @@ async function addRelayIconToInput(emailInput) {
 function getEmailInputsAndAddIcon(domRoot) {
   const emailInputs = detectEmailInputs(domRoot);
   for (const emailInput of emailInputs) {
-    if (!emailInput.parentElement.classList.contains("fx-relay-email-input-wrapper")) {
+    if (
+      !emailInput.parentElement.classList.contains(
+        "fx-relay-email-input-wrapper"
+      )
+    ) {
       addRelayIconToInput(emailInput);
     }
   }
 }
 
-
-(async function() {
+(async function () {
   const inputIconsAreEnabled = await areInputIconsEnabled();
   if (!inputIconsAreEnabled) {
     return;
@@ -369,8 +442,8 @@ function getEmailInputsAndAddIcon(domRoot) {
   });
 
   // Create a MutationObserver to watch for dynamically generated email inputs
-  const mutationObserver = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
+  const mutationObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
       if (mutation.target.tagName === "FORM") {
         getEmailInputsAndAddIcon(mutation.target);
       }
