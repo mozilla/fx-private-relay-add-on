@@ -234,6 +234,8 @@ async function updateUpgradeContextMenuItem() {
 
   if (premiumFeaturesAvailable(premiumEnabledString)) {
     if (!premium) {
+      // Remove any previous upgrade menu items first!
+      await removeUpgradeContextMenuItem();
       await createUpgradeContextMenuItem();
     }
 
