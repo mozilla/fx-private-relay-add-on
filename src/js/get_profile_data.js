@@ -184,7 +184,7 @@
     // If local storage items exist AND have label metadata stored, sync it to the server.
     const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
 
-    // let usage: This data may be overwritten when merging the
+    // let usage: This data may be overwritten when merging the local storage dataset with the server set. 
     let localStorageData = serverRelayAddresses;
 
     // Check/cache local storage

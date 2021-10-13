@@ -29,15 +29,7 @@ function getOnboardingPanels() {
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    },
-    // "serverStoragePanel": {
-    //   "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
-    //   "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
-    //   "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
-    //   "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
-    //   "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
-    //   "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    // },
+    }
   };
 }
 
