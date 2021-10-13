@@ -172,7 +172,7 @@
     const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
 
     // let usage: This data may be overwritten when merging the local storage dataset with the server set. 
-    let localStorageData = serverRelayAddresses;
+    let localCopyOfServerRelayAddresses = serverRelayAddresses;
 
     // Check/cache local storage
     const { relayAddresses } = await browser.storage.local.get(
@@ -183,16 +183,16 @@
       relayAddresses &&
       relayAddresses.length > 0 &&
       aliasesHaveStoredMetadata(relayAddresses) && // Make sure there is meta data in the local dataset
-      !aliasesHaveStoredMetadata(localStorageData) // Make sure there is no meta data in the server dataset
+      !aliasesHaveStoredMetadata(localCopyOfServerRelayAddresses) // Make sure there is no meta data in the server dataset
     ) {
       await sendMetaDataToServer(relayAddresses);
-      localStorageData = getAliasesWithUpdatedMetadata(
-        localStorageData,
+      localCopyOfServerRelayAddresses = getAliasesWithUpdatedMetadata(
+        localCopyOfServerRelayAddresses,
         relayAddresses
       );
     }
 
-    browser.storage.local.set({ relayAddresses: localStorageData });
+    browser.storage.local.set({ relayAddresses: localCopyOfServerRelayAddresses });
   } else {
     // Scrape alias data from Profile page (Local)
 
