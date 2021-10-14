@@ -464,6 +464,7 @@ onboarding-panel {
 
 .email-domain-illustration {
   margin: 0 auto;
+  padding-top: 16px;
   display: block;
   width: 280px;
 }
