@@ -298,6 +298,11 @@ async function showRelayPanel(tipPanelToShow) {
     });
   });
 
+  if (premium) {
+    remainingAliasMessage.classList.add("hidden");
+    getUnlimitedAliases.classList.add("hidden");
+  }
+
   const relayPanel = document.querySelector(".signed-in-panel");
   relayPanel.classList.remove("hidden");
 
