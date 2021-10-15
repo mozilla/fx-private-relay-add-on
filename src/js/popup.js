@@ -92,13 +92,18 @@ const serverStoragePanel = {
       .querySelectorAll(".is-hidden")
       .forEach((childDiv) => childDiv.classList.add("is-hidden"));
   },
-  init: () => {
+  init: (premium) => {
     // Server Storage Prompt Panel
     const serverStoragePanelWrapper = document.querySelector(
       ".server-storage-wrapper"
     );
 
-    document.querySelectorAll(".content-wrapper").forEach(div => {
+    if (premium) {
+      const panelStatus = document.querySelector(".panel-status");
+      panelStatus.classList.add("is-hidden");
+    }
+
+    document.querySelectorAll(".content-wrapper").forEach((div) => {
       div.classList.add("is-hidden");
     });
 
@@ -163,7 +168,7 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
   const shouldShowServerStoragePromptPanel = await isServerStoragePromptPanelRelevant();
 
   if (shouldShowServerStoragePromptPanel) {
-    serverStoragePanel.init();
+    serverStoragePanel.init(premium);
   } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
