@@ -1,3 +1,5 @@
+(async function () {
+
 const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
 
 browser.storage.local.set({ maxNumAliases: 5 });
@@ -288,6 +290,37 @@ browser.menus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+async function displayBrowserActionBadge() {
+  const userApiToken = await browser.storage.local.get("apiToken");
+  const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+  if (!apiKeyInStorage) {
+    // Not Logged In
+    return;
+  }
+
+  // Logged In User
+  const { browserActionBadgesClicked } = await browser.storage.local.get(
+    "browserActionBadgesClicked"
+  );
+
+  const { serverStoragePrompt } = await browser.storage.local.get(
+    "serverStoragePrompt"
+  );
+
+  if (browserActionBadgesClicked === undefined) {
+    browser.storage.local.set({ browserActionBadgesClicked: false });
+  }
+
+  if (!browserActionBadgesClicked && serverStoragePrompt !== true) {
+    browser.browserAction.setBadgeBackgroundColor({
+      color: "#00D900",
+    });
+    browser.browserAction.setBadgeText({ text: "!" });
+  }
+}
+
+await displayBrowserActionBadge();
+
 browser.runtime.onMessage.addListener(async (m) => {
   let response;
 
@@ -309,6 +342,9 @@ browser.runtime.onMessage.addListener(async (m) => {
     case "rebuildContextMenuUpgrade":
       await updateUpgradeContextMenuItem();
       break;
+    case "displayBrowserActionBadge":
+      await displayBrowserActionBadge()
+      break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
       break;
@@ -318,3 +354,5 @@ browser.runtime.onMessage.addListener(async (m) => {
   }
   return response;
 });
+
+})();

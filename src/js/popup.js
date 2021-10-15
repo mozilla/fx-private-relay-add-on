@@ -385,9 +385,22 @@ async function enableInputIconDisabling() {
 
 }
 
+async function clearBrowserActionBadge() {
+  const { browserActionBadgesClicked } = await browser.storage.local.get(
+    "browserActionBadgesClicked"
+  );
+
+  // Dismiss the browserActionBadge only when it exists
+  if (browserActionBadgesClicked === false) {
+    browser.storage.local.set({ browserActionBadgesClicked: true });
+    browser.browserAction.setBadgeBackgroundColor({ color: null });
+    browser.browserAction.setBadgeText({ text: "" });
+  }
+}
 
 async function popup() {
   sendRelayEvent("Panel", "opened-panel", "any-panel");
+  clearBrowserActionBadge();
   const userApiToken = await browser.storage.local.get("apiToken");
   const signedInUser = (userApiToken.hasOwnProperty("apiToken"));
   if (!signedInUser) {
