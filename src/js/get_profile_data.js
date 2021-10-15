@@ -410,4 +410,5 @@
   await browser.runtime.sendMessage({
     method: "rebuildContextMenuUpgrade",
   });
+
 })();
