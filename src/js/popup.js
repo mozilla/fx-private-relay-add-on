@@ -225,7 +225,32 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
+  const updateBadge = (numRemaining) => {
+    if (premium) {
+      // Premium users have unlimited aliases, so we don't need to list the remaining number:
+      return;
+    }
+    browser.browserAction.setBadgeText({ text: (numRemaining >= 0) ? numRemaining.toString() : "" });
+    if (numRemaining === 0) {
+      browser.browserAction.setBadgeBackgroundColor({
+        color: "#810220",
+      });
+      browser.browserAction.setBadgeTextColor({
+        color: "white",
+      });
+    }
+    if (numRemaining > 0) {
+      browser.browserAction.setBadgeBackgroundColor({
+        color: "#ffd567",
+      });
+      browser.browserAction.setBadgeTextColor({
+        color: "black",
+      });
+    }
+  }
+
   const updatePanel = async (numRemaining, panelId) => {
+    updateBadge(numRemaining);
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
