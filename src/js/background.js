@@ -288,6 +288,30 @@ browser.menus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+async function displayBrowserActionBadge() {
+    const { browserActionBadgesClicked } = await browser.storage.local.get(
+      "browserActionBadgesClicked"
+    );
+
+    const { serverStoragePrompt } = await browser.storage.local.get(
+      "serverStoragePrompt"
+    );
+
+    if (browserActionBadgesClicked === undefined) {
+      browser.storage.local.set({ browserActionBadgesClicked: false });
+    }
+
+    if (
+      !browserActionBadgesClicked &&
+      serverStoragePrompt !== true
+    ) {
+      browser.browserAction.setBadgeBackgroundColor({
+        color: "#00D900",
+      });
+      browser.browserAction.setBadgeText({ text: "!" });
+    }
+}
+
 browser.runtime.onMessage.addListener(async (m) => {
   let response;
 
@@ -308,6 +332,9 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "rebuildContextMenuUpgrade":
       await updateUpgradeContextMenuItem();
+      break;
+    case "displayBrowserActionBadge":
+      await displayBrowserActionBadge()
       break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
