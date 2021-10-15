@@ -46,6 +46,12 @@
     },
     {
       "matches": [
+          "http://127.0.0.1/accounts/settings/**"
+      ],
+      "js": ["js/settings_refresh.js"]
+    },
+    {
+      "matches": [
           "<all_urls>"
       ],
       "js": ["js/utils.js", "js/fathom.js", "js/email_detector.js", "js/add_input_icon.js", "js/fill_relay_address.js", "js/metrics.js"],

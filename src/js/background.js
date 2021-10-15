@@ -162,6 +162,9 @@ async function makeRelayAddress(description = null) {
     newRelayAddressJson,
   ]);
   browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
+
+  await refreshAccountPages();
+  
   return newRelayAddressJson;
 }
 
@@ -187,6 +190,9 @@ async function makeRelayAddressForTargetElement(info, tab) {
       frameId: info.frameId,
     }
   );
+
+  
+
 }
 
 function premiumFeaturesAvailable(premiumEnabledString) {
@@ -217,6 +223,7 @@ async function removeUpgradeContextMenuItem() {
 }
 
 async function updateUpgradeContextMenuItem() {
+  await refreshAccountPages();
   // Check for status
   // Update
   const premiumEnabled = await browser.storage.local.get("premiumEnabled");
@@ -234,6 +241,22 @@ async function updateUpgradeContextMenuItem() {
     else {
       await removeUpgradeContextMenuItem();
     }
+  }
+}
+
+async function refreshAccountPages() {
+  const { settingsRefresh } = await browser.storage.local.get("settingsRefresh");
+
+  // This functions only runs once (when on the dashboard page), if the user has visited the settings page.
+  // If they revisit the settings page, it resets so that it only runs once again. 
+  if (!settingsRefresh) {
+    browser.storage.local.set({ settingsRefresh: true });
+
+    browser.tabs.query({ url: "*://127.0.0.1/*" }, function (tabs) {
+      for (let tab of tabs) {
+        browser.tabs.reload(tab.id);
+      }
+    });
   }
 }
 
@@ -288,6 +311,9 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
+      break;
+    case "refreshAccountPages":
+      await refreshAccountPages();
       break;
   }
   return response;
