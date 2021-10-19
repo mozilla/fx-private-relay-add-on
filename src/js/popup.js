@@ -149,7 +149,7 @@ const serverStoragePanel = {
       serverStoragePanel.event.dontShowPanelAgain();
       
       browser.tabs.create({
-        url: `${relaySiteOrigin}/accounts/settings/`,
+        url: `${relaySiteOrigin}/accounts/profile/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=allow-labels-sync#sync-labels`,
         active: true,
       });
 
