@@ -262,6 +262,14 @@ async function refreshAccountPages() {
   }
 }
 
+async function updateAddOnAuthStatus(status) {
+  // If user is no longer logged in, remove the apiToken attribute. 
+  // This will cause the "Sign in" panel to be visible when the popup is opened.
+  if (status == "False") {
+    await browser.storage.local.remove("apiToken");
+  }
+}
+
 browser.menus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
@@ -343,13 +351,16 @@ browser.runtime.onMessage.addListener(async (m) => {
       await updateUpgradeContextMenuItem();
       break;
     case "displayBrowserActionBadge":
-      await displayBrowserActionBadge()
+      await displayBrowserActionBadge();
       break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
       break;
     case "refreshAccountPages":
       await refreshAccountPages();
+      break;
+    case "updateAddOnAuthStatus":
+      await updateAddOnAuthStatus(m.status);
       break;
   }
   return response;
