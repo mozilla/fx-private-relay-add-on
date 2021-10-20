@@ -22,7 +22,7 @@ browser.runtime.onInstalled.addListener(async () => {
 
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
-  const headers = await createNewHeadersObject();
+  const headers = await createNewHeadersObject({ auth: true });
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
   const url = `${relayApiSource}/profiles/${profileID}/`;
 
