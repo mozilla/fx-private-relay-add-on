@@ -121,8 +121,9 @@ to each release, under the release "Assets" section.
 
 #### Publish to AMO
 
-1. `npm run-script build`
-2. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
+1. `npm run config:prod`
+2. `npm run-script build`
+3. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
 
 #### Publish to GitHub
 Finally, we also publish the release to GitHub for those followers.
