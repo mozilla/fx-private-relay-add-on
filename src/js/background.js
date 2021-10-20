@@ -254,7 +254,7 @@ async function refreshAccountPages() {
   if (!settingsRefresh) {
     browser.storage.local.set({ settingsRefresh: true });
 
-    browser.tabs.query({ url: "*://127.0.0.1/*" }, function (tabs) {
+    browser.tabs.query({ url: "http://127.0.0.1/*" }, function (tabs) {
       for (let tab of tabs) {
         browser.tabs.reload(tab.id);
       }
