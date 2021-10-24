@@ -447,7 +447,7 @@ async function popup() {
   });
 
   document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
-    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile`;
+    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=register-email-domain#mpp-choose-subdomain`;
   });
 
 }
