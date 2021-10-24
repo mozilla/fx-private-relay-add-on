@@ -201,17 +201,63 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return premiumEnabledString === "True";
 }
 
+function localStorageWatcher(changes, area) {
+  let changedItems = Object.keys(changes);
+  for (let item of changedItems) {
+    if (item === "relayAddresses") {
+      updateGenerateAliasContextMenuItem(changes[item].newValue.length);
+    }
+  }
+}
+
+await browser.storage.onChanged.addListener(localStorageWatcher);
+
+function onContextMenuCreated() {
+  // Catch errors when trying to create the same menu twice.
+  // The browser.menus API is limited. You cannot query if a menu item already exists.
+  // The error it throws does not show up to the user. 
+  if (browser.runtime.lastError) {
+    return;
+  }
+}
+
 async function createMenu() {
   if (browser.menus) {
     browser.menus.create({
       id: "fx-private-relay-generate-alias",
       title: "Generate New Alias",
       contexts: ["editable"],
-    });
+    }, onContextMenuCreated);
   }
 }
 
+
 createMenu();
+
+async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
+  const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
+  const { premium } = await browser.storage.local.get("premium");
+  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+  const aliasesRemaining = maxNumAliases - relayAddressesLength;
+  
+  if (premiumFeaturesAvailable(premiumEnabled)) {
+    if (!premium && aliasesRemaining < 1) {
+      // Post-launch: Check if user is premium and under the max limit.
+      browser.menus.remove("fx-private-relay-generate-alias");
+      return;
+    }
+  } else {
+    // TODO: REMOVE THIS BLOCK AFTER PREMIUM LAUNCH
+    if (aliasesRemaining < 1) {
+      // Current users
+      browser.menus.remove("fx-private-relay-generate-alias");
+      return;
+    }
+  }
+
+  // Generate Alias link should be visible
+  createMenu();
+}
 
 async function createUpgradeContextMenuItem() {
   browser.menus.create({
@@ -226,8 +272,7 @@ async function removeUpgradeContextMenuItem() {
 
 async function updateUpgradeContextMenuItem() {
   await refreshAccountPages();
-  // Check for status
-  // Update
+  // Check for status update
   const premiumEnabled = await browser.storage.local.get("premiumEnabled");
   const premiumEnabledString = premiumEnabled.premiumEnabled;
   const { premium } = await browser.storage.local.get("premium");
