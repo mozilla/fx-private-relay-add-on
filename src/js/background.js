@@ -270,7 +270,7 @@ async function createUpgradeContextMenuItem() {
   });
 }
 
-async function removeUpgradeContextMenuItem() {
+function removeUpgradeContextMenuItem() {
   browser.menus.remove("fx-private-relay-get-unlimited-aliases");
 }
 
@@ -284,13 +284,13 @@ async function updateUpgradeContextMenuItem() {
   if (premiumFeaturesAvailable(premiumEnabledString)) {
     if (!premium) {
       // Remove any previous upgrade menu items first!
-      await removeUpgradeContextMenuItem();
+      removeUpgradeContextMenuItem();
       await createUpgradeContextMenuItem();
     }
 
     // Remove the upgrade item, if the user is upgraded
     else {
-      await removeUpgradeContextMenuItem();
+      removeUpgradeContextMenuItem();
     }
   }
 }
