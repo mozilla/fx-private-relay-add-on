@@ -207,6 +207,10 @@ function localStorageWatcher(changes, area) {
     if (item === "relayAddresses") {
       updateGenerateAliasContextMenuItem(changes[item].newValue.length);
     }
+    if (item === "apiToken" && changes[item].newValue === undefined) {
+      // User has logged out. Remove all menu items. 
+      browser.menus.removeAll();
+    }
   }
 }
 
