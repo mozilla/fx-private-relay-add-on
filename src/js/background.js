@@ -225,7 +225,7 @@ async function createMenu() {
   if (browser.menus) {
     browser.menus.create({
       id: "fx-private-relay-generate-alias",
-      title: "Generate New Alias",
+      title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
       contexts: ["editable"],
     }, onContextMenuCreated);
   }
@@ -262,7 +262,7 @@ async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
 async function createUpgradeContextMenuItem() {
   browser.menus.create({
     id: "fx-private-relay-get-unlimited-aliases",
-    title: "Get Unlimited Aliases",
+    title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
   });
 }
 
