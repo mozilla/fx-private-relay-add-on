@@ -2,7 +2,7 @@ name: continuous prerelease to GitHub
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, build-stage-extension ]
 
   workflow_dispatch:
 
