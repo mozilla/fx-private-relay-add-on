@@ -286,7 +286,6 @@ async function addRelayIconToInput(emailInput) {
 
     // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
     if (numAliasesRemaining < 0) {
-      console.log("too many for free");
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
         "pageFillRelayAddressLimit"
       );
