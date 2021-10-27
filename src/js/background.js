@@ -277,15 +277,15 @@ function removeUpgradeContextMenuItem() {
 async function updateUpgradeContextMenuItem() {
   await refreshAccountPages();
   // Check for status update
-  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
-  const premiumEnabledString = premiumEnabled.premiumEnabled;
+  const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
   const { premium } = await browser.storage.local.get("premium");
 
-  if (premiumFeaturesAvailable(premiumEnabledString)) {
+  if (premiumFeaturesAvailable(premiumEnabled)) {
     if (!premium) {
       // Remove any previous upgrade menu items first!
       removeUpgradeContextMenuItem();
       await createUpgradeContextMenuItem();
+      return;
     }
 
     // Remove the upgrade item, if the user is upgraded

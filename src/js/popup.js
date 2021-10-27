@@ -255,9 +255,9 @@ async function showRelayPanel(tipPanelToShow) {
 
 
     //If Premium features are not available, do not show upgrade CTA on the panel
-    if (!premiumFeaturesAvailable(premiumEnabledString)) {
+    if (premiumFeaturesAvailable(premiumEnabledString)) {
       const premiumCTA = document.querySelector(".premium-cta");
-      premiumCTA.classList.add("is-hidden");
+      premiumCTA.classList.remove("is-hidden");
     }
 
     // Remove panel status if user has unlimited aliases, so no negative alias left count
@@ -304,8 +304,11 @@ async function showRelayPanel(tipPanelToShow) {
   });
 
   if (premium) {
-    remainingAliasMessage.classList.add("hidden");
-    getUnlimitedAliases.classList.add("hidden");
+    remainingAliasMessage.classList.add("is-hidden");
+  }
+
+  if (premiumFeaturesAvailable(premiumEnabledString)) {
+    getUnlimitedAliases.classList.remove("is-hidden");
   }
 
   const relayPanel = document.querySelector(".signed-in-panel");
