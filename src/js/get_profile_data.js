@@ -281,10 +281,10 @@
       };
 
       const pluralSingularErrorMessage = (badCharactersInValue) => {
-        const newErrorMessage =
-          badCharactersInValue.length === 1
-            ? `${badCharactersInValue} is not an allowed character`
-            : `${badCharactersInValue.join(" ")} are not allowed characters`;
+        const newErrorMessage = browser.i18n.getMessage(
+          "profilePageInvalidAliasCharactersError",
+          Array.isArray(badCharactersInValue) ? badCharactersInValue.join(" ") : badCharactersInValue,
+        );
         return newErrorMessage;
       };
 
