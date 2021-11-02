@@ -1,3 +1,7 @@
+// This element can be used to avoid a page's own CSS selectors
+// applying to this element:
+customElements.define("fx-relay-element", HTMLSpanElement);
+
 function closeRelayInPageMenu() {
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
   relayIconBtn.classList.remove("fx-relay-menu-open");
@@ -88,6 +92,11 @@ function createElementWithClassList(elemType, elemClass) {
   newElem.classList.add(elemClass);
   return newElem;
 }
+function createRelayElementWithClassList(elemClass) {
+  const newElem = document.createElement("fx-relay-element");
+  newElem.classList.add(elemClass);
+  return newElem;
+}
 
 async function isUserSignedIn() {
   const userApiToken = await browser.storage.local.get("apiToken");
@@ -127,10 +136,7 @@ async function addRelayIconToInput(emailInput) {
   const emailInputOriginalParentEl = emailInput.parentElement;
 
   // create new wrapping element;
-  const emailInputWrapper = createElementWithClassList(
-    "span",
-    "fx-relay-email-input-wrapper"
-  );
+  const emailInputWrapper = createRelayElementWithClassList("fx-relay-email-input-wrapper");
   emailInputOriginalParentEl.insertBefore(emailInputWrapper, emailInput);
 
   // add padding to the input so that input text
@@ -141,7 +147,7 @@ async function addRelayIconToInput(emailInput) {
   const computedInputStyles = getComputedStyle(emailInput);
   const inputHeight = emailInput.offsetHeight;
 
-  const divEl = createElementWithClassList("div", "fx-relay-icon");
+  const iconWrapper = createRelayElementWithClassList("fx-relay-icon");
 
   const bottomMargin = parseInt(
     computedInputStyles.getPropertyValue("margin-bottom"),
@@ -152,11 +158,11 @@ async function addRelayIconToInput(emailInput) {
     10
   );
 
-  divEl.style.height =
+  iconWrapper.style.height =
     computedInputStyles.height - bottomMargin - topMargin + "px";
 
-  divEl.style.top = topMargin;
-  divEl.style.bottom = `${bottomMargin}px`;
+  iconWrapper.style.top = topMargin;
+  iconWrapper.style.bottom = `${bottomMargin}px`;
 
   const relayIconBtn = createElementWithClassList("button", "fx-relay-button");
   relayIconBtn.id = "fx-relay-button";
@@ -173,7 +179,7 @@ async function addRelayIconToInput(emailInput) {
     relayIconBtn.style.width = smallIconSize;
     relayIconBtn.style.minWidth = smallIconSize;
     emailInput.style.paddingRight = "30px";
-    divEl.style.right = "2px";
+    iconWrapper.style.right = "2px";
   }
 
   const sendInPageEvent = (evtAction, evtLabel) => {
@@ -188,11 +194,8 @@ async function addRelayIconToInput(emailInput) {
     window.addEventListener("scroll", positionRelayMenu);
     document.addEventListener("keydown", handleKeydownEvents);
 
-    const relayInPageMenu = createElementWithClassList("div", "fx-relay-menu");
-    const relayMenuWrapper = createElementWithClassList(
-      "div",
-      "fx-relay-menu-wrapper"
-    );
+    const relayInPageMenu = createRelayElementWithClassList("fx-relay-menu");
+    const relayMenuWrapper = createRelayElementWithClassList("fx-relay-menu-wrapper");
 
     // Set custom fonts from the add-on
     await setCustomFonts();
@@ -209,10 +212,7 @@ async function addRelayIconToInput(emailInput) {
     const signedInUser = await isUserSignedIn();
 
     if (!signedInUser) {
-      const signUpMessageEl = createElementWithClassList(
-        "span",
-        "fx-relay-menu-sign-up-message"
-      );
+      const signUpMessageEl = createRelayElementWithClassList("fx-relay-menu-sign-up-message");
       signUpMessageEl.textContent = browser.i18n.getMessage(
         "pageInputIconSignUpText"
       );
@@ -275,10 +275,7 @@ async function addRelayIconToInput(emailInput) {
     loadingAnimationDiv.appendChild(loadingAnimationImage);
 
     // Create "You have .../.. remaining relay address" message
-    const remainingAliasesSpan = createElementWithClassList(
-      "span",
-      "fx-relay-menu-remaining-aliases"
-    );
+    const remainingAliasesSpan = createRelayElementWithClassList("fx-relay-menu-remaining-aliases");
     const { relayAddresses } = await browser.storage.local.get(
       "relayAddresses"
     );
@@ -412,8 +409,8 @@ async function addRelayIconToInput(emailInput) {
     addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
   });
 
-  divEl.appendChild(relayIconBtn);
-  emailInputWrapper.appendChild(divEl);
+  iconWrapper.appendChild(relayIconBtn);
+  emailInputWrapper.appendChild(iconWrapper);
   sendInPageEvent("input-icon-injected", "input-icon");
 }
 
