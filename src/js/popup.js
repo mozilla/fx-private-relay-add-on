@@ -56,28 +56,28 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return false;
 }
 
-async function isServerStoragePromptPanelRelevant() {
-  const { serverStoragePrompt } = await browser.storage.local.get(
-    "serverStoragePrompt"
-  );
-
-
-  const serverStoragePref = await browser.runtime.sendMessage({
-    method: "getServerStoragePref"
-  });
-  
-
-
-  // Only show the server prompt panel the user has not already opt'd in,
-  // or if they have not interacted with the panel before.
-  if (!serverStoragePref && !serverStoragePrompt) {
-    return true;
-  }
-
-  return false;
-}
 
 const serverStoragePanel = {
+  isRelevant: async () => {
+    const { serverStoragePrompt } = await browser.storage.local.get(
+      "serverStoragePrompt"
+    );
+
+
+    const serverStoragePref = await browser.runtime.sendMessage({
+      method: "getServerStoragePref"
+    });
+
+
+
+    // Only show the server prompt panel the user has not already opt'd in,
+    // or if they have not interacted with the panel before.
+    if (!serverStoragePref && !serverStoragePrompt) {
+      return true;
+    }
+
+    return false;
+  },
   hide: () => {
     const serverStoragePanelWrapper = document.querySelector(
       ".js-server-storage-wrapper"
@@ -162,12 +162,81 @@ const serverStoragePanel = {
   },
 };
 
+const privacyNoticeUpdatePanel = {
+  isRelevant: async () => {
+    const { privacyNoticeUpdatePromptShown } = await browser.storage.local.get(
+      "privacyNoticeUpdatePromptShown"
+    );
+
+    // Only show the privacy notice update panel if the user has not interacted with the panel before.
+    return !privacyNoticeUpdatePromptShown;
+  },
+  hide: () => {
+    const privacyNoticeUpdatePanelWrapper = document.querySelector(
+      ".js-privacy-policy-update-wrapper"
+    );
+
+    document.querySelectorAll(".content-wrapper").forEach((div) => {
+      div.classList.remove("is-hidden");
+    });
+
+    privacyNoticeUpdatePanelWrapper.classList.add("is-hidden");
+    privacyNoticeUpdatePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.add("is-hidden"));
+  },
+  init: (premium) => {
+    const privacyNoticeUpdatePanelWrapper = document.querySelector(
+      ".js-privacy-policy-update-wrapper"
+    );
+
+    if (premium) {
+      const panelStatus = document.querySelector(".panel-status");
+      panelStatus.classList.add("is-hidden");
+    }
+
+    document.querySelectorAll(".content-wrapper").forEach((div) => {
+      div.classList.add("is-hidden");
+    });
+
+    privacyNoticeUpdatePanelWrapper.classList.remove("is-hidden");
+
+    privacyNoticeUpdatePanelWrapper
+      .querySelectorAll(".is-hidden")
+      .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
+
+    const privacyNoticeUpdatePanelButtonDismiss =
+      privacyNoticeUpdatePanelWrapper.querySelector(".js-button-dismiss");
+
+    privacyNoticeUpdatePanelButtonDismiss.addEventListener(
+      "click",
+      privacyNoticeUpdatePanel.event.dismiss,
+      false
+    );
+  },
+  event: {
+    dismiss: async (e) => {
+      e.preventDefault();
+      privacyNoticeUpdatePanel.event.dontShowPanelAgain();
+      privacyNoticeUpdatePanel.hide();
+      showRelayPanel(1);
+    },
+
+    dontShowPanelAgain: ()=> {
+      browser.storage.local.set({ privacyNoticeUpdatePromptShown: true });
+    }
+  },
+};
+
 async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
 
-  const shouldShowServerStoragePromptPanel = await isServerStoragePromptPanelRelevant();
+  const shouldShowPrivacyNoticeUpdatePanel = await privacyNoticeUpdatePanel.isRelevant();
+  const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
 
-  if (shouldShowServerStoragePromptPanel) {
+  if (shouldShowPrivacyNoticeUpdatePanel) {
+    privacyNoticeUpdatePanel.init();
+  } else if (shouldShowServerStoragePromptPanel) {
     serverStoragePanel.init(premium);
   } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
     document.getElementsByClassName("content-wrapper")[0].remove();

@@ -360,6 +360,9 @@ async function displayBrowserActionBadge() {
     "browserActionBadgesClicked"
   );
 
+  const { privacyNoticeUpdatePromptShown } = await browser.storage.local.get(
+    "privacyNoticeUpdatePromptShown"
+  );
   const { serverStoragePrompt } = await browser.storage.local.get(
     "serverStoragePrompt"
   );
@@ -368,7 +371,7 @@ async function displayBrowserActionBadge() {
     browser.storage.local.set({ browserActionBadgesClicked: false });
   }
 
-  if (!browserActionBadgesClicked && serverStoragePrompt !== true) {
+  if (!browserActionBadgesClicked && (serverStoragePrompt !== true || privacyNoticeUpdatePromptShown !== true)) {
     browser.browserAction.setBadgeBackgroundColor({
       color: "#00D900",
     });

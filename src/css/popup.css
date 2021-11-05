@@ -715,6 +715,14 @@ onboarding-panel p {
   text-decoration: none;
 }
 
+.newsflash-wrapper:not(.has-approval-button) .newsflash-description a {
+  display: block;
+  text-align: center;
+}
+.newsflash-wrapper:not(.has-approval-button) .newsflash-description a:hover {
+  text-decoration: underline;
+}
+
 .newsflash-body {
   padding-top: 8px;
 }
@@ -722,7 +730,7 @@ onboarding-panel p {
 .newsflash-buttons {
   display: flex;
   margin-top: 48px;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .newsflash-buttons > button {
