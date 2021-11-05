@@ -80,7 +80,7 @@ async function isServerStoragePromptPanelRelevant() {
 const serverStoragePanel = {
   hide: () => {
     const serverStoragePanelWrapper = document.querySelector(
-      ".server-storage-wrapper"
+      ".js-server-storage-wrapper"
     );
 
     document.querySelectorAll(".content-wrapper").forEach((div) => {
@@ -95,7 +95,7 @@ const serverStoragePanel = {
   init: (premium) => {
     // Server Storage Prompt Panel
     const serverStoragePanelWrapper = document.querySelector(
-      ".server-storage-wrapper"
+      ".js-server-storage-wrapper"
     );
 
     if (premium) {
@@ -114,10 +114,10 @@ const serverStoragePanel = {
       .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
     
     const serverStoragePanelButtonDismiss =
-      document.querySelector(".server-storage-button-dismiss");
+      serverStoragePanelWrapper.querySelector(".js-button-dismiss");
 
     const serverStoragePanelButtonAllow =
-      document.querySelector(".server-storage-button-allow");
+      serverStoragePanelWrapper.querySelector(".js-button-allow");
 
     serverStoragePanelButtonDismiss.addEventListener(
       "click",
