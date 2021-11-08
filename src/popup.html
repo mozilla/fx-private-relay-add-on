@@ -111,14 +111,25 @@
             </div>
           </div>
           <!-- Server Storage Opt-in -->
-          <div class="server-storage-wrapper is-hidden">
-            <div class="server-storage-description">
-              <h1 class="server-storage-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
-              <p class="server-storage-body i18n-content" data-i18n-message-id="popupDataCollectionBody"></p>
-              <a class="server-storage-learn-more i18n-content" href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button" data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
-              <div class="server-storage-buttons">
-                <button class="server-storage-button server-storage-button-dismiss i18n-content" data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
-                <button class="server-storage-button server-storage-button-allow i18n-content" data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
+          <div class="js-server-storage-wrapper newsflash-wrapper is-hidden has-approval-button">
+            <div class="newsflash-description">
+              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
+              <p class="newsflash-body i18n-content" data-i18n-message-id="popupDataCollectionBody"></p>
+              <a class="newsflash-learn-more i18n-content" href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button" data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
+              <div class="newsflash-buttons">
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
+                <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content" data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
+              </div>
+            </div>
+          </div>
+          <!-- Privacy Policy update notification -->
+          <div class="js-privacy-policy-update-wrapper newsflash-wrapper is-hidden">
+            <div class="newsflash-description">
+              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline"></h1>
+              <p class="newsflash-body i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateBody"></p>
+              <a class="newsflash-learn-more i18n-content" href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification" data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
+              <div class="newsflash-buttons">
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
               </div>
             </div>
           </div>

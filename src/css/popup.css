@@ -669,22 +669,22 @@ onboarding-panel p {
   }
 }
 
-.server-storage-wrapper.is-hidden, .server-storage-wrapper .is-hidden {
+.newsflash-wrapper.is-hidden, .newsflash-wrapper .is-hidden {
   display: none;
 }
 
-.server-storage-wrapper {
+.newsflash-wrapper {
   background-color: var(--relayGrey10);
   padding: 8px;
   margin-top: 16px;
   height: 100%;
 }
 
-.server-storage-description {
+.newsflash-description {
   padding: 0 8px;
 }
 
-.server-storage-headline {
+.newsflash-headline {
   background: white;
   font-size: 15px;
   font-weight: bold;
@@ -694,7 +694,7 @@ onboarding-panel p {
   font-family: var(--relayMetropolis);
 }
 
-.server-storage-headline:before {
+.newsflash-headline:before {
   content: "";
   display: inline-block;
   height: 20px;
@@ -708,24 +708,32 @@ onboarding-panel p {
   position: absolute;
 }
 
-.server-storage-description a {
+.newsflash-description a {
   color: var(--relayBlue3);
   font-weight: bold;
   padding-top: 8px;
   text-decoration: none;
 }
 
-.server-storage-body {
+.newsflash-wrapper:not(.has-approval-button) .newsflash-description a {
+  display: block;
+  text-align: center;
+}
+.newsflash-wrapper:not(.has-approval-button) .newsflash-description a:hover {
+  text-decoration: underline;
+}
+
+.newsflash-body {
   padding-top: 8px;
 }
 
-.server-storage-buttons {
+.newsflash-buttons {
   display: flex;
   margin-top: 48px;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
-.server-storage-buttons > button {
+.newsflash-buttons > button {
   width: 120px;
   padding: 8px 0;
   font-size: 15px;
@@ -737,24 +745,24 @@ onboarding-panel p {
   cursor: pointer;
 }
 
-.server-storage-button-dismiss {
+.newsflash-button-dismiss {
   color: var(--relayBlue3);
   background: none;
 }
 
-.server-storage-button-allow {
+.newsflash-button-allow {
   background: var(--relayBlue3);
   color: white;
 }
 
-.server-storage-button-allow:hover, 
-.server-storage-button-dismiss:hover  {
+.newsflash-button-allow:hover, 
+.newsflash-button-dismiss:hover  {
   background: var(--relayBlueHover);
   color: white;
 }
 
-.server-storage-button-allow:focus,
-.server-storage-button-dismiss:focus {
+.newsflash-button-allow:focus,
+.newsflash-button-dismiss:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
