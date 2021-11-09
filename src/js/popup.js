@@ -235,7 +235,7 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
   const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
 
   if (shouldShowPrivacyNoticeUpdatePanel) {
-    privacyNoticeUpdatePanel.init();
+    privacyNoticeUpdatePanel.init(premium);
   } else if (shouldShowServerStoragePromptPanel) {
     serverStoragePanel.init(premium);
   } else if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
