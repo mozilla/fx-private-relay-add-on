@@ -196,9 +196,9 @@
   } else {
     // Scrape alias data from Profile page (Local)
 
-    await browser.runtime.sendMessage({
-      method: "displayBrowserActionBadge",
-    });
+    // await browser.runtime.sendMessage({
+    //   method: "displayBrowserActionBadge",
+    // });
 
     const { relayAddresses } = await browser.storage.local.get(
       "relayAddresses"
