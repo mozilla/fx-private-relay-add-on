@@ -289,13 +289,13 @@ main-panel {
 
 .aliases-remaining {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
   background: white;
 }
 
 .premium-cta {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
   color: var(--relayBlue3);
   font-weight: 700;
   text-decoration: none;
@@ -328,7 +328,7 @@ main-panel {
 }
 
 .upgrade-banner {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
   padding-left: 10px;
   color: #5953F3;
   margin: auto;
@@ -350,7 +350,7 @@ footer {
   font-weight: 600;
   text-decoration: none;
   margin: 0 auto 16px auto;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
   text-align: center;
 }
 
@@ -381,7 +381,7 @@ onboarding-panel {
 
 .premiumPanel {
   padding: 8px 16px 0px 16px;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
 }
 
 .content-wrapper.is-hidden, .premium-wrapper.is-hidden {
@@ -496,7 +496,7 @@ onboarding-panel {
 }
 
 .education-headline {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUI);
   font-weight: 700;
   font-size: 16px;
 }

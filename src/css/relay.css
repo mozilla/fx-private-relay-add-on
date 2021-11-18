@@ -1,26 +1,26 @@
 @font-face {
-  font-family: "Metropolis";
+  font-family: "addon-Metropolis";
   font-style: normal;
   font-weight: 800;
   src: url("/fonts/Metropolis/Metropolis-Bold.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Metropolis";
+  font-family: "addon-Metropolis";
   font-style: normal;
   font-weight: 500;
   src: url("/fonts/Metropolis/Metropolis-Medium.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Metropolis";
+  font-family: "addon-Metropolis";
   font-style: normal;
   font-weight: 300;
   src: url("/fonts/Metropolis/Metropolis-Light.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "InterUI";
+  font-family: "addon-InterUI";
   font-style: normal;
   src: url("/fonts/Inter/Inter-UI-Regular.woff2") format("woff2");
 }
@@ -47,7 +47,8 @@
   --relayGrey90: #0c0c0d;
   --relayInk: #20123a;
   --relayInk70: #363959;
-  --relayMetropolis: "Metropolis", sans-serif, "SF Pro Text", "Segoe UI", Roboto, "Open Sans";
+  --relayMetropolis: "addon-Metropolis", sans-serif, "SF Pro Text", "Segoe UI", Roboto, "Open Sans";
+  --relayInterUI: "addon-InterUI", Helvetica Neue, Helvetica, Arial, sans-serif;
   --relayIconDimension: 30px;
   --relayViolet: #9059ff;
 
@@ -250,7 +251,7 @@ button.fx-relay-menu-sign-up-btn{
 .fx-relay-menu-dashboard-link, .fx-relay-modal-manage-aliases {
   color: var(--relayBlue3) !important;
   font-size: 15px;
-  font-family: "InterUI", sans-serif;
+  font-family: var(--relayInterUI);
   text-align: center;
   padding: 8px;
   margin: 16px 0 0 0;
@@ -281,7 +282,7 @@ button.fx-relay-menu-generate-alias-btn {
   width: 100%;
   padding: 16px 0px;
   border-radius: 4px;
-  font-family: "InterUI", sans-serif;
+  font-family: var(--relayInterUI);
   color: var(--relayBlue3) !important;
   font-size: 16px;
   text-align: center;
