@@ -19,7 +19,7 @@
   },
 
   "background": {
-      "scripts": ["js/background.js"]
+      "scripts": ["js/background/background.js"]
   },
 
   "browser_action": {
@@ -35,26 +35,33 @@
       "matches": [
         "http://127.0.0.1/**"
       ],
-      "js": ["js/installation_indicator.js"]
+      "js": ["js/relay.firefox.com/installation_indicator.js"]
 
     },
     {
       "matches": [
           "http://127.0.0.1/accounts/profile/**"
       ],
-      "js": ["js/get_profile_data.js"]
+      "js": ["js/relay.firefox.com/get_profile_data.js"]
     },
     {
       "matches": [
           "http://127.0.0.1/accounts/settings/**"
       ],
-      "js": ["js/settings_refresh.js"]
+      "js": ["js/relay.firefox.com/settings_refresh.js"]
     },
     {
       "matches": [
           "<all_urls>"
       ],
-      "js": ["js/utils.js", "js/fathom.js", "js/email_detector.js", "js/add_input_icon.js", "js/fill_relay_address.js", "js/metrics.js"],
+      "js": [
+        "js/shared/utils.js",
+        "js/other-websites/fathom.js",
+        "js/other-websites/email_detector.js",
+        "js/other-websites/add_input_icon.js",
+        "js/other-websites/fill_relay_address.js",
+        "js/shared/metrics.js"
+      ],
       "css": ["css/relay.css"],
       "all_frames": true
     }

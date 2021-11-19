@@ -9,7 +9,7 @@
   "devDependencies": {},
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
-    "build:clean": "git checkout src/manifest.json src/js/background.js src/popup.html",
+    "build:clean": "git checkout src/manifest.json src/js/background/background.js src/popup/popup.html",
     "build:dev": "npm run build:clean && npm run config:dev  && npm run build",
     "build:stage": "npm run build:clean && npm run config:stage && npm run build",
     "build:prod": "npm run build:clean && npm run config:prod && npm run build",
