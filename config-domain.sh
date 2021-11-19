@@ -8,9 +8,9 @@
 echo $1
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "s/:8000//g"  src/manifest.json src/js/background.js src/popup.html
-    sed -i '' "s|http://127.0.0.1|$1|g" src/manifest.json src/js/background.js src/popup.html
+    sed -i '' "s/:8000//g"  src/manifest.json src/js/background/background.js src/popup.html
+    sed -i '' "s|http://127.0.0.1|$1|g" src/manifest.json src/js/background/background.js src/popup.html
 else
-    sed -i "s/:8000//g"  src/manifest.json src/js/background.js src/popup.html
-    sed -i "s|http://127.0.0.1|$1|g" src/manifest.json src/js/background.js src/popup.html
+    sed -i "s/:8000//g"  src/manifest.json src/js/background/background.js src/popup.html
+    sed -i "s|http://127.0.0.1|$1|g" src/manifest.json src/js/background/background.js src/popup.html
 fi
