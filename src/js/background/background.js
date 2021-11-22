@@ -20,6 +20,39 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
+async function storePremiumAvailabilityInCountry() {
+  // If we already fetched Premium availability in the past seven days,
+  // don't fetch it again.
+  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
+  if (typeof existingPremiumAvailability === "object" && existingPremiumAvailability.fetchedAt > (Date.now() - 7 * 24 * 60 * 60 * 1000)) {
+    return;
+  }
+
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
+  if (!relayApiSource) {
+    return;
+  }
+  const currentPremiumAvailabilityResponse = await fetch(
+    `${relayApiSource}/premium_countries`,
+    {
+      headers: { Accept: "application/json" },
+    },
+  );
+  const currentPremiumAvailability = await currentPremiumAvailabilityResponse.json();
+  browser.storage.local.set({
+    premiumCountries: {
+      ...currentPremiumAvailability,
+      fetchedAt: Date.now(),
+    },
+  })
+}
+storePremiumAvailabilityInCountry();
+
+async function isPremiumAvailableInCountry() {
+  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
+  return premiumCountryAvailability?.premium_available_in_country === true;
+}
+
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
@@ -244,7 +277,7 @@ async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
   const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
   const aliasesRemaining = maxNumAliases - relayAddressesLength;
   
-  if (premiumFeaturesAvailable(premiumEnabled)) {
+  if (premiumFeaturesAvailable(premiumEnabled) && await isPremiumAvailableInCountry()) {
     if (!premium && aliasesRemaining < 1) {
       // Post-launch: Check if user is premium and under the max limit.
       browser.menus.remove("fx-private-relay-generate-alias");
@@ -280,7 +313,7 @@ async function updateUpgradeContextMenuItem() {
   const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
   const { premium } = await browser.storage.local.get("premium");
 
-  if (premiumFeaturesAvailable(premiumEnabled)) {
+  if (premiumFeaturesAvailable(premiumEnabled) && await isPremiumAvailableInCountry()) {
     if (!premium) {
       // Remove any previous upgrade menu items first!
       removeUpgradeContextMenuItem();

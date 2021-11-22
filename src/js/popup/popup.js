@@ -169,7 +169,7 @@ async function choosePanel(numRemaining, panelId, premium, premiumEnabledString,
   // if (shouldShowServerStoragePromptPanel) {
   //   serverStoragePanel.init(premium);
   // } else 
-  if (premium && premiumFeaturesAvailable(premiumEnabledString)) {
+  if (premium && premiumFeaturesAvailable(premiumEnabledString) && premiumCountryAvailability?.premium_available_in_country === true) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper
@@ -223,6 +223,7 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if premium features are available
   const premiumEnabled = await browser.storage.local.get("premiumEnabled");
   const premiumEnabledString = premiumEnabled.premiumEnabled;
+  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
@@ -255,7 +256,7 @@ async function showRelayPanel(tipPanelToShow) {
 
 
     //If Premium features are not available, do not show upgrade CTA on the panel
-    if (premiumFeaturesAvailable(premiumEnabledString)) {
+    if (premiumFeaturesAvailable(premiumEnabledString) && premiumCountryAvailability?.premium_available_in_country === true) {
       const premiumCTA = document.querySelector(".premium-cta");
       premiumCTA.classList.remove("is-hidden");
     }
@@ -307,7 +308,7 @@ async function showRelayPanel(tipPanelToShow) {
     remainingAliasMessage.classList.add("is-hidden");
   }
 
-  if (premiumFeaturesAvailable(premiumEnabledString)) {
+  if (premiumFeaturesAvailable(premiumEnabledString) && premiumCountryAvailability?.premium_available_in_country === true) {
     getUnlimitedAliases.classList.remove("is-hidden");
   }
 
@@ -316,7 +317,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   if (numRemaining === 0) {
     
-    if (premiumFeaturesAvailable(premiumEnabledString)) {
+    if (premiumFeaturesAvailable(premiumEnabledString) && premiumCountryAvailability?.premium_available_in_country === true) {
       const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
       upgradeButton.classList.remove("is-hidden");
     }
