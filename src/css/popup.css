@@ -288,7 +288,8 @@ main-panel {
 }
 
 .aliases-remaining {
-  margin: 0;
+  /* If the "Get unlimited aliases" prompt is hidden, this should be centered: */
+  margin: 0 auto;
   font-family: 'InterUI';
   background: white;
 }
