@@ -1,5 +1,3 @@
-(async function () {
-
 const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
 
 browser.storage.local.set({ maxNumAliases: 5 });
@@ -90,21 +88,18 @@ async function createNewHeadersObject(opts) {
   headers.set("X-CSRFToken", csrfCookieValue);
   headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json");
-  
+
   if (opts && opts.auth) {
     const apiToken = await browser.storage.local.get("apiToken");
     headers.set("Authorization", `Token ${apiToken.apiToken}`);
   }
 
-
   return headers;
-
 }
 
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
-  
   if (!apiToken.apiToken) {
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
@@ -166,149 +161,8 @@ async function makeRelayAddress(description = null) {
   browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
 
   await refreshAccountPages();
-  
+
   return newRelayAddressJson;
-}
-
-async function makeRelayAddressForTargetElement(info, tab) {
-  const pageUrl = new URL(info.pageUrl);
-  const newRelayAddress = await makeRelayAddress(pageUrl.hostname);
-
-  if (newRelayAddress.status === 402) {
-    browser.tabs.sendMessage(tab.id, {
-      type: "showMaxNumAliasesMessage",
-    });
-    return;
-  }
-
-  browser.tabs.sendMessage(
-    tab.id,
-    {
-      type: "fillTargetWithRelayAddress",
-      targetElementId: info.targetElementId,
-      relayAddress: newRelayAddress,
-    },
-    {
-      frameId: info.frameId,
-    }
-  );
-
-  
-
-}
-
-function premiumFeaturesAvailable(premiumEnabledString) {
-  return premiumEnabledString === "True";
-}
-
-function localStorageWatcher(changes, area) {
-  let changedItems = Object.keys(changes);
-  for (let item of changedItems) {
-    if (item === "relayAddresses") {
-      updateGenerateAliasContextMenuItem(changes[item].newValue.length);
-    }
-    if (item === "apiToken" && changes[item].newValue === undefined) {
-      // User has logged out. Remove all menu items. 
-      browser.menus.removeAll();
-    }
-  }
-}
-
-await browser.storage.onChanged.addListener(localStorageWatcher);
-
-function onContextMenuCreated() {
-  // Catch errors when trying to create the same menu twice.
-  // The browser.menus API is limited. You cannot query if a menu item already exists.
-  // The error it throws does not show up to the user. 
-  if (browser.runtime.lastError) {
-    return;
-  }
-}
-
-async function createMenu() {
-  if (browser.menus) {
-    browser.menus.create({
-      id: "fx-private-relay-generate-alias",
-      title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
-      contexts: ["editable"],
-    }, onContextMenuCreated);
-  }
-}
-
-
-createMenu();
-
-async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
-  const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
-  const { premium } = await browser.storage.local.get("premium");
-  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
-  const aliasesRemaining = maxNumAliases - relayAddressesLength;
-  
-  if (premiumFeaturesAvailable(premiumEnabled)) {
-    if (!premium && aliasesRemaining < 1) {
-      // Post-launch: Check if user is premium and under the max limit.
-      browser.menus.remove("fx-private-relay-generate-alias");
-      return;
-    }
-  } else {
-    // TODO: REMOVE THIS BLOCK AFTER PREMIUM LAUNCH
-    if (aliasesRemaining < 1) {
-      // Current users
-      browser.menus.remove("fx-private-relay-generate-alias");
-      return;
-    }
-  }
-
-  // Generate Alias link should be visible
-  createMenu();
-}
-
-async function createUpgradeContextMenuItem() {
-  browser.menus.create({
-    id: "fx-private-relay-get-unlimited-aliases",
-    title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
-  });
-}
-
-function removeUpgradeContextMenuItem() {
-  browser.menus.remove("fx-private-relay-get-unlimited-aliases");
-}
-
-async function updateUpgradeContextMenuItem() {
-  await refreshAccountPages();
-  // Check for status update
-  const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
-  const { premium } = await browser.storage.local.get("premium");
-
-  if (premiumFeaturesAvailable(premiumEnabled)) {
-    if (!premium) {
-      // Remove any previous upgrade menu items first!
-      removeUpgradeContextMenuItem();
-      await createUpgradeContextMenuItem();
-      return;
-    }
-
-    // Remove the upgrade item, if the user is upgraded
-    else {
-      removeUpgradeContextMenuItem();
-    }
-  }
-}
-
-async function refreshAccountPages() {
-  const { settingsRefresh } = await browser.storage.local.get("settingsRefresh");
-
-  // This functions only runs once (when on the dashboard page), if the user has visited the settings page.
-  // If they revisit the settings page, it resets so that it only runs once again. 
-  if (!settingsRefresh) {
-    browser.storage.local.set({ settingsRefresh: true });
-
-    browser.tabs.query({ url: "http://127.0.0.1/*" }, function (tabs) {
-      for (let tab of tabs) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  }
 }
 
 async function updateAddOnAuthStatus(status) {
@@ -318,34 +172,6 @@ async function updateAddOnAuthStatus(status) {
     await browser.storage.local.remove("apiToken");
   }
 }
-
-browser.menus.onClicked.addListener(async (info, tab) => {
-  switch (info.menuItemId) {
-    case "fx-private-relay-generate-alias":
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-generate-alias",
-      });
-      await makeRelayAddressForTargetElement(info, tab);
-      break;
-    case "fx-private-relay-get-unlimited-aliases":
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-get-unlimited-aliases",
-      });
-      const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } =
-        await browser.storage.local.get([
-          "fxaSubscriptionsUrl",
-          "premiumProdId",
-          "premiumPriceId",
-        ]);
-      const urlPremium = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
-      await browser.tabs.create({ url: urlPremium });
-      break;
-  }
-});
 
 async function displayBrowserActionBadge() {
   const userApiToken = await browser.storage.local.get("apiToken");
@@ -378,8 +204,6 @@ async function displayBrowserActionBadge() {
     browser.browserAction.setBadgeText({ text: "!" });
   }
 }
-
-await displayBrowserActionBadge();
 
 browser.runtime.onMessage.addListener(async (m) => {
   let response;
@@ -418,4 +242,6 @@ browser.runtime.onMessage.addListener(async (m) => {
   return response;
 });
 
+(async () => {
+  await displayBrowserActionBadge();
 })();

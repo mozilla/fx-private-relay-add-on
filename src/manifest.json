@@ -19,7 +19,7 @@
   },
 
   "background": {
-      "scripts": ["js/background/background.js"]
+      "scripts": ["js/background/background.js", "js/background/context-menu.js"]
   },
 
   "browser_action": {
