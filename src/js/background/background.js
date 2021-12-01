@@ -224,7 +224,7 @@ browser.runtime.onMessage.addListener(async (m) => {
       response = await sendMetricsEvent(m.eventData);
       break;
     case "rebuildContextMenuUpgrade":
-      await updateUpgradeContextMenuItem();
+      await relayContextMenus.init();
       break;
     case "displayBrowserActionBadge":
       await displayBrowserActionBadge();

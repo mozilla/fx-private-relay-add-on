@@ -114,13 +114,9 @@ async function generateAliasesContextMenu(aliases, opts) {
   }
 }
 
-function addManageAllLink() {
-  browser.menus.create({
-    id: "fx-private-relay-manage-aliases",
-    title: browser.i18n.getMessage("ManageAllAliases"),
-    //   parentId: parentId,
-  });
-}
+// function addManageAllLink() {
+  
+// }
 
 async function initExistingAliasContextMenu() {
   const { relayAddresses } = await browser.storage.local.get("relayAddresses");
@@ -177,19 +173,14 @@ async function initExistingAliasContextMenu() {
 async function createGenerateAliasContextMenuItem(canGenerateAlias = true) {
 //   console.log("createGenerateAliasContextMenuItem");
 
-  if (!browser.menus) {
-    throw new Error(`Cannot create browser menus`);
-  }
-
-  browser.menus.create(
-    {
+  const data = {
       id: "fx-private-relay-generate-alias",
       title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
       contexts: ["editable"],
       enabled: canGenerateAlias,
-    },
-    onContextMenuCreated
-  );
+  };
+
+  relayContextMenus.menus.create(data)
 
   // addManageAllLink();
 
@@ -210,18 +201,18 @@ function premiumFeaturesAvailable(premiumEnabledString) {
   return premiumEnabledString === "True";
 }
 
-function localStorageWatcher(changes, area) {
-  let changedItems = Object.keys(changes);
-  for (let item of changedItems) {
-    if (item === "relayAddresses") {
-      updateGenerateAliasContextMenuItem(changes[item].newValue.length);
-    }
-    if (item === "apiToken" && changes[item].newValue === undefined) {
-      // User has logged out. Remove all menu items.
-      browser.menus.removeAll();
-    }
-  }
-}
+// function localStorageWatcher(changes, area) {
+//   let changedItems = Object.keys(changes);
+//   for (let item of changedItems) {
+//     if (item === "relayAddresses") {
+//       updateGenerateAliasContextMenuItem(changes[item].newValue.length);
+//     }
+//     if (item === "apiToken" && changes[item].newValue === undefined) {
+//       // User has logged out. Remove all menu items.
+//       browser.menus.removeAll();
+//     }
+//   }
+// }
 
 async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
   const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
@@ -268,7 +259,7 @@ function removeUpgradeContextMenuItem() {
 }
 
 async function updateUpgradeContextMenuItem() {
-//   console.log("updateUpgradeContextMenuItem");
+  console.log("updateUpgradeContextMenuItem");
 
   await refreshAccountPages();
   // Check for status update
@@ -309,6 +300,7 @@ async function refreshAccountPages() {
 }
 
 browser.menus.onClicked.addListener(async (info, tab) => {
+  // console.log("browser.menus.onClicked: ", info.menuItemId);
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
@@ -346,8 +338,9 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 });
 
 browser.menus.onShown.addListener(async (info, tab) => {
-  console.log(info, tab);
-  browser.menus.refresh();
+  // console.log("browser.menus.onShown");
+  // console.log(info, tab);
+  // browser.menus.refresh();
   /*
             // Menu ID: "fx-private-relay-use-existing-aliases":  
             Function Outline: 
@@ -361,21 +354,138 @@ browser.menus.onShown.addListener(async (info, tab) => {
             */
 });
 
+const getUserStatus = {
+  generateAliases: async (numberOfAliasesCreated = null)=> {
+    const { premium } = await browser.storage.local.get("premium");
+
+    // Short-circuit if the user is premium.
+    if (premium) return true;
+    
+    const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+    const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+
+    let aliasesRemaining = maxNumAliases - relayAddresses.length;
+
+    if (numberOfAliasesCreated) {
+      aliasesRemaining = maxNumAliases - numberOfAliasesCreated.length;
+    }
+    
+    // The user cannot create and additional aliases.
+    if (aliasesRemaining < 1) return false;
+
+    return true;
+  },
+  upgradeToPremium: async()=> {
+    const { premium } = await browser.storage.local.get("premium");
+  
+    // Note: If user is already premium, this will return false.
+    return !premium;
+  },
+}
+
+const staticMenuData = {
+  generateAliasEnabled: {
+    id: "fx-private-relay-generate-alias",
+    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
+    contexts: ["editable"],
+    enabled: true,
+  },
+  generateAliasDisabled: {
+    id: "fx-private-relay-generate-alias",
+    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
+    contexts: ["editable"],
+    enabled: false,
+  },
+  manageAliases: {
+      id: "fx-private-relay-manage-aliases",
+      title: browser.i18n.getMessage("ManageAllAliases"),
+  },
+  upgradeToPremium: {
+    id: "fx-private-relay-get-unlimited-aliases",
+    title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
+  },
+  upgradeToPremiumSeperator: {
+    id: "fx-private-relay-get-unlimited-aliases-separator",
+    type: "separator",
+  }
+}
+
 const relayContextMenus = {
   init: async () => {
     // console.log("relayContextMenus.init");
 
-    // Generate aliases menu item
-    const canUserGenerateAliases =
-      await checkIfUserCanGenerateAliasContextMenuItem();
-    await createGenerateAliasContextMenuItem(canUserGenerateAliases);
+    if (!browser.menus) {
+      throw new Error(`Cannot create browser menus`);
+    }
 
-    // Generate upgrade menu item
-    updateUpgradeContextMenuItem();
+    // Reset any previously created menus
+    await browser.menus.removeAll();
+
+    // Generate aliases menu item
+    // If a user is maxed out/not premium, the generate item will be disabled.
+    const canUserGenerateAliases = await getUserStatus.generateAliases();
+    // console.log("canUserGenerateAliases: ", canUserGenerateAliases);
+    canUserGenerateAliases ? relayContextMenus.menus.create(staticMenuData.generateAliasEnabled) : relayContextMenus.menus.create(staticMenuData.generateAliasDisabled);
+
+    // Create "Manage all aliases" link
+    relayContextMenus.menus.create(staticMenuData.manageAliases);
+
+    // Generate upgrade menu item for non-premium users
+    const canUserUpgradeToPremium = await getUserStatus.upgradeToPremium();
+    // console.log("canUserUpgradeToPremium", canUserUpgradeToPremium);
+    if (canUserUpgradeToPremium) relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
 
     // Set listerners
-    await browser.storage.onChanged.addListener(localStorageWatcher);
+    await browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);
   },
+  listeners: {
+    onLocalStorageChange: async (changes, area) => {
+      // console.log("relayContextMenus.listeners.onLocalStorageChange", changes, area);
+      let changedItems = Object.keys(changes);
+      for (let item of changedItems) {
+        if (item === "relayAddresses") {
+          // console.log("relayAddresses", changes);
+          await relayContextMenus.init();
+        }
+
+        if (item === "apiToken" && changes[item].newValue === undefined) {
+          // User has logged out. Remove all menu items.
+          await browser.menus.removeAll();
+        }
+      }
+    },
+  },
+  menus: {
+    create: (data, opts) => {
+      // If multiple items need to be created: 
+      if (Array.isArray(data)) {
+        data.forEach(menu => {
+          browser.menus.create(menu, relayContextMenus.utils.onCreatedCallback);
+        });
+
+        return;
+      }
+
+      browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+      
+    },
+    remove: (id) => {
+      browser.menus.remove(id);
+    }
+  }, 
+  utils: {
+    onCreatedCallback: ()=> {
+      // console.log("relayContextMenus.utils.onCreatedCallback");
+      
+      // Catch errors when trying to create the same menu twice.
+      // The browser.menus API is limited. You cannot query if a menu item already exists.
+      // The error it throws does not show up to the user.
+
+      if (browser.runtime.lastError) {
+        return;
+      }
+    }
+  }
 };
 
 (async () => {
