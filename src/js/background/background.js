@@ -18,6 +18,37 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
+async function getAliasesFromServer(method = "GET", body = null, opts=null) {
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+
+  const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
+  const headers = new Headers();
+  
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  
+  if (opts && opts.auth) {
+    const apiToken = await browser.storage.local.get("apiToken");
+    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  }
+
+  const response = await fetch(apiMakeRelayAddressesURL, {
+    mode: "same-origin",
+    method,
+    headers: headers,
+    body,
+  });
+
+  answer = await response.json();
+
+  // Cache alias list in local storage
+  // browser.storage.local.set({ relayAddresses: answer });
+  
+  return answer;
+}
+
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
@@ -224,6 +255,7 @@ browser.runtime.onMessage.addListener(async (m) => {
       response = await sendMetricsEvent(m.eventData);
       break;
     case "rebuildContextMenuUpgrade":
+      // console.log("rebuildContextMenuUpgrade-init");
       await relayContextMenus.init();
       break;
     case "displayBrowserActionBadge":
