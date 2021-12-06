@@ -36,7 +36,13 @@
         "http://127.0.0.1/**"
       ],
       "js": ["js/relay.firefox.com/installation_indicator.js"]
-
+    },
+    {
+      "matches": [
+        "http://127.0.0.1/**"
+      ],
+      "css": ["css/relay-website.css"],
+      "run_at": "document_start"
     },
     {
       "matches": [
