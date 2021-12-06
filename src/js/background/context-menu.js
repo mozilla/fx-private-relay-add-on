@@ -1,28 +1,28 @@
 // TODO: Move all functions in this page into relayContextMenus() function
 
-async function makeRelayAddressForTargetElement(info, tab) {
-  const pageUrl = new URL(info.pageUrl);
-  const newRelayAddress = await makeRelayAddress(pageUrl.hostname);
+// async function makeRelayAddressForTargetElement(info, tab) {
+//   const pageUrl = new URL(info.pageUrl);
+//   const newRelayAddress = await makeRelayAddress(pageUrl.hostname);
 
-  if (newRelayAddress.status === 402) {
-    browser.tabs.sendMessage(tab.id, {
-      type: "showMaxNumAliasesMessage",
-    });
-    return;
-  }
+//   if (newRelayAddress.status === 402) {
+//     browser.tabs.sendMessage(tab.id, {
+//       type: "showMaxNumAliasesMessage",
+//     });
+//     return;
+//   }
 
-  browser.tabs.sendMessage(
-    tab.id,
-    {
-      type: "fillTargetWithRelayAddress",
-      targetElementId: info.targetElementId,
-      relayAddress: newRelayAddress,
-    },
-    {
-      frameId: info.frameId,
-    }
-  );
-}
+//   browser.tabs.sendMessage(
+//     tab.id,
+//     {
+//       type: "fillTargetWithRelayAddress",
+//       targetElementId: info.targetElementId,
+//       relayAddress: newRelayAddress,
+//     },
+//     {
+//       frameId: info.frameId,
+//     }
+//   );
+// }
 
 function onContextMenuCreated() {
   // Catch errors when trying to create the same menu twice.
@@ -214,32 +214,32 @@ function premiumFeaturesAvailable(premiumEnabledString) {
 //   }
 // }
 
-async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
-  const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
-  const { premium } = await browser.storage.local.get("premium");
-  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
-  const aliasesRemaining = maxNumAliases - relayAddressesLength;
+// async function updateGenerateAliasContextMenuItem(relayAddressesLength) {
+//   const { premiumEnabled } = await browser.storage.local.get("premiumEnabled");
+//   const { premium } = await browser.storage.local.get("premium");
+//   const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+//   const aliasesRemaining = maxNumAliases - relayAddressesLength;
 
-  if (premiumFeaturesAvailable(premiumEnabled)) {
-    if (!premium && aliasesRemaining < 1) {
-      // Post-launch: Check if user is premium and under the max limit.
-      await browser.menus.remove("fx-private-relay-generate-alias");
-      createGenerateAliasContextMenuItem(false);
-      return;
-    }
-  } else {
-    // TODO: REMOVE THIS BLOCK AFTER PREMIUM LAUNCH
-    if (aliasesRemaining < 1) {
-      // Current users
-      await browser.menus.remove("fx-private-relay-generate-alias");
-      createGenerateAliasContextMenuItem(false);
-      return;
-    }
-  }
+//   if (premiumFeaturesAvailable(premiumEnabled)) {
+//     if (!premium && aliasesRemaining < 1) {
+//       // Post-launch: Check if user is premium and under the max limit.
+//       await browser.menus.remove("fx-private-relay-generate-alias");
+//       createGenerateAliasContextMenuItem(false);
+//       return;
+//     }
+//   } else {
+//     // TODO: REMOVE THIS BLOCK AFTER PREMIUM LAUNCH
+//     if (aliasesRemaining < 1) {
+//       // Current users
+//       await browser.menus.remove("fx-private-relay-generate-alias");
+//       createGenerateAliasContextMenuItem(false);
+//       return;
+//     }
+//   }
 
-  // Generate Alias link should be visible
-  createGenerateAliasContextMenuItem();
-}
+//   // Generate Alias link should be visible
+//   createGenerateAliasContextMenuItem();
+// }
 
 async function createUpgradeContextMenuItem() {
   browser.menus.create({
@@ -259,7 +259,7 @@ function removeUpgradeContextMenuItem() {
 }
 
 async function updateUpgradeContextMenuItem() {
-  // console.log("updateUpgradeContextMenuItem");
+  console.log("updateUpgradeContextMenuItem");
 
   await refreshAccountPages();
   // Check for status update
@@ -281,26 +281,8 @@ async function updateUpgradeContextMenuItem() {
   }
 }
 
-async function refreshAccountPages() {
-  const { settingsRefresh } = await browser.storage.local.get(
-    "settingsRefresh"
-  );
-
-  // This functions only runs once (when on the dashboard page), if the user has visited the settings page.
-  // If they revisit the settings page, it resets so that it only runs once again.
-  if (!settingsRefresh) {
-    browser.storage.local.set({ settingsRefresh: true });
-
-    browser.tabs.query({ url: "http://127.0.0.1/*" }, function (tabs) {
-      for (let tab of tabs) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  }
-}
-
 browser.menus.onClicked.addListener(async (info, tab) => {
-  // console.log("browser.menus.onClicked: ", info.menuItemId);
+  console.log("browser.menus.onClicked: ", info.menuItemId);
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
@@ -308,7 +290,7 @@ browser.menus.onClicked.addListener(async (info, tab) => {
         action: "click",
         label: "context-menu-generate-alias",
       });
-      await makeRelayAddressForTargetElement(info, tab);
+      await relayContextMenus.listeners.onMakeRelayAddressForTargetElement(info, tab);
       break;
     case "fx-private-relay-get-unlimited-aliases":
       sendMetricsEvent({
@@ -335,6 +317,11 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       await browser.tabs.create({ url: urlManageAliases });
       break;
   }
+
+  if (info.menuItemId.startsWith("fx-private-relay-use-existing-alias_")) {
+    await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
+  }
+
 });
 
 let lastMenuInstanceId = 0;
@@ -443,11 +430,11 @@ const staticMenuData = {
   },
   useExistingAliasFromWebsite: {
     id: "fx-private-relay-use-existing-aliases-from-this-site",
-    title: "Use existing alias from this site…",
+    title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite"),
   }, 
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
-    title: "Use existing alias",
+    title: browser.i18n.getMessage("pageInputIconRecentAliases"),
   }
 }
 
@@ -473,15 +460,11 @@ const relayContextMenus = {
     // Generate aliases menu item
     // If a user is maxed out/not premium, the generate item will be disabled.
     const canUserGenerateAliases = await getUserStatus.generateAliases();
-    // console.log("canUserGenerateAliases: ", canUserGenerateAliases);
     canUserGenerateAliases ? relayContextMenus.menus.create(staticMenuData.generateAliasEnabled) : relayContextMenus.menus.create(staticMenuData.generateAliasDisabled);
 
     
     // Create Use Existing Alias submenu
-    // TODO: Add logic to build based on current website, rather than past five created aliases.
     if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) ) {
-
-      console.log("useExistingAliasFromWebsite", currentWebsite);
       relayContextMenus.menus.create(staticMenuData.useExistingAliasFromWebsite);
       relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
@@ -489,36 +472,54 @@ const relayContextMenus = {
         currentWebsite
       })
       
-    } else {
-      console.log("useExistingAlias");
-      relayContextMenus.menus.create(staticMenuData.useExistingAlias);
-      relayContextMenus.menus.create(staticMenuData.existingAlias, {
-        createExistingAliases: true,
-        parentId: staticMenuData.useExistingAlias.id,
-        currentWebsite
-      })
-
     }
 
-    
+    // Create "Recent Aliases…" menu
+    relayContextMenus.menus.create(staticMenuData.useExistingAlias);
+    relayContextMenus.menus.create(staticMenuData.existingAlias, {
+      createExistingAliases: true,
+      parentId: staticMenuData.useExistingAlias.id,
+    })
 
     // Create "Manage all aliases" link
     relayContextMenus.menus.create(staticMenuData.manageAliases);
 
     // Generate upgrade menu item for non-premium users
     const canUserUpgradeToPremium = await getUserStatus.upgradeToPremium();
-    // console.log("canUserUpgradeToPremium", canUserUpgradeToPremium);
     if (canUserUpgradeToPremium) relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
 
     // Set listerners
-    await browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);    
-
-    // console.log("refresh-init-bottom");
-    // await browser.menus.refresh();
-    
-    
+    await browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
   },
   listeners: {
+    onFillInAddressWithAliasId: async (info, tab) => {
+      // Trim the context menu id to get the alias reference ID
+      const selectedAliasId = info.menuItemId.replace(
+        "fx-private-relay-use-existing-alias_",
+        ""
+      );
+
+      // Get stored alias data
+      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+
+      // Select the correct alias from the stored alias data
+      const selectedAliasObject = relayAddresses.filter((alias) => {
+        return alias.id === parseInt(selectedAliasId, 10);
+      });
+
+      browser.tabs.sendMessage(
+        tab.id,
+        {
+          type: "fillTargetWithRelayAddress",
+          targetElementId: info.targetElementId,
+          relayAddress: selectedAliasObject[0],
+        },
+        {
+          frameId: info.frameId,
+        }
+      );
+      
+    },
     onLocalStorageChange: async (changes, area) => {
       // console.log("relayContextMenus.listeners.onLocalStorageChange", changes, area);
       let changedItems = Object.keys(changes);
@@ -534,7 +535,30 @@ const relayContextMenus = {
           await browser.menus.removeAll();
         }
       }
-    },
+    },    
+    onMakeRelayAddressForTargetElement: async (info, tab) => {
+      const pageUrl = new URL(info.pageUrl);
+      const newRelayAddress = await makeRelayAddress(pageUrl.hostname);
+    
+      if (newRelayAddress.status === 402) {
+        browser.tabs.sendMessage(tab.id, {
+          type: "showMaxNumAliasesMessage",
+        });
+        return;
+      }
+    
+      browser.tabs.sendMessage(
+        tab.id,
+        {
+          type: "fillTargetWithRelayAddress",
+          targetElementId: info.targetElementId,
+          relayAddress: newRelayAddress,
+        },
+        {
+          frameId: info.frameId,
+        }
+      );
+    }
   },
   menus: {
     create: async (data, opts=null) => {     
@@ -566,10 +590,14 @@ const relayContextMenus = {
 
           // // Cache server set locally
           // browser.storage.local.set({ relayAddresses: aliases });
+          const currentUseAliasIds = [];
 
           for (const alias of filteredAliases) {
             const title = alias.description ? alias.description : alias.address;
             const id = "fx-private-relay-use-existing-alias_" + alias.id;
+            
+            currentUseAliasIds.push(id);
+            
             data.title = title;
             data.id = id;
             data.parentId = opts.parentId;
@@ -577,7 +605,18 @@ const relayContextMenus = {
           }
 
           console.log("refresh-init-createExistingAliases");
+
+          // await browser.menus.onClicked.addListener(async (info, tab) => {
+          //   console.log("currentUseAliasIds: ", currentUseAliasIds);
+          //   console.log("info.menuItemId: ", info.menuItemId);
+          //   if (currentUseAliasIds.includes(info.menuItemId)) {
+          //     await fillInAddressWithAliasId(info, tab);
+          //   }
+          // });
+          
           await browser.menus.refresh();
+
+          await browser.storage.local.set({ currentUseAliasIds });
 
         }
 
@@ -599,7 +638,7 @@ const relayContextMenus = {
 
       array.reverse();
       const filteredAliases = array.filter(alias => alias.generated_for === domain);
-      const otherAliases = array.filter(alias => alias.generated_for !== domain);
+      // const otherAliases = array.filter(alias => alias.generated_for !== domain);
 
       // If 5 results for specific domain
       if (filteredAliases.length > 5) { 
@@ -607,19 +646,21 @@ const relayContextMenus = {
         return filteredAliases;
       };
 
+      return filteredAliases
+
       // Run this code if user has less than 5 aliases for a specific domain: 
-      const targetLength = 5 - filteredAliases.length;
+      // const targetLength = 5 - filteredAliases.length;
 
       // Use case: Use has less than five aliases total
-      if (otherAliases.length <= targetLength) {
-        const combinedAliases = filteredAliases.concat(otherAliases);
-        return combinedAliases;
-      }
+      // if (otherAliases.length <= targetLength) {
+      //   const combinedAliases = filteredAliases.concat(otherAliases);
+      //   return combinedAliases;
+      // }
 
       // Default use case: User has more than five aliases total, so trim the extras
-      otherAliases.length = targetLength;
-      const combinedAliases = filteredAliases.concat(otherAliases);
-      return combinedAliases;
+      // otherAliases.length = targetLength;
+      // const combinedAliases = filteredAliases.concat(otherAliases);
+      // return combinedAliases;
     },
     getGeneratedForHistory: async (website) => {
       console.log("getGeneratedForHistory: ", website);
