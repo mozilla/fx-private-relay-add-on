@@ -52,10 +52,10 @@ const relayContextMenus = {
 
     // Generate aliases menu item
     // If a user is maxed out/not premium, the generate item will be disabled.
-    const canUserGenerateAliases = await relayContextMenus.utils.getUserStatus.generateAliases();
+    const canUserGenerateAliases = await relayContextMenus.utils.getUserStatus.canGenerateMoreAliases();
     canUserGenerateAliases ? relayContextMenus.menus.create(staticMenuData.generateAliasEnabled) : relayContextMenus.menus.create(staticMenuData.generateAliasDisabled);
 
-    const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.numberOfAliases() > 0);
+    const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
     
     // Create Use Existing Alias submenu
     if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
@@ -80,7 +80,7 @@ const relayContextMenus = {
     relayContextMenus.menus.create(staticMenuData.manageAliases);
 
     // Generate upgrade menu item for non-premium users
-    const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.upgradeToPremium();
+    const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
     if (canUserUpgradeToPremium) relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
 
     // Set listerners
@@ -116,7 +116,6 @@ const relayContextMenus = {
       
     },
     onLocalStorageChange: async (changes, area) => {
-      console.log("relayContextMenus.listeners.onLocalStorageChange");
       let changedItems = Object.keys(changes);
       for (let item of changedItems) {
         if (item === "relayAddresses") {
@@ -235,8 +234,7 @@ const relayContextMenus = {
       array.reverse();
 
       // Limit to 5
-      if (array.length > 5) { array.length = 5 };
-      return array;
+      return array.slice(0, 5);
     },
     getSiteSpecificAliases: (array, domain)=> {
 
@@ -246,15 +244,10 @@ const relayContextMenus = {
       const filteredAliases = array.filter(alias => alias.generated_for === domain);
 
       // If 5 results for specific domain
-      if (filteredAliases.length > 5) { 
-        filteredAliases.length = 5;
-        return filteredAliases;
-      };
-
-      return filteredAliases
+      return filteredAliases.slice(0, 5);
     },
     getUserStatus: {
-      generateAliases: async (numberOfAliasesCreated = null)=> {
+      canGenerateMoreAliases: async ()=> {
         const { premium } = await browser.storage.local.get("premium");
     
         // Short-circuit if the user is premium.
@@ -262,23 +255,14 @@ const relayContextMenus = {
         
         const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
         const { relayAddresses } = await browser.storage.local.get("relayAddresses");
-    
-        let aliasesRemaining = maxNumAliases - relayAddresses.length;
-    
-        if (numberOfAliasesCreated) {
-          aliasesRemaining = maxNumAliases - numberOfAliasesCreated.length;
-        }
-        
-        // The user cannot create and additional aliases.
-        if (aliasesRemaining < 1) return false;
-    
-        return true;
+
+        return (maxNumAliases - relayAddresses.length) > 0;
       },
-      numberOfAliases: async () => {
+      getNumberOfAliases: async () => {
         const { relayAddresses } = await browser.storage.local.get("relayAddresses");
         return relayAddresses.length;
       },
-      upgradeToPremium: async()=> {
+      canUpgradeToPremium: async()=> {
         const { premium } = await browser.storage.local.get("premium");
       
         // Note: If user is already premium, this will return false.
