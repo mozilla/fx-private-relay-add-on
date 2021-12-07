@@ -47,6 +47,14 @@ const relayContextMenus = {
       throw new Error(`Cannot create browser menus`);
     }
 
+    const userApiToken = await browser.storage.local.get("apiToken");
+    const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+
+    if (!apiKeyInStorage) {
+      // User is not logged in. Do not do anything.
+      return;
+    }
+
     // Reset any previously created menus
     await browser.menus.removeAll();
 
