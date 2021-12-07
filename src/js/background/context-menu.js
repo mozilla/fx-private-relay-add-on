@@ -26,6 +26,9 @@ const staticMenuData = {
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
     title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
+    icons: {
+      16: "/icons/placeholder-logo.png",
+    },
   },
   upgradeToPremiumSeperator: {
     id: "fx-private-relay-get-unlimited-aliases-separator",
@@ -43,6 +46,7 @@ const staticMenuData = {
 
 const relayContextMenus = {
   init: async (currentWebsite=null) => {
+    
     if (!browser.menus) {
       throw new Error(`Cannot create browser menus`);
     }
@@ -69,7 +73,7 @@ const relayContextMenus = {
 
     // Create Use Existing Alias submenu
     if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
-      relayContextMenus.menus.create(staticMenuData.existingAlias, {
+      await relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
         parentMenu: staticMenuData.useExistingAliasFromWebsite,
         exisitingSite: true,
@@ -79,7 +83,7 @@ const relayContextMenus = {
 
     // Create "Recent Aliases…" menu
     if ( userHasSomeAliasesCreated ) {
-      relayContextMenus.menus.create(staticMenuData.existingAlias, {
+      await relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
         parentMenu: staticMenuData.useExistingAlias,
         exisitingSite: false,
@@ -88,14 +92,22 @@ const relayContextMenus = {
     }
 
     // Create "Manage all aliases" link
-    relayContextMenus.menus.create(staticMenuData.manageAliases);
+    await relayContextMenus.menus.create(staticMenuData.manageAliases);
 
     // Generate upgrade menu item for non-premium users
     const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
-    if (canUserUpgradeToPremium) relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
+    if (canUserUpgradeToPremium) {
+      await relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
+    }
 
     // Set listerners
     browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
+
+    // Refresh menus
+    await browser.menus.refresh();
+
+    return Promise.resolve(1)
+
   },
   listeners: {
     onFillInAddressWithAliasId: async (info, tab) => {
@@ -170,8 +182,8 @@ const relayContextMenus = {
         data.forEach(async (menu) => {
           await browser.menus.create(menu, relayContextMenus.utils.onCreatedCallback);
         });
-
-        return;
+        
+        return Promise.resolve(1)
       }
 
       // Loop Through Existing Aliases
@@ -187,6 +199,9 @@ const relayContextMenus = {
         // Only create the parent menu if we have will create sub-items
         if (filteredAliases.length > 0) {
           await browser.menus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
+        } else {
+          // Exit early. Nothing else to create.
+          return Promise.resolve(1);
         }
 
         for (const alias of filteredAliases) {
@@ -200,13 +215,12 @@ const relayContextMenus = {
           await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
         }
         
-        await browser.menus.refresh();
-
-
-        return;
+        return Promise.resolve(1)
       }
 
       await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+
+      return Promise.resolve(1)
       
     },
     remove: async (id) => {
@@ -303,7 +317,7 @@ browser.menus.onShown.addListener(async (info, tab) => {
   }
 
   const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
-  await relayContextMenus.init(domain);
+   await relayContextMenus.init(domain);
 
   if (menuInstanceId !== lastMenuInstanceId) {
     return; // Menu was closed and shown again.
@@ -352,5 +366,6 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 
 });
 
-relayContextMenus.init();
-
+(async () => {
+  await relayContextMenus.init();
+})();
