@@ -273,7 +273,6 @@ browser.runtime.onMessage.addListener(async (m) => {
       response = await sendMetricsEvent(m.eventData);
       break;
     case "rebuildContextMenuUpgrade":
-      // console.log("rebuildContextMenuUpgrade-init");
       await relayContextMenus.init();
       break;
     case "displayBrowserActionBadge":
@@ -292,6 +291,4 @@ browser.runtime.onMessage.addListener(async (m) => {
   return response;
 });
 
-(async () => {
-  await displayBrowserActionBadge();
-})();
+displayBrowserActionBadge();

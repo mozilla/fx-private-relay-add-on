@@ -84,7 +84,7 @@ const relayContextMenus = {
     if (canUserUpgradeToPremium) relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
 
     // Set listerners
-    await browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
+    browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
   },
   listeners: {
     onFillInAddressWithAliasId: async (info, tab) => {
@@ -116,6 +116,7 @@ const relayContextMenus = {
       
     },
     onLocalStorageChange: async (changes, area) => {
+      console.log("relayContextMenus.listeners.onLocalStorageChange");
       let changedItems = Object.keys(changes);
       for (let item of changedItems) {
         if (item === "relayAddresses") {
@@ -223,24 +224,8 @@ const relayContextMenus = {
     getGeneratedForHistory: async (website) => {
       const { relayAddresses } = await browser.storage.local.get("relayAddresses");
       
-      function checkAvailability(aliases, domain) {
-        return aliases.some(function(alias) {
-            return domain === alias.generated_for;
-        });
-      }
-
-      const websiteMatch = checkAvailability(relayAddresses, website)
-
-      return websiteMatch
+      return relayAddresses.some(alias => website === alias.generated_for);
     },
-    getHostnameFromRegex: (url) => {
-      // TODO: Unused function
-      // https://stackoverflow.com/a/54947757
-      // run against regex
-      const matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-      // extract hostname (will be null if no match is found)
-      return matches && matches[1];
-    },  
     getHostnameFromUrlConstructor: (url) => {
       const { hostname } = new URL(url);
       return hostname;
@@ -312,11 +297,6 @@ const relayContextMenus = {
   }
 };
 
-// TLDR: We make sure the menu is still open when performing the refresh command, as to not waste resoruces. 
-// This method is taken from https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus/onShown documentation. 
-let lastMenuInstanceId = 0;
-let nextMenuInstanceId = 1;
-
 // Events
 browser.menus.onShown.addListener(async (info, tab) => {
   
@@ -325,19 +305,12 @@ browser.menus.onShown.addListener(async (info, tab) => {
     return;
   }
 
-  let menuInstanceId = nextMenuInstanceId++;
-  lastMenuInstanceId = menuInstanceId;
-
   const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
   await relayContextMenus.init(domain);
 
   if (menuInstanceId !== lastMenuInstanceId) {
     return; // Menu was closed and shown again.
   }
-});
-
-browser.menus.onHidden.addListener(async (info, tab) => {
-  lastMenuInstanceId = 0;
 });
 
 browser.menus.onClicked.addListener(async (info, tab) => {
@@ -382,7 +355,5 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 
 });
 
-(async () => {
-  await relayContextMenus.init();
-})();
+relayContextMenus.init();
 
