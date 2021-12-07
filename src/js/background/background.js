@@ -128,6 +128,24 @@ async function createNewHeadersObject(opts) {
   return headers;
 }
 
+async function refreshAccountPages() {
+  const { settingsRefresh } = await browser.storage.local.get(
+    "settingsRefresh"
+  );
+
+  // This functions only runs once (when on the dashboard page), if the user has visited the settings page.
+  // If they revisit the settings page, it resets so that it only runs once again.
+  if (!settingsRefresh) {
+    browser.storage.local.set({ settingsRefresh: true });
+
+    browser.tabs.query({ url: "http://127.0.0.1/*" }, function (tabs) {
+      for (let tab of tabs) {
+        browser.tabs.reload(tab.id);
+      }
+    });
+  }
+}
+
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
