@@ -61,20 +61,21 @@ const relayContextMenus = {
 
     // Create Use Existing Alias submenu
     if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
-      relayContextMenus.menus.create(staticMenuData.useExistingAliasFromWebsite);
       relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
-        parentId: staticMenuData.useExistingAliasFromWebsite.id,
+        parentMenu: staticMenuData.useExistingAliasFromWebsite,
+        exisitingSite: true,
         currentWebsite
       }, aliases);
     } 
 
     // Create "Recent Aliases…" menu
     if ( userHasSomeAliasesCreated ) {
-      relayContextMenus.menus.create(staticMenuData.useExistingAlias);
       relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
-        parentId: staticMenuData.useExistingAlias.id,
+        parentMenu: staticMenuData.useExistingAlias,
+        exisitingSite: false,
+        currentWebsite
       }, aliases)
     }
 
@@ -168,31 +169,31 @@ const relayContextMenus = {
       // Loop Through Existing Aliases
       if (opts?.createExistingAliases) {
         
-        const filteredAliases = opts.currentWebsite
+        const filteredAliases = opts.exisitingSite
           ? relayContextMenus.utils.getSiteSpecificAliases(
               aliases,
               opts.currentWebsite
             )
-          : relayContextMenus.utils.getMostRecentAliases(aliases);
+          : relayContextMenus.utils.getMostRecentAliases(aliases, opts.currentWebsite);
 
-        const currentUseAliasIds = [];
+        // Only create the parent menu if we have will create sub-items
+        if (filteredAliases.length > 0) {
+          await browser.menus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
+        }
 
         for (const alias of filteredAliases) {
           const title = alias.description ? alias.description : alias.address;
           const id = "fx-private-relay-use-existing-alias_" + alias.id;
           
-          currentUseAliasIds.push(id);
           
           data.title = title;
           data.id = id;
-          data.parentId = opts.parentId;
+          data.parentId = opts.parentMenu.id;
           await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
         }
         
         await browser.menus.refresh();
 
-        // Used to parse "use alias" context menus
-        await browser.storage.local.set({ currentUseAliasIds });
 
         return;
       }
@@ -230,12 +231,15 @@ const relayContextMenus = {
       const { hostname } = new URL(url);
       return hostname;
     },  
-    getMostRecentAliases: (array)=> {
+    getMostRecentAliases: (array, domain)=> {
       // Flipped to match the same order as the dashboard
       array.reverse();
 
+      // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
+      const filteredAliases = array.filter(alias => alias.generated_for !== domain);
+
       // Limit to 5
-      return array.slice(0, 5);
+      return filteredAliases.slice(0, 5);
     },
     getSiteSpecificAliases: (array, domain)=> {
 
