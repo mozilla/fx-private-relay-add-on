@@ -42,9 +42,6 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   });
 
   answer = await response.json();
-
-  // Cache alias list in local storage
-  // browser.storage.local.set({ relayAddresses: answer });
   
   return answer;
 }

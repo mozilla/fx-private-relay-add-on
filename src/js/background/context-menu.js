@@ -175,8 +175,6 @@ const relayContextMenus = {
             )
           : relayContextMenus.utils.getMostRecentAliases(aliases);
 
-        // // Cache server set locally
-        // browser.storage.local.set({ relayAddresses: aliases });
         const currentUseAliasIds = [];
 
         for (const alias of filteredAliases) {
