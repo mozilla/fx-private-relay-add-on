@@ -57,6 +57,8 @@ const relayContextMenus = {
 
     const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
     
+    const aliases = await relayContextMenus.utils.getAliases();
+
     // Create Use Existing Alias submenu
     if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
       relayContextMenus.menus.create(staticMenuData.useExistingAliasFromWebsite);
@@ -64,8 +66,8 @@ const relayContextMenus = {
         createExistingAliases: true,
         parentId: staticMenuData.useExistingAliasFromWebsite.id,
         currentWebsite
-      })
-    }
+      }, aliases);
+    } 
 
     // Create "Recent Aliases…" menu
     if ( userHasSomeAliasesCreated ) {
@@ -73,7 +75,7 @@ const relayContextMenus = {
       relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
         parentId: staticMenuData.useExistingAlias.id,
-      })
+      }, aliases)
     }
 
     // Create "Manage all aliases" link
@@ -153,7 +155,7 @@ const relayContextMenus = {
     }
   },
   menus: {
-    create: async (data, opts=null) => {     
+    create: async (data, opts=null, aliases) => {     
       // If multiple items need to be created: 
       if (Array.isArray(data)) {
         data.forEach(async (menu) => {
@@ -165,9 +167,6 @@ const relayContextMenus = {
 
       // Loop Through Existing Aliases
       if (opts?.createExistingAliases) {
-        
-        // TODO: Edgecase Fix if API doesn't respond (use local)
-        const aliases = await relayContextMenus.utils.getAliases();
         
         const filteredAliases = opts.currentWebsite
           ? relayContextMenus.utils.getSiteSpecificAliases(
@@ -209,16 +208,20 @@ const relayContextMenus = {
   }, 
   utils: {
     getAliases: async () => {
-
-      // TODO: This requires network access/server uptime. 
-      // Is there a way to test/fallback to local?
-      if ( await getServerStoragePref() ) {
-        return await getAliasesFromServer();
+      if (await getServerStoragePref()) {
+        try {
+          return await getAliasesFromServer();
+        } catch (error) {
+          // API Error — Fallback to local storage
+          const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+          return relayAddresses;
+        }
       }
 
+      // User is not syncing with the server. Use local storage.
       const { relayAddresses } = await browser.storage.local.get("relayAddresses");
       return relayAddresses;
-
+      
     },
     getGeneratedForHistory: async (website) => {
       const { relayAddresses } = await browser.storage.local.get("relayAddresses");
