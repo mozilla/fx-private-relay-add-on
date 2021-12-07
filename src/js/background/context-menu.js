@@ -55,8 +55,10 @@ const relayContextMenus = {
     const canUserGenerateAliases = await relayContextMenus.utils.getUserStatus.generateAliases();
     canUserGenerateAliases ? relayContextMenus.menus.create(staticMenuData.generateAliasEnabled) : relayContextMenus.menus.create(staticMenuData.generateAliasDisabled);
 
+    const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.numberOfAliases() > 0);
+    
     // Create Use Existing Alias submenu
-    if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) ) {
+    if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
       relayContextMenus.menus.create(staticMenuData.useExistingAliasFromWebsite);
       relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
@@ -66,11 +68,13 @@ const relayContextMenus = {
     }
 
     // Create "Recent Aliases…" menu
-    relayContextMenus.menus.create(staticMenuData.useExistingAlias);
-    relayContextMenus.menus.create(staticMenuData.existingAlias, {
-      createExistingAliases: true,
-      parentId: staticMenuData.useExistingAlias.id,
-    })
+    if ( userHasSomeAliasesCreated ) {
+      relayContextMenus.menus.create(staticMenuData.useExistingAlias);
+      relayContextMenus.menus.create(staticMenuData.existingAlias, {
+        createExistingAliases: true,
+        parentId: staticMenuData.useExistingAlias.id,
+      })
+    }
 
     // Create "Manage all aliases" link
     relayContextMenus.menus.create(staticMenuData.manageAliases);
@@ -284,6 +288,10 @@ const relayContextMenus = {
         if (aliasesRemaining < 1) return false;
     
         return true;
+      },
+      numberOfAliases: async () => {
+        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+        return relayAddresses.length;
       },
       upgradeToPremium: async()=> {
         const { premium } = await browser.storage.local.get("premium");
