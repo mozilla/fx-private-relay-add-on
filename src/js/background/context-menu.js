@@ -65,7 +65,8 @@ const relayContextMenus = {
     // Generate aliases menu item
     // If a user is maxed out/not premium, the generate item will be disabled.
     const canUserGenerateAliases = await relayContextMenus.utils.getUserStatus.canGenerateMoreAliases();
-    canUserGenerateAliases ? relayContextMenus.menus.create(staticMenuData.generateAliasEnabled) : relayContextMenus.menus.create(staticMenuData.generateAliasDisabled);
+    const menuData = canUserGenerateAliases ? staticMenuData.generateAliasEnabled : staticMenuData.generateAliasDisabled;
+    relayContextMenus.menus.create(menuData);
 
     const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
     
