@@ -46,6 +46,34 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   return answer;
 }
 
+async function storePremiumAvailabilityInCountry() {
+  // If we already fetched Premium availability in the past seven days,
+  // don't fetch it again.
+  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
+  if (typeof existingPremiumAvailability === "object" && existingPremiumAvailability.fetchedAt > (Date.now() - 7 * 24 * 60 * 60 * 1000)) {
+    return;
+  }
+
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");
+  if (!relayApiSource) {
+    return;
+  }
+  const currentPremiumAvailabilityResponse = await fetch(
+    `${relayApiSource}/premium_countries`,
+    {
+      headers: { Accept: "application/json" },
+    },
+  );
+  const currentPremiumAvailability = await currentPremiumAvailabilityResponse.json();
+  browser.storage.local.set({
+    premiumCountries: {
+      ...currentPremiumAvailability,
+      fetchedAt: Date.now(),
+    },
+  })
+}
+storePremiumAvailabilityInCountry();
+
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });

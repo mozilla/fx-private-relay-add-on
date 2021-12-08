@@ -353,9 +353,11 @@ async function addRelayIconToInput(emailInput) {
     //Check if premium features are available
     const premiumEnabled = await browser.storage.local.get("premiumEnabled");
     const premiumEnabledString = premiumEnabled.premiumEnabled;
+    const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
 
     if (
       !premiumFeaturesAvailable(premiumEnabledString) ||
+      premiumCountryAvailability?.premium_available_in_country !== true ||
       !maxNumAliasesReached
     ) {
       getUnlimitedAliasesBtn.remove();
