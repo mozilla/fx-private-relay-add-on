@@ -102,7 +102,8 @@ const relayContextMenus = {
     // Generate upgrade menu item for non-premium users
     const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
     if (canUserUpgradeToPremium) {
-      await relayContextMenus.menus.create([staticMenuData.upgradeToPremiumSeperator, staticMenuData.upgradeToPremium]);
+      await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);
+      await relayContextMenus.menus.create(staticMenuData.upgradeToPremium);
     }
 
     // Set listerners
@@ -182,15 +183,6 @@ const relayContextMenus = {
   },
   menus: {
     create: async (data, opts=null, aliases) => {     
-      // If multiple items need to be created: 
-      if (Array.isArray(data)) {
-        data.forEach(async (menu) => {
-          await browser.menus.create(menu, relayContextMenus.utils.onCreatedCallback);
-        });
-        
-        return Promise.resolve(1)
-      }
-
       // Loop Through Existing Aliases
       if (opts?.createExistingAliases) {
         
