@@ -319,7 +319,7 @@ browser.menus.onShown.addListener(async (info, tab) => {
   }
 
   const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
-   await relayContextMenus.init(domain);
+  await relayContextMenus.init(domain);
 
   if (menuInstanceId !== lastMenuInstanceId) {
     return; // Menu was closed and shown again.
