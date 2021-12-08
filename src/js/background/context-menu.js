@@ -55,6 +55,12 @@ const relayContextMenus = {
       throw new Error(`Cannot create browser menus`);
     }
 
+    // Remove the listener so we don't add the same one multiple times
+    if (browser.storage.onChanged.hasListener(relayContextMenus.listeners.onLocalStorageChange)) {
+      await browser.storage.onChanged.removeListener(relayContextMenus.listeners.onLocalStorageChange);
+    }
+    
+
     const userApiToken = await browser.storage.local.get("apiToken");
     const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
 
