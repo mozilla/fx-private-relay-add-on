@@ -44,6 +44,10 @@ const staticMenuData = {
   }
 }
 
+// Existing Relay/random aliases will get their own context menu items,
+// identified by the following prefix followed by their alias ID:
+const reuseAliasMenuIdPrefix = "fx-private-relay-use-existing-alias_";
+
 const relayContextMenus = {
   init: async (currentWebsite=null) => {
     
@@ -114,7 +118,7 @@ const relayContextMenus = {
     onFillInAddressWithAliasId: async (info, tab) => {
       // Trim the context menu id to get the alias reference ID
       const selectedAliasId = info.menuItemId.replace(
-        "fx-private-relay-use-existing-alias_",
+        reuseAliasMenuIdPrefix,
         ""
       );
 
@@ -207,7 +211,7 @@ const relayContextMenus = {
 
         for (const alias of filteredAliases) {
           const title = alias.description ? alias.description : alias.address;
-          const id = "fx-private-relay-use-existing-alias_" + alias.id;
+          const id = reuseAliasMenuIdPrefix + alias.id;
           
           
           data.title = title;
@@ -363,7 +367,7 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       break;
   }
 
-  if (info.menuItemId.startsWith("fx-private-relay-use-existing-alias_")) {
+  if (info.menuItemId.startsWith(reuseAliasMenuIdPrefix)) {
     await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
   }
 
