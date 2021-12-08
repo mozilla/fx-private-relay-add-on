@@ -197,7 +197,7 @@ const relayContextMenus = {
             )
           : relayContextMenus.utils.getMostRecentAliases(aliases, opts.currentWebsite);
 
-        // Only create the parent menu if we have will create sub-items
+        // Only create the parent menu if we will create sub-items
         if (filteredAliases.length > 0) {
           await browser.menus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
         } else {
