@@ -72,7 +72,6 @@ async function storePremiumAvailabilityInCountry() {
     },
   })
 }
-storePremiumAvailabilityInCountry();
 
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
@@ -316,4 +315,8 @@ browser.runtime.onMessage.addListener(async (m) => {
   return response;
 });
 
-displayBrowserActionBadge();
+
+(async () => {
+  await displayBrowserActionBadge();
+  await storePremiumAvailabilityInCountry();
+})();
