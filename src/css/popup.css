@@ -285,11 +285,11 @@ main-panel {
   font-size: 1rem;
   border-bottom: 1px solid var(--relayGrey20);
   border-top: 1px solid var(--relayGrey20);
+  width: 100%;
 }
 
 .aliases-remaining {
-  /* If the "Get unlimited aliases" prompt is hidden, this should be centered: */
-  margin: 0 auto;
+  margin: 0;
   font-family: 'InterUI';
   background: white;
 }
