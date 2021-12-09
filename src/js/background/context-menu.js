@@ -366,6 +366,11 @@ browser.menus.onClicked.addListener(async (info, tab) => {
   }
 
   if (info.menuItemId.startsWith(reuseAliasMenuIdPrefix)) {
+    sendMetricsEvent({
+      category: "Extension: Context Menu",
+      action: "click",
+      label: "context-menu-" + info.parentMenuItemId,
+    });
     await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
   }
 
