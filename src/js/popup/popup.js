@@ -163,6 +163,7 @@ const serverStoragePanel = {
 
 async function choosePanel(numRemaining, panelId, premium, premiumEnabledString, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
+  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
 
   // Turned off label sync prompt for premium release
   // const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
