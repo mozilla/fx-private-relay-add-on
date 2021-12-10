@@ -217,12 +217,19 @@ const relayContextMenus = {
       // Loop Through Existing Aliases
       if (opts?.createExistingAliases) {
         
+        const shouldAliasOrderBeReversed = await getServerStoragePref();
+
         const filteredAliases = opts.exisitingSite
           ? relayContextMenus.utils.getSiteSpecificAliases(
               aliases,
-              opts.currentWebsite
+              opts.currentWebsite,
+              shouldAliasOrderBeReversed
             )
-          : relayContextMenus.utils.getMostRecentAliases(aliases, opts.currentWebsite);
+          : relayContextMenus.utils.getMostRecentAliases(
+              aliases,
+              opts.currentWebsite,
+              shouldAliasOrderBeReversed
+            );
 
         // Only create the parent menu if we will create sub-items
         if (filteredAliases.length > 0) {
@@ -281,9 +288,12 @@ const relayContextMenus = {
       const { hostname } = new URL(url);
       return hostname;
     },  
-    getMostRecentAliases: (array, domain)=> {
-      // Flipped to match the same order as the dashboard
-      array.reverse();
+    getMostRecentAliases: (array, domain, shouldFlipArray)=> {
+      // Flipped to match the same order as the dashboard if synced from the server
+      if (shouldFlipArray) {
+        array.reverse();
+      }
+      
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
       const filteredAliases = array.filter(alias => alias.generated_for !== domain);
@@ -291,10 +301,12 @@ const relayContextMenus = {
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
-    getSiteSpecificAliases: (array, domain)=> {
+    getSiteSpecificAliases: (array, domain, shouldFlipArray)=> {
 
-      // Flipped to match the same order as the dashboard
-      array.reverse();
+      // Flipped to match the same order as the dashboard if synced from the server
+      if (shouldFlipArray) {
+        array.reverse();
+      }
 
       const filteredAliases = array.filter(alias => alias.generated_for === domain);
 
