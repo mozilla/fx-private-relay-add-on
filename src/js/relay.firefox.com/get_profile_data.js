@@ -109,9 +109,6 @@
   const premiumSubdomainSet = document.querySelector(
     "firefox-private-relay-addon-data"
   ).dataset.premiumSubdomainSet;
-  const premiumEnabled = document.querySelector(
-    "firefox-private-relay-addon-data"
-  ).dataset.premiumEnabled;
   browser.storage.local.set({
     fxaSubscriptionsUrl,
     premiumProdId,
@@ -120,7 +117,6 @@
     emailsForwardedVal,
     emailsBlockedVal,
     premiumSubdomainSet,
-    premiumEnabled,
   });
 
   // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
