@@ -50,12 +50,7 @@ async function showModal(modalType) {
   const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
   getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
 
-  const premiumEnabled = await browser.storage.local.get("premiumEnabled");
-  const premiumEnabledString = premiumEnabled.premiumEnabled;
-
-  if (premiumEnabledString === "True") {
-    modalContent.appendChild(getUnlimitedAliasesBtn);
-  }
+  modalContent.appendChild(getUnlimitedAliasesBtn);
 
   const manageAliasesLink = document.createElement("a");
   manageAliasesLink.textContent = browser.i18n.getMessage("ManageAllAliases");
