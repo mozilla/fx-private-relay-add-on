@@ -4,8 +4,27 @@
 
 (async () => {
   localStorage.setItem("fxRelayAddonInstalled", "true");
-  document.querySelectorAll("firefox-private-relay-addon").forEach((el) => {
+  document.querySelectorAll("firefox-private-relay-addon").forEach(async (el) => {
     el.dataset.addonInstalled = "true";
+
+    // In the server-rendered version of the website, the add-on would store alias labels
+    // locally if server-side storage was disabled.
+    // In the React version of the website, the website handles local storage itself.
+    // However, to allow for seamless migration, this injects the labels stored in the add-on
+    // into the website, so that it can copy those into its own storage.
+    const localRandomAliasCache = (await browser.storage.local.get("relayAddresses")).relayAddresses;
+    if (Array.isArray(localRandomAliasCache)) {
+      const localLabels = localRandomAliasCache
+        .filter(address => address.description.length > 0)
+        .map(address => ({
+          type: "random",
+          id: Number.parseInt(address.id, 10),
+          description: address.description,
+          address: address.address,
+        })
+      );
+      el.dataset.localLabels = JSON.stringify(localLabels);
+    }
   });
 
   // Check for <firefox-private-relay-addon>
