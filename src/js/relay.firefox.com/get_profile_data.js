@@ -434,6 +434,15 @@
         localStorageRelayAddresses.push(relayAddress);
       }
 
+      if (localStorageRelayAddresses.length === 0) {
+        // If we weren't able to scrape alias data from the page, that means
+        // the React version of the website (with a different DOM structure)
+        // has been deployed. Since the React version handles local storage of
+        // label data by itself, we don't need to add our own listeners,
+        // and we can just fetch label data from the API.
+        const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
+        localStorageRelayAddresses.push(...serverRelayAddresses);
+      }
       browser.storage.local.set({ relayAddresses: localStorageRelayAddresses });
     }
 
