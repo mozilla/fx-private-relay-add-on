@@ -105,6 +105,7 @@ function fillInputWithAlias(emailInput, relayAlias) {
       emailInput.value = relayAlias.address + "@mozmail.com";
       break;
     default:
+      emailInput.value = relayAlias.address;
       break;
   }
 
