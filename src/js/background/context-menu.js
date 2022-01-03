@@ -83,24 +83,24 @@ const relayContextMenus = {
     const aliases = await relayContextMenus.utils.getAliases();
 
     // Create Use Existing Alias submenu
-    // if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
-    //   await relayContextMenus.menus.create(staticMenuData.existingAlias, {
-    //     createExistingAliases: true,
-    //     parentMenu: staticMenuData.useExistingAliasFromWebsite,
-    //     exisitingSite: true,
-    //     currentWebsite
-    //   }, aliases);
-    // } 
-
-    // Create "Recent Aliases…" menu
-    if ( userHasSomeAliasesCreated ) {
+    if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
       await relayContextMenus.menus.create(staticMenuData.existingAlias, {
         createExistingAliases: true,
-        parentMenu: staticMenuData.useExistingAlias,
-        exisitingSite: false,
+        parentMenu: staticMenuData.useExistingAliasFromWebsite,
+        exisitingSite: true,
         currentWebsite
-      }, aliases)
-    }
+      }, aliases);
+    } 
+
+    // Create "Recent Aliases…" menu
+    // if ( userHasSomeAliasesCreated ) {
+    //   await relayContextMenus.menus.create(staticMenuData.existingAlias, {
+    //     createExistingAliases: true,
+    //     parentMenu: staticMenuData.useExistingAlias,
+    //     exisitingSite: false,
+    //     currentWebsite
+    //   }, aliases)
+    // }
 
     // Create "Manage all aliases" link
     await relayContextMenus.menus.create(staticMenuData.manageAliases);
@@ -261,10 +261,10 @@ const relayContextMenus = {
       array.reverse();
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
-      // const filteredAliases = array.filter(alias => alias.generated_for !== domain);
+      const filteredAliases = array.filter(alias => alias.generated_for !== domain);
 
       // Limit to 5
-      return array.slice(0, 5);
+      return filteredAliases.slice(0, 5);
     },
     getSiteSpecificAliases: (array, domain)=> {
 
