@@ -93,24 +93,24 @@ const relayContextMenus = {
     } 
 
     // Create "Recent Aliases…" menu
-    // if ( userHasSomeAliasesCreated ) {
-    //   await relayContextMenus.menus.create(staticMenuData.existingAlias, {
-    //     createExistingAliases: true,
-    //     parentMenu: staticMenuData.useExistingAlias,
-    //     exisitingSite: false,
-    //     currentWebsite
-    //   }, aliases)
-    // }
+    if ( userHasSomeAliasesCreated ) {
+      await relayContextMenus.menus.create(staticMenuData.existingAlias, {
+        createExistingAliases: true,
+        parentMenu: staticMenuData.useExistingAlias,
+        exisitingSite: false,
+        currentWebsite
+      }, aliases)
+    }
 
     // Create "Manage all aliases" link
     await relayContextMenus.menus.create(staticMenuData.manageAliases);
 
     // Generate upgrade menu item for non-premium users
-    const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
-    if (canUserUpgradeToPremium) {
-      await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);
-      await relayContextMenus.menus.create(staticMenuData.upgradeToPremium);
-    }
+    // const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
+    // if (canUserUpgradeToPremium) {
+    //   await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);
+    //   await relayContextMenus.menus.create(staticMenuData.upgradeToPremium);
+    // }
 
     // Set listerners
     browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
