@@ -438,7 +438,7 @@ async function popup() {
 
 
   document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
-    premiumLink.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+    premiumLink.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=popup&utm_content=get-premium-link`;
   });
 
   document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
