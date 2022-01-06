@@ -292,6 +292,7 @@ main-panel {
   margin: 0;
   font-family: 'InterUI';
   background: white;
+  text-align: start;
 }
 
 .premium-cta {
@@ -389,15 +390,19 @@ onboarding-panel {
   display: none;
 }
 
-.content-wrapper, .premium-wrapper {
+
+.content-wrapper {
   display: flex;
-  height: 100%;
+  height: 300px;
   width: 100%;
   flex-direction: column;
+  justify-content: space-around;
 }
 
 .premium-wrapper {
   width: 100%;
+  flex-direction: column;
+  display: flex;
 }
 
 .premium-dashboard {
@@ -465,24 +470,25 @@ onboarding-panel {
 
 .email-domain-illustration {
   margin: 0 auto;
-  padding-top: 16px;
   display: block;
-  width: 280px;
 }
 
 .register-domain-component {
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
 }
 
 .register-domain-cta {
-  margin: 16px auto;
   max-width: 200px;
+  text-align: center;
 }
 
 .register-domain-headline {
-  margin: 24px auto 16px auto;
   font-weight: 700;
   font-size: 14px;
+  text-align: center;
 }
 
 .educational-component {
@@ -512,13 +518,17 @@ onboarding-panel p {
   margin: 0 0 8px 0;
 }
 
-.onboarding-img {
-  padding: 16px;
+.onboarding-img, .email-domain-illustration, .education-img {
+  max-width: 100%;
+  max-height: 100%;
 }
 
-.maxAliasesPanel .onboarding-img {
-  margin: auto;
-  max-height: 140px;
+.img-wrapper {
+  margin-top: 16px;
+  max-height: 100%;
+  overflow: hidden;
+  text-align: center;
+  padding: 16px;
 }
 
 .maxAliasesPanel .onboarding-pagination {
