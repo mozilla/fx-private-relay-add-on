@@ -22,7 +22,10 @@
     "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
     "test": "echo \"Error: no test specified\" && exit 1",
     "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
-    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/"
+    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/",
+    "web-ext-run:firefox": "rm -rf src/_locales/.github && web-ext run -s src/ -t firefox-desktop",
+    "web-ext-run:chrome": "rm -rf src/_locales/.github && web-ext run -s src/ -t chromium",
+    "web-ext-run:all": "rm -rf src/_locales/.github && web-ext run -s src/ -t chromium -t firefox-desktop"
   },
   "private": false,
   "repository": {
