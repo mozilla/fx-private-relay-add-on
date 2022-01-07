@@ -8,6 +8,7 @@
   "default_locale": "en",
 
   "icons": {
+    "16": "icons/placeholder-logo_16.png",
     "48": "icons/placeholder-logo.png"
   },
 
@@ -19,7 +20,7 @@
   },
 
   "background": {
-      "scripts": ["js/background/background.js", "js/background/context-menu.js"]
+      "scripts": ["js/libs/browser-polyfill.min.js", "js/background/background.js", "js/background/context-menu.js"]
   },
 
   "browser_action": {
@@ -35,7 +36,7 @@
       "matches": [
         "http://127.0.0.1/**"
       ],
-      "js": ["js/relay.firefox.com/installation_indicator.js"]
+      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/installation_indicator.js"]
     },
     {
       "matches": [
@@ -48,19 +49,20 @@
       "matches": [
           "http://127.0.0.1/accounts/profile/**"
       ],
-      "js": ["js/relay.firefox.com/get_profile_data.js"]
+      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/get_profile_data.js"]
     },
     {
       "matches": [
           "http://127.0.0.1/accounts/settings/**"
       ],
-      "js": ["js/relay.firefox.com/settings_refresh.js"]
+      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/settings_refresh.js"]
     },
     {
       "matches": [
           "<all_urls>"
       ],
       "js": [
+        "js/libs/browser-polyfill.min.js",
         "js/shared/utils.js",
         "js/other-websites/fathom.js",
         "js/other-websites/email_detector.js",
@@ -76,6 +78,16 @@
   "permissions": [
       "<all_urls>",
       "storage",
+      "contextMenus",
       "menus"
+  ],
+
+  "web_accessible_resources": [
+    "images/*.svg",
+    "icons/*.svg",
+    "icons/*.png",
+    "fonts/Inter/*.woff2",
+    "fonts/Metropolis/*.woff2"
   ]
+
 }
