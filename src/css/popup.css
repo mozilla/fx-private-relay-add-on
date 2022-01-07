@@ -13,7 +13,14 @@
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
+
+.fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
+  box-sizing: inherit;
+}
+
+
 
 sign-up-panel {
   height: 100%;
@@ -286,6 +293,7 @@ main-panel {
   border-bottom: 1px solid var(--relayGrey20);
   border-top: 1px solid var(--relayGrey20);
   width: 100%;
+  font-size: 13px;
 }
 
 .aliases-remaining {
@@ -632,7 +640,9 @@ onboarding-panel p {
 
 /* For mobile screens with a bigger height viewport than the browser popup.
    This takes the --panelHeight + 1px as its min-height. */
-@media screen and (min-height: 501px) {
+
+/* TODO: Understand why this exists before removing */
+/* @media screen and (min-height: 501px) {
   .fx-relay-panel {
     height: 100vh;
   }
@@ -678,7 +688,7 @@ onboarding-panel p {
   .view-dashboard {
     margin: auto auto 0 auto;
   }
-}
+} */
 
 .newsflash-wrapper.is-hidden, .newsflash-wrapper .is-hidden {
   display: none;
