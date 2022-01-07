@@ -1,4 +1,3 @@
-
 // The static data used to create different context menu items. 
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
 // See these docs to better understead the context menu paramaters
@@ -51,7 +50,7 @@ const reuseAliasMenuIdPrefix = "fx-private-relay-use-existing-alias_";
 const relayContextMenus = {
   init: async (currentWebsite=null) => {
     
-    if (!browser.menus) {
+    if (!browser.contextMenus) {
       throw new Error(`Cannot create browser menus`);
     }
 
@@ -70,7 +69,7 @@ const relayContextMenus = {
     }
 
     // Reset any previously created menus
-    await browser.menus.removeAll();
+    await browser.contextMenus.removeAll();
 
     // Generate aliases menu item
     // If a user is maxed out/not premium, the generate item will be disabled.
@@ -116,7 +115,7 @@ const relayContextMenus = {
     browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
 
     // Refresh menus
-    await browser.menus.refresh();
+    await browser.contextMenus.refresh();
 
     return Promise.resolve(1)
 
@@ -159,7 +158,7 @@ const relayContextMenus = {
 
         if (item === "apiToken" && changes[item].newValue === undefined) {
           // User has logged out. Remove all menu items.
-          await browser.menus.removeAll();
+          await browser.contextMenus.removeAll();
         }
       }
     },    
@@ -201,7 +200,7 @@ const relayContextMenus = {
 
         // Only create the parent menu if we will create sub-items
         if (filteredAliases.length > 0) {
-          await browser.menus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
+          await browser.contextMenus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
         } else {
           // Exit early. Nothing else to create.
           return Promise.resolve(1);
@@ -215,19 +214,19 @@ const relayContextMenus = {
           data.title = title;
           data.id = id;
           data.parentId = opts.parentMenu.id;
-          await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+          await browser.contextMenus.create(data, relayContextMenus.utils.onCreatedCallback);
         }
         
         return Promise.resolve(1)
       }
 
-      await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+      await browser.contextMenus.create(data, relayContextMenus.utils.onCreatedCallback);
 
       return Promise.resolve(1)
       
     },
     remove: async (id) => {
-      await browser.menus.remove(id);
+      await browser.contextMenus.remove(id);
     }
   }, 
   utils: {
@@ -303,7 +302,7 @@ const relayContextMenus = {
     },
     onCreatedCallback: ()=> {
       // Catch errors when trying to create the same menu twice.
-      // The browser.menus API is limited. You cannot query if a menu item already exists.
+      // The browser.contextMenus API is limited. You cannot query if a menu item already exists.
       // The error it throws does not show up to the user.
 
       if (browser.runtime.lastError) {
@@ -314,22 +313,22 @@ const relayContextMenus = {
 };
 
 // Events
-browser.menus.onShown.addListener(async (info, tab) => {
+// browser.contextMenus.onShown.addListener(async (info, tab) => {
   
-  if (!info.menuIds.includes("fx-private-relay-generate-alias") ) {
-    // No Relay menu items exist. Stop listening.
-    return;
-  }
+//   if (!info.menuIds.includes("fx-private-relay-generate-alias") ) {
+//     // No Relay menu items exist. Stop listening.
+//     return;
+//   }
 
-  const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
-  await relayContextMenus.init(domain);
+//   const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
+//   await relayContextMenus.init(domain);
 
-  if (menuInstanceId !== lastMenuInstanceId) {
-    return; // Menu was closed and shown again.
-  }
-});
+//   if (menuInstanceId !== lastMenuInstanceId) {
+//     return; // Menu was closed and shown again.
+//   }
+// });
 
-browser.menus.onClicked.addListener(async (info, tab) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
