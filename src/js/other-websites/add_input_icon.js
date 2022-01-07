@@ -262,6 +262,15 @@ async function addRelayIconToInput(emailInput) {
     // If the user has a premium accout, they may create unlimited aliases.
     const { premium } = await browser.storage.local.get("premium");
 
+    const loadingAnimationDiv = createElementWithClassList(
+      "div",
+      "fx-relay-alias-loading-image"
+    )
+
+    const loadingAnimationImage = document.createElement("img");
+
+    loadingAnimationDiv.appendChild(loadingAnimationImage);
+
     // Create "You have .../.. remaining relay address" message
     const remainingAliasesSpan = createElementWithClassList(
       "span",
@@ -325,6 +334,7 @@ async function addRelayIconToInput(emailInput) {
 
     // Append menu elements to the menu
     [
+      loadingAnimationDiv,
       remainingAliasesSpan,
       getUnlimitedAliasesBtn,
       generateAliasBtn,
@@ -366,6 +376,9 @@ async function addRelayIconToInput(emailInput) {
         method: "makeRelayAddress",
         description: document.location.hostname,
       });
+      
+      const loadingImagePath = chrome.runtime.getURL('/images/loader.svg');
+      document.querySelector(".fx-relay-alias-loading-image img").src = loadingImagePath;    
 
       relayInPageMenu.classList.add("fx-relay-alias-loading");
 
