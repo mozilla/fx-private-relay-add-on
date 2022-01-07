@@ -25,6 +25,10 @@
   src: url("/fonts/Inter/Inter-UI-Regular.woff2") format("woff2");
 }
 
+:root, body {
+  font-size: 16px;
+}
+
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
 .fx-relay-panel,
