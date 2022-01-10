@@ -110,9 +110,27 @@ function fillInputWithAlias(emailInput, relayAlias) {
   );
 }
 
+
+// Chrome: browser.menus.getTargetElement is not available so 
+// we have to listen for any contextmenu click to determe the target element.
+// https://stackoverflow.com/a/7704392
+let clickedEl = null;
+
+// Only listen if on Chrome
+if (!browser.menus) {
+  document.addEventListener("contextmenu", function(event){
+      clickedEl = event.target;
+  }, true);
+}
+
 browser.runtime.onMessage.addListener((message, sender, response) => {
-  if (message.type === "fillTargetWithRelayAddress") {
-    const emailInput = browser.menus.getTargetElement(message.targetElementId);
+
+  if (message.type === "fillTargetWithRelayAddress") {    
+
+    // If the browser.menus API is available
+    const emailInput = browser.menus
+          ? browser.menus.getTargetElement(message.targetElementId)
+          : clickedEl
     return fillInputWithAlias(emailInput, message.relayAddress);
   }
 
