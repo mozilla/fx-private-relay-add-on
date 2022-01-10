@@ -100,6 +100,8 @@ function fillInputWithAlias(emailInput, relayAlias) {
       emailInput.value = relayAlias.address + "@mozmail.com";
       break;
     default:
+      // Use does not sync data so no relayAlias.domain is available
+      emailInput.value = relayAlias.address
       break;
   }
 
