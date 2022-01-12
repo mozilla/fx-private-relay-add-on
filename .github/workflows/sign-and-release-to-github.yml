@@ -16,9 +16,8 @@ jobs:
         id: create-deployment
         uses: actions/github-script@v5
         with:
-          result-encoding: string
           script: |
-            github.rest.repos.createDeployment({
+            return await github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: context.sha,
