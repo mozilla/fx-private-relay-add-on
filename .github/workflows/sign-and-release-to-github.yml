@@ -34,6 +34,7 @@ jobs:
 
   sign-tag-release:
     runs-on: ubuntu-latest
+    needs: [prepare-deployment]
     steps:
       - name: "Test obtaining the ID"
         run: echo $DEPLOYMENT_ID
