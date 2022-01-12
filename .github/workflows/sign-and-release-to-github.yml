@@ -40,13 +40,15 @@ jobs:
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               description: "Building add-on",
               environment: "review",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "in_progress",
               mediaType: {previews: ["flash", "ant-man"]},
             })
+        env:
+          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
 
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -111,7 +113,7 @@ jobs:
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               description: "Add-on built successfully.",
               environment: "review",
               environment_url: process.env.DOWNLOAD_URL,
@@ -120,6 +122,7 @@ jobs:
             })
         env:
           DOWNLOAD_URL: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
+          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
 
       - name: Mark GitHub Deployment as failed
         uses: actions/github-script@v5
@@ -129,13 +132,15 @@ jobs:
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               description: "Build the add-on failed. Review the GitHub Actions log for more information.",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               environment: "review",
               state: "failure",
               mediaType: {previews: ["flash", "ant-man"]},
             })
+        env:
+          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
 
       ## This should theoretically be enough to publish the extension as a GitHub Release,
       ## except for sending the actual .xpi in the body of a request using octokit/request-action.
