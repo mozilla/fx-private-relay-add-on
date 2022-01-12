@@ -36,10 +36,13 @@ jobs:
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
         uses: actions/github-script@v5
+        env:
+          # DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
+          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
         with:
           script: |
             const { DEPLOYMENT_ID } = process.env;
-            console.log(`Hello ${DEPLOYMENT_ID}`);
+            console.log(`Hello ${DEPLOYMENT_ID}, ${{...process.env}}`);
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -51,9 +54,6 @@ jobs:
               state: "in_progress",
               mediaType: {previews: ["flash", "ant-man"]},
             });
-        env:
-          # DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
-          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
 
       - name: "Checkout"
         uses: actions/checkout@v2
