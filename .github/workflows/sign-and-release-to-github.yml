@@ -108,22 +108,6 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
 
-      - uses: actions/github-script@v5
-        id: get_artifact_links
-        with:
-          script: |
-            console.log(context.runId);
-            const result = await github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-            });
-            console.log({ result });
-            return result;
-
-      - name: Get result
-        run: echo "${{ steps.get_artifact_links.outputs.result }}"
-
       - name: Mark GitHub Deployment as successful
         uses: actions/github-script@v5
         with:
@@ -134,7 +118,7 @@ jobs:
               deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               description: "Add-on built successfully.",
               environment: "review",
-              environment_url: process.env.DOWNLOAD_URL,
+              environment_url: `https://github.com/mozilla/fx-private-relay-add-on/actions/runs/${context.runId}`,
               state: "success",
               mediaType: {previews: ["flash", "ant-man"]},
             });
