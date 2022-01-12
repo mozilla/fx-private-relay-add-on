@@ -24,6 +24,8 @@ jobs:
               transient_environment: true,
               auto_merge: false,
               mediaType: {previews: ["flash", "ant-man"]},
+              // The deployment runs in parallel with CI, so status checks will never have succeeded yet:
+              required_contexts: [],
             })
 
   sign-tag-release:
