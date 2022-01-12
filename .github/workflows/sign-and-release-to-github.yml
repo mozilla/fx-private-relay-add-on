@@ -28,6 +28,8 @@ jobs:
               // The deployment runs in parallel with CI, so status checks will never have succeeded yet:
               required_contexts: [],
             })
+      - name: Get result
+        run: echo "${{steps.create-deployment.outputs.result}}"
 
 
   sign-tag-release:
