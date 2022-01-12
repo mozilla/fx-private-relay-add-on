@@ -34,7 +34,8 @@ jobs:
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
+              //deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
+              deployment_id: process.env.DEPLOYMENT_ID,
               description: "Building add-on",
               environment: "review",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
