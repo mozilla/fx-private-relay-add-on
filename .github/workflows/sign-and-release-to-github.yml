@@ -21,9 +21,9 @@ jobs:
               repo: context.repo.repo,
               ref: github.sha,
               environment: "review",
-              transient_environment: true
-              auto_merge: false
-              mediaType: {previews: ["flash", "ant-man"]}
+              transient_environment: true,
+              auto_merge: false,
+              mediaType: {previews: ["flash", "ant-man"]},
             })
 
   sign-tag-release:
@@ -39,11 +39,11 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
-              description: "Building add-on"
+              description: "Building add-on",
               environment: "review",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "in_progress",
-              mediaType: {previews: ["flash", "ant-man"]}
+              mediaType: {previews: ["flash", "ant-man"]},
             })
 
       - name: "Checkout"
@@ -110,11 +110,11 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
-              description: "Add-on built successfully."
+              description: "Add-on built successfully.",
               environment: "review",
               environment_url: process.env.DOWNLOAD_URL,
               state: "success",
-              mediaType: {previews: ["flash", "ant-man"]}
+              mediaType: {previews: ["flash", "ant-man"]},
             })
         env:
           DOWNLOAD_URL: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
@@ -128,11 +128,11 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
-              description: "Build the add-on failed. Review the GitHub Actions log for more information."
+              description: "Build the add-on failed. Review the GitHub Actions log for more information.",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               environment: "review",
               state: "failure",
-              mediaType: {previews: ["flash", "ant-man"]}
+              mediaType: {previews: ["flash", "ant-man"]},
             })
 
       ## This should theoretically be enough to publish the extension as a GitHub Release,
