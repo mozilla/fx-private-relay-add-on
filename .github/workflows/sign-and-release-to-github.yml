@@ -112,7 +112,7 @@ jobs:
         id: get_artifact_links
         with:
           script: |
-            github.rest.repos.listWorkflowRunArtifacts({
+            github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: context.runId,
