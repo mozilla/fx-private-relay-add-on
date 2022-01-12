@@ -43,7 +43,8 @@ jobs:
               mediaType: {previews: ["flash", "ant-man"]},
             })
         env:
-          DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
+          # DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
+          DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result }}"
 
       - name: "Checkout"
         uses: actions/checkout@v2
