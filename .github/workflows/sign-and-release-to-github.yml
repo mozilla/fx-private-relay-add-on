@@ -7,7 +7,7 @@ on:
 
 jobs:
   prepare-deployment:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       tag-slug: ${{ steps.determine-npm-tag.outputs.tag-slug }}
       deployment-id: ${{ fromJson(steps.create-deployment.outputs.result).data.id }}
@@ -28,32 +28,22 @@ jobs:
               // The deployment runs in parallel with CI, so status checks will never have succeeded yet:
               required_contexts: [],
             });
-      - name: Get result
-        run: echo "${{ fromJson(steps.create-deployment.outputs.result).data.id }}"
 
 
   sign-tag-release:
     runs-on: ubuntu-latest
     needs: [prepare-deployment]
     steps:
-      - name: "Test obtaining the ID"
-        run: echo $DEPLOYMENT_ID
-        env:
-          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
         uses: actions/github-script@v5
         env:
-          # DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
           DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
         with:
           script: |
-            const { DEPLOYMENT_ID } = process.env;
-            console.log(`Hello ${DEPLOYMENT_ID}, ${JSON.stringify(process.env)}`);
             return await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              //deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               deployment_id: process.env.DEPLOYMENT_ID,
               description: "Building add-on",
               environment: "review",
@@ -118,7 +108,7 @@ jobs:
               deployment_id: parseInt(process.env.DEPLOYMENT_ID, 10),
               description: "Add-on built successfully.",
               environment: "review",
-              environment_url: `https://github.com/mozilla/fx-private-relay-add-on/actions/runs/${context.runId}`,
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "success",
               mediaType: {previews: ["flash", "ant-man"]},
             });
