@@ -278,7 +278,7 @@ async function showRelayPanel(tipPanelToShow) {
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases-2", [numRemaining, maxNumAliases]);
+  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2", [numRemaining, maxNumAliases]);
   const getUnlimitedAliases = document.querySelector(".premium-cta");
   getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
 

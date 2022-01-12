@@ -273,7 +273,7 @@ async function addRelayIconToInput(emailInput) {
 
     // Free user: Set text informing them how many aliases they can create
     remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "popupRemainingAliases-2",
+      "popupRemainingAliases_2",
       [numAliasesRemaining, maxNumAliases]
     );
 
