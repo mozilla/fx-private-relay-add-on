@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       tag-slug: ${{ steps.determine-npm-tag.outputs.tag-slug }}
-      deployment-id: ${{ (steps.create-deployment.outputs.result }}
+      deployment-id: ${{ steps.create-deployment.outputs.result }}
     steps:
       - name: Create GitHub Deployment
         id: create-deployment
