@@ -118,6 +118,9 @@ jobs:
               run_id: context.runId,
             });
 
+      - name: Get result
+        run: echo "${{ steps.get_artifact_links.outputs.result }}"
+
       - name: Mark GitHub Deployment as successful
         uses: actions/github-script@v5
         with:
