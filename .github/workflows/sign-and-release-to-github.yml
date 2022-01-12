@@ -123,7 +123,6 @@ jobs:
               mediaType: {previews: ["flash", "ant-man"]},
             });
         env:
-          DOWNLOAD_URL: "${{ fromJson(steps.get_artifact_links.outputs.result).data.artifacts[0].archive_download_url }}"
           DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
 
       - name: Mark GitHub Deployment as failed
