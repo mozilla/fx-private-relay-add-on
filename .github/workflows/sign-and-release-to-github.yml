@@ -34,10 +34,6 @@ jobs:
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
         uses: octokit/request-action@v2.1.0
-        # Dependabot does not have access to our secrets,
-        # so publishing packages for Dependabot PRs can only be manually started.
-        # https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/
-        if: github.actor != 'dependabot[bot]'
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
           repository: ${{ github.repository }}
@@ -96,7 +92,7 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
 
-      - uses: octokit/request-action@v2.x
+      - uses: octokit/request-action@v2.1.0
         id: get_artifact_links
         with:
           route: GET /repos/:repository/actions/runs/:run_id/artifacts
