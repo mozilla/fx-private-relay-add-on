@@ -237,6 +237,7 @@ panel-content {
   max-width: 260px;
   text-align: center;
   color: var(--relayInk);
+  font-family: var(--relayMetropolisBold);
   margin: auto auto 8px auto;
 }
 
@@ -294,18 +295,19 @@ main-panel {
   border-top: 1px solid var(--relayGrey20);
   width: 100%;
   font-size: 13px;
+  font-family: var(--relayInterUiRegular);
 }
 
 .aliases-remaining {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   background: white;
   text-align: start;
 }
 
 .premium-cta {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   color: var(--relayBlue3);
   font-weight: 700;
   text-decoration: none;
@@ -338,7 +340,7 @@ main-panel {
 }
 
 .upgrade-banner {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   padding-left: 10px;
   color: #5953F3;
   margin: auto;
@@ -360,7 +362,7 @@ footer {
   font-weight: 600;
   text-decoration: none;
   margin: 0 auto 16px auto;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   text-align: center;
 }
 
@@ -391,7 +393,7 @@ onboarding-panel {
 
 .premiumPanel {
   padding: 8px 16px 0px 16px;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
 }
 
 .content-wrapper.is-hidden, .premium-wrapper.is-hidden {
@@ -511,7 +513,7 @@ onboarding-panel {
 }
 
 .education-headline {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   font-weight: 700;
   font-size: 16px;
 }
@@ -618,6 +620,7 @@ onboarding-panel p {
 .panel-num {
   margin: auto 12px auto;
   width: 55px;
+  font-family: var(--relayMetropolisBold);
 }
 
 .current-panel,
