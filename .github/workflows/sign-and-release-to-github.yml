@@ -6,10 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare-deployment:
+  sign-tag-release:
     runs-on: ubuntu-latest
-    outputs:
-      deployment-id: ${{ fromJson(steps.create-deployment.outputs.data || '{}').id }}
     steps:
       - name: Create GitHub Deployment
         id: create-deployment
@@ -28,10 +26,6 @@ jobs:
               required_contexts: [],
             })
 
-  sign-tag-release:
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
         uses: actions/github-script@v5
@@ -48,7 +42,7 @@ jobs:
               mediaType: {previews: ["flash", "ant-man"]},
             })
         env:
-          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
+          DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
 
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -122,7 +116,7 @@ jobs:
             })
         env:
           DOWNLOAD_URL: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
-          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
+          DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
 
       - name: Mark GitHub Deployment as failed
         uses: actions/github-script@v5
@@ -140,7 +134,7 @@ jobs:
               mediaType: {previews: ["flash", "ant-man"]},
             })
         env:
-          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
+          DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
 
       ## This should theoretically be enough to publish the extension as a GitHub Release,
       ## except for sending the actual .xpi in the body of a request using octokit/request-action.
