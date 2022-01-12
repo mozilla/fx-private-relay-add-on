@@ -19,7 +19,7 @@ jobs:
             github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: github.sha,
+              ref: context.sha,
               environment: "review",
               transient_environment: true,
               auto_merge: false,
