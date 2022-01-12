@@ -2,15 +2,54 @@ name: continuous prerelease to GitHub
 
 on:
   push:
-    branches: [ main ]
-
+    branches: [ "*" ]
   workflow_dispatch:
 
 jobs:
+  prepare-deployment:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-id: ${{ fromJson(steps.create-deployment.outputs.data || '{}').id || 'Skipped for Dependabot' }}
+    steps:
+      - name: Create GitHub Deployment
+        id: create-deployment
+        uses: octokit/request-action@v2.1.0
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          environment: review
+          transient_environment: true
+          auto_merge: false
+          mediaType: '{"previews": ["flash", "ant-man"]}'
+          # The deployment runs in parallel with CI, so status checks will never have succeeded yet:
+          required_contexts: "[]"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
   sign-tag-release:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Mark GitHub Deployment as in progress
+        id: start-deployment
+        uses: octokit/request-action@v2.1.0
+        # Dependabot does not have access to our secrets,
+        # so publishing packages for Dependabot PRs can only be manually started.
+        # https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/
+        if: github.actor != 'dependabot[bot]'
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
+          environment: review
+          description: "Building add-on"
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          state: in_progress
+          mediaType: '{"previews": ["flash", "ant-man"]}'
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
       - name: "Checkout"
         uses: actions/checkout@v2
 
@@ -57,6 +96,44 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
 
+      - uses: octokit/request-action@v2.x
+        id: get_artifact_links
+        with:
+          route: GET /repos/:repository/actions/runs/:run_id/artifacts
+          repository: ${{ github.repository }}
+          run_id: ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mark GitHub Deployment as successful
+        uses: octokit/request-action@v2.1.0
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
+          environment: review
+          environment_url: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
+          description: "Add-on built successfully."
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          mediaType: '{"previews": ["flash", "ant-man"]}'
+          state: success
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Mark GitHub Deployment as failed
+        uses: octokit/request-action@v2.1.0
+        if: failure()
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
+          environment: review
+          description: "Build the add-on failed. Review the GitHub Actions log for more information."
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          mediaType: '{"previews": ["flash", "ant-man"]}'
+          state: failure
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       ## This should theoretically be enough to publish the extension as a GitHub Release,
       ## except for sending the actual .xpi in the body of a request using octokit/request-action.
