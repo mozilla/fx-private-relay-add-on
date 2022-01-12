@@ -194,6 +194,9 @@ async function addRelayIconToInput(emailInput) {
       "fx-relay-menu-wrapper"
     );
 
+    // Set custom fonts from the add-on
+    await setCustomFonts();
+
     // Close menu if the user clicks outside of the menu
     relayMenuWrapper.addEventListener("click", closeRelayInPageMenu);
 
