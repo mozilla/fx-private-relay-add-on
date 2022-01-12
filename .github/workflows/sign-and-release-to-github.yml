@@ -50,7 +50,7 @@ jobs:
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "in_progress",
               mediaType: {previews: ["flash", "ant-man"]},
-            })
+            });
         env:
           # DEPLOYMENT_ID: "${{ steps.create-deployment.outputs.result.id }}"
           DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
