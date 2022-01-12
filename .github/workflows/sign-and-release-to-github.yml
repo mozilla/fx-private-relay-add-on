@@ -33,6 +33,10 @@ jobs:
   sign-tag-release:
     runs-on: ubuntu-latest
     steps:
+      - name: "Test obtaining the ID"
+        run: echo $DEPLOYMENT_ID
+        env:
+          DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
         uses: actions/github-script@v5
