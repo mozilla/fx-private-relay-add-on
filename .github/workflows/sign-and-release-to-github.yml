@@ -42,7 +42,7 @@ jobs:
         with:
           script: |
             const { DEPLOYMENT_ID } = process.env;
-            console.log(`Hello ${DEPLOYMENT_ID}`);
+            console.log(`Hello ${DEPLOYMENT_ID}, ${process.env}`);
             github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
