@@ -9,23 +9,22 @@ jobs:
   prepare-deployment:
     runs-on: ubuntu-latest
     outputs:
-      deployment-id: ${{ fromJson(steps.create-deployment.outputs.data || '{}').id || 'Skipped for Dependabot' }}
+      deployment-id: ${{ fromJson(steps.create-deployment.outputs.data || '{}').id }}
     steps:
       - name: Create GitHub Deployment
         id: create-deployment
-        uses: octokit/request-action@v2.1.0
+        uses: actions/github-script@v5
         with:
-          route: POST /repos/:repository/deployments
-          repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
-          environment: review
-          transient_environment: true
-          auto_merge: false
-          mediaType: '{"previews": ["flash", "ant-man"]}'
-          # The deployment runs in parallel with CI, so status checks will never have succeeded yet:
-          required_contexts: "[]"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: github.sha,
+              environment: "review",
+              transient_environment: true
+              auto_merge: false
+              mediaType: {previews: ["flash", "ant-man"]}
+            })
 
   sign-tag-release:
     runs-on: ubuntu-latest
@@ -33,18 +32,19 @@ jobs:
     steps:
       - name: Mark GitHub Deployment as in progress
         id: start-deployment
-        uses: octokit/request-action@v2.1.0
+        uses: actions/github-script@v5
         with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
-          environment: review
-          description: "Building add-on"
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          state: in_progress
-          mediaType: '{"previews": ["flash", "ant-man"]}'
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              description: "Building add-on"
+              environment: "review",
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              state: "in_progress",
+              mediaType: {previews: ["flash", "ant-man"]}
+            })
 
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -92,44 +92,48 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
 
-      - uses: octokit/request-action@v2.1.0
+      - uses: actions/github-script@v5
         id: get_artifact_links
         with:
-          route: GET /repos/:repository/actions/runs/:run_id/artifacts
-          repository: ${{ github.repository }}
-          run_id: ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.repos.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            })
 
       - name: Mark GitHub Deployment as successful
-        uses: octokit/request-action@v2.1.0
+        uses: actions/github-script@v5
         with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
-          environment: review
-          environment_url: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
-          description: "Add-on built successfully."
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          mediaType: '{"previews": ["flash", "ant-man"]}'
-          state: success
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              description: "Add-on built successfully."
+              environment: "review",
+              environment_url: process.env.DOWNLOAD_URL,
+              state: "success",
+              mediaType: {previews: ["flash", "ant-man"]}
+            })
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          DOWNLOAD_URL: "${{ fromJson(steps.get_artifact_links.outputs.data).artifacts[0].archive_download_url }}"
 
       - name: Mark GitHub Deployment as failed
-        uses: octokit/request-action@v2.1.0
+        uses: actions/github-script@v5
         if: failure()
         with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
-          environment: review
-          description: "Build the add-on failed. Review the GitHub Actions log for more information."
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          mediaType: '{"previews": ["flash", "ant-man"]}'
-          state: failure
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ needs.prepare-deployment.outputs.deployment-id }},
+              description: "Build the add-on failed. Review the GitHub Actions log for more information."
+              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              environment: "review",
+              state: "failure",
+              mediaType: {previews: ["flash", "ant-man"]}
+            })
 
       ## This should theoretically be enough to publish the extension as a GitHub Release,
       ## except for sending the actual .xpi in the body of a request using octokit/request-action.
