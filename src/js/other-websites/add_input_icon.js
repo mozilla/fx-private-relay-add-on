@@ -162,7 +162,7 @@ async function addRelayIconToInput(emailInput) {
   relayIconBtn.id = "fx-relay-button";
   relayIconBtn.type = "button";
   relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
-  const makeNewAliasImagePath = chrome.runtime.getURL('icons/make-new-alias.png');
+  const makeNewAliasImagePath = browser.runtime.getURL('icons/make-new-alias.png');
   relayIconBtn.style.backgroundImage = `url(${makeNewAliasImagePath})`;
 
 
@@ -380,7 +380,7 @@ async function addRelayIconToInput(emailInput) {
         description: document.location.hostname,
       });
       
-      const loadingImagePath = chrome.runtime.getURL('/images/loader.svg');
+      const loadingImagePath = browser.runtime.getURL('/images/loader.svg');
       document.querySelector(".fx-relay-alias-loading-image img").src = loadingImagePath;    
 
       relayInPageMenu.classList.add("fx-relay-alias-loading");

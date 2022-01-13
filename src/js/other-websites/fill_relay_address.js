@@ -100,7 +100,7 @@ function fillInputWithAlias(emailInput, relayAlias) {
       emailInput.value = relayAlias.address + "@mozmail.com";
       break;
     default:
-      // Use does not sync data so no relayAlias.domain is available
+      // User does not sync data so no relayAlias.domain is available
       emailInput.value = relayAlias.address
       break;
   }
@@ -113,7 +113,7 @@ function fillInputWithAlias(emailInput, relayAlias) {
 }
 
 
-// Chrome: browser.menus.getTargetElement is not available so 
+// COMPATIBILITY NOTE: browser.menus.getTargetElement is not available so 
 // we have to listen for any contextmenu click to determe the target element.
 // https://stackoverflow.com/a/7704392
 let clickedEl = null;
@@ -129,7 +129,7 @@ browser.runtime.onMessage.addListener((message, sender, response) => {
 
   if (message.type === "fillTargetWithRelayAddress") {    
 
-    // If the browser.menus API is available
+    // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
     const emailInput = browser.menus
           ? browser.menus.getTargetElement(message.targetElementId)
           : clickedEl

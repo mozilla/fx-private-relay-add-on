@@ -181,6 +181,7 @@ button.fx-relay-modal-close-button {
 
 .fx-relay-alias-loading .fx-relay-alias-loading-image {
   opacity: 1;
+  /* z-index usage: This image is an overlay of the in-page Relay UI when generating a new alias */
   z-index: 3;
   animation: fxRelayFadeIn 1s ease;
   display: block;

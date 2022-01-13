@@ -90,9 +90,9 @@ const relayContextMenus = {
     const menuData = canUserGenerateAliases ? staticMenuData.generateAliasEnabled : staticMenuData.generateAliasDisabled;
     relayContextMenus.menus.create(menuData);
 
+
+    // COMPATIBILITY NOTE: Chrome uses the contextMenus API to create menus. Firefox built their own API, menus, based on it. It has additional features that are only available in Firefox. Anything wrapped in a (browser.menus) check is only executed in a browser that supports it. 
     if (browser.menus) {
-
-
       const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
       
       const aliases = await relayContextMenus.utils.getAliases();
@@ -126,11 +126,10 @@ const relayContextMenus = {
     const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
     if (canUserUpgradeToPremium) {
 
-
+      // COMPATIBILITY NOTE: The Chrome contextMenus API create() argument params do not support icons 
       if (browser.menus) {
         staticMenuData.upgradeToPremium.icons =  {16: "/icons/placeholder-logo.png"};
       }
-
 
       await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);
       await relayContextMenus.menus.create(staticMenuData.upgradeToPremium);
@@ -139,7 +138,7 @@ const relayContextMenus = {
     // Set listerners
     browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
 
-    // Refresh menus
+    // COMPATIBILITY NOTE: Refresh menus (not available on Chrome contextMenus API)
     if (browser.menus) {
       await browser.menus.refresh();
     }
@@ -341,6 +340,7 @@ const relayContextMenus = {
 
 // Events
 
+// COMPATIBILITY NOTE: The onShown event is not available on the Chrome contextMenus API
 if (browser.menus) {
   browser.menus.onShown.addListener(async (info, tab) => {
     if (!info.menuIds.includes("fx-private-relay-generate-alias") ) {
