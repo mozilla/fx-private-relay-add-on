@@ -3,11 +3,9 @@
   "version": "2.2.0",
   "description": "Firefox Relay",
   "main": "index.js",
-  "dependencies": {
-    "web-ext": "^5.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "webextension-polyfill": "^0.8.0"
+    "web-ext": "^5.5.0"
   },
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
