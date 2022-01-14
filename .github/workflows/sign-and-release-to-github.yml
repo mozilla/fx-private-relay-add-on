@@ -23,7 +23,6 @@ jobs:
               environment: "review",
               transient_environment: true,
               auto_merge: false,
-              mediaType: {previews: ["flash", "ant-man"]},
               // The deployment runs in parallel with CI, so status checks will never have succeeded yet:
               required_contexts: [],
             });
@@ -48,7 +47,6 @@ jobs:
               environment: "review",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "in_progress",
-              mediaType: {previews: ["flash", "ant-man"]},
             });
 
       - name: "Checkout"
@@ -109,7 +107,6 @@ jobs:
               environment: "review",
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               state: "success",
-              mediaType: {previews: ["flash", "ant-man"]},
             });
         env:
           DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
@@ -127,7 +124,6 @@ jobs:
               log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               environment: "review",
               state: "failure",
-              mediaType: {previews: ["flash", "ant-man"]},
             });
         env:
           DEPLOYMENT_ID: "${{ needs.prepare-deployment.outputs.deployment-id }}"
