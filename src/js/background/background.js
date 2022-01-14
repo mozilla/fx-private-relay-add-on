@@ -11,7 +11,7 @@ browser.runtime.onInstalled.addListener(async () => {
   }
   const userApiToken = await browser.storage.local.get("apiToken");
   const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
-  const url = browser.runtime.getURL("first-run.html");
+  const url = browser.runtime.getURL("/first-run.html");
   if (!apiKeyInStorage) {
     await browser.tabs.create({ url });
     browser.storage.local.set({ firstRunShown: true });
