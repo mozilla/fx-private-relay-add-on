@@ -35,7 +35,7 @@
     "privacy",
     "email"
   ],
-  "author": "Mozilla",
+  "author": "Luke Crouch, Maxx Crawford, Vincent Tunru, Kaitlyn Andres, Se Yeon Kim, Lesley Norton",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/mozilla/fx-private-relay-add-on/issues"
