@@ -398,6 +398,10 @@ async function popup() {
   clearBrowserActionBadge();
   const userApiToken = await browser.storage.local.get("apiToken");
   const signedInUser = (userApiToken.hasOwnProperty("apiToken"));
+
+  // Set custom fonts from the add-on
+  await setCustomFonts();
+
   if (!signedInUser) {
     sendRelayEvent("Panel", "viewed-panel", "unauthenticated-user-panel");
     showSignUpPanel();

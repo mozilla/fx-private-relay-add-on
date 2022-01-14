@@ -162,6 +162,9 @@ async function addRelayIconToInput(emailInput) {
   relayIconBtn.id = "fx-relay-button";
   relayIconBtn.type = "button";
   relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
+  const makeNewAliasImagePath = browser.runtime.getURL('/icons/make-new-alias.png');
+  relayIconBtn.style.backgroundImage = `url(${makeNewAliasImagePath})`;
+
 
   const relayIconHeight = 30;
   if (relayIconHeight > inputHeight) {
@@ -190,6 +193,9 @@ async function addRelayIconToInput(emailInput) {
       "div",
       "fx-relay-menu-wrapper"
     );
+
+    // Set custom fonts from the add-on
+    await setCustomFonts();
 
     // Close menu if the user clicks outside of the menu
     relayMenuWrapper.addEventListener("click", closeRelayInPageMenu);
@@ -259,6 +265,15 @@ async function addRelayIconToInput(emailInput) {
     // If the user has a premium accout, they may create unlimited aliases.
     const { premium } = await browser.storage.local.get("premium");
 
+    const loadingAnimationDiv = createElementWithClassList(
+      "div",
+      "fx-relay-alias-loading-image"
+    )
+
+    const loadingAnimationImage = document.createElement("img");
+
+    loadingAnimationDiv.appendChild(loadingAnimationImage);
+
     // Create "You have .../.. remaining relay address" message
     const remainingAliasesSpan = createElementWithClassList(
       "span",
@@ -322,6 +337,7 @@ async function addRelayIconToInput(emailInput) {
 
     // Append menu elements to the menu
     [
+      loadingAnimationDiv,
       remainingAliasesSpan,
       getUnlimitedAliasesBtn,
       generateAliasBtn,
@@ -363,6 +379,9 @@ async function addRelayIconToInput(emailInput) {
         method: "makeRelayAddress",
         description: document.location.hostname,
       });
+      
+      const loadingImagePath = browser.runtime.getURL('/images/loader.svg');
+      document.querySelector(".fx-relay-alias-loading-image img").src = loadingImagePath;    
 
       relayInPageMenu.classList.add("fx-relay-alias-loading");
 

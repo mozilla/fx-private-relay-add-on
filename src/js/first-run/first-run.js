@@ -3,6 +3,8 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
 
+  // Set custom fonts from the add-on
+  await setCustomFonts();
 
   document.addEventListener("focus", () => {
     enableDataOptOut();

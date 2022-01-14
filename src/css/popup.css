@@ -13,6 +13,11 @@
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+.fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
+  box-sizing: inherit;
 }
 
 sign-up-panel {
@@ -230,6 +235,7 @@ panel-content {
   max-width: 260px;
   text-align: center;
   color: var(--relayInk);
+  font-family: var(--relayMetropolisBold);
   margin: auto auto 8px auto;
 }
 
@@ -286,18 +292,20 @@ main-panel {
   border-bottom: 1px solid var(--relayGrey20);
   border-top: 1px solid var(--relayGrey20);
   width: 100%;
+  font-size: 13px;
+  font-family: var(--relayInterUiRegular);
 }
 
 .aliases-remaining {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   background: white;
   text-align: start;
 }
 
 .premium-cta {
   margin: 0;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   color: var(--relayBlue3);
   font-weight: 700;
   text-decoration: none;
@@ -330,7 +338,7 @@ main-panel {
 }
 
 .upgrade-banner {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   padding-left: 10px;
   color: #5953F3;
   margin: auto;
@@ -352,7 +360,7 @@ footer {
   font-weight: 600;
   text-decoration: none;
   margin: 0 auto 16px auto;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   text-align: center;
 }
 
@@ -383,7 +391,7 @@ onboarding-panel {
 
 .premiumPanel {
   padding: 8px 16px 0px 16px;
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
 }
 
 .content-wrapper.is-hidden, .premium-wrapper.is-hidden {
@@ -503,7 +511,7 @@ onboarding-panel {
 }
 
 .education-headline {
-  font-family: 'InterUI';
+  font-family: var(--relayInterUiRegular);
   font-weight: 700;
   font-size: 16px;
 }
@@ -610,6 +618,7 @@ onboarding-panel p {
 .panel-num {
   margin: auto 12px auto;
   width: 55px;
+  font-family: var(--relayMetropolisBold);
 }
 
 .current-panel,
@@ -632,7 +641,9 @@ onboarding-panel p {
 
 /* For mobile screens with a bigger height viewport than the browser popup.
    This takes the --panelHeight + 1px as its min-height. */
-@media screen and (min-height: 501px) {
+
+/* TODO: Understand why this exists before removing */
+/* @media screen and (min-height: 501px) {
   .fx-relay-panel {
     height: 100vh;
   }
@@ -678,7 +689,7 @@ onboarding-panel p {
   .view-dashboard {
     margin: auto auto 0 auto;
   }
-}
+} */
 
 .newsflash-wrapper.is-hidden, .newsflash-wrapper .is-hidden {
   display: none;

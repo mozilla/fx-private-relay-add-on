@@ -1,4 +1,3 @@
-
 // The static data used to create different context menu items. 
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
 // See these docs to better understead the context menu paramaters
@@ -6,41 +5,54 @@
 const staticMenuData = {
   existingAlias: {
     type: "radio",
+    visible: true,
+    contexts: ["all"],
   },
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
     contexts: ["editable"],
     enabled: true,
+    visible: true,
+    contexts: ["all"],
   },
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
     contexts: ["editable"],
     enabled: false,
+    visible: true,
+    contexts: ["all"],
   },
   manageAliases: {
-      id: "fx-private-relay-manage-aliases",
-      title: browser.i18n.getMessage("ManageAllAliases"),
+    id: "fx-private-relay-manage-aliases",
+    title: browser.i18n.getMessage("ManageAllAliases"),
+    visible: true,
+    contexts: ["all"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
     title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
-    icons: {
-      16: "/icons/placeholder-logo.png",
-    },
+    visible: true,
+    contexts: ["all"],
   },
   upgradeToPremiumSeperator: {
     id: "fx-private-relay-get-unlimited-aliases-separator",
     type: "separator",
+    visible: true,
+    contexts: ["all"],
   },
   useExistingAliasFromWebsite: {
     id: "fx-private-relay-use-existing-aliases-from-this-site",
     title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite"),
+    visible: true,
+    contexts: ["all"],
   }, 
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
     title: browser.i18n.getMessage("pageInputIconRecentAliases"),
+    visible: true,
+    contexts: ["all"],
   }
 }
 
@@ -51,7 +63,7 @@ const reuseAliasMenuIdPrefix = "fx-private-relay-use-existing-alias_";
 const relayContextMenus = {
   init: async (currentWebsite=null) => {
     
-    if (!browser.menus) {
+    if (!browser.contextMenus) {
       throw new Error(`Cannot create browser menus`);
     }
 
@@ -70,7 +82,7 @@ const relayContextMenus = {
     }
 
     // Reset any previously created menus
-    await browser.menus.removeAll();
+    await browser.contextMenus.removeAll();
 
     // Generate aliases menu item
     // If a user is maxed out/not premium, the generate item will be disabled.
@@ -78,28 +90,33 @@ const relayContextMenus = {
     const menuData = canUserGenerateAliases ? staticMenuData.generateAliasEnabled : staticMenuData.generateAliasDisabled;
     relayContextMenus.menus.create(menuData);
 
-    const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
-    
-    const aliases = await relayContextMenus.utils.getAliases();
 
-    // Create Use Existing Alias submenu
-    if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
-      await relayContextMenus.menus.create(staticMenuData.existingAlias, {
-        createExistingAliases: true,
-        parentMenu: staticMenuData.useExistingAliasFromWebsite,
-        exisitingSite: true,
-        currentWebsite
-      }, aliases);
-    } 
+    // COMPATIBILITY NOTE: Chrome uses the contextMenus API to create menus. Firefox built their own API, menus, based on it. It has additional features that are only available in Firefox. Anything wrapped in a (browser.menus) check is only executed in a browser that supports it. 
+    if (browser.menus) {
+      const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
+      
+      const aliases = await relayContextMenus.utils.getAliases();
 
-    // Create "Recent Aliases…" menu
-    if ( userHasSomeAliasesCreated ) {
-      await relayContextMenus.menus.create(staticMenuData.existingAlias, {
-        createExistingAliases: true,
-        parentMenu: staticMenuData.useExistingAlias,
-        exisitingSite: false,
-        currentWebsite
-      }, aliases)
+      // Create Use Existing Alias submenu
+      if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
+        await relayContextMenus.menus.create(staticMenuData.existingAlias, {
+          createExistingAliases: true,
+          parentMenu: staticMenuData.useExistingAliasFromWebsite,
+          exisitingSite: true,
+          currentWebsite
+        }, aliases);
+      } 
+
+      // Create "Recent Aliases…" menu
+      if ( userHasSomeAliasesCreated ) {
+        await relayContextMenus.menus.create(staticMenuData.existingAlias, {
+          createExistingAliases: true,
+          parentMenu: staticMenuData.useExistingAlias,
+          exisitingSite: false,
+          currentWebsite
+        }, aliases)
+      }
+
     }
 
     // Create "Manage all aliases" link
@@ -108,6 +125,12 @@ const relayContextMenus = {
     // Generate upgrade menu item for non-premium users
     const canUserUpgradeToPremium = await relayContextMenus.utils.getUserStatus.canUpgradeToPremium();
     if (canUserUpgradeToPremium) {
+
+      // COMPATIBILITY NOTE: The Chrome contextMenus API create() argument params do not support icons 
+      if (browser.menus) {
+        staticMenuData.upgradeToPremium.icons =  {16: "/icons/placeholder-logo.png"};
+      }
+
       await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);
       await relayContextMenus.menus.create(staticMenuData.upgradeToPremium);
     }
@@ -115,8 +138,10 @@ const relayContextMenus = {
     // Set listerners
     browser.storage.onChanged.addListener(relayContextMenus.listeners.onLocalStorageChange);        
 
-    // Refresh menus
-    await browser.menus.refresh();
+    // COMPATIBILITY NOTE: Refresh menus (not available on Chrome contextMenus API)
+    if (browser.menus) {
+      await browser.menus.refresh();
+    }
 
     return Promise.resolve(1)
 
@@ -159,7 +184,7 @@ const relayContextMenus = {
 
         if (item === "apiToken" && changes[item].newValue === undefined) {
           // User has logged out. Remove all menu items.
-          await browser.menus.removeAll();
+          await browser.contextMenus.removeAll();
         }
       }
     },    
@@ -201,7 +226,7 @@ const relayContextMenus = {
 
         // Only create the parent menu if we will create sub-items
         if (filteredAliases.length > 0) {
-          await browser.menus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
+          await browser.contextMenus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
         } else {
           // Exit early. Nothing else to create.
           return Promise.resolve(1);
@@ -215,19 +240,19 @@ const relayContextMenus = {
           data.title = title;
           data.id = id;
           data.parentId = opts.parentMenu.id;
-          await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+          await browser.contextMenus.create(data, relayContextMenus.utils.onCreatedCallback);
         }
         
         return Promise.resolve(1)
       }
 
-      await browser.menus.create(data, relayContextMenus.utils.onCreatedCallback);
+      await browser.contextMenus.create(data, relayContextMenus.utils.onCreatedCallback);
 
       return Promise.resolve(1)
       
     },
     remove: async (id) => {
-      await browser.menus.remove(id);
+      await browser.contextMenus.remove(id);
     }
   }, 
   utils: {
@@ -303,7 +328,7 @@ const relayContextMenus = {
     },
     onCreatedCallback: ()=> {
       // Catch errors when trying to create the same menu twice.
-      // The browser.menus API is limited. You cannot query if a menu item already exists.
+      // The browser.contextMenus API is limited. You cannot query if a menu item already exists.
       // The error it throws does not show up to the user.
 
       if (browser.runtime.lastError) {
@@ -314,22 +339,26 @@ const relayContextMenus = {
 };
 
 // Events
-browser.menus.onShown.addListener(async (info, tab) => {
+
+// COMPATIBILITY NOTE: The onShown event is not available on the Chrome contextMenus API
+if (browser.menus) {
+  browser.menus.onShown.addListener(async (info, tab) => {
+    if (!info.menuIds.includes("fx-private-relay-generate-alias") ) {
+      // No Relay menu items exist. Stop listening.
+      return;
+    }
   
-  if (!info.menuIds.includes("fx-private-relay-generate-alias") ) {
-    // No Relay menu items exist. Stop listening.
-    return;
-  }
+    const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
+    await relayContextMenus.init(domain);
+  
+    if (menuInstanceId !== lastMenuInstanceId) {
+      return; // Menu was closed and shown again.
+    }
+  });
+}
 
-  const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
-  await relayContextMenus.init(domain);
 
-  if (menuInstanceId !== lastMenuInstanceId) {
-    return; // Menu was closed and shown again.
-  }
-});
-
-browser.menus.onClicked.addListener(async (info, tab) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({

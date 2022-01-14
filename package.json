@@ -1,12 +1,12 @@
 {
   "name": "fx-private-relay-add-on",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Firefox Relay",
   "main": "index.js",
-  "dependencies": {
-    "web-ext": "^5.2.0"
+  "dependencies": {},
+  "devDependencies": {
+    "web-ext": "^5.5.0"
   },
-  "devDependencies": {},
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
     "build:clean": "git checkout src/manifest.json src/js/background/background.js src/popup.html",
@@ -20,7 +20,10 @@
     "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
     "test": "echo \"Error: no test specified\" && exit 1",
     "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
-    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/"
+    "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/",
+    "web-ext-run:firefox": "npm run web-ext-run -- --target firefox-desktop",
+    "web-ext-run:chrome": "npm run web-ext-run -- --target chromium",
+    "web-ext-run:all": "npm run web-ext-run -- --target chromium --target firefox-desktop"
   },
   "private": false,
   "repository": {
@@ -32,7 +35,7 @@
     "privacy",
     "email"
   ],
-  "author": "Mozilla",
+  "author": "Luke Crouch, Maxx Crawford, Vincent Tunru, Kaitlyn Andres, Se Yeon Kim, Lesley Norton",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/mozilla/fx-private-relay-add-on/issues"

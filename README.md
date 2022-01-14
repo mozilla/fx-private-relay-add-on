@@ -32,6 +32,19 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
     npm run web-ext-run
     ```
 
+   By default, this will open and run the extension in Firefox. If you'd like to run this in Chrome, run the following: 
+
+      ```
+      npm run web-ext-run:chrome
+      ```
+
+   If you'd like to run the extension in both Chrome and Firefox at the same time, use this command: 
+
+      ```
+      npm run web-ext-run:all
+      ```
+
+
 3. Visit http://127.0.0.1:8000
 
 

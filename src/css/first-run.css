@@ -32,6 +32,8 @@
   margin: 14vh auto 2rem auto;
   color: var(--relayInk);
   line-height: 1.1;
+  font-weight: 700;
+  font-family: var(--relayMetropolisBold);
 }
 
 .first-run-img {

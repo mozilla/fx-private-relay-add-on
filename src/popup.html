@@ -5,6 +5,7 @@
     <title>Firefox Relay</title>
     <link rel="stylesheet" href="css/relay.css">
     <link rel="stylesheet" href="css/popup.css">
+    <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/i18n.js"></script>
     <script src="/js/shared/data-opt-out-toggle.js"></script>
     <script src="js/shared/utils.js"></script>
@@ -42,7 +43,7 @@
       </settings>
 
       <sign-up-panel class="sign-up-panel hidden">
-        <span class="fx-relay-font-met welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
+        <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
         <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
         <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
       </sign-up-panel>
@@ -71,7 +72,7 @@
             </a>
             <div class="onboarding-pagination">
               <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
-              <span class="panel-num fx-relay-font-met">
+              <span class="panel-num">
                 <span class="current-panel"></span>/
                   <span class="total-panels">3</span>
               </span>

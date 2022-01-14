@@ -11,7 +11,7 @@ browser.runtime.onInstalled.addListener(async () => {
   }
   const userApiToken = await browser.storage.local.get("apiToken");
   const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
-  const url = browser.runtime.getURL("first-run.html");
+  const url = browser.runtime.getURL("/first-run.html");
   if (!apiKeyInStorage) {
     await browser.tabs.create({ url });
     browser.storage.local.set({ firstRunShown: true });
@@ -162,11 +162,13 @@ async function refreshAccountPages() {
   if (!settingsRefresh) {
     browser.storage.local.set({ settingsRefresh: true });
 
-    browser.tabs.query({ url: "http://127.0.0.1/*" }, function (tabs) {
+    function tabReloader(tabs) {
       for (let tab of tabs) {
         browser.tabs.reload(tab.id);
       }
-    });
+    };
+
+    browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabReloader);   
   }
 }
 
