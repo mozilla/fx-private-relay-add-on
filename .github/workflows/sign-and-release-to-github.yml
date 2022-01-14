@@ -9,7 +9,6 @@ jobs:
   prepare-deployment:
     runs-on: ubuntu-latest
     outputs:
-      tag-slug: ${{ steps.determine-npm-tag.outputs.tag-slug }}
       deployment-id: ${{ fromJson(steps.create-deployment.outputs.result).data.id }}
     steps:
       - name: Create GitHub Deployment
