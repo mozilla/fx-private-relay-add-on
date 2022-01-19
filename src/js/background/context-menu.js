@@ -374,13 +374,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         action: "click",
         label: "context-menu-get-unlimited-aliases",
       });
-      const { fxaSubscriptionsUrl, premiumProdId, premiumPriceId } =
-        await browser.storage.local.get([
-          "fxaSubscriptionsUrl",
-          "premiumProdId",
-          "premiumPriceId",
-        ]);
-      const urlPremium = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+      const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
+      const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
       await browser.tabs.create({ url: urlPremium });
       break;
     case "fx-private-relay-manage-aliases":

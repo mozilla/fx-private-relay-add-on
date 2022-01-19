@@ -427,9 +427,6 @@ async function popup() {
   });
   
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
-  const { fxaSubscriptionsUrl } = await browser.storage.local.get("fxaSubscriptionsUrl");
-  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
-  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
 
 
   document.querySelectorAll(".login-link").forEach(loginLink => {

@@ -43,12 +43,7 @@ async function showModal(modalType) {
   getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
 
   //Create "Get unlimited aliases" link
-  const { fxaSubscriptionsUrl } = await browser.storage.local.get(
-    "fxaSubscriptionsUrl"
-  );
-  const { premiumProdId } = await browser.storage.local.get("premiumProdId");
-  const { premiumPriceId } = await browser.storage.local.get("premiumPriceId");
-  getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+  getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
 
   modalContent.appendChild(getUnlimitedAliasesBtn);
 
