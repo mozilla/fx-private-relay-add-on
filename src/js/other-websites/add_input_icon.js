@@ -323,14 +323,7 @@ async function addRelayIconToInput(emailInput) {
     });
 
     //Create "Get unlimited aliases" link
-    const { fxaSubscriptionsUrl } = await browser.storage.local.get(
-      "fxaSubscriptionsUrl"
-    );
-    const { premiumProdId } = await browser.storage.local.get("premiumProdId");
-    const { premiumPriceId } = await browser.storage.local.get(
-      "premiumPriceId"
-    );
-    getUnlimitedAliasesBtn.href = `${fxaSubscriptionsUrl}/products/${premiumProdId}?plan=${premiumPriceId}`;
+    getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
 
     // Restrict tabbing to relay menu elements
     restrictOrRestorePageTabbing(-1);
