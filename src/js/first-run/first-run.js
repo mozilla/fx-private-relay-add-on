@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
       sendRelayEvent("First Run", "click", e.target.dataset.eventLabel);
-      return window.open(`${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=first-run&utm_content=first-run-sign-up-btn`);
+      return document.location = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=first-run&utm_content=first-run-sign-up-btn`;
     });
   });
 
