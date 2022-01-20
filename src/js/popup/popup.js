@@ -429,7 +429,14 @@ async function popup() {
 
 
   document.querySelectorAll(".login-link").forEach(loginLink => {
-    loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
+    loginLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      sendRelayEvent("Login link", "click", e.target.dataset.eventLabel);
+      const authResult = browser.identity.launchWebAuthFlow({
+        url: 'https://oauth.accounts.firefox.com/v1/authorization'
+      });
+    });
+    // loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
   });
 
   document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {

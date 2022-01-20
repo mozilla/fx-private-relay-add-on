@@ -69,6 +69,7 @@
 
   "permissions": [
       "<all_urls>",
+      "identity",
       "storage",
       "menus"
   ]
