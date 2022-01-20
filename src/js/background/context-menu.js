@@ -213,27 +213,30 @@ const relayContextMenus = {
     }
   },
   menus: {
-    create: async (data, opts=null, aliases) => {     
+    create: async (data, options=null, aliases) => {     
       // Loop Through Existing Aliases
-      if (opts?.createExistingAliases) {
+      if (options?.createExistingAliases) {
         
+        // https://github.com/mozilla/fx-private-relay-add-on/issues/239 
+        // There is a bug in the order in which the aliases are stored when synced with the server versus local storage. 
+        // We need to determine which method is used to determine if need to flip that order.  
         const shouldAliasOrderBeReversed = await getServerStoragePref();
 
-        const filteredAliases = opts.exisitingSite
+        const filteredAliases = options.exisitingSite
           ? relayContextMenus.utils.getSiteSpecificAliases(
               aliases,
-              opts.currentWebsite,
-              shouldAliasOrderBeReversed
+              options.currentWebsite,
+              { shouldAliasOrderBeReversed }
             )
           : relayContextMenus.utils.getMostRecentAliases(
               aliases,
-              opts.currentWebsite,
-              shouldAliasOrderBeReversed
+              options.currentWebsite,
+              { shouldAliasOrderBeReversed }
             );
 
         // Only create the parent menu if we will create sub-items
         if (filteredAliases.length > 0) {
-          await browser.contextMenus.create(opts.parentMenu, relayContextMenus.utils.onCreatedCallback);
+          await browser.contextMenus.create(options.parentMenu, relayContextMenus.utils.onCreatedCallback);
         } else {
           // Exit early. Nothing else to create.
           return Promise.resolve(1);
@@ -246,7 +249,7 @@ const relayContextMenus = {
           
           data.title = title;
           data.id = id;
-          data.parentId = opts.parentMenu.id;
+          data.parentId = options.parentMenu.id;
           await browser.contextMenus.create(data, relayContextMenus.utils.onCreatedCallback);
         }
         
@@ -288,12 +291,11 @@ const relayContextMenus = {
       const { hostname } = new URL(url);
       return hostname;
     },  
-    getMostRecentAliases: (array, domain, shouldFlipArray)=> {
+    getMostRecentAliases: (array, domain, options = {})=> {
       // Flipped to match the same order as the dashboard if synced from the server
-      if (shouldFlipArray) {
+      if (options.shouldAliasOrderBeReversed) {
         array.reverse();
       }
-      
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
       const filteredAliases = array.filter(alias => alias.generated_for !== domain);
@@ -301,10 +303,10 @@ const relayContextMenus = {
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
-    getSiteSpecificAliases: (array, domain, shouldFlipArray)=> {
+    getSiteSpecificAliases: (array, domain, options = {})=> {
 
       // Flipped to match the same order as the dashboard if synced from the server
-      if (shouldFlipArray) {
+      if (shouldAliasOrderBeReversed) {
         array.reverse();
       }
 
