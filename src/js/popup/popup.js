@@ -155,14 +155,13 @@ const serverStoragePanel = {
 
 async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
-
+  
   // Turned off label sync prompt for premium release
   // const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
   // if (shouldShowServerStoragePromptPanel) {
   //   serverStoragePanel.init(premium);
   // } else 
-  if (premium && premiumCountryAvailability?.premium_available_in_country === true) {
+  if (premium) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper
