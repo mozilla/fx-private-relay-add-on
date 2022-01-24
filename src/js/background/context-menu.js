@@ -306,7 +306,7 @@ const relayContextMenus = {
     getSiteSpecificAliases: (array, domain, options = {})=> {
 
       // Flipped to match the same order as the dashboard if synced from the server
-      if (shouldAliasOrderBeReversed) {
+      if (options.shouldAliasOrderBeReversed) {
         array.reverse();
       }
 
