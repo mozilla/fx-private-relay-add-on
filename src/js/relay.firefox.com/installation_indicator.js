@@ -2,6 +2,7 @@
 // updates the dataset. The Private Relay website watches for this change, and
 // makes content changes if the addon has been installed.
 
+// TODO: refactor this. maybe use a webRequest listener instead of content script?
 (async () => {
   localStorage.setItem("fxRelayAddonInstalled", "true");
   document.querySelectorAll("firefox-private-relay-addon").forEach((el) => {

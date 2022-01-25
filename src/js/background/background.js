@@ -9,8 +9,8 @@ browser.runtime.onInstalled.addListener(async () => {
   if (firstRunShown) {
     return;
   }
-  const userApiToken = await browser.storage.local.get("apiToken");
-  const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+  const fxaTokenData = await browser.storage.local.get("fxaTokenData");
+  const apiKeyInStorage = fxaTokenData.hasOwnProperty("access_token");
   const url = browser.runtime.getURL("first-run.html");
   if (!apiKeyInStorage) {
     await browser.tabs.create({ url });
@@ -20,7 +20,7 @@ browser.runtime.onInstalled.addListener(async () => {
 
 async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
-  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+  const relayAddressesURL = `${relayApiSource}/relayaddresses/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -30,11 +30,12 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   headers.set("Accept", "application/json");
   
   if (opts && opts.auth) {
-    const apiToken = await browser.storage.local.get("apiToken");
-    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+    const {fxaTokenData} = await browser.storage.local.get("fxaTokenData");
+    console.log(`Sending fxa access token in request: ${fxaTokenData.access_token}`);
+    headers.set("Authorization", `Token ${fxaTokenData.access_token}`);
   }
 
-  const response = await fetch(apiMakeRelayAddressesURL, {
+  const response = await fetch(relayAddressesURL, {
     mode: "same-origin",
     method,
     headers: headers,
@@ -145,8 +146,8 @@ async function createNewHeadersObject(opts) {
   headers.set("Accept", "application/json");
 
   if (opts && opts.auth) {
-    const apiToken = await browser.storage.local.get("apiToken");
-    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+    const fxaTokenData = await browser.storage.local.get("fxaTokenData");
+    headers.set("Authorization", `Token ${fxaTokenData.access_token}`);
   }
 
   return headers;
@@ -171,9 +172,9 @@ async function refreshAccountPages() {
 }
 
 async function makeRelayAddress(description = null) {
-  const apiToken = await browser.storage.local.get("apiToken");
+  const fxaTokenData = await browser.storage.local.get("fxaTokenData");
 
-  if (!apiToken.apiToken) {
+  if (!fxaTokenData.access_token) {
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
     });
@@ -239,6 +240,7 @@ async function makeRelayAddress(description = null) {
 }
 
 async function updateAddOnAuthStatus(status) {
+  // TODO: refactor this to remove fxaTokenData
   // If user is no longer logged in, remove the apiToken attribute. 
   // This will cause the "Sign in" panel to be visible when the popup is opened.
   if (status === "False") {
@@ -310,6 +312,12 @@ browser.runtime.onMessage.addListener(async (m) => {
       break;
     case "updateAddOnAuthStatus":
       await updateAddOnAuthStatus(m.status);
+      break;
+    case "loadAliasesFromServerIntoStorage":
+      console.log('loading aliases from relay server ...');
+      relayAddresses = await getAliasesFromServer('GET', null, {auth: true});
+      console.log(relayAddresses);
+      await browser.storage.local.set({relayAddresses});
       break;
   }
   return response;

@@ -90,8 +90,8 @@ function createElementWithClassList(elemType, elemClass) {
 }
 
 async function isUserSignedIn() {
-  const userApiToken = await browser.storage.local.get("apiToken");
-  return userApiToken.hasOwnProperty("apiToken");
+  const {fxaTokenData} = await browser.storage.local.get("fxaTokenData");
+  return fxaTokenData.hasOwnProperty("access_token");
 }
 
 function addPaddingRight(element, paddingInPixels) {

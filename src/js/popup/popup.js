@@ -396,8 +396,8 @@ async function clearBrowserActionBadge() {
 async function popup() {
   sendRelayEvent("Panel", "opened-panel", "any-panel");
   clearBrowserActionBadge();
-  const userApiToken = await browser.storage.local.get("apiToken");
-  const signedInUser = (userApiToken.hasOwnProperty("apiToken"));
+  const fxaTokenData = await browser.storage.local.get("fxaTokenData");
+  const signedInUser = (fxaTokenData.hasOwnProperty("access_token"));
   if (!signedInUser) {
     sendRelayEvent("Panel", "viewed-panel", "unauthenticated-user-panel");
     showSignUpPanel();

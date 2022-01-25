@@ -22,7 +22,7 @@ async function pkceCodeChallengeB64(pkceCodeVerifierValue){
     new TextEncoder().encode(pkceCodeVerifierValue)
   );
   const b64EncodedChallenge = btoa(String.fromCharCode(...new Uint8Array(pkceCodeChallengeDigest)))
-  return b64EncodedChallenge.replace('=', '')
+  return b64EncodedChallenge.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 
@@ -49,25 +49,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       const redirectUrl = browser.identity.getRedirectURL();
       const state = Math.random().toString(36).substr(2);
       const pkceCodeVerifier = generatePKCECodeVerifierValue();
-      console.log(pkceCodeVerifier);
+      console.log(`pkceCodeVerifier: ${pkceCodeVerifier}`);
       const pkceCodeChallenge = await pkceCodeChallengeB64(pkceCodeVerifier);
-      console.log(pkceCodeChallenge);
+      console.log(`pkceCodeCallenge: ${pkceCodeChallenge}`);
       const fullAuthUrl = `${authUrl}?client_id=${clientID}&scope=${scope}&access_type=${accessType}&redirect_uri=${redirectUrl}&state=${state}&code_challenge_method=S256&code_challenge=${pkceCodeChallenge}&response_type=code`;
-      console.log(fullAuthUrl);
+      console.log(`fullAuthUrl: ${fullAuthUrl}`);
       browser.identity.launchWebAuthFlow({
         url: fullAuthUrl,
         interactive: true
       }).then(async (result) => {
-        console.log(result);
+        console.log(`launchWebAuthFlow result: ${result}`);
         const resultUrl = new URL(result);
         const resultState = resultUrl.searchParams.get('state');
         if (resultState !== state) {
           return;
         }
+        console.log(`state matches; continuing ...`);
         const code = resultUrl.searchParams.get('code');
-        console.log(code);
+        console.log(`oauth code: ${code}`);
         const tokenUrl = `${fxaAuthBaseUrl}/oauth/token`;
-        console.log(tokenUrl);
+        console.log(`redeeming code for token: ${tokenUrl}`);
         const tokenResponse = await fetch(tokenUrl, {
           method: 'POST',
           headers: {
@@ -79,7 +80,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             code_verifier: pkceCodeVerifier,
           })
         })
-        console.log(tokenResponse);
+        console.log(`tokenResponse from FXA: ${tokenResponse}`);
+        const fxaTokenData = await tokenResponse.json();
+        console.log(`fxaTokenData: ${fxaTokenData}`);
+        await browser.storage.local.set({fxaTokenData});
+        console.log(`set token into browser.storage.local`);
+        browser.runtime.sendMessage({
+          method: "loadAliasesFromServerIntoStorage"
+        });
       });
     });
   });

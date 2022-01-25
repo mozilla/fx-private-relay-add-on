@@ -61,8 +61,8 @@ const relayContextMenus = {
     }
     
 
-    const userApiToken = await browser.storage.local.get("apiToken");
-    const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+    const fxaTokenData = await browser.storage.local.get("fxaTokenData");
+    const apiKeyInStorage = fxaTokenData.hasOwnProperty("access_token");
 
     if (!apiKeyInStorage) {
       // User is not logged in. Do not do anything.
@@ -157,7 +157,7 @@ const relayContextMenus = {
           await relayContextMenus.init();
         }
 
-        if (item === "apiToken" && changes[item].newValue === undefined) {
+        if (item === "fxaTokenData" && changes[item].newValue === undefined) {
           // User has logged out. Remove all menu items.
           await browser.menus.removeAll();
         }

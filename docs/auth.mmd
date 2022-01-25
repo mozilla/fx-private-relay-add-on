@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Extension
+    participant FXA
+    participant Relay
+
+    Extension->>FXA: GET /v1/authorization?...
+    FXA->>Extension: 301 Moved https://{extension-id}.extensions.allizom.org/?...
+    Extension->>FXA: POST /v1/oauth/token/
+    FXA->>Extension: JSON: {token}
+    Extension->>Relay: GET /api/v1/relayaddresses Authorization: Token {token}
+    Relay->>FXA: POST /v1/oauth/verify {token}
+    FXA->>Relay: 200 OK
+    Relay->>Extension: [{id:, address:, etc.}, {id:, address:, etc.}]
