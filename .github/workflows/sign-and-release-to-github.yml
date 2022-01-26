@@ -95,6 +95,11 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: fx-private-relay-stage-chromium
+          path: src/
+
       - name: Mark GitHub Deployment as successful
         uses: actions/github-script@v5
         with:
