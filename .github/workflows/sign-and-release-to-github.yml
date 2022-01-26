@@ -97,7 +97,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: fx-private-relay-stage-chromium.zip
+          name: fx-private-relay-stage-chromium
           path: src/
 
       - name: Mark GitHub Deployment as successful
