@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
+    "@playwright/test": "^1.18.1",
     "web-ext": "^5.5.0"
   },
   "scripts": {
@@ -18,7 +19,7 @@
     "config:prod": "npm run build:clean && ./config-domain.sh https://relay.firefox.com",
     "dev": "npm run web-ext-run",
     "lint": "web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "playwright test",
     "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
     "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/",
     "web-ext-run:firefox": "npm run web-ext-run -- --target firefox-desktop",
