@@ -19,6 +19,8 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: xvfb-run npm test
+      env:
+        DEBUG: "pw:protocol"
     - run: ls
       if: always()
     - run: ls --recursive --ignore=node_modules
