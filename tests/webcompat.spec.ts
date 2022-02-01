@@ -6,7 +6,9 @@ let browserContext: BrowserContext;
 
 test.beforeAll(async () => {
   const pathToExtension = resolvePath(__dirname, "../src");
+  console.log({pathToExtension});
   const userDataDir = resolvePath(tmpdir(), "playwright-test-user-data-dir");
+  console.log({userDataDir});
   browserContext = await chromium.launchPersistentContext(userDataDir, {
     // Extensions only work in headed mode:
     headless: false,
@@ -17,6 +19,7 @@ test.beforeAll(async () => {
       `--load-extension=${pathToExtension}`,
     ],
   });
+  console.log("Got browser context");
 });
 
 test.afterAll(async () => {

@@ -21,7 +21,7 @@ jobs:
       run: xvfb-run npm test
     - run: ls
       if: always()
-    - run: ls --recursive
+    - run: ls --recursive --ignore=node_modules
       if: always()
       # run: xvfb-run --auto-servernum npm test
     # - name: cleanup xvfb
