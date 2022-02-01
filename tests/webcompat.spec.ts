@@ -9,6 +9,7 @@ test.beforeAll(async () => {
   console.log({pathToExtension});
   const userDataDir = resolvePath(tmpdir(), "playwright-test-user-data-dir");
   console.log({userDataDir});
+  process.exit(0);
   browserContext = await chromium.launchPersistentContext(userDataDir, {
     // Extensions only work in headed mode:
     headless: false,
