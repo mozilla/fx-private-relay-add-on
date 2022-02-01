@@ -1,4 +1,8 @@
+import { resolve as resolvePath } from "path";
 import { PlaywrightTestConfig, devices } from '@playwright/test';
+
+const pathToExtension = resolvePath(__dirname, "./src");
+console.log({ pathToExtension });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -54,6 +58,15 @@ const config: PlaywrightTestConfig = {
       /* Project-specific settings. */
       use: {
         ...devices['Desktop Chrome'],
+        locale: "en-GB",
+        timezoneId: "GMT",
+        launchOptions: {
+          headless: false,
+          args: [
+            `--disable-extensions-except=${pathToExtension}`,
+            `--load-extension=${pathToExtension}`,
+          ],
+        },
       },
     },
 

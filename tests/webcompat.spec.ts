@@ -4,28 +4,27 @@ import { test, expect, chromium, BrowserContext } from "@playwright/test";
 
 let browserContext: BrowserContext;
 
-test.beforeAll(async () => {
-  const pathToExtension = resolvePath(__dirname, "../src");
-  console.log({pathToExtension});
-  const userDataDir = resolvePath(tmpdir(), "playwright-test-user-data-dir");
-  console.log({userDataDir});
-  process.exit(0);
-  browserContext = await chromium.launchPersistentContext(userDataDir, {
-    // Extensions only work in headed mode:
-    headless: false,
-    locale: "en-GB",
-    timezoneId: "GMT",
-    args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`,
-    ],
-  });
-  console.log("Got browser context");
-});
+// test.beforeAll(async () => {
+//   const pathToExtension = resolvePath(__dirname, "../src");
+//   console.log({pathToExtension});
+//   const userDataDir = resolvePath(tmpdir(), "playwright-test-user-data-dir");
+//   console.log({userDataDir});
+//   browserContext = await chromium.launchPersistentContext(userDataDir, {
+//     // Extensions only work in headed mode:
+//     headless: false,
+//     locale: "en-GB",
+//     timezoneId: "GMT",
+//     args: [
+//       `--disable-extensions-except=${pathToExtension}`,
+//       `--load-extension=${pathToExtension}`,
+//     ],
+//   });
+//   console.log("Got browser context");
+// });
 
-test.afterAll(async () => {
-  await browserContext.close();
-});
+// test.afterAll(async () => {
+//   await browserContext.close();
+// });
 
 type PageWithEmail = {
   url: string;
@@ -63,16 +62,16 @@ const pagesToTest: Record<string, PageWithEmail> = {
 Object.keys(pagesToTest).forEach((id) => {
   const pageToTest = pagesToTest[id];
   test.describe(`Extension on ${id}`, () => {
-    test("The menu can be opened", async () => {
-      const page = await browserContext.newPage();
+    test("The menu can be opened", async ({ page }) => {
+      // const page = await browserContext.newPage();
       await page.goto(pageToTest.url);
       expect(page.locator(".fx-relay-menu")).not.toBeVisible();
       await page.click("#fx-relay-button");
       expect(page.locator(".fx-relay-menu")).not.toBeVisible();
     });
 
-    test("The email field is still editable and no extra characters (e.g. placeholders) remain when editing", async () => {
-      const page = await browserContext.newPage();
+    test("The email field is still editable and no extra characters (e.g. placeholders) remain when editing", async ({ page }) => {
+      // const page = await browserContext.newPage();
       await page.goto(pageToTest.url);
       const inputEl = page
         .locator(pageToTest.inputSelector ?? "input[type=email]")
@@ -83,8 +82,8 @@ Object.keys(pagesToTest).forEach((id) => {
     });
 
     test.describe("Visual regressions", () => {
-      test("The email input", async () => {
-        const page = await browserContext.newPage();
+      test("The email input", async ({ page }) => {
+        // const page = await browserContext.newPage();
         await page.goto(pageToTest.url);
         // Some pages (e.g. Yahoo!'s) immediately focus the email,
         // then animate the placeholder turning into a label:
@@ -99,8 +98,8 @@ Object.keys(pagesToTest).forEach((id) => {
         );
       });
 
-      test("The in-page popup menu", async () => {
-        const page = await browserContext.newPage();
+      test("The in-page popup menu", async ({ page }) => {
+        // const page = await browserContext.newPage();
         await page.goto(pageToTest.url);
         await page.click("#fx-relay-button");
         // The menu has an opening animation of 200ms:
