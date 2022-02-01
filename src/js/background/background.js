@@ -32,7 +32,7 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   if (opts && opts.auth) {
     const {fxaTokenData} = await browser.storage.local.get("fxaTokenData");
     console.log(`Sending fxa access token in request: ${fxaTokenData.access_token}`);
-    headers.set("Authorization", `Token ${fxaTokenData.access_token}`);
+    headers.set("Authorization", `Bearer ${fxaTokenData.access_token}`);
   }
 
   const response = await fetch(relayAddressesURL, {
@@ -147,7 +147,7 @@ async function createNewHeadersObject(opts) {
 
   if (opts && opts.auth) {
     const fxaTokenData = await browser.storage.local.get("fxaTokenData");
-    headers.set("Authorization", `Token ${fxaTokenData.access_token}`);
+    headers.set("Authorization", `Bearer ${fxaTokenData.access_token}`);
   }
 
   return headers;
