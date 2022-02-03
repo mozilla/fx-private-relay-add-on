@@ -181,6 +181,12 @@ async function addRelayIconToInput(emailInput) {
   };
 
   relayIconBtn.addEventListener("click", async (e) => {
+    
+    if (!e.isTrusted) {
+      // The click was not user generated so ignore
+      return false;
+    } 
+
     sendInPageEvent("input-icon-clicked", "input-icon");
 
     preventDefaultBehavior(e);
