@@ -190,6 +190,7 @@ async function inpageContentInit() {
     sendInPageEvent("click", "input-menu-generate-alias");
     preventDefaultBehavior(generateClickEvt);
 
+    // In place of `document.location.hostname`
     const currentPage = await browser.runtime.sendMessage({method: "getCurrentPage"});
     
     chrome.runtime.sendMessage({ method: "getCurrentPage" }, tabId => {
@@ -198,7 +199,8 @@ async function inpageContentInit() {
 
     // Attempt to create a new alias
     const newRelayAddressResponse = await browser.runtime.sendMessage({
-      method: "makeRelayAddress"
+      method: "makeRelayAddress",
+      description: currentPage
     });
 
     const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
