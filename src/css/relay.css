@@ -1,5 +1,7 @@
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
+.fx-relay-menu-iframe,
+.fx-relay-menu-body,
 .fx-relay-panel,
 .fx-relay-icon,
 .fx-relay-modal-wrapper {
@@ -33,9 +35,46 @@
   font-size: 16px;
 }
 
+.fx-relay-menu-iframe ::-moz-focus-inner,
+.fx-relay-menu-body ::-moz-focus-inner,
 .fx-relay-menu ::-moz-focus-inner,
 .fx-relay-icon ::-moz-focus-inner {
   border: 0;
+}
+
+.fx-relay-menu-body {
+  margin: 0;
+  padding: 0;
+  background: var(--relayGrey10);
+  background-color: var(--relayGrey10);
+  box-sizing: border-box;
+}
+
+.fx-relay-menu-iframe iframe { 
+  border-radius: 4px;
+  background: var(--relayGrey10);
+  background-color: var(--relayGrey10);
+}
+
+.fx-relay-menu-iframe { 
+  width: 300px;
+  min-height: 60px;
+  top: 47px;
+  right: -15px;
+  position: absolute;
+}
+
+.fx-relay-menu-iframe::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: -7px;
+  right: 20px;
+  height: 20px;
+  width: 20px;
+  background: var(--relayGrey10);
+  z-index: -1;
+  transform: rotate(45deg);
 }
 
 .fx-relay-menu-wrapper {
@@ -141,35 +180,13 @@ button.fx-relay-modal-close-button {
 /* input icon & icon messaging */
 
 .fx-relay-menu {
-  width: 300px;
-  min-height: 60px;
-  border-radius: 4px;
-  background: var(--relayGrey10);
-  background-color: var(--relayGrey10);
   display: flex;
   flex-direction: column;
-  position: absolute;
   align-content: center;
   padding: 24px 16px 16px 16px;
-  top: 47px;
-  right: -15px;
   pointer-events: all;
   animation: fxRelayFadeIn 0.2s ease forwards;
-  box-shadow: 3px 3px 3px 3px #00000017;
   box-sizing: border-box;
-}
-
-.fx-relay-menu::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: -7px;
-  right: 20px;
-  height: 20px;
-  width: 20px;
-  background: var(--relayGrey10);
-  z-index: -1;
-  transform: rotate(45deg);
 }
 
 .fx-relay-alias-loading {
