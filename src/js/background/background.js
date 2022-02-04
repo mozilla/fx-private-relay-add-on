@@ -73,6 +73,21 @@ async function storePremiumAvailabilityInCountry() {
   })
 }
 
+async function getCurrentPage() {
+  // BUG: FUNCTION DOES NOT WORK AS EXPECTED
+  let querying = browser.tabs.query({active : true, lastFocusedWindow : true});
+  let hostname;
+
+  querying.then(function (tabs) {
+    var CurrTab = tabs[0];
+    const url = new URL(CurrTab.url);
+    hostname = url.hostname;
+    return hostname;
+  });
+
+  return hostname;
+}
+
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
@@ -280,38 +295,53 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m) => {
+browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
   let response;
+  let tab2id;
 
   switch (m.method) {
-    case "makeRelayAddress":
-      response = await makeRelayAddress(m.description);
+    case "displayBrowserActionBadge":
+      await displayBrowserActionBadge();
       break;
-    case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
+    case "fillInputWithAliasParentPage":
+      tab2id = sender.tab.id;
+      break;
+    case "fillInputWithAlias":
+      chrome.tabs.sendMessage(sender.tab.id, m.message);
+      break;
+    case "getServerStoragePref":
+      response = await getServerStoragePref();
+      break;
+    case "getCurrentPage":
+      response = await getCurrentPage();
+      sendResponse({url: response});
+      break;
+    case "makeRelayAddress":
+      // BUG: getCurrentPage DOES NOT WORK AS INTENDED
+      if (!m.description) {
+        m.description = await getCurrentPage();
+      }
+      response = await makeRelayAddress(m.description);
       break;
     case "openRelayHomepage":
       browser.tabs.create({
         url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
       });
       break;
-    case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
     case "rebuildContextMenuUpgrade":
       await relayContextMenus.init();
-      break;
-    case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
-      break;
-    case "getServerStoragePref":
-      response = await getServerStoragePref();
       break;
     case "refreshAccountPages":
       await refreshAccountPages();
       break;
+    case "sendMetricsEvent":
+      response = await sendMetricsEvent(m.eventData);
+      break;
     case "updateAddOnAuthStatus":
       await updateAddOnAuthStatus(m.status);
+      break;
+    case "updateInputIconPref":
+      browser.storage.local.set({ showInputIcons: m.iconPref });
       break;
   }
   return response;

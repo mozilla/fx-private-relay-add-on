@@ -87,6 +87,12 @@ async function showModal(modalType) {
 
 // eslint-disable-next-line no-redeclare
 function fillInputWithAlias(emailInput, relayAlias) {
+
+  // BUG: Duplicate fillInputWithAlias calls without proper input contect
+  if (!emailInput) {
+    return false;
+  }
+
   switch (relayAlias.domain) {
     case 1:
       emailInput.value = relayAlias.address + "@relay.firefox.com";

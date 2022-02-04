@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts */
+/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -30,4 +30,11 @@ async function setCustomFonts() {
     await font.load();
     document.fonts.add(font);      
   }
+}
+
+function preventDefaultBehavior(clickEvt) {
+  clickEvt.stopPropagation();
+  clickEvt.stopImmediatePropagation();
+  clickEvt.preventDefault();
+  return;
 }
