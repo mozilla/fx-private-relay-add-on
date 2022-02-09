@@ -84,7 +84,7 @@ async function isUserSignedIn() {
   return userApiToken.hasOwnProperty("apiToken");
 }
 
-function buildInpageIframe() {
+function buildInpageIframe(opts) {
   const div = createElementWithClassList(
     "div",
     "fx-relay-menu-iframe"
@@ -93,6 +93,12 @@ function buildInpageIframe() {
   iframe.src = browser.runtime.getURL("inpage-panel.html");
   iframe.width = 300;
   iframe.height = 205;
+
+  if (!opts.isSignedIn) {
+    // If the user is not signed in, the content is shorter. Build the iframe accordingly.
+    iframe.height = 150;
+  }
+
   iframe.dataset.something = "test";
   // iframe.sandbox = ["allow-scripts"];
   // iframe.scrolling = "no";
@@ -206,7 +212,9 @@ async function addRelayIconToInput(emailInput) {
     window.addEventListener("scroll", positionRelayMenu);
     document.addEventListener("keydown", handleKeydownEvents);
 
-    const relayInPageMenu = buildInpageIframe();
+    const signedInUser = await isUserSignedIn();
+
+    const relayInPageMenu = buildInpageIframe({isSignedIn: signedInUser});
     const relayMenuWrapper = createElementWithClassList(
       "div",
       "fx-relay-menu-wrapper"
@@ -220,11 +228,10 @@ async function addRelayIconToInput(emailInput) {
 
     // Close menu if it's already open
     relayIconBtn.classList.toggle("fx-relay-menu-open");
+
     if (!relayIconBtn.classList.contains("fx-relay-menu-open")) {
       return closeRelayInPageMenu();
     }
-
-    const signedInUser = await isUserSignedIn();
 
     if (!signedInUser) {
       addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);

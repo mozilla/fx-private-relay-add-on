@@ -60,16 +60,23 @@ async function inpageContentInit() {
 
   const signedInUser = await isUserSignedIn();
 
+  const signedOutContent = document.querySelector(".fx-content-signed-out");
+  const signedInContent = document.querySelector(".fx-content-signed-in");
+
   if (!signedInUser) {
+    signedOutContent.classList.remove("is-hidden");
+    signedInContent.classList.add("is-hidden");
+
     const signUpMessageEl = document.querySelector(
       ".fx-relay-menu-sign-up-message"
     );
+
     signUpMessageEl.textContent = browser.i18n.getMessage(
       "pageInputIconSignUpText"
     );
 
     const signUpButton = document.querySelector(
-      ".fx-relay-menu-sign-up-message"
+      ".fx-relay-menu-sign-up-btn"
     );
 
     signUpButton.textContent = browser.i18n.getMessage(
@@ -214,6 +221,7 @@ async function inpageContentInit() {
     if (newRelayAddressResponse.status === 402) {
       relayInPageMenu.classList.remove("fx-relay-alias-loading");
       // preserve menu height before removing child elements
+      // TODO: Add background/function to adjust height of iframe
       relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
 
       [generateAliasBtn, remainingAliasesSpan].forEach((el) => {

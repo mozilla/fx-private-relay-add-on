@@ -17,11 +17,23 @@
   <body class="fx-relay-menu-body">
     <div>
         <div class="fx-relay-menu">
-          <div class="fx-relay-alias-loading-image"><img /></div>
-          <span class="fx-relay-menu-remaining-aliases"></span>
-          <button class="fx-relay-menu-generate-alias-btn"></button>
-          <a class="fx-relay-menu-get-unlimited-aliases" target="_blank" rel="noopener noreferrer" href=""></a>
-          <a class="fx-relay-menu-dashboard-link" href="" target="_blank"></a>
+
+          <!-- Logged In Content -->
+          <div class="fx-content-signed-in">
+            <div class="fx-relay-alias-loading-image"><img /></div>
+
+            <span class="fx-relay-menu-remaining-aliases"></span>
+            <button class="fx-relay-menu-generate-alias-btn"></button>
+            
+            <a class="fx-relay-menu-get-unlimited-aliases" target="_blank" rel="noopener noreferrer" href=""></a>
+            <a class="fx-relay-menu-dashboard-link" href="" target="_blank"></a>
+          </div>
+          
+          <!-- Logged Out Content -->
+          <div class="fx-content-signed-out is-hidden">
+            <span class="fx-relay-menu-sign-up-message"></span>
+            <button class="fx-relay-menu-sign-up-btn"></button>
+          </div>
         </div>
       </div>
   </body>
