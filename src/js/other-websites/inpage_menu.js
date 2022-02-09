@@ -190,17 +190,13 @@ async function inpageContentInit() {
     sendInPageEvent("click", "input-menu-generate-alias");
     preventDefaultBehavior(generateClickEvt);
 
-    // In place of `document.location.hostname`
-    const currentPage = await browser.runtime.sendMessage({method: "getCurrentPage"});
-    
-    chrome.runtime.sendMessage({ method: "getCurrentPage" }, tabId => {
-      // console.log('My tabId is', tabId);
-   });
+    // Request the active tab from the background script and parse the `document.location.hostname`
+    const currentPageHostName = await browser.runtime.sendMessage({method: "getCurrentPageHostname"});
 
     // Attempt to create a new alias
     const newRelayAddressResponse = await browser.runtime.sendMessage({
       method: "makeRelayAddress",
-      description: currentPage
+      description: currentPageHostName 
     });
 
     const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
