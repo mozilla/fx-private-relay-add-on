@@ -54,6 +54,9 @@
   border-radius: 4px;
   background: var(--relayGrey10);
   background-color: var(--relayGrey10);
+  border: 0;
+  box-shadow: 3px 3px 3px 3px #00000017;
+  animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
 .fx-relay-menu-iframe { 
@@ -73,7 +76,7 @@
   height: 20px;
   width: 20px;
   background: var(--relayGrey10);
-  z-index: -1;
+  z-index: 1;
   transform: rotate(45deg);
 }
 
