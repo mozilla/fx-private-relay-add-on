@@ -74,18 +74,12 @@ async function storePremiumAvailabilityInCountry() {
 }
 
 async function getCurrentPage() {
-  // BUG: FUNCTION DOES NOT WORK AS EXPECTED
-  let querying = browser.tabs.query({active : true, lastFocusedWindow : true});
-  let hostname;
-
-  querying.then(function (tabs) {
-    var CurrTab = tabs[0];
-    const url = new URL(CurrTab.url);
-    hostname = url.hostname;
-    return hostname;
+  const [currentTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
   });
 
-  return hostname;
+  return currentTab;
 }
 
 async function getServerStoragePref() {
@@ -307,20 +301,17 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
       tab2id = sender.tab.id;
       break;
     case "fillInputWithAlias":
-      chrome.tabs.sendMessage(sender.tab.id, m.message);
+      browser.tabs.sendMessage(sender.tab.id, m.message);
       break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
       break;
-    case "getCurrentPage":
-      response = await getCurrentPage();
-      sendResponse({url: response});
+    case "getCurrentPageHostname":
+      const currentPage = await getCurrentPage();
+      const url = new URL(currentPage.url);
+      response = url.hostname;
       break;
     case "makeRelayAddress":
-      // BUG: getCurrentPage DOES NOT WORK AS INTENDED
-      if (!m.description) {
-        m.description = await getCurrentPage();
-      }
       response = await makeRelayAddress(m.description);
       break;
     case "openRelayHomepage":
