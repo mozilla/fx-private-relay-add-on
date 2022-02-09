@@ -243,7 +243,6 @@ async function addRelayIconToInput(emailInput) {
 
 browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   if (m.filter = "fillInputWithAlias") {
-    // console.log("add_input_icon/fillInputWithAlias", sender, m);
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
     relayIconBtn?.classList.add("user-generated-relay");
