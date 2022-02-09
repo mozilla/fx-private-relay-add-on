@@ -2,6 +2,7 @@
 .fx-relay-menu-wrapper,
 .fx-relay-menu-iframe,
 .fx-relay-menu-body,
+.fx-relay-menu,
 .fx-relay-panel,
 .fx-relay-icon,
 .fx-relay-modal-wrapper {
@@ -90,6 +91,10 @@
   width: 100%;
   z-index: 9999999999999999999999;
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+.fx-relay-menu-body .is-hidden {
+  display: none;
 }
 
 .fx-relay-modal-content fx-relay-logo-wrapper {
@@ -182,7 +187,7 @@ button.fx-relay-modal-close-button {
 
 /* input icon & icon messaging */
 
-.fx-relay-menu {
+.fx-relay-menu > div {
   display: flex;
   flex-direction: column;
   align-content: center;
@@ -254,9 +259,9 @@ button.fx-relay-menu-sign-up-btn{
   justify-content: center;
   padding: 12px 24px;
   pointer-events: all;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-radius: 4px;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .fx-relay-menu-dashboard-link, .fx-relay-modal-manage-aliases {
