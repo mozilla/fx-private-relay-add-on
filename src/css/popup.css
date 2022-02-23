@@ -504,6 +504,7 @@ onboarding-panel {
   flex-direction: row;
   padding-top: 32px;
   justify-content: space-between;
+  gap: 16px;
 }
 
 .education-img {
