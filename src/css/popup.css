@@ -561,7 +561,7 @@ onboarding-panel p {
   margin: auto;
 }
 
-.panel-nav {
+.panel-nav, .js-panel-nav {
   border: none;
   outline: none;
   border-radius: 50%;
@@ -572,7 +572,7 @@ onboarding-panel p {
   background-color: rgba(0, 0, 0, 0);
 }
 
-.panel-nav::after {
+.panel-nav::after, .js-panel-nav::after {
   content: "";
   display: inline-block;
   position: absolute;
@@ -590,18 +590,18 @@ onboarding-panel p {
 }
 
 .settings-toggle:hover::after,
-.panel-nav:hover::after {
+.panel-nav:hover::after, .js-panel-nav::after {
   opacity: .8;
   transition: opacity 0.2s ease;
 }
 
 .settings-toggle:focus,
-.panel-nav:focus {
+.panel-nav:focus, .js-panel-nav:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
 .settings-toggle:active::after,
-.panel-nav:active::after {
+.panel-nav:active::after, .js-panel-nav::after {
   opacity: 1;
   transition: opacity 0.2s ease;
 }
@@ -611,19 +611,19 @@ onboarding-panel p {
 }
 
 .panel1 .previous-panel,
-.panel3 .next-panel  {
+.panel3 .next-panel, .educationalAttachmentSizeLimit .previous-panel  {
   pointer-events: none;
   opacity: 0;
 }
 
-.panel-num {
+.panel-num, .js-panel-num {
   margin: auto 12px auto;
   width: 55px;
   font-family: var(--relayMetropolisBold);
 }
 
 .current-panel,
-.panel-num {
+.panel-num, .js-panel-num {
   font-weight: 600;
   font-size: 17px;
   text-align: center;

@@ -44,6 +44,11 @@ function getEducationalStrings() {
       "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
       "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
       "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+    },
+    "testtest": {
+      "img": "/images/panel-images/email-domain-illustration.svg",
+      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     }
   };
 }
@@ -226,6 +231,46 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
+  //Educational Panel
+  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
+  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
+  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+  const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
+  const hidePreviousNav = premiumPanelWrapper.querySelector(".previous-panel");
+
+
+  const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
+  const educationalComponentStrings = educationStringsSelection;
+
+  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
+  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
+  educationalImgEl.src = educationalComponentStrings.img;
+  currentEducationalPanel.textContent = "1";
+  hidePreviousNav.classList.add("is-hidden");
+
+
+  const updateEducationPanel = async (announcementIndex) => {
+    
+    currentEducationalPanel.textContent = [`${announcementIndex}`];
+
+    if (announcementIndex === 1) {
+    const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
+    const educationalComponentStrings = educationStringsSelection;
+    attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
+    attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
+    educationalImgEl.src = educationalComponentStrings.img;
+    }
+
+    if (announcementIndex === 2) {
+      const updateEducationPanel = educationalStrings["testtest"];
+
+      attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
+      attachmentSizeLimitBody.textContent = updateEducationPanel.description;
+      educationalImgEl.src = updateEducationPanel.img;
+      console.log("switch");
+    }
+  }
+
   const updatePanel = async (numRemaining, panelId) => {
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
@@ -265,17 +310,17 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  //Educational Matrix
-  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const educationalModuleToShow = educationalStrings["educationalAttachmentSizeLimit"];
-  const educationalComponentStrings = educationalModuleToShow;
+  // //Educational Matrix
+  // const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
+  // const educationalModuleToShow = educationalStrings["educationalAttachmentSizeLimit"];
+  // const educationalComponentStrings = educationalModuleToShow;
 
-  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
-  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+  // const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
+  // const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
 
-  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
-  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
-  educationalImgEl.src = educationalComponentStrings.img;
+  // attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
+  // attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
+  // educationalImgEl.src = educationalComponentStrings.img;
 
 
 
@@ -303,6 +348,17 @@ async function showRelayPanel(tipPanelToShow) {
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
       return updatePanel(numRemaining, tipPanelToShow+=nextPanel);
+    });
+  });
+
+  document.querySelectorAll(".js-panel-nav").forEach(navBtn => {
+    navBtn.addEventListener("click", () => {
+      sendRelayEvent("Panel", "click", "panel-navigation-arrow");
+      // pointer events are disabled in popup CSS for the "previous" button on panel 1
+      // and the "next" button on panel 3
+      const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
+      updateEducationPanel(tipPanelToShow+=nextPanel);
+      console.log(nextPanel);
     });
   });
 
