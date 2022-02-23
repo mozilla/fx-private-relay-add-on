@@ -42,8 +42,8 @@ function getEducationalStrings() {
     },
     "educationalAttachmentSizeLimit": {
       "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
-      "headline": browser.i18n.getMessage("popupEmailsBlocked"),
-      "description": "Firefox Relay can now forward emails up to 25MB, including attachments.",
+      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     }
   };
 }
@@ -269,7 +269,14 @@ async function showRelayPanel(tipPanelToShow) {
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
   const educationalModuleToShow = educationalStrings["educationalAttachmentSizeLimit"];
   const educationalComponentStrings = educationalModuleToShow;
+
+  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
+  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+
+  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
+  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
   educationalImgEl.src = educationalComponentStrings.img;
+
 
 
   //Dashboard Data
