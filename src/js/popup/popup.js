@@ -1,19 +1,19 @@
 function getOnboardingPanels() {
   return {
     "panel1": {
-      "imgSrc": "tip1-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignUpPanelWelcome"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel1Body"),
+      "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
+      "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+      "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     },
     "panel2": {
-      "imgSrc": "tip2-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel2Headline"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel2Body"),
+      "imgSrc": "announcements/panel-announcement-critical-emails.svg",
+      "tipHeadline": browser.i18n.getMessage("popupCriticalEmailForwardingHeadline"),
+      "tipBody": browser.i18n.getMessage("popupCriticalEmailForwardingBody"),
     },
     "panel3": {
-      "imgSrc": "tip3-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel3Headline"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel3Body"),
+      "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
+      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "tipBody": browser.i18n.getMessage("popupSignBackInBody"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -39,6 +39,11 @@ function getEducationalStrings() {
       "img": "/images/panel-images/educational-matrix/educationalImg1.png",
       "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
       "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
+    },
+    "educationalAttachmentSizeLimit": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
+      "headline": browser.i18n.getMessage("popupEmailsBlocked"),
+      "description": "Firefox Relay can now forward emails up to 25MB, including attachments.",
     }
   };
 }
@@ -262,7 +267,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Educational Matrix
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const educationalModuleToShow = educationalStrings["educationalComponent1"];
+  const educationalModuleToShow = educationalStrings["educationalAttachmentSizeLimit"];
   const educationalComponentStrings = educationalModuleToShow;
   educationalImgEl.src = educationalComponentStrings.img;
 
