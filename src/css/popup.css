@@ -507,14 +507,22 @@ onboarding-panel {
   gap: 16px;
 }
 
+#educationalSignBackIn {
+  padding-top: 16px;
+}
+
+.education-body {
+  line-height: 120%;
+}
+
 #educationalAttachmentSizeLimit .previous-panel,
 #educationalSignBackIn .next-panel {
   opacity: 0;
   pointer-events: none;
 }
 
-#educationalSignBackIn .education-img{
-  width: 110px;
+#educationalSignBackIn .education-img {
+  width: 100px;
 }
 
 .education-img {
