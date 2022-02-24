@@ -252,7 +252,6 @@ async function showRelayPanel(tipPanelToShow) {
   currentEducationalPanel.textContent = `${tipPanelToShow}`;
   educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
 
-
   const updateEducationPanel = async (announcementIndex) => {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
 
@@ -275,7 +274,6 @@ async function showRelayPanel(tipPanelToShow) {
     attachmentSizeLimitBody.textContent = updateEducationPanel.description;
     educationalImgEl.src = updateEducationPanel.img;
     educationalModule.setAttribute("id", announcementType);
-    console.log(announcementType);
   }
 
   const updatePanel = async (numRemaining, panelId) => {

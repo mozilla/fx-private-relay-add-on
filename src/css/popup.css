@@ -620,7 +620,7 @@ onboarding-panel p {
 }
 
 .panel1 .previous-panel,
-.panel3 .next-panel, .educationalAttachmentSizeLimit .previous-panel  {
+.panel3 .next-panel {
   pointer-events: none;
   opacity: 0;
 }
