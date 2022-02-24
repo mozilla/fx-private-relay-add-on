@@ -259,28 +259,23 @@ async function showRelayPanel(tipPanelToShow) {
     currentEducationalPanel.textContent = [`${announcementIndex}`];
 
     if (announcementIndex === 1) {
-    const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
-    const educationalComponentStrings = educationStringsSelection;
-    attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
-    attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
-    educationalImgEl.src = educationalComponentStrings.img;
+    switchEducationPanel("educationalAttachmentSizeLimit")
     }
 
     if (announcementIndex === 2) {
-      const updateEducationPanel = educationalStrings["educationalCriticalEmails"];
-      attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
-      attachmentSizeLimitBody.textContent = updateEducationPanel.description;
-      educationalImgEl.src = updateEducationPanel.img;
-      console.log("switch");
+      switchEducationPanel("educationalCriticalEmails")
     }
 
     if (announcementIndex === 3) {
-      const updateEducationPanel = educationalStrings["educationalSignBackIn"];
-      attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
-      attachmentSizeLimitBody.textContent = updateEducationPanel.description;
-      educationalImgEl.src = updateEducationPanel.img;
-      console.log("switch");
+      switchEducationPanel("educationalSignBackIn")
     }
+  }
+
+  function switchEducationPanel(announcementType) {
+    const updateEducationPanel = educationalStrings[announcementType];
+    attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
+    attachmentSizeLimitBody.textContent = updateEducationPanel.description;
+    educationalImgEl.src = updateEducationPanel.img;
   }
 
   const updatePanel = async (numRemaining, panelId) => {
