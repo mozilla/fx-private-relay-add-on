@@ -237,37 +237,35 @@ async function showRelayPanel(tipPanelToShow) {
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
   //Educational Panel
+  const educationalModule = premiumPanelWrapper.querySelector(".educational-component");
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
   const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
   const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
-  const hidePreviousNav = premiumPanelWrapper.querySelector(".previous-panel");
 
-
+  //Load first announcement item
   const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
   const educationalComponentStrings = educationStringsSelection;
-
   attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
   attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
   educationalImgEl.src = educationalComponentStrings.img;
   currentEducationalPanel.textContent = "1";
-  hidePreviousNav.classList.add("is-hidden");
+  educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
 
 
   const updateEducationPanel = async (announcementIndex) => {
-    
     currentEducationalPanel.textContent = [`${announcementIndex}`];
 
     if (announcementIndex === 1) {
-    switchEducationPanel("educationalAttachmentSizeLimit")
+    switchEducationPanel("educationalAttachmentSizeLimit");
     }
 
     if (announcementIndex === 2) {
-      switchEducationPanel("educationalCriticalEmails")
+      switchEducationPanel("educationalCriticalEmails");
     }
 
     if (announcementIndex === 3) {
-      switchEducationPanel("educationalSignBackIn")
+      switchEducationPanel("educationalSignBackIn");
     }
   }
 
@@ -276,6 +274,8 @@ async function showRelayPanel(tipPanelToShow) {
     attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
     attachmentSizeLimitBody.textContent = updateEducationPanel.description;
     educationalImgEl.src = updateEducationPanel.img;
+    educationalModule.setAttribute("id", announcementType);
+    console.log(announcementType);
   }
 
   const updatePanel = async (numRemaining, panelId) => {
@@ -365,7 +365,6 @@ async function showRelayPanel(tipPanelToShow) {
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
       updateEducationPanel(tipPanelToShow+=nextPanel);
-      console.log(nextPanel);
     });
   });
 

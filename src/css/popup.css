@@ -502,9 +502,18 @@ onboarding-panel {
 .educational-component {
   display: flex;
   flex-direction: row;
-  padding-top: 32px;
+  padding-top: 24px;
   justify-content: space-between;
   gap: 16px;
+}
+
+#educationalAttachmentSizeLimit .previous-panel,
+#educationalSignBackIn .next-panel {
+  display: none;
+}
+
+#educationalSignBackIn .education-img{
+  width: 110px;
 }
 
 .education-img {
