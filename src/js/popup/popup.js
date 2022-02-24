@@ -256,7 +256,7 @@ async function showRelayPanel(tipPanelToShow) {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
 
     if (announcementIndex === 1) {
-    switchEducationPanel("educationalAttachmentSizeLimit");
+      switchEducationPanel("educationalAttachmentSizeLimit");
     }
 
     if (announcementIndex === 2) {
