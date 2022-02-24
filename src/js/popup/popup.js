@@ -45,10 +45,15 @@ function getEducationalStrings() {
       "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
       "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     },
-    "testtest": {
-      "img": "/images/panel-images/email-domain-illustration.svg",
-      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+    "educationalCriticalEmails": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
+      "headline": browser.i18n.getMessage("popupCriticalEmailForwardingHeadline"),
+      "description": browser.i18n.getMessage("popupCriticalEmailForwardingBody"),
+    },
+    "educationalSignBackIn": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
+      "headline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "description": browser.i18n.getMessage("popupSignBackInBody"),
     }
   };
 }
@@ -262,8 +267,15 @@ async function showRelayPanel(tipPanelToShow) {
     }
 
     if (announcementIndex === 2) {
-      const updateEducationPanel = educationalStrings["testtest"];
+      const updateEducationPanel = educationalStrings["educationalCriticalEmails"];
+      attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
+      attachmentSizeLimitBody.textContent = updateEducationPanel.description;
+      educationalImgEl.src = updateEducationPanel.img;
+      console.log("switch");
+    }
 
+    if (announcementIndex === 3) {
+      const updateEducationPanel = educationalStrings["educationalSignBackIn"];
       attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
       attachmentSizeLimitBody.textContent = updateEducationPanel.description;
       educationalImgEl.src = updateEducationPanel.img;
