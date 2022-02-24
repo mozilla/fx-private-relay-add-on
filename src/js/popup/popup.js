@@ -249,12 +249,12 @@ async function showRelayPanel(tipPanelToShow) {
   attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
   attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
   educationalImgEl.src = educationalComponentStrings.img;
-  currentEducationalPanel.textContent = "1";
+  currentEducationalPanel.textContent = `${tipPanelToShow}`;
   educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
 
 
   const updateEducationPanel = async (announcementIndex) => {
-    currentEducationalPanel.textContent = [`${announcementIndex}`];
+    currentEducationalPanel.textContent = [`${tipPanelToShow}`];
 
     if (announcementIndex === 1) {
     switchEducationPanel("educationalAttachmentSizeLimit");
@@ -316,20 +316,6 @@ async function showRelayPanel(tipPanelToShow) {
 
     return;
   };
-
-  // //Educational Matrix
-  // const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  // const educationalModuleToShow = educationalStrings["educationalAttachmentSizeLimit"];
-  // const educationalComponentStrings = educationalModuleToShow;
-
-  // const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
-  // const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
-
-  // attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
-  // attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
-  // educationalImgEl.src = educationalComponentStrings.img;
-
-
 
   //Dashboard Data
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
