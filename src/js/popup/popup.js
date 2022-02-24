@@ -1,19 +1,19 @@
 function getOnboardingPanels() {
   return {
     "panel1": {
-      "imgSrc": "tip1-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignUpPanelWelcome"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel1Body"),
+      "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
+      "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+      "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     },
     "panel2": {
-      "imgSrc": "tip2-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel2Headline"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel2Body"),
+      "imgSrc": "announcements/panel-announcement-critical-emails.svg",
+      "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
+      "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
     "panel3": {
-      "imgSrc": "tip3-icon.svg",
-      "tipHeadline": browser.i18n.getMessage("popupOnboardingPanel3Headline"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingPanel3Body"),
+      "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
+      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "tipBody": browser.i18n.getMessage("popupSignBackInBody"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -39,6 +39,21 @@ function getEducationalStrings() {
       "img": "/images/panel-images/educational-matrix/educationalImg1.png",
       "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
       "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
+    },
+    "educationalAttachmentSizeLimit": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
+      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+    },
+    "educationalCriticalEmails": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
+      "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
+      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody"),
+    },
+    "educationalSignBackIn": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
+      "headline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "description": browser.i18n.getMessage("popupSignBackInBody"),
     }
   };
 }
@@ -221,6 +236,46 @@ async function showRelayPanel(tipPanelToShow) {
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
+  //Educational Panel
+  const educationalModule = premiumPanelWrapper.querySelector(".educational-component");
+  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
+  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
+  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+  const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
+
+  //Load first announcement item
+  const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
+  const educationalComponentStrings = educationStringsSelection;
+  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
+  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
+  educationalImgEl.src = educationalComponentStrings.img;
+  currentEducationalPanel.textContent = `${tipPanelToShow}`;
+  educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
+
+  const updateEducationPanel = async (announcementIndex) => {
+    currentEducationalPanel.textContent = [`${tipPanelToShow}`];
+
+    if (announcementIndex === 1) {
+      switchEducationPanel("educationalAttachmentSizeLimit");
+    }
+
+    if (announcementIndex === 2) {
+      switchEducationPanel("educationalCriticalEmails");
+    }
+
+    if (announcementIndex === 3) {
+      switchEducationPanel("educationalSignBackIn");
+    }
+  }
+
+  function switchEducationPanel(announcementType) {
+    const updateEducationPanel = educationalStrings[announcementType];
+    attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
+    attachmentSizeLimitBody.textContent = updateEducationPanel.description;
+    educationalImgEl.src = updateEducationPanel.img;
+    educationalModule.setAttribute("id", announcementType);
+  }
+
   const updatePanel = async (numRemaining, panelId) => {
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
@@ -260,13 +315,6 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  //Educational Matrix
-  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const educationalModuleToShow = educationalStrings["educationalComponent1"];
-  const educationalComponentStrings = educationalModuleToShow;
-  educationalImgEl.src = educationalComponentStrings.img;
-
-
   //Dashboard Data
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
@@ -291,6 +339,16 @@ async function showRelayPanel(tipPanelToShow) {
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
       return updatePanel(numRemaining, tipPanelToShow+=nextPanel);
+    });
+  });
+
+  document.querySelectorAll(".js-panel-nav").forEach(navBtn => {
+    navBtn.addEventListener("click", () => {
+      sendRelayEvent("Panel", "click", "panel-navigation-arrow");
+      // pointer events are disabled in popup CSS for the "previous" button on panel 1
+      // and the "next" button on panel 3
+      const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
+      updateEducationPanel(tipPanelToShow+=nextPanel);
     });
   });
 
