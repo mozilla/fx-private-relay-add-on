@@ -509,7 +509,8 @@ onboarding-panel {
 
 #educationalAttachmentSizeLimit .previous-panel,
 #educationalSignBackIn .next-panel {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #educationalSignBackIn .education-img{
