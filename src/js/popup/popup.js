@@ -220,6 +220,14 @@ async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelStrings = getOnboardingPanels();
   const educationalStrings = getEducationalStrings();
 
+  if (!browser.menus) {
+    // Remove sign back in for browsers that don't support menus API (Chrome)
+    delete onboardingPanelStrings.panel3;
+    document.querySelectorAll(".total-panels").forEach(panel => {
+      panel.textContent = 2;
+    });
+  }
+
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
@@ -257,10 +265,17 @@ async function showRelayPanel(tipPanelToShow) {
 
     if (announcementIndex === 1) {
       switchEducationPanel("educationalAttachmentSizeLimit");
+      educationalModule.classList.remove("is-last-panel");
     }
 
     if (announcementIndex === 2) {
       switchEducationPanel("educationalCriticalEmails");
+
+      if (!browser.menus) {
+        // Override class for Chrome browsers to not display sign-back in
+        educationalModule.classList.add("is-last-panel");
+      }
+
     }
 
     if (announcementIndex === 3) {
@@ -279,6 +294,13 @@ async function showRelayPanel(tipPanelToShow) {
   const updatePanel = async (numRemaining, panelId) => {
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
+
+    
+    // Override class for Chrome browsers to not display sign-back in
+    if (!browser.menus && (panelId === 2)){
+      onboardingPanelWrapper.classList.add("is-last-panel")
+    }
+    
     const panelStrings = onboardingPanelStrings[`${panelToShow}`];
 
     if (!panelStrings) {

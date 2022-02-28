@@ -515,6 +515,7 @@ onboarding-panel {
   line-height: 120%;
 }
 
+.is-last-panel .next-panel,
 #educationalAttachmentSizeLimit .previous-panel,
 #educationalSignBackIn .next-panel {
   opacity: 0;
