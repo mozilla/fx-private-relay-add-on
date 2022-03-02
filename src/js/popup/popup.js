@@ -251,19 +251,19 @@ async function showRelayPanel(tipPanelToShow) {
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
 
   //Load first announcement item
-  const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
+  const educationStringsSelection = educationalStrings["educationalCriticalEmails"];
   const educationalComponentStrings = educationStringsSelection;
   attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
   attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
   educationalImgEl.src = educationalComponentStrings.img;
   currentEducationalPanel.textContent = `${tipPanelToShow}`;
-  educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
+  educationalModule.setAttribute("id", "educationalCriticalEmails");
 
   const updateEducationPanel = async (announcementIndex) => {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
 
     if (announcementIndex === 1) {
-      switchEducationPanel("educationalAttachmentSizeLimit");
+      switchEducationPanel("educationalCriticalEmails");
       // educationalModule.classList.remove("is-last-panel");
 
       if (!browser.menus) {
@@ -273,14 +273,14 @@ async function showRelayPanel(tipPanelToShow) {
     }
 
     if (announcementIndex === 2) {
-      switchEducationPanel("educationalCriticalEmails");
-
-
-    }
-
-    if (announcementIndex === 3) {
       switchEducationPanel("educationalSignBackIn");
+
+
     }
+
+    // if (announcementIndex === 3) {
+    //   switchEducationPanel("educationalSignBackIn");
+    // }
   }
 
   function switchEducationPanel(announcementType) {
