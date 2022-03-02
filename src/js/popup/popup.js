@@ -1,16 +1,11 @@
 function getOnboardingPanels() {
   return {
     "panel1": {
-      "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
-      "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-      "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-    },
-    "panel2": {
       "imgSrc": "announcements/panel-announcement-critical-emails.svg",
       "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
       "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
-    "panel3": {
+    "panel2": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
       "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
       "tipBody": browser.i18n.getMessage("popupSignBackInBody"),
@@ -217,15 +212,21 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
+  const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
   const onboardingPanelStrings = getOnboardingPanels();
   const educationalStrings = getEducationalStrings();
 
+  document.querySelectorAll(".total-panels").forEach(panel => {
+    panel.textContent = 2;
+  });
+
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
-    delete onboardingPanelStrings.panel3;
-    document.querySelectorAll(".total-panels").forEach(panel => {
-      panel.textContent = 2;
-    });
+    delete onboardingPanelStrings.panel2;
+    panelPagination.classList.add("is-hidden");
+    // document.querySelectorAll(".total-panels").forEach(panel => {
+    //   panel.textContent = 1;
+    // });
   }
 
   //Premium Panel
@@ -250,37 +251,41 @@ async function showRelayPanel(tipPanelToShow) {
   const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
   const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
+  const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
 
   //Load first announcement item
-  const educationStringsSelection = educationalStrings["educationalAttachmentSizeLimit"];
+  const educationStringsSelection = educationalStrings["educationalCriticalEmails"];
   const educationalComponentStrings = educationStringsSelection;
   attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
   attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
   educationalImgEl.src = educationalComponentStrings.img;
   currentEducationalPanel.textContent = `${tipPanelToShow}`;
-  educationalModule.setAttribute("id", "educationalAttachmentSizeLimit");
+  educationalModule.setAttribute("id", "educationalCriticalEmails");
+  
+  if (!browser.menus) {
+    panelPremiumPagination.classList.add("hidden");
+  }
 
   const updateEducationPanel = async (announcementIndex) => {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
-
     if (announcementIndex === 1) {
-      switchEducationPanel("educationalAttachmentSizeLimit");
-      educationalModule.classList.remove("is-last-panel");
-    }
-
-    if (announcementIndex === 2) {
       switchEducationPanel("educationalCriticalEmails");
+      // educationalModule.classList.remove("is-last-panel");
 
       if (!browser.menus) {
         // Override class for Chrome browsers to not display sign-back in
         educationalModule.classList.add("is-last-panel");
       }
-
     }
 
-    if (announcementIndex === 3) {
+    if (announcementIndex === 2) {
       switchEducationPanel("educationalSignBackIn");
+
     }
+
+    // if (announcementIndex === 3) {
+    //   switchEducationPanel("educationalSignBackIn");
+    // }
   }
 
   function switchEducationPanel(announcementType) {

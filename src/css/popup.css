@@ -516,7 +516,7 @@ onboarding-panel {
 }
 
 .is-last-panel .next-panel,
-#educationalAttachmentSizeLimit .previous-panel,
+#educationalCriticalEmails .previous-panel,
 #educationalSignBackIn .next-panel {
   opacity: 0;
   pointer-events: none;
@@ -630,7 +630,7 @@ onboarding-panel p {
 }
 
 .panel1 .previous-panel,
-.panel3 .next-panel {
+.panel2 .next-panel {
   pointer-events: none;
   opacity: 0;
 }
