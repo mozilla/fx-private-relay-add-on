@@ -1,16 +1,11 @@
 function getOnboardingPanels() {
   return {
     "panel1": {
-      "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
-      "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-      "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-    },
-    "panel2": {
       "imgSrc": "announcements/panel-announcement-critical-emails.svg",
       "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
       "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
-    "panel3": {
+    "panel2": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
       "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
       "tipBody": browser.i18n.getMessage("popupSignBackInBody"),
@@ -220,11 +215,15 @@ async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelStrings = getOnboardingPanels();
   const educationalStrings = getEducationalStrings();
 
+  document.querySelectorAll(".total-panels").forEach(panel => {
+    panel.textContent = 2;
+  });
+
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
-    delete onboardingPanelStrings.panel3;
+    delete onboardingPanelStrings.panel2;
     document.querySelectorAll(".total-panels").forEach(panel => {
-      panel.textContent = 2;
+      panel.textContent = 1;
     });
   }
 
@@ -265,16 +264,17 @@ async function showRelayPanel(tipPanelToShow) {
 
     if (announcementIndex === 1) {
       switchEducationPanel("educationalAttachmentSizeLimit");
-      educationalModule.classList.remove("is-last-panel");
-    }
-
-    if (announcementIndex === 2) {
-      switchEducationPanel("educationalCriticalEmails");
+      // educationalModule.classList.remove("is-last-panel");
 
       if (!browser.menus) {
         // Override class for Chrome browsers to not display sign-back in
         educationalModule.classList.add("is-last-panel");
       }
+    }
+
+    if (announcementIndex === 2) {
+      switchEducationPanel("educationalCriticalEmails");
+
 
     }
 
