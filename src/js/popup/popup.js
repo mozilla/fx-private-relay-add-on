@@ -212,6 +212,7 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
+  const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
   const onboardingPanelStrings = getOnboardingPanels();
   const educationalStrings = getEducationalStrings();
 
@@ -222,9 +223,10 @@ async function showRelayPanel(tipPanelToShow) {
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
     delete onboardingPanelStrings.panel2;
-    document.querySelectorAll(".total-panels").forEach(panel => {
-      panel.textContent = 1;
-    });
+    panelPagination.classList.add("is-hidden");
+    // document.querySelectorAll(".total-panels").forEach(panel => {
+    //   panel.textContent = 1;
+    // });
   }
 
   //Premium Panel
