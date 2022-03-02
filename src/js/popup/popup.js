@@ -251,6 +251,7 @@ async function showRelayPanel(tipPanelToShow) {
   const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
   const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
+  const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
 
   //Load first announcement item
   const educationStringsSelection = educationalStrings["educationalCriticalEmails"];
@@ -260,10 +261,11 @@ async function showRelayPanel(tipPanelToShow) {
   educationalImgEl.src = educationalComponentStrings.img;
   currentEducationalPanel.textContent = `${tipPanelToShow}`;
   educationalModule.setAttribute("id", "educationalCriticalEmails");
+  panelPremiumPagination.classList.add("hidden");
+
 
   const updateEducationPanel = async (announcementIndex) => {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
-
     if (announcementIndex === 1) {
       switchEducationPanel("educationalCriticalEmails");
       // educationalModule.classList.remove("is-last-panel");
@@ -276,7 +278,6 @@ async function showRelayPanel(tipPanelToShow) {
 
     if (announcementIndex === 2) {
       switchEducationPanel("educationalSignBackIn");
-
 
     }
 
