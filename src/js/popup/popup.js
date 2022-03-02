@@ -261,8 +261,10 @@ async function showRelayPanel(tipPanelToShow) {
   educationalImgEl.src = educationalComponentStrings.img;
   currentEducationalPanel.textContent = `${tipPanelToShow}`;
   educationalModule.setAttribute("id", "educationalCriticalEmails");
-  panelPremiumPagination.classList.add("hidden");
-
+  
+  if (!browser.menus) {
+    panelPremiumPagination.classList.add("hidden");
+  }
 
   const updateEducationPanel = async (announcementIndex) => {
     currentEducationalPanel.textContent = [`${tipPanelToShow}`];
