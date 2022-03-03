@@ -76,6 +76,9 @@ jobs:
           git diff
           echo ::set-output name=version::$(echo $VERSION)
 
+      - name: "Package Chrome version of add-on for stage site"
+        run: npm run package:chrome
+
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
 
@@ -97,8 +100,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: fx-private-relay-stage-chromium
-          path: src/
+          name: fx-private-relay-stage-chromium.zip
+          path: web-ext-artifacts/chrome_relay-${{ steps.version.outputs.version }}.zip
 
       - name: Mark GitHub Deployment as successful
         uses: actions/github-script@v5
