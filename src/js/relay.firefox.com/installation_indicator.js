@@ -7,11 +7,9 @@
   document.querySelectorAll("firefox-private-relay-addon").forEach(async (el) => {
     el.dataset.addonInstalled = "true";
 
-    // In the server-rendered version of the website, the add-on would store alias labels
-    // locally if server-side storage was disabled.
-    // In the React version of the website, the website handles local storage itself.
-    // However, to allow for seamless migration, this injects the labels stored in the add-on
-    // into the website, so that it can copy those into its own storage.
+    // If server-side storage of label data is disabled, they can still be
+    // stored locally by the add-on. Here, we inject those into the website,
+    // so that it can display them in the label editor:
     const localRandomAliasCache = (await browser.storage.local.get("relayAddresses")).relayAddresses;
     if (Array.isArray(localRandomAliasCache)) {
       const localLabels = localRandomAliasCache
@@ -20,6 +18,7 @@
           type: "random",
           id: Number.parseInt(address.id, 10),
           description: address.description,
+          generated_for: address.generated_for,
           address: address.address,
         })
       );

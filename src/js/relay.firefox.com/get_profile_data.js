@@ -228,9 +228,6 @@
       //   method: "displayBrowserActionBadge",
       // });
 
-      const { relayAddresses } = await browser.storage.local.get(
-        "relayAddresses"
-      );
       // Scrape data from /accounts/profile/ page
       for (const aliasCard of dashboardRelayAliasCards) {
         // Add the description (previoulsy domain) note from the addon storage to the page
@@ -441,6 +438,12 @@
         localStorageRelayAddresses.push(relayAddress);
       }
 
+      const { relayAddresses: existingLocalStorageRelayAddresses } = await browser.storage.local.get(
+        "relayAddresses"
+      );
+      if (localStorageRelayAddresses.length === 0) {
+        localStorageRelayAddresses.push(...existingLocalStorageRelayAddresses);
+      }
       if (localStorageRelayAddresses.length === 0) {
         // If we weren't able to scrape alias data from the page, that means
         // the React version of the website (with a different DOM structure)
@@ -452,6 +455,26 @@
       }
       browser.storage.local.set({ relayAddresses: localStorageRelayAddresses });
     }
+
+    document.querySelector(
+      "firefox-private-relay-addon"
+    ).addEventListener("website", async (event) => {
+      if (event.detail.type === "labelUpdate") {
+        const existingAddresses = (await browser.storage.local.get("relayAddresses")).relayAddresses;
+        const update = event.detail;
+        const oldAddress = existingAddresses.find(existingAddress =>
+          existingAddress.id === update.alias.id &&
+          existingAddress.address === update.alias.address &&
+          existingAddress.domain === update.alias.domain
+        );
+        const newAddresses = existingAddresses.filter(existingAddress => existingAddress !== oldAddress);
+        newAddresses.push({
+          ...oldAddress,
+          description: update.newLabel,
+        });
+        await browser.storage.local.set({ relayAddresses: newAddresses });
+      }
+    });
 
     await browser.runtime.sendMessage({
       method: "rebuildContextMenuUpgrade",
