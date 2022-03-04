@@ -20,6 +20,7 @@
           type: "random",
           id: Number.parseInt(address.id, 10),
           description: address.description,
+          generated_for: address.generated_for,
           address: address.address,
         })
       );
