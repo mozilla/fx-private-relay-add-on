@@ -100,9 +100,16 @@
         : addonStorageRelayAddresses;
 
     // Check if user is premium
+    // Note: for the non-React website, we would look at the DOM for the
+    //       `is-premium` class. Starting with the React-based website, the
+    //       Premium status is explicitly communicated with the add-on via a
+    //       data property. In other words: if the website is in React when you
+    //       encounter this, the first leg of the `||` can be removed.
     const isPremiumUser = document
       .querySelector("body")
-      .classList.contains("is-premium");
+      .classList.contains("is-premium") || document.querySelector(
+        "firefox-private-relay-addon-data"
+      ).dataset.hasPremium === "true";
     browser.storage.local.set({ premium: isPremiumUser });
 
     // Loop over the addresses on the page
