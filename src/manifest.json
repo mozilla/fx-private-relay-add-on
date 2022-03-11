@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Firefox Relay",
-  "version": "2.3.0",
+  "version": "2.3.1",
 
   "description": "__MSG_extensionDescription_v1__",
 
