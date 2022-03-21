@@ -30,11 +30,11 @@ function positionRelayMenu() {
   relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
 }
 
-let activeElemIndex = -1;
+// let activeElemIndex = -1;
 function handleKeydownEvents(e) {
   // TODO: Migrate to iframe
   // const clickableElsInMenu = relayInPageMenu.querySelectorAll("button, a");
-  const relayButton = document.querySelector(".fx-relay-button");
+  const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe iframe");
   const watchedKeys = ["Escape", "ArrowDown", "ArrowUp", "Tab"];
   const watchedKeyClicked = watchedKeys.includes(e.key);
 
@@ -45,12 +45,12 @@ function handleKeydownEvents(e) {
 
   if (e.key === "ArrowDown" || (e.key === "Tab" && e.shiftKey === false)) {
     preventDefaultBehavior(e);
-    activeElemIndex += 1;
+    // activeElemIndex += 1;
   }
 
   if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey === true)) {
     preventDefaultBehavior(e);
-    activeElemIndex -= 1;
+    // activeElemIndex -= 1;
   }
 
   // TODO: Migrate to iframe
@@ -60,7 +60,7 @@ function handleKeydownEvents(e) {
 
   if (watchedKeyClicked) {
     activeElemIndex = -1;
-    relayButton.focus();
+    relayInPageMenu.contentWindow.focus();
   }
 }
 
@@ -244,7 +244,7 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
     relayIconBtn?.classList.add("user-generated-relay");
-    closeRelayInPageMenu();
+    return closeRelayInPageMenu();
   }
 });
 
