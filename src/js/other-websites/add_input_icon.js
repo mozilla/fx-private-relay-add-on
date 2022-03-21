@@ -1,3 +1,5 @@
+/* global restrictOrRestorePageTabbing */
+
 function closeRelayInPageMenu() {
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
   relayIconBtn?.classList.remove("fx-relay-menu-open");
@@ -60,17 +62,6 @@ function handleKeydownEvents(e) {
     activeElemIndex = -1;
     relayButton.focus();
   }
-}
-
-// When restricting tabbing to Relay menu... tabIndexValue = -1
-// When restoring tabbing to page elements... tabIndexValue = 0
-function restrictOrRestorePageTabbing(tabIndexValue) {
-  const allClickableEls = document.querySelectorAll(
-    "button, a, input, select, option, textarea, [tabindex]"
-  );
-  allClickableEls.forEach((el) => {
-    el.tabIndex = tabIndexValue;
-  });
 }
 
 function createElementWithClassList(elemType, elemClass) {
