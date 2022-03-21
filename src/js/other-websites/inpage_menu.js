@@ -1,3 +1,5 @@
+/* global restrictOrRestorePageTabbing */
+
 function iframeCloseRelayInPageMenu() {
   // TODO: SEND MESSAGE TO CLOSE IFRAME
   // console.log("iframeCloseRelayInPageMenu");
@@ -22,17 +24,6 @@ function handleKeydownEvents(e) {
   if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
     return clickableElsInMenu[activeElemIndex].focus();
   }
-}
-
-// When restricting tabbing to Relay menu... tabIndexValue = -1
-// When restoring tabbing to page elements... tabIndexValue = 0
-function restrictOrRestorePageTabbing(tabIndexValue) {
-  const allClickableEls = document.querySelectorAll(
-    "button, a, input, select, option, textarea, [tabindex]"
-  );
-  allClickableEls.forEach((el) => {
-    el.tabIndex = tabIndexValue;
-  });
 }
 
 function createElementWithClassList(elemType, elemClass) {
