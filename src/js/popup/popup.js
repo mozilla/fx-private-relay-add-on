@@ -7,7 +7,7 @@ function getOnboardingPanels() {
     },
     "panel2": {
       "imgSrc": "announcements/panel-announcement-critical-emails.svg",
-      "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
+      "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
       "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
     "panel3": {
@@ -47,7 +47,7 @@ function getEducationalStrings() {
     },
     "educationalCriticalEmails": {
       "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
-      "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline"),
+      "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
       "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody"),
     },
     "educationalSignBackIn": {
