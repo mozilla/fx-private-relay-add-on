@@ -173,10 +173,15 @@ async function inpageContentInit() {
   relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
   relayMenuDashboardLink.addEventListener("click", () => {
     sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
+    iframeCloseRelayInPageMenu();
   });
 
   // Create "Get unlimited aliases" link
   getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
+  getUnlimitedAliasesBtn.addEventListener("click", () => {
+    sendInPageEvent("click", "input-menu-get-premium-btn");
+    iframeCloseRelayInPageMenu();
+  });
 
   if (!premium) {
     if (maxNumAliasesReached) {

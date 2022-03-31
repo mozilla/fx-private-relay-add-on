@@ -88,6 +88,8 @@ async function showModal(modalType) {
 // eslint-disable-next-line no-redeclare
 function fillInputWithAlias(emailInput, relayAlias) {
   // BUG: Duplicate fillInputWithAlias calls without proper input content
+  // The relayAlias/emailInput arguments check below is a work-around to let the duplicate call(s) fail silently. 
+  // To debug, check all instances where fillInputWithAlias() is being called and isolate it. 
   if (!emailInput || !relayAlias) {
     return false;
   }
