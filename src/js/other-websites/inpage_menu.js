@@ -9,7 +9,7 @@ function getRelayMenuEl() {
   return document.querySelector(".fx-relay-menu");
 }
 
-let activeElemIndex = -1;
+let activeElemIndex = 0;
 function handleKeydownEvents(e) {
   const relayInPageMenu = getRelayMenuEl();
   const clickableElsInMenu = relayInPageMenu.querySelectorAll("button, a");
@@ -100,6 +100,10 @@ async function inpageContentInit() {
     });
 
     sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
+
+    // Focus on "Go to Firefox Relay" button
+    signUpButton.focus();
+
     return;
   }
 
@@ -112,8 +116,6 @@ async function inpageContentInit() {
   const generateAliasBtn = document.querySelector(
     ".fx-relay-menu-generate-alias-btn"
   );
-
-  // generateAliasBtn.tabIndex = 0;
 
   generateAliasBtn.textContent = browser.i18n.getMessage(
     "pageInputIconGenerateNewAlias"
@@ -176,9 +178,6 @@ async function inpageContentInit() {
   // Create "Get unlimited aliases" link
   getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
 
-  // Focus on newly opened iframe
-  generateAliasBtn.focus()
-
   if (!premium) {
     if (maxNumAliasesReached) {
       generateAliasBtn.remove();
@@ -187,8 +186,15 @@ async function inpageContentInit() {
         "pageFillRelayAddressLimit",
         [numAliasesRemaining, maxNumAliases]
       );
+      // Focus on "Get unlimited alias" button
+      getUnlimitedAliasesBtn.focus();
+    } else {
+      // Focus on "Generate New Alias" button
+      generateAliasBtn.focus();
     }
   } else {
+    // Focus on "Generate New Alias" button
+    generateAliasBtn.focus();
     getUnlimitedAliasesBtn.remove();
   }
 
