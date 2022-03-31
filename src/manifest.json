@@ -15,7 +15,7 @@
   "browser_specific_settings": {
       "gecko": {
           "id": "private-relay@firefox.com",
-          "strict_min_version": "63.0"
+          "strict_min_version": "74.0"
       }
   },
 
@@ -87,7 +87,8 @@
     "icons/*.svg",
     "icons/*.png",
     "fonts/Inter/*.woff2",
-    "fonts/Metropolis/*.woff2"
+    "fonts/Metropolis/*.woff2",
+    "*.html"
   ]
 
 }

@@ -73,6 +73,15 @@ async function storePremiumAvailabilityInCountry() {
   })
 }
 
+async function getCurrentPage() {
+  const [currentTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+
+  return currentTab;
+}
+
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
@@ -280,38 +289,49 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m) => {
+browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
   let response;
 
   switch (m.method) {
+    case "displayBrowserActionBadge":
+      await displayBrowserActionBadge();
+      break;
+    case "iframeCloseRelayInPageMenu":
+      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+      break;
+    case "fillInputWithAlias":
+      browser.tabs.sendMessage(sender.tab.id, m.message);
+      break;
+    case "getServerStoragePref":
+      response = await getServerStoragePref();
+      break;
+    case "getCurrentPageHostname":
+      const currentPage = await getCurrentPage();
+      const url = new URL(currentPage.url);
+      response = url.hostname;
+      break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
-      break;
-    case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
       break;
     case "openRelayHomepage":
       browser.tabs.create({
         url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
       });
       break;
-    case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
     case "rebuildContextMenuUpgrade":
       await relayContextMenus.init();
-      break;
-    case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
-      break;
-    case "getServerStoragePref":
-      response = await getServerStoragePref();
       break;
     case "refreshAccountPages":
       await refreshAccountPages();
       break;
+    case "sendMetricsEvent":
+      response = await sendMetricsEvent(m.eventData);
+      break;
     case "updateAddOnAuthStatus":
       await updateAddOnAuthStatus(m.status);
+      break;
+    case "updateInputIconPref":
+      browser.storage.local.set({ showInputIcons: m.iconPref });
       break;
   }
   return response;
