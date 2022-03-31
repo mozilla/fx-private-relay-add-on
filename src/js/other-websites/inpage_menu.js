@@ -1,8 +1,6 @@
-/* global restrictOrRestorePageTabbing */
-
 function iframeCloseRelayInPageMenu() {
-  // TODO: SEND MESSAGE TO CLOSE IFRAME
-  // console.log("iframeCloseRelayInPageMenu");
+  document.removeEventListener("keydown", handleKeydownEvents);
+  browser.runtime.sendMessage({method:"iframeCloseRelayInPageMenu"});
 }
 
 function preventDefaultBehavior(clickEvt) {
@@ -16,13 +14,40 @@ function getRelayMenuEl() {
   return document.querySelector(".fx-relay-menu");
 }
 
-// let activeElemIndex = -1;
+let activeElemIndex = -1;
 function handleKeydownEvents(e) {
   const relayInPageMenu = getRelayMenuEl();
   const clickableElsInMenu = relayInPageMenu.querySelectorAll("button, a");
+  const watchedKeys = ["Escape", "ArrowDown", "ArrowUp"];
+  const watchedKeyClicked = watchedKeys.includes(e.key);
+
+  if (e.key === "ArrowDown") {
+    preventDefaultBehavior(e);
+    activeElemIndex += 1;
+  }
+
+  if (e.key === "ArrowUp") {
+    preventDefaultBehavior(e);
+    activeElemIndex -= 1;
+  }
+
+  if (e.key === "Escape") {
+    preventDefaultBehavior(e);
+    iframeCloseRelayInPageMenu();
+  }
 
   if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
     return clickableElsInMenu[activeElemIndex].focus();
+  }
+
+  // Limit the lower bounds of the active element tab index (Don't go below 0)
+  if (activeElemIndex <= 0) {
+    activeElemIndex = 0;
+  }
+
+  // Limit the upper bounds of the active element tab index (Don't go below however many tab-able elements there are)
+  if (activeElemIndex >= clickableElsInMenu.length) {
+    activeElemIndex = (clickableElsInMenu.length - 1);
   }
 }
 
@@ -50,13 +75,15 @@ async function inpageContentInit() {
   await setCustomFonts();
 
   const signedInUser = await isUserSignedIn();
-
   const signedOutContent = document.querySelector(".fx-content-signed-out");
   const signedInContent = document.querySelector(".fx-content-signed-in");
 
+  document.addEventListener("keydown", handleKeydownEvents);
+
   if (!signedInUser) {
     signedOutContent.classList.remove("is-hidden");
-    signedInContent.classList.add("is-hidden");
+    // Remove signed in content from DOM so there are no hidden/screen readable-elements available
+    signedInContent.remove();
 
     const signUpMessageEl = document.querySelector(
       ".fx-relay-menu-sign-up-message"
@@ -87,12 +114,17 @@ async function inpageContentInit() {
     return;
   }
 
+  // Remove signed out content from DOM so there are no hidden/screen readable-elements available
+  signedOutContent.remove();
+
   sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
   
   // Create "Generate Relay Address" button
   const generateAliasBtn = document.querySelector(
     ".fx-relay-menu-generate-alias-btn"
   );
+
+  // generateAliasBtn.tabIndex = 0;
 
   generateAliasBtn.textContent = browser.i18n.getMessage(
     "pageInputIconGenerateNewAlias"
@@ -155,8 +187,8 @@ async function inpageContentInit() {
   // Create "Get unlimited aliases" link
   getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
 
-  // Restrict tabbing to relay menu elements
-  restrictOrRestorePageTabbing(-1);
+  // Focus on newly opened iframe
+  generateAliasBtn.focus()
 
   if (!premium) {
     if (maxNumAliasesReached) {

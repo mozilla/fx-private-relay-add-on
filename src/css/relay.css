@@ -293,6 +293,10 @@ button.fx-relay-menu-generate-alias-btn {
   margin-top: 4px;
 }
 
+button.fx-relay-menu-generate-alias-btn:focus-visible, button.fx-relay-menu-generate-alias-btn:focus {
+  outline: 5px solid rgba(0, 96, 223, .44);
+}
+
 .fx-relay-menu-get-unlimited-aliases {
   border: 2px solid var(--relayBlue3);
   width: 100%;

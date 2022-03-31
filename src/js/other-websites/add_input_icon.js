@@ -1,12 +1,8 @@
-/* global restrictOrRestorePageTabbing */
-
 function closeRelayInPageMenu() {
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
   relayIconBtn?.classList.remove("fx-relay-menu-open");
   const openMenuEl = document.querySelector(".fx-relay-menu-wrapper");
   openMenuEl?.remove();
-  restrictOrRestorePageTabbing(0);
-  document.removeEventListener("keydown", handleKeydownEvents);
   window.removeEventListener("resize", positionRelayMenu);
   window.removeEventListener("scroll", positionRelayMenu);
   return;
@@ -18,7 +14,10 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
 
   // Position menu according to the input icon's position
   positionRelayMenu();
-  relayIconBtn.focus();
+
+  const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
+  relayInPageMenuIframe.ariaHidden = "false"
+  relayInPageMenuIframe.focus();
   return;
 }
 
@@ -28,40 +27,6 @@ function positionRelayMenu() {
   const newIconPosition = relayIconBtn.getBoundingClientRect();
   relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
   relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
-}
-
-// let activeElemIndex = -1;
-function handleKeydownEvents(e) {
-  // TODO: Migrate to iframe
-  // const clickableElsInMenu = relayInPageMenu.querySelectorAll("button, a");
-  const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe iframe");
-  const watchedKeys = ["Escape", "ArrowDown", "ArrowUp", "Tab"];
-  const watchedKeyClicked = watchedKeys.includes(e.key);
-
-  if (e.key === "Escape") {
-    preventDefaultBehavior(e);
-    return closeRelayInPageMenu();
-  }
-
-  if (e.key === "ArrowDown" || (e.key === "Tab" && e.shiftKey === false)) {
-    preventDefaultBehavior(e);
-    // activeElemIndex += 1;
-  }
-
-  if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey === true)) {
-    preventDefaultBehavior(e);
-    // activeElemIndex -= 1;
-  }
-
-  // TODO: Migrate to iframe
-  // if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
-  //   return clickableElsInMenu[activeElemIndex].focus();
-  // }
-
-  if (watchedKeyClicked) {
-    activeElemIndex = -1;
-    relayInPageMenu.contentWindow.focus();
-  }
 }
 
 function createElementWithClassList(elemType, elemClass) {
@@ -84,15 +49,15 @@ function buildInpageIframe(opts) {
   iframe.src = browser.runtime.getURL("inpage-panel.html");
   iframe.width = 300;
   iframe.height = 205;
+  iframe.title = browser.i18n.getMessage("pageInputTitle");
+  iframe.tabIndex = 0;
+  iframe.ariaHidden = "false";
+  
 
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
     iframe.height = 150;
   }
-
-  iframe.dataset.something = "test";
-  // iframe.sandbox = ["allow-scripts"];
-  // iframe.scrolling = "no";
 
   div.appendChild(iframe);
   
@@ -189,7 +154,6 @@ async function addRelayIconToInput(emailInput) {
   };
 
   relayIconBtn.addEventListener("click", async (e) => {
-    
     if (!e.isTrusted) {
       // The click was not user generated so ignore
       return false;
@@ -201,7 +165,6 @@ async function addRelayIconToInput(emailInput) {
     preventDefaultBehavior(e);
     window.addEventListener("resize", positionRelayMenu);
     window.addEventListener("scroll", positionRelayMenu);
-    document.addEventListener("keydown", handleKeydownEvents);
 
     const signedInUser = await isUserSignedIn();
 
@@ -232,6 +195,7 @@ async function addRelayIconToInput(emailInput) {
 
     sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
     addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
+
   });
 
   divEl.appendChild(relayIconBtn);
@@ -240,12 +204,17 @@ async function addRelayIconToInput(emailInput) {
 }
 
 browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
-  if (m.filter = "fillInputWithAlias") {
+  if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
     relayIconBtn?.classList.add("user-generated-relay");
     return closeRelayInPageMenu();
   }
+
+  // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
+  if (m = "iframeCloseRelayInPageMenu") {
+      return closeRelayInPageMenu();
+  }  
 });
 
 browser.runtime.sendMessage({method:"fillInputWithAliasParentPage"});

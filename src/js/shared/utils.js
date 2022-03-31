@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior restrictOrRestorePageTabbing */
+/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -37,15 +37,4 @@ function preventDefaultBehavior(clickEvt) {
   clickEvt.stopImmediatePropagation();
   clickEvt.preventDefault();
   return;
-}
-
-// When restricting tabbing to Relay menu... tabIndexValue = -1
-// When restoring tabbing to page elements... tabIndexValue = 0
-function restrictOrRestorePageTabbing(tabIndexValue) {
-  const allClickableEls = document.querySelectorAll(
-    "button, a, input, select, option, textarea, [tabindex]"
-  );
-  allClickableEls.forEach((el) => {
-    el.tabIndex = tabIndexValue;
-  });
 }

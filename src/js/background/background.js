@@ -297,6 +297,9 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
     case "displayBrowserActionBadge":
       await displayBrowserActionBadge();
       break;
+    case "iframeCloseRelayInPageMenu":
+      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+      break;
     case "fillInputWithAliasParentPage":
       tab2id = sender.tab.id;
       break;
