@@ -1,13 +1,8 @@
+/* global preventDefaultBehavior */
+
 function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
   browser.runtime.sendMessage({method:"iframeCloseRelayInPageMenu"});
-}
-
-function preventDefaultBehavior(clickEvt) {
-  clickEvt.stopPropagation();
-  clickEvt.stopImmediatePropagation();
-  clickEvt.preventDefault();
-  return;
 }
 
 function getRelayMenuEl() {
@@ -49,12 +44,6 @@ function handleKeydownEvents(e) {
   if (activeElemIndex >= clickableElsInMenu.length) {
     activeElemIndex = (clickableElsInMenu.length - 1);
   }
-}
-
-function createElementWithClassList(elemType, elemClass) {
-  const newElem = document.createElement(elemType);
-  newElem.classList.add(elemClass);
-  return newElem;
 }
 
 async function isUserSignedIn() {
@@ -251,10 +240,9 @@ async function inpageContentInit() {
         el.remove();
       });
 
-      const errorMessage = createElementWithClassList(
-        "p",
-        "fx-relay-error-message"
-      );
+      const errorMessage = document.createElement("p");
+      errorMessage.classList.add("fx-relay-error-message");
+
       errorMessage.textContent = browser.i18n.getMessage(
         "pageInputIconMaxAliasesError",
         [relayAddresses.length]
@@ -264,15 +252,13 @@ async function inpageContentInit() {
       return;
     }
 
-    setTimeout(async () => {
-      await browser.runtime.sendMessage({
-        method: "fillInputWithAlias",
-        message: {
-          filter: "fillInputWithAlias", 
-          newRelayAddressResponse
-        }
-      });
-    }, 700);
+    await browser.runtime.sendMessage({
+      method: "fillInputWithAlias",
+      message: {
+        filter: "fillInputWithAlias", 
+        newRelayAddressResponse
+      }
+    });
   });
 }
 

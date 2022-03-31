@@ -66,7 +66,6 @@
         "js/shared/utils.js",
         "js/other-websites/fathom.js",
         "js/other-websites/email_detector.js",
-        "js/other-websites/inpage_menu.js",
         "js/other-websites/add_input_icon.js",
         "js/other-websites/fill_relay_address.js",
         "js/shared/metrics.js"
