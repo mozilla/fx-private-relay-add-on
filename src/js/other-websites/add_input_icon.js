@@ -214,8 +214,6 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }  
 });
 
-browser.runtime.sendMessage({method:"fillInputWithAliasParentPage"});
-
 (async function () {
 
   function getEmailInputsAndAddIcon(domRoot) {
