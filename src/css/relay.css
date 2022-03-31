@@ -63,6 +63,7 @@
 .fx-relay-menu-iframe { 
   width: 300px;
   min-height: 60px;
+  /* The top/right positioning here is necessary to align the box correctly (offset) underneath the "triangle" directly below the in-page Relay logo */
   top: 47px;
   right: -15px;
   position: absolute;
@@ -79,6 +80,7 @@
   background: var(--relayGrey10);
   z-index: 1;
   transform: rotate(45deg);
+  animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
 .fx-relay-menu-wrapper {
@@ -91,6 +93,7 @@
   width: 100%;
   z-index: 9999999999999999999999;
   background-color: rgba(0, 0, 0, 0.1);
+  animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
 .fx-relay-menu-body .is-hidden {
