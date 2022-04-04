@@ -138,6 +138,16 @@ to each release, under the release "Assets" section.
 2. `npm run-script build`
 3. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
 
+**Note: Be sure the *"Where to Host Version"* is set to _"On this site"._**
+
+#### Publish to Chrome 
+
+1. `npm run config:prod`
+2. `npm run package:chrome`
+3. [Upload the `.zip` to Chrome](https://developer.chrome.com/docs/webstore/publish//)
+
+**Note: Be sure the publisher is set to *Mozilla Corportation*.**
+
 #### Publish to GitHub
 Finally, we also publish the release to GitHub for those followers.
 
