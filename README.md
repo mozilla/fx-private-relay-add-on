@@ -44,6 +44,13 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
       npm run web-ext-run:all
       ```
 
+   If you want to run the extension on Android, you'll need to install the [Android SDK platform tools](https://developer.android.com/studio/releases/platform-tools.html):
+
+      ```
+      npm run web-ext-run:android --device=DEVICE_ID
+      ```
+
+   Please refer to [extensionworkshop.com](https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/) to learn more about how to run an extension on Android.
 
 3. Visit http://127.0.0.1:8000
 
