@@ -58,10 +58,12 @@
   border: 0;
   box-shadow: 3px 3px 3px 3px #00000017;
   animation: fxRelayFadeIn 0.2s ease forwards;
+  position: relative;
+  z-index: 2;
 }
 
 .fx-relay-menu-iframe { 
-  width: 300px;
+  width: 320px;
   min-height: 60px;
   /* The top/right positioning here is necessary to align the box correctly (offset) underneath the "triangle" directly below the in-page Relay logo */
   top: 47px;
@@ -74,7 +76,7 @@
   display: block;
   position: absolute;
   top: -7px;
-  right: 20px;
+  right: 40px;
   height: 20px;
   width: 20px;
   background: var(--relayGrey10);

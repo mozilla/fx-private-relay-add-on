@@ -1,0 +1,122 @@
+.fx-relay-menu-body {
+  --relayBlue3: #0060df;
+  --relayBlue4: #0250bb;
+  --relayBlueHover: #003eaa;
+  --relayBlueActive: #002275;
+  --relayButtonFocus: 0 0 1px 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, 0.3);
+  --relayFxGradient: linear-gradient(
+    -90deg,
+    #ff9100 0%,
+    #f10366 50%,
+    #6173ff 100%
+  );
+  --relayGrey10: #e7e7e7;
+  --relayGrey20: #ededf0;
+  --relayGrey30: #d7d7db;
+  --relayGrey40: #b1b1b3;
+  --relayGrey50: #737373;
+  --relayGrey60: #4a4a4f;
+  --relayGrey70: #38383d;
+  --relayGrey80: #2a2a2e;
+  --relayGrey90: #0c0c0d;
+  --relayInk: #20123a;
+  --relayInk70: #363959;
+  --relayMetropolisBold: "Metropolis Bold", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayMetropolisMedium: "Metropolis Medium", "SF Pro Text", "Segoe UI",
+    Roboto, "Open Sans", sans-serif;
+  --relayMetropolisLight: "Metropolis Light", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayInterUiRegular: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayIconDimension: 30px;
+  --relayViolet: #9059ff;
+
+  font-family: open-sans, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.fx-relay-menu-body {
+  margin: 0;
+  padding: 0;
+  background: white;
+  box-sizing: border-box;
+  font-size: 16px;
+  width: 100%;
+}
+
+.fx-relay-menu-body *, .fx-relay-menu-body *:before, .fx-relay-menu-body *:after {
+    box-sizing: inherit;
+  }
+
+html {
+    box-sizing: border-box;
+  }
+  
+
+/* Hide the premium logo by default */
+.fx-relay-menu-logo-text-premium {
+    /* display: none; */
+}
+
+/* Toggle premium logo when user is upgraded */
+.fx-relay-menu-body.is-premium .fx-relay-menu-logo-text-premium {
+    display: block;
+}
+
+.fx-relay-menu-body.is-premium .fx-relay-menu-logo-text, .fx-relay-menu-logo-text  {
+    display: none;
+}
+
+
+  
+.fx-relay-menu-header {
+    padding: 8px;
+    border-bottom: 1px solid var(--relayGrey20);
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.fx-relay-menu-logo {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+}
+
+.fx-relay-menu-logo img {
+    /* transform: scale(1.2); */
+}
+
+
+.fx-relay-menu-dashboard-link {
+    padding: 4px;
+    background-color: red;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.fx-relay-menu-dashboard-link span {
+    visibility: collapse;
+    width: 0;
+    display: inline-block;
+}
+
+.fx-relay-menu-dashboard-link:hover, fx-relay-menu-dashboard-link:focus {
+    background-color: var(--relayGrey20);
+}
+
+.fx-relay-menu-dashboard-link:hover span, fx-relay-menu-dashboard-link:focus span {
+    visibility: visible;
+    width: auto;
+    margin: 0 4px;
+}
