@@ -3,33 +3,30 @@
   <head>
     <meta charset="utf-8"/>
     <title>Firefox Relay</title>
-    <link rel="stylesheet" href="/css/relay.css" />
+    <link rel="stylesheet" href="/css/in-page.css" />
     <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/utils.js"></script>
     <script src="/js/shared/metrics.js"></script>
     <script src="/js/other-websites/inpage_menu.js"></script>
   </head>
   <body class="fx-relay-menu-body">
-    <div>
-        <div class="fx-relay-menu">
+    <header class="fx-relay-menu-header">
+      <h1 class="fx-relay-menu-logo">
+        <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="">
+        <img class="fx-relay-menu-logo-text" alt="Firefox Relay" src="/images/logo-text-fx-relay.svg" alt="">
+      </h1>
+      <a class="fx-relay-menu-dashboard-link" tabindex="0" href="https://relay.firefox.com">
+        <span>Manage</span>
+        <img src="/icons/nebula-external-link.svg" alt="">
+      </a>
+    </header>
+    <main class="fx-relay-menu">
+      <!-- Logged Out -->
+      <section class="fx-content-signed-out is-hidden">
+        <p class="fx-relay-menu-sign-up-message"></p>
+        <a tabindex="0" class="fx-relay-menu-sign-up-btn" href="https://relay.firefox.com"></a>
+      </section>
 
-          <!-- Logged In Content -->
-          <div class="fx-content-signed-in">
-            <div class="fx-relay-alias-loading-image"><img /></div>
-
-            <span class="fx-relay-menu-remaining-aliases"></span>
-            <button tabindex="0" class="fx-relay-menu-generate-alias-btn"></button>
-            
-            <a tabindex="0" class="fx-relay-menu-get-unlimited-aliases" target="_blank" rel="noopener noreferrer" href=""></a>
-            <a tabindex="0" class="fx-relay-menu-dashboard-link" target="_blank"></a>
-          </div>
-          
-          <!-- Logged Out Content -->
-          <div class="fx-content-signed-out is-hidden">
-            <span class="fx-relay-menu-sign-up-message"></span>
-            <button tabindex="0" class="fx-relay-menu-sign-up-btn"></button>
-          </div>
-        </div>
-      </div>
+    </main>
   </body>
 </html>
