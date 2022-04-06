@@ -47,7 +47,7 @@ function buildInpageIframe(opts) {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
-  iframe.width = 300;
+  iframe.width = 320;
   iframe.height = 205;
   iframe.title = browser.i18n.getMessage("pageInputTitle");
   iframe.tabIndex = 0;
@@ -56,7 +56,7 @@ function buildInpageIframe(opts) {
 
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
-    iframe.height = 150;
+    iframe.height = 300;
   }
 
   div.appendChild(iframe);
