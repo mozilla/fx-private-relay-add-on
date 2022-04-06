@@ -70,9 +70,9 @@ async function inpageContentInit() {
   document.addEventListener("keydown", handleKeydownEvents);
 
   if (!signedInUser) {
-    signedOutContent.classList.remove("is-hidden");
+    signedOutContent?.classList.remove("is-hidden");
     // Remove signed in content from DOM so there are no hidden/screen readable-elements available
-    signedInContent.remove();
+    signedInContent?.remove();
 
     const signUpMessageEl = document.querySelector(
       ".fx-relay-menu-sign-up-message"
