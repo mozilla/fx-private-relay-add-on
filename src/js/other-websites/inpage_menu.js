@@ -6,7 +6,7 @@ function iframeCloseRelayInPageMenu() {
 }
 
 function getRelayMenuEl() {
-  return document.querySelector(".fx-relay-menu");
+  return document.querySelector(".fx-relay-menu-body");
 }
 
 let activeElemIndex = 0;
