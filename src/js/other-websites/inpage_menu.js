@@ -65,14 +65,16 @@ async function inpageContentInit() {
 
   const signedInUser = await isUserSignedIn();
   const signedOutContent = document.querySelector(".fx-content-signed-out");
-  const signedInContent = document.querySelector(".fx-content-signed-in");
+  const signedInContentFree = document.querySelector(".fx-content-signed-in-free");
+  const signedInContentPremium = document.querySelector(".fx-content-signed-in-premium");
 
   document.addEventListener("keydown", handleKeydownEvents);
 
   if (!signedInUser) {
     signedOutContent?.classList.remove("is-hidden");
     // Remove signed in content from DOM so there are no hidden/screen readable-elements available
-    signedInContent?.remove();
+    signedInContentFree?.remove();
+    signedInContentPremium?.remove();
 
     const signUpMessageEl = document.querySelector(
       ".fx-relay-menu-sign-up-message"
@@ -104,13 +106,31 @@ async function inpageContentInit() {
     // Focus on "Go to Firefox Relay" button
     signUpButton.focus();
 
-    await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+    // Bug: There's a race condition on how fast to detect the iframe being loaded. The setTimeout solves it for now. 
+    setTimeout(async ()=>{
+      await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+    }, 10)
 
     return;
   }
 
   // Remove signed out content from DOM so there are no hidden/screen readable-elements available
   signedOutContent.remove();
+
+  // If the user has a premium accout, they may create unlimited aliases.
+  const { premium } = await browser.storage.local.get("premium");
+
+  if (premium) {
+    // User is signed in/premium: Remove the free section from DOM so there are no hidden/screen readable-elements available
+    signedInContentPremium?.classList.remove("is-hidden");
+    signedInContentFree?.remove();
+  } else {
+    // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
+    signedInContentFree?.classList.remove("is-hidden");
+    signedInContentPremium?.remove();
+  }
+
+
 
   sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
   
@@ -128,12 +148,10 @@ async function inpageContentInit() {
     ".fx-relay-menu-get-unlimited-aliases"
   );
   getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-    "popupGetUnlimitedAliases"
+    "popupGetUnlimitedAliases_mask"
   );
 
-  // If the user has a premium accout, they may create unlimited aliases.
-  const { premium } = await browser.storage.local.get("premium");
-
+  
   // Create "You have .../.. remaining relay address" message
   const remainingAliasesSpan = document.querySelector(
     ".fx-relay-menu-remaining-aliases"
@@ -146,16 +164,9 @@ async function inpageContentInit() {
 
   // Free user: Set text informing them how many aliases they can create
   remainingAliasesSpan.textContent = browser.i18n.getMessage(
-    "popupRemainingAliases_2",
+    "popupRemainingFreeMasks",
     [numAliasesRemaining, maxNumAliases]
   );
-
-  // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
-  if (numAliasesRemaining < 0) {
-    remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "pageFillRelayAddressLimit"
-    );
-  }
 
   // Premium user: Set text informing them how many aliases they have created so far
   if (premium) {
@@ -171,7 +182,11 @@ async function inpageContentInit() {
   const relayMenuDashboardLink = document.querySelector(
     ".fx-relay-menu-dashboard-link"
   );
-  relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");
+
+  const relayMenuDashboardLinkSpan = relayMenuDashboardLink.querySelector(
+    "span"
+  );
+  relayMenuDashboardLinkSpan.textContent = browser.i18n.getMessage("labelManage");
   relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
   relayMenuDashboardLink.addEventListener("click", () => {
     sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
@@ -190,9 +205,11 @@ async function inpageContentInit() {
       generateAliasBtn.remove();
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
-        "pageFillRelayAddressLimit",
-        [numAliasesRemaining, maxNumAliases]
+        "pageNoMasksRemaining"
       );
+
+      getUnlimitedAliasesBtn.classList.remove("t-secondary")
+      getUnlimitedAliasesBtn.classList.add("t-primary")
       // Focus on "Get unlimited alias" button
       getUnlimitedAliasesBtn.focus();
     } else {
@@ -210,12 +227,12 @@ async function inpageContentInit() {
     await browser.storage.local.get("premiumCountries")
   )?.premiumCountries;
 
-  if (
-    premiumCountryAvailability?.premium_available_in_country !== true ||
-    !maxNumAliasesReached
-  ) {
-    getUnlimitedAliasesBtn.remove();
-  }
+  // if (
+  //   premiumCountryAvailability?.premium_available_in_country !== true ||
+  //   !maxNumAliasesReached
+  // ) {
+  //   getUnlimitedAliasesBtn.remove();
+  // }
 
   // Handle "Generate New Alias" clicks
   generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
@@ -231,11 +248,11 @@ async function inpageContentInit() {
       description: currentPageHostName 
     });
 
-    const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
-    const loadingAnimationImage = document.querySelector(
-      ".fx-relay-alias-loading-image img"
-    );
-    loadingAnimationImage.src = loadingImagePath;
+    // const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
+    // const loadingAnimationImage = document.querySelector(
+    //   ".fx-relay-alias-loading-image img"
+    // );
+    // loadingAnimationImage.src = loadingImagePath;
 
     const relayInPageMenu = document.querySelector(".fx-relay-menu");
 
@@ -273,6 +290,9 @@ async function inpageContentInit() {
       }
     });
   });
+
+  await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+  
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
