@@ -1,87 +1,112 @@
 .fx-relay-menu-body {
-  
-    /* Primary Nebula Colors */
-    --colorInformational: #0060df;
-    --colorInformationalActive: #054096;
-    --colorInformationalHover: #0250bb;
-    --colorInformationalFocus: rgba(0, 96, 223, .4); /* #0060df @ 40% */ 
+  /* Primary Nebula Colors */
+  --colorInformational: #0060df;
+  --colorInformationalActive: #054096;
+  --colorInformationalHover: #0250bb;
+  --colorInformationalFocus: rgba(0, 96, 223, 0.4);
+   /* #0060df @ 40% */
 
-    /* Nebula Colors: Whites */
-    --colorWhite: #FFFFFF;
-  
-  
-    --relayBlue3: #0060df;
-    --relayBlue4: #0250bb;
-    --relayBlueHover: #003eaa;
-    --relayBlueActive: #002275;
-    --relayButtonFocus: 0 0 1px 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, 0.3);
-    --relayFxGradient: linear-gradient(
-      -90deg,
-      #ff9100 0%,
-      #f10366 50%,
-      #6173ff 100%
-    );
-    --relayGrey10: #e7e7e7;
-    --relayGrey20: #ededf0;
-    --relayGrey30: #d7d7db;
-    --relayGrey40: #b1b1b3;
-    --relayGrey50: #737373;
-    --relayGrey60: #4a4a4f;
-    --relayGrey70: #38383d;
-    --relayGrey80: #2a2a2e;
-    --relayGrey90: #0c0c0d;
-    --relayInk: #20123a;
-    --relayInk70: #363959;
-    --relayMetropolisBold: "Metropolis Bold", "SF Pro Text", "Segoe UI", Roboto,
-      "Open Sans", sans-serif;
-    --relayMetropolisMedium: "Metropolis Medium", "SF Pro Text", "Segoe UI",
-      Roboto, "Open Sans", sans-serif;
-    --relayMetropolisLight: "Metropolis Light", "SF Pro Text", "Segoe UI", Roboto,
-      "Open Sans", sans-serif;
-    --relayInterUiRegular: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
-      "Open Sans", sans-serif;
-    --relayIconDimension: 30px;
-    --relayViolet: #9059ff;
-  
-    font-family: open-sans, sans-serif;
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;
-    font-size: 16px;
-  }
+  /* Nebula Colors: Whites */
+  --colorWhite: #ffffff;
 
+  --relayBlue3: #0060df;
+  --relayBlue4: #0250bb;
+  --relayBlueHover: #003eaa;
+  --relayBlueActive: #002275;
+  --relayButtonFocus: 0 0 1px 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, 0.3);
+  --relayFxGradient: linear-gradient(
+    -90deg,
+    #ff9100 0%,
+    #f10366 50%,
+    #6173ff 100%
+  );
+  --relayGrey10: #e7e7e7;
+  --relayGrey20: #ededf0;
+  --relayGrey30: #d7d7db;
+  --relayGrey40: #b1b1b3;
+  --relayGrey50: #737373;
+  --relayGrey60: #4a4a4f;
+  --relayGrey70: #38383d;
+  --relayGrey80: #2a2a2e;
+  --relayGrey90: #0c0c0d;
+  --relayInk: #20123a;
+  --relayInk70: #363959;
+  --relayMetropolisBold: "Metropolis Bold", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayMetropolisMedium: "Metropolis Medium", "SF Pro Text", "Segoe UI",
+    Roboto, "Open Sans", sans-serif;
+  --relayMetropolisLight: "Metropolis Light", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayInterUiRegular: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
+    "Open Sans", sans-serif;
+  --relayIconDimension: 30px;
+  --relayViolet: #9059ff;
 
-/* TODO: */
+  font-family: open-sans, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Utilities */
 .debug {
-    border: 1px solid red;
-  }
-
-.c-button {
-    display: block;
-    padding: 8px 16px;
-    border-radius: 4px;
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-weight: 600;
-    font-family: var(--relayMetropolisBold);
+  border: 1px solid red;
 }
 
-.c-button.t-primary {
-    background-color: var(--colorInformational);
-    color: var(--colorWhite);
+.fx-relay-c-button {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 400;
+  font-family: var(--relayMetropolisBold);
+  appearance: none;
+  outline: none;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
-.c-button.t-primary:hover {
-    background-color: var(--colorInformationalHover);
+.fx-relay-c-button:last-child {
+    margin-bottom: 0;
 }
 
-.c-button.t-primary:active {
-    background-color: var(--colorInformationalActive);
+.fx-relay-c-button.t-primary {
+  background-color: var(--colorInformational);
+  color: var(--colorWhite);
+  font-weight: 600;
 }
 
-.c-button.t-primary:focus {
-    outline: 4px solid var(--colorInformationalFocus);
+.fx-relay-c-button.t-primary:hover {
+  background-color: var(--colorInformationalHover);
+}
+
+.fx-relay-c-button.t-primary:active {
+  background-color: var(--colorInformationalActive);
+}
+
+.fx-relay-c-button.t-primary:focus {
+  outline: 4px solid var(--colorInformationalFocus);
+}
+
+.fx-relay-c-button.t-secondary {
+  color: var(--colorInformational);
+}
+
+.fx-relay-c-button.t-secondary:hover {
+  color: var(--colorInformationalHover);
+}
+
+.fx-relay-c-button.t-secondary:active {
+  color: var(--colorInformationalActive);
+}
+
+.fx-relay-c-button.t-secondary:focus {
+  outline: 4px solid var(--colorInformationalFocus);
 }
