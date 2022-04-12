@@ -302,6 +302,9 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);
       break;
+    case "updateIframeHeight":
+      browser.tabs.sendMessage(sender.tab.id, m);
+      break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
       break;
