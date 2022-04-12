@@ -66,10 +66,6 @@
   box-sizing: inherit;
 }
 
-html {
-  box-sizing: border-box;
-}
-
 .fx-relay-menu-header {
   padding: 8px;
   border-bottom: 1px solid var(--relayGrey20);
@@ -127,11 +123,12 @@ fx-relay-menu-dashboard-link:focus span {
   height: 100%;
 }
 
+.fx-relay-menu-content.is-hidden {
+  display: none;
+}
+
 .fx-relay-menu-content p {
   margin: 0 0 16px;
   padding: 0;
-}
-
-.fx-relay-menu-content-bottom {
-  margin-top: auto;
+  text-align: center;
 }
