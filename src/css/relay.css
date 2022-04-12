@@ -64,7 +64,7 @@
 
 .fx-relay-menu-iframe { 
   width: 320px;
-  min-height: 60px;
+  /* min-height: 60px; */
   /* The top/right positioning here is necessary to align the box correctly (offset) underneath the "triangle" directly below the in-page Relay logo */
   top: 47px;
   right: -15px;

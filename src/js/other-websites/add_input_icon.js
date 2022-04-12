@@ -48,7 +48,7 @@ function buildInpageIframe(opts) {
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
   iframe.width = 320;
-  iframe.height = 205;
+  iframe.height = 300;
   iframe.title = browser.i18n.getMessage("pageInputTitle");
   iframe.tabIndex = 0;
   iframe.ariaHidden = "false";
@@ -56,7 +56,7 @@ function buildInpageIframe(opts) {
 
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
-    iframe.height = 300;
+    iframe.height = 200;
   }
 
   div.appendChild(iframe);
@@ -200,6 +200,11 @@ async function addRelayIconToInput(emailInput) {
   sendInPageEvent("input-icon-injected", "input-icon");
 }
 
+function updateIframeHeight(height) {
+  const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
+  relayInPageMenuIframe.height = height;
+}
+
 browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
@@ -209,8 +214,13 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m = "iframeCloseRelayInPageMenu") {
+  if (m == "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
+  }  
+
+  // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
+  if (m.method == "updateIframeHeight") {
+    updateIframeHeight(m.height);
   }  
 });
 
