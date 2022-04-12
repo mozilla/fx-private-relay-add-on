@@ -3,13 +3,14 @@
   <head>
     <meta charset="utf-8"/>
     <title>Firefox Relay</title>
+    <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/in-page.css" />
     <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/utils.js"></script>
     <script src="/js/shared/metrics.js"></script>
     <script src="/js/other-websites/inpage_menu.js"></script>
   </head>
-  <body class="fx-relay-menu-body">
+  <body id="fxRelayMenuBody" class="fx-relay-menu-body">
     <header class="fx-relay-menu-header">
       <h1 class="fx-relay-menu-logo">
         <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="">
@@ -22,9 +23,11 @@
     </header>
     <main class="fx-relay-menu">
       <!-- Logged Out -->
-      <section class="fx-content-signed-out is-hidden">
-        <p class="fx-relay-menu-sign-up-message"></p>
-        <a tabindex="0" class="fx-relay-menu-sign-up-btn" href="https://relay.firefox.com"></a>
+      <section class="fx-relay-menu-content fx-content-signed-out is-hidden">
+        <p class="fx-relay-menu-sign-up-message "></p>
+        <div class="fx-relay-menu-content-bottom">          
+          <a tabindex="0" class="c-button t-primary fx-relay-menu-sign-up-btn " href="https://relay.firefox.com"></a>
+        </div>
       </section>
 
     </main>
