@@ -11,7 +11,7 @@
     <script src="/js/other-websites/inpage_menu.js"></script>
   </head>
   <body id="fxRelayMenuBody" class="fx-relay-menu-body fx-relay">
-    <header class="fx-relay-menu-header">
+    <div class="fx-relay-menu-header">
       <h1 class="fx-relay-menu-logo">
         <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="">
         <img class="fx-relay-menu-logo-text" alt="Firefox Relay" src="/images/logo-text-fx-relay.svg" alt="">
@@ -20,18 +20,56 @@
         <span>Manage</span>
         <img src="/icons/nebula-external-link.svg" alt="">
       </a>
-    </header>
+    </div>
     <main class="fx-relay-menu">
       <!-- Logged Out -->
       <section class="fx-relay-menu-content fx-content-signed-out is-hidden">
         <p class="fx-relay-menu-sign-up-message"></p>
-        <a tabindex="0" class="fx-relay-c-button t-primary fx-relay-menu-sign-up-btn " href="https://relay.firefox.com"></a>
+        <a role="link" tabindex="0" class="fx-relay-c-button t-primary fx-relay-menu-sign-up-btn " href="https://relay.firefox.com"></a>
       </section>
 
       <!-- Logged In / Free Tier -->
       <section class="fx-relay-menu-content fx-content-signed-in-free is-hidden">
         <p class="fx-relay-menu-remaining-aliases"></p>
         <button tabindex="0" class="fx-relay-c-button t-primary fx-relay-menu-generate-alias-btn"></button>
+
+        <div class="fx-relay-menu-masks-lists">
+            <!-- Reused Alias Menu -->
+          <div class="fx-relay-menu-masks-list t-website fx-relay-menu-masks-free-this-website">
+            <span>
+              <!-- pageInputIconPreviouslyUsedMask -->
+              Previously used on this website
+            </span>
+            <ul>
+              <li>
+                <button tabindex="0">Label name</button>
+              </li>
+              <li>
+                <button tabindex="0">Label name</button>
+              </li>
+              <li>
+                <button tabindex="0">Label name</button>
+              </li>
+            </ul>
+          </div>
+          
+          
+          <div class="fx-relay-menu-masks-list fx-relay-menu-masks-free-other">
+            <span>
+              <!-- pageInputIconAdditionalEmailMasks -->
+              Additional email masks
+            </span>
+            <ul>
+              <li>
+                <button tabindex="0">Label name</button>
+              </li>
+              <li>
+                <button tabindex="0">Label name</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
         <a tabindex="0" class="fx-relay-c-button t-secondary fx-relay-menu-get-unlimited-aliases" href="https://relay.firefox.com/premium"></a>
       </section>
 

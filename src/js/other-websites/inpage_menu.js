@@ -212,6 +212,9 @@ async function inpageContentInit() {
       getUnlimitedAliasesBtn.classList.add("t-primary")
       // Focus on "Get unlimited alias" button
       getUnlimitedAliasesBtn.focus();
+
+      document.querySelector(".fx-relay-menu-masks-lists").style.order = "2";
+
     } else {
       // Focus on "Generate New Alias" button
       generateAliasBtn.focus();
