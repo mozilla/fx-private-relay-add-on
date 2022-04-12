@@ -104,6 +104,8 @@ async function inpageContentInit() {
     // Focus on "Go to Firefox Relay" button
     signUpButton.focus();
 
+    await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+
     return;
   }
 
