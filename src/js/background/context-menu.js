@@ -10,7 +10,7 @@ const staticMenuData = {
   },
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
-    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
+    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     contexts: ["editable"],
     enabled: true,
     visible: true,
@@ -18,7 +18,7 @@ const staticMenuData = {
   },
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
-    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias"),
+    title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     contexts: ["editable"],
     enabled: false,
     visible: true,
@@ -26,13 +26,13 @@ const staticMenuData = {
   },
   manageAliases: {
     id: "fx-private-relay-manage-aliases",
-    title: browser.i18n.getMessage("ManageAllAliases"),
+    title: browser.i18n.getMessage("ManageAllAliases_mask"),
     visible: true,
     contexts: ["all"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
-    title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases"),
+    title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases_mask"),
     visible: true,
     contexts: ["all"],
   },
@@ -44,13 +44,13 @@ const staticMenuData = {
   },
   useExistingAliasFromWebsite: {
     id: "fx-private-relay-use-existing-aliases-from-this-site",
-    title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite"),
+    title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite_mask"),
     visible: true,
     contexts: ["all"],
   }, 
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
-    title: browser.i18n.getMessage("pageInputIconRecentAliases"),
+    title: browser.i18n.getMessage("pageInputIconRecentAliases_mask"),
     visible: true,
     contexts: ["all"],
   }

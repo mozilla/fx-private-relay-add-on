@@ -118,7 +118,7 @@ async function inpageContentInit() {
   );
 
   generateAliasBtn.textContent = browser.i18n.getMessage(
-    "pageInputIconGenerateNewAlias"
+    "pageInputIconGenerateNewAlias_mask"
   );
 
   // Create "Get unlimited aliases" button
@@ -126,7 +126,7 @@ async function inpageContentInit() {
     ".fx-relay-menu-get-unlimited-aliases"
   );
   getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-    "popupGetUnlimitedAliases"
+    "popupGetUnlimitedAliases_mask"
   );
 
   // If the user has a premium accout, they may create unlimited aliases.
@@ -144,21 +144,21 @@ async function inpageContentInit() {
 
   // Free user: Set text informing them how many aliases they can create
   remainingAliasesSpan.textContent = browser.i18n.getMessage(
-    "popupRemainingAliases_2",
+    "popupRemainingAliases_2_mask",
     [numAliasesRemaining, maxNumAliases]
   );
 
   // Free user (who once was premium): Set text informing them how they have exceeded the maximum amount of aliases and cannot create any more
   if (numAliasesRemaining < 0) {
     remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "pageFillRelayAddressLimit"
+      "pageFillRelayAddressLimit_mask"
     );
   }
 
   // Premium user: Set text informing them how many aliases they have created so far
   if (premium) {
     remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "popupUnlimitedAliases",
+      "popupUnlimitedAliases_mask",
       [relayAddresses.length]
     );
   }
@@ -169,7 +169,7 @@ async function inpageContentInit() {
   const relayMenuDashboardLink = document.querySelector(
     ".fx-relay-menu-dashboard-link"
   );
-  relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases");
+  relayMenuDashboardLink.textContent = browser.i18n.getMessage("ManageAllAliases_mask");
   relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
   relayMenuDashboardLink.addEventListener("click", () => {
     sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
@@ -188,7 +188,7 @@ async function inpageContentInit() {
       generateAliasBtn.remove();
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
-        "pageFillRelayAddressLimit",
+        "pageFillRelayAddressLimit_mask",
         [numAliasesRemaining, maxNumAliases]
       );
       // Focus on "Get unlimited alias" button
@@ -255,7 +255,7 @@ async function inpageContentInit() {
       errorMessage.classList.add("fx-relay-error-message");
 
       errorMessage.textContent = browser.i18n.getMessage(
-        "pageInputIconMaxAliasesError",
+        "pageInputIconMaxAliasesError_mask",
         [relayAddresses.length]
       );
 
