@@ -7,7 +7,7 @@ function getOnboardingPanels() {
     },
     "panel2": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
       "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     },
     "maxAliasesPanel": {
@@ -43,11 +43,11 @@ function getEducationalStrings() {
     "educationalCriticalEmails": {
       "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
       "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody"),
+      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
     },
     "educationalSignBackIn": {
       "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
-      "headline": browser.i18n.getMessage("popupSignBackInHeadline"),
+      "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
       "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     }
   };
