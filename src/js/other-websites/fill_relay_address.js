@@ -26,7 +26,7 @@ async function showModal(modalType) {
   const modalMessage = document.createElement("span");
 
   modalMessage.textContent = browser.i18n.getMessage(
-    "pageFillRelayAddressLimit"
+    "pageFillRelayAddressLimit_mask"
   );
   modalMessage.classList = ["fx-relay-modal-message"];
   modalContent.appendChild(modalMessage);
@@ -37,7 +37,7 @@ async function showModal(modalType) {
     "fx-relay-menu-get-unlimited-aliases"
   );
   getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-    "popupGetUnlimitedAliases"
+    "popupGetUnlimitedAliases_mask"
   );
   getUnlimitedAliasesBtn.setAttribute("target", "_blank");
   getUnlimitedAliasesBtn.setAttribute("rel", "noopener noreferrer");
@@ -48,7 +48,7 @@ async function showModal(modalType) {
   modalContent.appendChild(getUnlimitedAliasesBtn);
 
   const manageAliasesLink = document.createElement("a");
-  manageAliasesLink.textContent = browser.i18n.getMessage("ManageAllAliases");
+  manageAliasesLink.textContent = browser.i18n.getMessage("ManageAllAliases_mask");
   manageAliasesLink.classList = [
     "fx-relay-new-tab fx-relay-modal-manage-aliases",
   ];

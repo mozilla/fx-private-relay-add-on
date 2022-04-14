@@ -134,7 +134,7 @@ async function addRelayIconToInput(emailInput) {
   const relayIconBtn = createElementWithClassList("button", "fx-relay-button");
   relayIconBtn.id = "fx-relay-button";
   relayIconBtn.type = "button";
-  relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias");
+  relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask");
   const makeNewAliasImagePath = browser.runtime.getURL('/icons/make-new-alias.png');
   relayIconBtn.style.backgroundImage = `url(${makeNewAliasImagePath})`;
 
