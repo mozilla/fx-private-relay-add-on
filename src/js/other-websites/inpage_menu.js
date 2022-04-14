@@ -118,7 +118,7 @@ async function inpageContentInit() {
   );
 
   generateAliasBtn.textContent = browser.i18n.getMessage(
-    "pageInputIconGenerateNewAlias"
+    "pageInputIconGenerateNewAlias_mask"
   );
 
   // Create "Get unlimited aliases" button
