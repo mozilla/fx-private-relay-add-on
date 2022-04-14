@@ -7,8 +7,8 @@ function getOnboardingPanels() {
     },
     "panel2": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline"),
-      "tipBody": browser.i18n.getMessage("popupSignBackInBody"),
+      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+      "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -18,10 +18,10 @@ function getOnboardingPanels() {
       "upgradeButtonIcon": "/icons/placeholder-logo.png",
     },
     "premiumPanel": {
-      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton"),
-      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline"),
+      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
+      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline_mask"),
       "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
-      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed"),
+      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
@@ -43,12 +43,12 @@ function getEducationalStrings() {
     "educationalCriticalEmails": {
       "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
       "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody"),
+      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
     },
     "educationalSignBackIn": {
       "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
-      "headline": browser.i18n.getMessage("popupSignBackInHeadline"),
-      "description": browser.i18n.getMessage("popupSignBackInBody"),
+      "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+      "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     }
   };
 }
@@ -352,9 +352,9 @@ async function showRelayPanel(tipPanelToShow) {
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2", [numRemaining, maxNumAliases]);
+  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2_mask", [numRemaining, maxNumAliases]);
   const getUnlimitedAliases = document.querySelector(".premium-cta");
-  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases");
+  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
 
   document.body.classList.add("relay-panel");
   updatePanel(numRemaining, tipPanelToShow);

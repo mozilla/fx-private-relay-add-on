@@ -3,7 +3,7 @@
   "name": "Firefox Relay",
   "version": "2.3.2",
 
-  "description": "__MSG_extensionDescription_v1__",
+  "description": "__MSG_extensionDescription_mask__",
 
   "default_locale": "en",
 
