@@ -51,10 +51,83 @@ async function isUserSignedIn() {
   return userApiToken.hasOwnProperty("apiToken");
 }
 
+async function getMasks() {
+
+  const serverStoragePref = await browser.runtime.sendMessage({
+    method: "getServerStoragePref"
+  });
+
+  if (serverStoragePref) {
+    try {
+      return await browser.runtime.sendMessage({
+        method: "getAliasesFromServer"
+      });
+    } catch (error) {
+      // API Error — Fallback to local storage
+      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+      return relayAddresses;
+    }
+  }
+
+  // User is not syncing with the server. Use local storage.
+  const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+  return relayAddresses;
+
+}
+
+async function fillTargetWithRelayAddress(generateClickEvt) {
+  
+  // sendInPageEvent("click", "input-menu-generate-alias");
+  preventDefaultBehavior(generateClickEvt);
+
+  const maskAddress = generateClickEvt.target.dataset.mask;
+
+  await browser.runtime.sendMessage({
+    method: "fillInputWithAlias",
+    message: {
+      filter: "fillInputWithAlias", 
+      newRelayAddressResponse: {
+        address: maskAddress
+      }
+    }
+  });
+}
+
+async function populateMaskList(maskList) {
+
+  const list = maskList.querySelector("ul");
+  const masks =  await getMasks();
+
+  masks.forEach(mask => {
+    const listItem = document.createElement("li");
+    const listButton = document.createElement("button");
+
+    listButton.tabIndex = 0;
+    listButton.dataset.mask = mask.full_address;
+
+    if (mask.description) {
+      listButton.textContent = mask.description
+    } else {
+      listButton.textContent = mask.full_address
+    }
+    
+    listButton.addEventListener("click", fillTargetWithRelayAddress, false);
+    
+    listItem.appendChild(listButton)
+    list.appendChild(listItem)
+    
+  });
+
+  await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+
+}
+
+const sendInPageEvent = (evtAction, evtLabel) => {
+  sendRelayEvent("In-page", evtAction, evtLabel);
+};
+
 async function inpageContentInit() {
-  const sendInPageEvent = (evtAction, evtLabel) => {
-    sendRelayEvent("In-page", evtAction, evtLabel);
-  };
+  
 
   const { relaySiteOrigin } = await browser.storage.local.get(
     "relaySiteOrigin"
@@ -130,8 +203,24 @@ async function inpageContentInit() {
     signedInContentPremium?.remove();
   }
 
+ 
+  const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
+
+  maskLists?.forEach(async maskList => {
+     // Set Mask List label names
+    const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
+    const stringId = label.dataset.stringId;
+    label.textContent = browser.i18n.getMessage(stringId);
+
+    // Populate mask lists
+    await populateMaskList(maskList)
+
+  });
 
 
+
+
+  
   sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
   
   // Create "Generate Relay Address" button
@@ -239,7 +328,7 @@ async function inpageContentInit() {
 
   // Handle "Generate New Alias" clicks
   generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
-    sendInPageEvent("click", "input-menu-generate-alias");
+    sendInPageEvent("click", "input-menu-reuse-previous-alias");
     preventDefaultBehavior(generateClickEvt);
 
     // Request the active tab from the background script and parse the `document.location.hostname`
