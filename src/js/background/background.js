@@ -308,6 +308,12 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
     case "getServerStoragePref":
       response = await getServerStoragePref();
       break;
+    case "getAliasesFromServer":
+      response = await getAliasesFromServer();
+      break;
+    case "getCurrentPage":
+      response = await getCurrentPage();
+      break;
     case "getCurrentPageHostname":
       const currentPage = await getCurrentPage();
       const url = new URL(currentPage.url);
