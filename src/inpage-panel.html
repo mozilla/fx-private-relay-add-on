@@ -10,7 +10,7 @@
     <script src="/js/shared/metrics.js"></script>
     <script src="/js/other-websites/inpage_menu.js"></script>
   </head>
-  <body id="fxRelayMenuBody" class="fx-relay-menu-body fx-relay">
+  <body id="fxRelayMenuBody" class="fx-relay-menu-body fx-relay is-premium">
     <header class="fx-relay-menu-header">
       <h1 class="fx-relay-menu-logo">
         <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="">
@@ -50,7 +50,6 @@
             </ul>
           </div> -->
           
-          
           <div class="fx-relay-menu-masks-list fx-relay-menu-masks-free-other">
             <span data-string-id="pageInputIconAdditionalEmailMasks" class="fx-relay-menu-masks-list-label"></span>
             <ul class="is-loading">
@@ -65,7 +64,23 @@
       </section>
 
       <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
-        PREMIUM
+        <!-- <p class="fx-relay-menu-remaining-aliases"></p> -->
+        <div class="fx-relay-menu-masks-search is-hidden">
+          <input type="search" class="fx-relay-menu-masks-search-input">
+          <div class="fx-relay-menu-masks-search-results">
+            <!-- <span data-string-id="pageInputIconAdditionalEmailMasks" class="fx-relay-menu-masks-list-label"></span> -->
+            <ul class="">
+              <!-- <li class="fx-relay-menu-masks-list-loading">
+                <img class="fx-relay-animation-spin" src="/icons/button-loading-dark.svg" alt="">
+              </li> -->
+            </ul>
+          </div>
+        </div>
+        
+        <div class="fx-relay-menu-content-footer">
+          <button tabindex="0" class="fx-relay-c-button t-primary fx-relay-menu-generate-alias-btn"></button>
+        </div>
+
       </section>
 
     </main>

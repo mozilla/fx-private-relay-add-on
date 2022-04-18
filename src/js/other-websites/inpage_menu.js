@@ -216,6 +216,12 @@ async function inpageContentInit() {
     signedInContentPremium?.remove();
   }
 
+  await browser.runtime.sendMessage({
+    method: "updateIframeHeight",
+    height: document.getElementById("fxRelayMenuBody").scrollHeight,
+  });
+
+
   sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
 
   // Create "Generate Relay Address" button
@@ -225,15 +231,6 @@ async function inpageContentInit() {
 
   generateAliasBtn.textContent = browser.i18n.getMessage(
     "pageInputIconGenerateNewAlias_mask"
-  );
-
-  // Create "Get unlimited aliases" button
-  const getUnlimitedAliasesBtn = document.querySelector(
-    ".fx-relay-menu-get-unlimited-aliases"
-  );
-
-  getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-    "popupGetUnlimitedAliases_mask"
   );
 
   // Create "You have .../.. remaining relay address" message
@@ -257,21 +254,6 @@ async function inpageContentInit() {
   });
 
   const numAliasesRemaining = maxNumAliases - masks.length;
-
-  // Free user: Set text informing them how many aliases they can create
-  remainingAliasesSpan.textContent = browser.i18n.getMessage(
-    "popupRemainingAliases_2_mask",
-    [numAliasesRemaining, maxNumAliases]
-  );
-
-  // Premium user: Set text informing them how many aliases they have created so far
-  if (premium) {
-    remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "popupUnlimitedAliases_mask",
-      [masks.length]
-    );
-  }
-
   const maxNumAliasesReached = numAliasesRemaining <= 0;
 
   // Create "Manage All Aliases" link
@@ -289,14 +271,31 @@ async function inpageContentInit() {
     iframeCloseRelayInPageMenu();
   });
 
-  // Create "Get unlimited aliases" link
-  getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
-  getUnlimitedAliasesBtn.addEventListener("click", () => {
-    sendInPageEvent("click", "input-menu-get-premium-btn");
-    iframeCloseRelayInPageMenu();
-  });
+  // Create "Get unlimited aliases" button
+  const getUnlimitedAliasesBtn = document.querySelector(
+    ".fx-relay-menu-get-unlimited-aliases"
+  );
 
   if (!premium) {
+
+    // Free user: Set text informing them how many aliases they can create
+    remainingAliasesSpan.textContent = browser.i18n.getMessage(
+      "popupRemainingAliases_2_mask",
+      [numAliasesRemaining, maxNumAliases]
+    );
+
+      getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
+        "popupGetUnlimitedAliases_mask"
+      );
+
+      // Create "Get unlimited aliases" link
+      getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
+      getUnlimitedAliasesBtn.addEventListener("click", () => {
+        sendInPageEvent("click", "input-menu-get-premium-btn");
+        iframeCloseRelayInPageMenu();
+      });
+
+
     if (maxNumAliasesReached) {
       generateAliasBtn.remove();
       sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
@@ -317,13 +316,25 @@ async function inpageContentInit() {
   } else {
     // Focus on "Generate New Alias" button
     generateAliasBtn.focus();
-    getUnlimitedAliasesBtn.remove();
+    getUnlimitedAliasesBtn?.remove();
+
+    // Premium user: Set text informing them how many aliases they have created so far
+    // remainingAliasesSpan.textContent = browser.i18n.getMessage(
+    //   "popupUnlimitedAliases_mask",
+    //   [masks.length]
+    // );
+
+    await browser.runtime.sendMessage({
+      method: "updateIframeHeight",
+      height: document.getElementById("fxRelayMenuBody").scrollHeight,
+    });
+
   }
 
   //Check if premium features are available
-  const premiumCountryAvailability = (
-    await browser.storage.local.get("premiumCountries")
-  )?.premiumCountries;
+  // const premiumCountryAvailability = (
+  //   await browser.storage.local.get("premiumCountries")
+  // )?.premiumCountries;
 
   // if (
   //   premiumCountryAvailability?.premium_available_in_country !== true ||
