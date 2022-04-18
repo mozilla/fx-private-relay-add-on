@@ -201,3 +201,16 @@
 .fx-relay-menu-masks-list button:focus {
   background-color: var(--colorViolet05);
 }
+
+.fx-relay-menu-masks-list li.fx-relay-menu-masks-list-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 8px;
+}
+
+.fx-relay-menu-masks-list-loading img {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}

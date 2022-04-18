@@ -105,6 +105,7 @@
   font-size: 16px;
   margin-bottom: 8px;
   cursor: pointer;
+  position: relative
 }
 
 .fx-relay-c-button:last-child {
@@ -143,4 +144,45 @@
 
 .fx-relay-c-button.t-secondary:focus {
   outline: 4px solid var(--colorInformationalFocus);
+}
+
+.fx-relay-c-button.is-loading.t-primary {
+  color: var(--colorInformational);
+}
+
+.fx-relay-c-button.is-loading.t-primary:active {
+  color: var(--colorInformationalActive);
+}
+
+.fx-relay-c-button.is-loading.t-primary:hover {
+  color: var(--colorInformationalHover);
+}
+
+.fx-relay-c-button.is-loading::after {
+  content: url(/icons/button-loading.svg);
+  position: absolute;
+  z-index: 1;
+  display: block;
+  animation-name: fx-relay-loader-spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
+  height: 24px;
+  width: 24px;
+}
+
+.fx-relay-animation-spin {
+  animation-name: fx-relay-loader-spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
+}
+
+@keyframes fx-relay-loader-spin {
+  from {
+      transform:rotate(0deg);
+  }
+  to {
+      transform:rotate(360deg);
+  }
 }
