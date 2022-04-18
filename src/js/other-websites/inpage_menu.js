@@ -2,7 +2,7 @@
 
 function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
-  browser.runtime.sendMessage({method:"iframeCloseRelayInPageMenu"});
+  browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
 }
 
 function getRelayMenuEl() {
@@ -42,7 +42,7 @@ function handleKeydownEvents(e) {
 
   // Limit the upper bounds of the active element tab index (Don't go below however many tab-able elements there are)
   if (activeElemIndex >= clickableElsInMenu.length) {
-    activeElemIndex = (clickableElsInMenu.length - 1);
+    activeElemIndex = clickableElsInMenu.length - 1;
   }
 }
 
@@ -52,19 +52,20 @@ async function isUserSignedIn() {
 }
 
 async function getMasks() {
-
   const serverStoragePref = await browser.runtime.sendMessage({
-    method: "getServerStoragePref"
+    method: "getServerStoragePref",
   });
 
   if (serverStoragePref) {
     try {
       return await browser.runtime.sendMessage({
-        method: "getAliasesFromServer"
+        method: "getAliasesFromServer",
       });
     } catch (error) {
       // API Error — Fallback to local storage
-      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+      const { relayAddresses } = await browser.storage.local.get(
+        "relayAddresses"
+      );
       return relayAddresses;
     }
   }
@@ -72,11 +73,9 @@ async function getMasks() {
   // User is not syncing with the server. Use local storage.
   const { relayAddresses } = await browser.storage.local.get("relayAddresses");
   return relayAddresses;
-
 }
 
 async function fillTargetWithRelayAddress(generateClickEvt) {
-  
   // sendInPageEvent("click", "input-menu-generate-alias");
   preventDefaultBehavior(generateClickEvt);
 
@@ -85,20 +84,23 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
     message: {
-      filter: "fillInputWithAlias", 
+      filter: "fillInputWithAlias",
       newRelayAddressResponse: {
-        address: maskAddress
-      }
-    }
+        address: maskAddress,
+      },
+    },
   });
 }
 
-async function populateMaskList(maskList) {
-
+async function populateMaskList(maskList, masks) {
   const list = maskList.querySelector("ul");
-  const masks =  await getMasks();
 
-  masks.forEach(mask => {
+  if (masks.length === 0) {
+    maskList.remove();
+    return;
+  }
+
+  masks.forEach((mask) => {
     const listItem = document.createElement("li");
     const listButton = document.createElement("button");
 
@@ -106,20 +108,28 @@ async function populateMaskList(maskList) {
     listButton.dataset.mask = mask.full_address;
 
     if (mask.description) {
-      listButton.textContent = mask.description
+      listButton.textContent = mask.description;
     } else {
-      listButton.textContent = mask.full_address
+      listButton.textContent = mask.full_address;
     }
-    
+
     listButton.addEventListener("click", fillTargetWithRelayAddress, false);
-    
-    listItem.appendChild(listButton)
-    list.appendChild(listItem)
-    
+
+    listItem.appendChild(listButton);
+    list.appendChild(listItem);
   });
 
-  await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
+  // Remove loading state
+  const loadingItem = maskList.querySelector(
+    ".fx-relay-menu-masks-list-loading"
+  );
+  loadingItem.remove();
+  list.classList.remove("is-loading");
 
+  await browser.runtime.sendMessage({
+    method: "updateIframeHeight",
+    height: document.getElementById("fxRelayMenuBody").scrollHeight,
+  });
 }
 
 const sendInPageEvent = (evtAction, evtLabel) => {
@@ -127,8 +137,6 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 };
 
 async function inpageContentInit() {
-  
-
   const { relaySiteOrigin } = await browser.storage.local.get(
     "relaySiteOrigin"
   );
@@ -138,8 +146,12 @@ async function inpageContentInit() {
 
   const signedInUser = await isUserSignedIn();
   const signedOutContent = document.querySelector(".fx-content-signed-out");
-  const signedInContentFree = document.querySelector(".fx-content-signed-in-free");
-  const signedInContentPremium = document.querySelector(".fx-content-signed-in-premium");
+  const signedInContentFree = document.querySelector(
+    ".fx-content-signed-in-free"
+  );
+  const signedInContentPremium = document.querySelector(
+    ".fx-content-signed-in-premium"
+  );
 
   document.addEventListener("keydown", handleKeydownEvents);
 
@@ -157,9 +169,7 @@ async function inpageContentInit() {
       "pageInputIconSignUpText"
     );
 
-    const signUpButton = document.querySelector(
-      ".fx-relay-menu-sign-up-btn"
-    );
+    const signUpButton = document.querySelector(".fx-relay-menu-sign-up-btn");
 
     signUpButton.textContent = browser.i18n.getMessage(
       "pageInputIconSignUpButton"
@@ -179,10 +189,13 @@ async function inpageContentInit() {
     // Focus on "Go to Firefox Relay" button
     signUpButton.focus();
 
-    // Bug: There's a race condition on how fast to detect the iframe being loaded. The setTimeout solves it for now. 
-    setTimeout(async ()=>{
-      await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
-    }, 10)
+    // Bug: There's a race condition on how fast to detect the iframe being loaded. The setTimeout solves it for now.
+    setTimeout(async () => {
+      await browser.runtime.sendMessage({
+        method: "updateIframeHeight",
+        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+      });
+    }, 10);
 
     return;
   }
@@ -203,26 +216,8 @@ async function inpageContentInit() {
     signedInContentPremium?.remove();
   }
 
- 
-  const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
-
-  maskLists?.forEach(async maskList => {
-     // Set Mask List label names
-    const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
-    const stringId = label.dataset.stringId;
-    label.textContent = browser.i18n.getMessage(stringId);
-
-    // Populate mask lists
-    await populateMaskList(maskList)
-
-  });
-
-
-
-
-  
   sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
-  
+
   // Create "Generate Relay Address" button
   const generateAliasBtn = document.querySelector(
     ".fx-relay-menu-generate-alias-btn"
@@ -236,20 +231,32 @@ async function inpageContentInit() {
   const getUnlimitedAliasesBtn = document.querySelector(
     ".fx-relay-menu-get-unlimited-aliases"
   );
+
   getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
     "popupGetUnlimitedAliases_mask"
   );
 
-  
   // Create "You have .../.. remaining relay address" message
   const remainingAliasesSpan = document.querySelector(
     ".fx-relay-menu-remaining-aliases"
   );
 
-  const { relayAddresses } = await browser.storage.local.get("relayAddresses");
   const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
 
-  const numAliasesRemaining = maxNumAliases - relayAddresses.length;
+  const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
+  const masks = await getMasks();
+
+  maskLists?.forEach(async (maskList) => {
+    // Set Mask List label names
+    const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
+    const stringId = label.dataset.stringId;
+    label.textContent = browser.i18n.getMessage(stringId);
+
+    // Populate mask lists
+    await populateMaskList(maskList, masks);
+  });
+
+  const numAliasesRemaining = maxNumAliases - masks.length;
 
   // Free user: Set text informing them how many aliases they can create
   remainingAliasesSpan.textContent = browser.i18n.getMessage(
@@ -261,7 +268,7 @@ async function inpageContentInit() {
   if (premium) {
     remainingAliasesSpan.textContent = browser.i18n.getMessage(
       "popupUnlimitedAliases_mask",
-      [relayAddresses.length]
+      [masks.length]
     );
   }
 
@@ -272,10 +279,10 @@ async function inpageContentInit() {
     ".fx-relay-menu-dashboard-link"
   );
 
-  const relayMenuDashboardLinkSpan = relayMenuDashboardLink.querySelector(
-    "span"
-  );
-  relayMenuDashboardLinkSpan.textContent = browser.i18n.getMessage("labelManage");
+  const relayMenuDashboardLinkSpan =
+    relayMenuDashboardLink.querySelector("span");
+  relayMenuDashboardLinkSpan.textContent =
+    browser.i18n.getMessage("labelManage");
   relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
   relayMenuDashboardLink.addEventListener("click", () => {
     sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
@@ -297,13 +304,12 @@ async function inpageContentInit() {
         "pageNoMasksRemaining"
       );
 
-      getUnlimitedAliasesBtn.classList.remove("t-secondary")
-      getUnlimitedAliasesBtn.classList.add("t-primary")
+      getUnlimitedAliasesBtn.classList.remove("t-secondary");
+      getUnlimitedAliasesBtn.classList.add("t-primary");
       // Focus on "Get unlimited alias" button
       getUnlimitedAliasesBtn.focus();
 
       document.querySelector(".fx-relay-menu-masks-lists").style.order = "2";
-
     } else {
       // Focus on "Generate New Alias" button
       generateAliasBtn.focus();
@@ -331,13 +337,17 @@ async function inpageContentInit() {
     sendInPageEvent("click", "input-menu-reuse-previous-alias");
     preventDefaultBehavior(generateClickEvt);
 
+    generateAliasBtn.classList.add("is-loading");
+
     // Request the active tab from the background script and parse the `document.location.hostname`
-    const currentPageHostName = await browser.runtime.sendMessage({method: "getCurrentPageHostname"});
+    const currentPageHostName = await browser.runtime.sendMessage({
+      method: "getCurrentPageHostname",
+    });
 
     // Attempt to create a new alias
     const newRelayAddressResponse = await browser.runtime.sendMessage({
       method: "makeRelayAddress",
-      description: currentPageHostName 
+      description: currentPageHostName,
     });
 
     // const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
@@ -346,9 +356,9 @@ async function inpageContentInit() {
     // );
     // loadingAnimationImage.src = loadingImagePath;
 
-    const relayInPageMenu = document.querySelector(".fx-relay-menu");
+    // const relayInPageMenu = document.querySelector(".fx-relay-menu");
 
-    relayInPageMenu.classList.add("fx-relay-alias-loading");
+    // relayInPageMenu.classList.add("fx-relay-alias-loading");
 
     // Catch edge cases where the "Generate New Alias" button is still enabled,
     // but the user has already reached the max number of aliases.
@@ -377,14 +387,16 @@ async function inpageContentInit() {
     await browser.runtime.sendMessage({
       method: "fillInputWithAlias",
       message: {
-        filter: "fillInputWithAlias", 
-        newRelayAddressResponse
-      }
+        filter: "fillInputWithAlias",
+        newRelayAddressResponse,
+      },
     });
   });
 
-  await browser.runtime.sendMessage({method: "updateIframeHeight", height: document.getElementById("fxRelayMenuBody").scrollHeight});
-  
+  await browser.runtime.sendMessage({
+    method: "updateIframeHeight",
+    height: document.getElementById("fxRelayMenuBody").scrollHeight,
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
