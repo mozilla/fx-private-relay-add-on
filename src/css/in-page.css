@@ -1,7 +1,4 @@
 .fx-relay-menu-body {
-  
-
-  
   --relayBlue3: #0060df;
   --relayBlue4: #0250bb;
   --relayBlueHover: #003eaa;
@@ -43,21 +40,28 @@
 
 .fx-relay-menu-body {
   height: 100%;
-}
-
-.fx-relay-menu-body {
   margin: 0;
   padding: 0;
-  background: white;
+  background-color: var(--colorWhite);
   box-sizing: border-box;
   font-size: 16px;
   width: 100%;
   display: flex;
   flex-direction: column;
   height: 100%;
-
   font-family: var(--relayInterUiRegular);
   font-size: 16px;
+}
+
+.fx-relay-menu-body.is-premium  {
+  background-color: var(--colorGrey10);
+}
+
+.is-premium .fx-relay-menu-header {
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  border: none;
+  background-color: var(--colorWhite);
 }
 
 .fx-relay-menu-body *,
@@ -74,6 +78,7 @@
   position: relative;
   z-index: 2;
   width: 100%;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .fx-relay-menu-logo {
@@ -114,13 +119,18 @@
 
 /* Main Content */
 .fx-relay-menu {
-  padding: 16px 16px 0;
+  padding: 0;
 }
 
 .fx-relay-menu-content {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 16px 16px 0;
+}
+
+.fx-relay-menu-content.fx-content-signed-in-premium{
+  padding: 0;
 }
 
 .fx-relay-menu-content.is-hidden {
@@ -206,11 +216,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 8px;
+  padding: 8px;
 }
 
 .fx-relay-menu-masks-list-loading img {
   width: 24px;
   height: 24px;
   display: inline-block;
+}
+
+/* Premium Search List */
+.fx-relay-menu-masks-search {
+  height: 275px;
+  background-color: var(--colorGrey10);
+  padding: 8px;
+}
+
+.fx-relay-menu-masks-search.is-hidden {
+  display: none;
+}
+
+.fx-relay-menu-masks-search-input {
+  display: block;
+  width: 100%;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: var(--colorWhite);
+  border: none;
+  outline: 1px solid var(--colorGrey30);
+}
+
+.fx-relay-menu-content-footer {
+  background-color: var(--colorWhite);
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.13);
+}
+
+.fx-relay-menu-content-footer .fx-relay-c-button {
+  margin-bottom: 0;
 }
