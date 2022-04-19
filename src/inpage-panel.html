@@ -63,16 +63,18 @@
         <a tabindex="0" class="fx-relay-c-button t-secondary fx-relay-menu-get-unlimited-aliases" href="https://relay.firefox.com/premium"></a>
       </section>
 
-      <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
+      <section class="fx-relay-menu-content fx-content-signed-in-premium">
         <!-- <p class="fx-relay-menu-remaining-aliases"></p> -->
-        <div class="fx-relay-menu-masks-search is-hidden">
-          <input type="search" class="fx-relay-menu-masks-search-input">
-          <div class="fx-relay-menu-masks-search-results">
+        <div class="fx-relay-menu-masks-search">
+          <form class="fx-relay-menu-masks-search-form">
+            <input type="search" class="fx-relay-menu-masks-search-input">
+          </form>
+          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-search-results is-loading">
             <!-- <span data-string-id="pageInputIconAdditionalEmailMasks" class="fx-relay-menu-masks-list-label"></span> -->
             <ul class="">
-              <!-- <li class="fx-relay-menu-masks-list-loading">
+              <li class="fx-relay-menu-masks-list-loading">
                 <img class="fx-relay-animation-spin" src="/icons/button-loading-dark.svg" alt="">
-              </li> -->
+              </li>
             </ul>
           </div>
         </div>
