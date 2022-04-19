@@ -76,7 +76,7 @@ async function getMasks() {
 }
 
 async function fillTargetWithRelayAddress(generateClickEvt) {
-  // sendInPageEvent("click", "input-menu-generate-alias");
+  sendInPageEvent("click", "input-menu-reuse-alias");
   preventDefaultBehavior(generateClickEvt);
 
   const maskAddress = generateClickEvt.target.dataset.mask;
@@ -92,7 +92,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   });
 }
 
-async function populateMaskList(maskList, masks) {
+async function populateMaskList(maskList, masks, options=null) {
   const list = maskList.querySelector("ul");
 
   if (masks.length === 0) {
@@ -106,11 +106,24 @@ async function populateMaskList(maskList, masks) {
 
     listButton.tabIndex = 0;
     listButton.dataset.mask = mask.full_address;
+    listButton.dataset.label = mask.description;
 
-    if (mask.description) {
-      listButton.textContent = mask.description;
+    if (!options?.replaceMaskAddressWithLabel) {
+      if (mask.description) {
+        listButton.textContent = mask.description;
+      } else {
+        listButton.textContent = mask.full_address;
+      }
     } else {
-      listButton.textContent = mask.full_address;
+
+      const listButtonLabel = document.createElement("span");
+      listButtonLabel.classList.add("fx-relay-menu-masks-search-result-label");
+      const listButtonAddress = document.createElement("span");
+      listButtonAddress.classList.add("fx-relay-menu-masks-search-result-address");
+      listButtonLabel.textContent = mask.description;
+      listButtonAddress.textContent = mask.full_address;
+      listButton.appendChild(listButtonLabel);
+      listButton.appendChild(listButtonAddress);
     }
 
     listButton.addEventListener("click", fillTargetWithRelayAddress, false);
@@ -136,28 +149,97 @@ const sendInPageEvent = (evtAction, evtLabel) => {
   sendRelayEvent("In-page", evtAction, evtLabel);
 };
 
-async function inpageContentInit() {
-  const { relaySiteOrigin } = await browser.storage.local.get(
-    "relaySiteOrigin"
-  );
+function applySearchFilter(query) {
 
-  // Set custom fonts from the add-on
-  await setCustomFonts();
+  const maskResults = Array.from(document.querySelectorAll(".fx-relay-menu-masks-search-results ul li button"));
 
-  const signedInUser = await isUserSignedIn();
-  const signedOutContent = document.querySelector(".fx-content-signed-out");
-  const signedInContentFree = document.querySelector(
-    ".fx-content-signed-in-free"
-  );
-  const signedInContentPremium = document.querySelector(
-    ".fx-content-signed-in-premium"
-  );
+  maskResults.forEach(maskResult => {
+    const emailAddress = maskResult.dataset.mask;
+    const label = maskResult.dataset.label;
+    // const labelElement = maskResult.querySelectorAll(".relay-email-address-label")[0];
+    // const label = labelElement ? labelElement.dataset.label : "";
+    const matchesSearchFilter = label.toLowerCase().includes(query.toLowerCase()) || emailAddress.toLowerCase().includes(query.toLowerCase());
 
-  document.addEventListener("keydown", handleKeydownEvents);
+    if (matchesSearchFilter) {
+        maskResult.classList.remove("is-hidden");
+    } else {
+        maskResult.classList.add("is-hidden");
+    }
+  });
 
-  if (!signedInUser) {
-    signedOutContent?.classList.remove("is-hidden");
+  // TODO: Add #/# label
+  // filterLabelVisibleCases.textContent = aliasContainers.filter(aliasContainer => !aliasContainer.classList.contains("is-hidden")).length;
+  // filterLabelTotalCases.textContent = aliasContainers.length;
+};
+
+
+const buildContent = {
+  loggedIn: {
+    free: async () => {
+
+    },
+    premium: async () => {
+      console.log("loggedIn/premium");
+
+      const searchInput = document.querySelector(".fx-relay-menu-masks-search-input");
+      searchInput.placeholder = browser.i18n.getMessage("labelSearch");
+
+      // Resize iframe
+      await browser.runtime.sendMessage({
+        method: "updateIframeHeight",
+        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+      });
+
+      const searchResults = document.querySelector(".fx-relay-menu-masks-search-results");
+      const searchResultsList = searchResults.querySelector("ul");
+      const masks = await getMasks();
+
+      // Populate search results lists
+      await populateMaskList(searchResults, masks, {replaceMaskAddressWithLabel: true});
+    
+      // Resize iframe
+      await browser.runtime.sendMessage({
+        method: "updateIframeHeight",
+        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+      });
+
+      searchResultsList.style.height = `${searchResultsList.offsetHeight}px`;
+
+      const filterSearchForm = document.querySelector(".fx-relay-menu-masks-search-form")
+      const filterSearchInput = filterSearchForm.querySelector(".fx-relay-menu-masks-search-input")
+      
+      filterSearchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        filterSearchInput.blur();
+      });
+      
+      filterSearchInput.addEventListener("input", (event) => {
+        applySearchFilter(event.target.value);
+      });
+
+      return;
+
+    },
+    // preium: async () => {
+
+    // }
+  },
+  loggedOut: () => {
+    console.log("loggedOut");
+    
     // Remove signed in content from DOM so there are no hidden/screen readable-elements available
+    document.getElementById("fxRelayMenuBody").classList.remove("is-premium");
+    const signedOutContent = document.querySelector(".fx-content-signed-out");
+    const signedInContentFree = document.querySelector(
+      ".fx-content-signed-in-free"
+    );
+    const signedInContentPremium = document.querySelector(
+      ".fx-content-signed-in-premium"
+    );
+
+    signedOutContent?.classList.remove("is-hidden");
+
+    
     signedInContentFree?.remove();
     signedInContentPremium?.remove();
 
@@ -196,155 +278,21 @@ async function inpageContentInit() {
         height: document.getElementById("fxRelayMenuBody").scrollHeight,
       });
     }, 10);
-
-    return;
   }
+}
 
-  // Remove signed out content from DOM so there are no hidden/screen readable-elements available
-  signedOutContent.remove();
-
-  // If the user has a premium accout, they may create unlimited aliases.
-  const { premium } = await browser.storage.local.get("premium");
-
-  if (premium) {
-    // User is signed in/premium: Remove the free section from DOM so there are no hidden/screen readable-elements available
-    signedInContentPremium?.classList.remove("is-hidden");
-    signedInContentFree?.remove();
-  } else {
-    // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
-    signedInContentFree?.classList.remove("is-hidden");
-    signedInContentPremium?.remove();
-  }
-
-  await browser.runtime.sendMessage({
-    method: "updateIframeHeight",
-    height: document.getElementById("fxRelayMenuBody").scrollHeight,
-  });
-
-
-  sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
-
-  // Create "Generate Relay Address" button
-  const generateAliasBtn = document.querySelector(
-    ".fx-relay-menu-generate-alias-btn"
-  );
-
-  generateAliasBtn.textContent = browser.i18n.getMessage(
-    "pageInputIconGenerateNewAlias_mask"
-  );
-
-  // Create "You have .../.. remaining relay address" message
-  const remainingAliasesSpan = document.querySelector(
-    ".fx-relay-menu-remaining-aliases"
-  );
-
-  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
-
-  const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
-  const masks = await getMasks();
-
-  maskLists?.forEach(async (maskList) => {
-    // Set Mask List label names
-    const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
-    const stringId = label.dataset.stringId;
-    label.textContent = browser.i18n.getMessage(stringId);
-
-    // Populate mask lists
-    await populateMaskList(maskList, masks);
-  });
-
-  const numAliasesRemaining = maxNumAliases - masks.length;
-  const maxNumAliasesReached = numAliasesRemaining <= 0;
-
-  // Create "Manage All Aliases" link
-  const relayMenuDashboardLink = document.querySelector(
-    ".fx-relay-menu-dashboard-link"
-  );
-
-  const relayMenuDashboardLinkSpan =
-    relayMenuDashboardLink.querySelector("span");
-  relayMenuDashboardLinkSpan.textContent =
-    browser.i18n.getMessage("labelManage");
-  relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
-  relayMenuDashboardLink.addEventListener("click", () => {
-    sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
-    iframeCloseRelayInPageMenu();
-  });
-
-  // Create "Get unlimited aliases" button
-  const getUnlimitedAliasesBtn = document.querySelector(
-    ".fx-relay-menu-get-unlimited-aliases"
-  );
-
-  if (!premium) {
-
-    // Free user: Set text informing them how many aliases they can create
-    remainingAliasesSpan.textContent = browser.i18n.getMessage(
-      "popupRemainingAliases_2_mask",
-      [numAliasesRemaining, maxNumAliases]
+async function setGenerateMaskButton() {
+    // Create "Generate Relay Address" button
+    const generateAliasBtn = document.querySelector(
+      ".fx-relay-menu-generate-alias-btn"
     );
-
-      getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-        "popupGetUnlimitedAliases_mask"
-      );
-
-      // Create "Get unlimited aliases" link
-      getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
-      getUnlimitedAliasesBtn.addEventListener("click", () => {
-        sendInPageEvent("click", "input-menu-get-premium-btn");
-        iframeCloseRelayInPageMenu();
-      });
-
-
-    if (maxNumAliasesReached) {
-      generateAliasBtn.remove();
-      sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
-      remainingAliasesSpan.textContent = browser.i18n.getMessage(
-        "pageNoMasksRemaining"
-      );
-
-      getUnlimitedAliasesBtn.classList.remove("t-secondary");
-      getUnlimitedAliasesBtn.classList.add("t-primary");
-      // Focus on "Get unlimited alias" button
-      getUnlimitedAliasesBtn.focus();
-
-      document.querySelector(".fx-relay-menu-masks-lists").style.order = "2";
-    } else {
-      // Focus on "Generate New Alias" button
-      generateAliasBtn.focus();
-    }
-  } else {
-    // Focus on "Generate New Alias" button
-    generateAliasBtn.focus();
-    getUnlimitedAliasesBtn?.remove();
-
-    // Premium user: Set text informing them how many aliases they have created so far
-    // remainingAliasesSpan.textContent = browser.i18n.getMessage(
-    //   "popupUnlimitedAliases_mask",
-    //   [masks.length]
-    // );
-
-    await browser.runtime.sendMessage({
-      method: "updateIframeHeight",
-      height: document.getElementById("fxRelayMenuBody").scrollHeight,
-    });
-
-  }
-
-  //Check if premium features are available
-  // const premiumCountryAvailability = (
-  //   await browser.storage.local.get("premiumCountries")
-  // )?.premiumCountries;
-
-  // if (
-  //   premiumCountryAvailability?.premium_available_in_country !== true ||
-  //   !maxNumAliasesReached
-  // ) {
-  //   getUnlimitedAliasesBtn.remove();
-  // }
-
-  // Handle "Generate New Alias" clicks
-  generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
+  
+    generateAliasBtn.textContent = browser.i18n.getMessage(
+      "pageInputIconGenerateNewAlias_mask"
+    );
+  
+   // Handle "Generate New Alias" clicks
+   generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
     sendInPageEvent("click", "input-menu-reuse-previous-alias");
     preventDefaultBehavior(generateClickEvt);
 
@@ -374,14 +322,16 @@ async function inpageContentInit() {
     // Catch edge cases where the "Generate New Alias" button is still enabled,
     // but the user has already reached the max number of aliases.
     if (newRelayAddressResponse.status === 402) {
-      relayInPageMenu.classList.remove("fx-relay-alias-loading");
-      // preserve menu height before removing child elements
-      // TODO: Add background/function to adjust height of iframe
-      relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
+      console.log("newRelayAddressResponse.status/402");
+      
+      // relayInPageMenu.classList.remove("fx-relay-alias-loading");
+      // // preserve menu height before removing child elements
+      // // TODO: Add background/function to adjust height of iframe
+      // relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
 
-      [generateAliasBtn, remainingAliasesSpan].forEach((el) => {
-        el.remove();
-      });
+      // [generateAliasBtn, remainingAliasesSpan].forEach((el) => {
+      //   el.remove();
+      // });
 
       const errorMessage = document.createElement("p");
       errorMessage.classList.add("fx-relay-error-message");
@@ -404,6 +354,184 @@ async function inpageContentInit() {
     });
   });
 
+}
+
+function setManageLink(relaySiteOrigin) {
+   // Create "Manage All Aliases" link
+   const relayMenuDashboardLink = document.querySelector(
+    ".fx-relay-menu-dashboard-link"
+  );
+
+  const relayMenuDashboardLinkSpan =
+    relayMenuDashboardLink.querySelector("span");
+    
+  relayMenuDashboardLinkSpan.textContent =
+    browser.i18n.getMessage("labelManage");
+    
+  relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
+  relayMenuDashboardLink.target = "_blank";
+
+  relayMenuDashboardLink.addEventListener("click", () => {
+    sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
+    iframeCloseRelayInPageMenu();
+  });
+}
+
+async function inpageContentInit() {
+  const { relaySiteOrigin } = await browser.storage.local.get(
+    "relaySiteOrigin"
+  );
+
+  // Set custom fonts from the add-on
+  await setCustomFonts();
+
+  const signedInUser = await isUserSignedIn();
+  const signedOutContent = document.querySelector(".fx-content-signed-out");
+  const signedInContentFree = document.querySelector(
+    ".fx-content-signed-in-free"
+  );
+  const signedInContentPremium = document.querySelector(
+    ".fx-content-signed-in-premium"
+  );
+
+  // Set Listeners
+  document.addEventListener("keydown", handleKeydownEvents);
+
+  // Set Manage All Masks Link
+  setManageLink(relaySiteOrigin);
+
+  // Build Content: Logged out user
+  if (!signedInUser) {
+    buildContent.loggedOut();
+    return;
+  }
+
+  // Remove signed out content from DOM so there are no hidden/screen readable-elements available
+  signedOutContent.remove();
+
+  sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
+
+
+  // If the user has a premium accout, they may create unlimited aliases.
+  const { premium } = await browser.storage.local.get("premium");
+
+  if (premium) {
+      // User is signed in/premium: Remove the free section from DOM so there are no hidden/screen readable-elements available
+      signedInContentPremium?.classList.remove("is-hidden");
+      signedInContentFree?.remove();
+
+      // Set Generate Mask button
+      await setGenerateMaskButton();
+
+      const generateAliasBtn = document.querySelector(
+        ".fx-relay-menu-generate-alias-btn"
+      );
+
+      await buildContent.loggedIn.premium();
+
+      // Focus on "Generate New Alias" button
+      generateAliasBtn.focus();
+      
+      generateAliasBtn.textContent = browser.i18n.getMessage(
+        "pageInputIconGenerateNewAlias_mask"
+      );
+
+      return;
+  }
+
+    
+  // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
+  document.getElementById("fxRelayMenuBody").classList.remove("is-premium");
+  signedInContentFree?.classList.remove("is-hidden");
+  signedInContentPremium?.remove();
+
+  // Set Generate Mask button
+  await setGenerateMaskButton();
+
+  // Create "You have .../.. remaining relay address" message
+  const remainingAliasesSpan = document.querySelector(
+    ".fx-relay-menu-remaining-aliases"
+  );
+
+  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+
+  const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
+  const masks = await getMasks();
+
+  maskLists?.forEach(async (maskList) => {
+    // Set Mask List label names
+    const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
+    const stringId = label.dataset.stringId;
+    label.textContent = browser.i18n.getMessage(stringId);
+
+    // Populate mask lists
+    await populateMaskList(maskList, masks);
+  });
+
+  const numAliasesRemaining = maxNumAliases - masks.length;
+  const maxNumAliasesReached = numAliasesRemaining <= 0;
+
+  // Create "Get unlimited aliases" button
+  const getUnlimitedAliasesBtn = document.querySelector(
+    ".fx-relay-menu-get-unlimited-aliases"
+  );
+
+  const generateAliasBtn = document.querySelector(
+    ".fx-relay-menu-generate-alias-btn"
+  );
+
+  if (!premium) {
+
+    // Free user: Set text informing them how many aliases they can create
+    remainingAliasesSpan.textContent = browser.i18n.getMessage(
+      "popupRemainingAliases_2_mask",
+      [numAliasesRemaining, maxNumAliases]
+    );
+
+      getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
+        "popupGetUnlimitedAliases_mask"
+      );
+
+      // Create "Get unlimited aliases" link
+      getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
+      getUnlimitedAliasesBtn.target = "_blank"
+      getUnlimitedAliasesBtn.addEventListener("click", () => {
+        sendInPageEvent("click", "input-menu-get-premium-btn");
+        iframeCloseRelayInPageMenu();
+      });
+
+
+    if (maxNumAliasesReached) {
+      generateAliasBtn.remove();
+      sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
+      remainingAliasesSpan.textContent = browser.i18n.getMessage(
+        "pageNoMasksRemaining"
+      );
+
+      getUnlimitedAliasesBtn.classList.remove("t-secondary");
+      getUnlimitedAliasesBtn.classList.add("t-primary");
+      // Focus on "Get unlimited alias" button
+      getUnlimitedAliasesBtn.focus();
+
+      document.querySelector(".fx-relay-menu-masks-lists").style.order = "2";
+    } else {
+      // Focus on "Generate New Alias" button
+      generateAliasBtn.focus();
+    }
+  }
+
+  //Check if premium features are available
+  // const premiumCountryAvailability = (
+  //   await browser.storage.local.get("premiumCountries")
+  // )?.premiumCountries;
+
+  // if (
+  //   premiumCountryAvailability?.premium_available_in_country !== true ||
+  //   !maxNumAliasesReached
+  // ) {
+  //   getUnlimitedAliasesBtn.remove();
+  // }
+ 
   await browser.runtime.sendMessage({
     method: "updateIframeHeight",
     height: document.getElementById("fxRelayMenuBody").scrollHeight,
