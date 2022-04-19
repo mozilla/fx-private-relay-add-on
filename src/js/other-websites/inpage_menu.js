@@ -51,10 +51,26 @@ async function isUserSignedIn() {
   return userApiToken.hasOwnProperty("apiToken");
 }
 
+async function getServerStoragePref() {
+
+  const serverStoragePref = await browser.storage.local.get("server_storage");
+  const serverStoragePrefInStorage = serverStoragePref.hasOwnProperty("server_storage");
+
+
+  if (!serverStoragePrefInStorage) {
+    return await browser.runtime.sendMessage({
+      method: "getServerStoragePref",
+    });
+  } else {
+    return serverStoragePrefInStorage;
+  }
+
+} 
+
 async function getMasks() {
-  const serverStoragePref = await browser.runtime.sendMessage({
-    method: "getServerStoragePref",
-  });
+
+
+  const serverStoragePref = await getServerStoragePref();
 
   if (serverStoragePref) {
     try {
@@ -172,7 +188,6 @@ function applySearchFilter(query) {
   // filterLabelTotalCases.textContent = aliasContainers.length;
 };
 
-
 const buildContent = {
   loggedIn: {
     free: async () => {
@@ -193,6 +208,21 @@ const buildContent = {
       const searchResults = document.querySelector(".fx-relay-menu-masks-search-results");
       const searchResultsList = searchResults.querySelector("ul");
       const masks = await getMasks();
+
+      if (masks.length === 0) {
+        // TODO: Add style/class to remove border-radius from header/footer sections
+        
+        const search = document.querySelector(".fx-relay-menu-masks-search");
+        search.remove();
+
+        // Resize iframe
+        await browser.runtime.sendMessage({
+          method: "updateIframeHeight",
+          height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        });
+        
+        return;
+      }
 
       // Populate search results lists
       await populateMaskList(searchResults, masks, {replaceMaskAddressWithLabel: true});
