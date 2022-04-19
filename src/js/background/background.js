@@ -96,6 +96,8 @@ async function getServerStoragePref() {
 
   answer = await response.json();
 
+  browser.storage.local.set({ server_storage: answer.server_storage });
+
   return answer.server_storage;
 }
 
