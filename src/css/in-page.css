@@ -89,8 +89,12 @@
   gap: 8px;
 }
 
-.fx-relay-menu-logo img {
-  /* transform: scale(1.2); */
+.fx-relay-menu-logo-image-fx-relay {
+  width: 26px;
+}
+
+.fx-relay-menu-logo-text {
+  width: 94px;
 }
 
 .fx-relay-menu-dashboard-link {
