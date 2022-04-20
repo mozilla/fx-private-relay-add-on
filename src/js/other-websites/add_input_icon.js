@@ -217,6 +217,12 @@ async function addRelayIconToInput(emailInput) {
 function updateIframeHeight(height) {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
   relayInPageMenuIframe.height = height;
+
+  // BUG: Console error in background.js being called. The code below solves it. 
+  // if (relayInPageMenuIframe) {
+  //   relayInPageMenuIframe.height = height;
+  // }
+
 }
 
 browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
