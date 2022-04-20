@@ -18,9 +18,10 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
-async function getAliasesFromServer(method = "GET", body = null, opts=null) {
+async function getAliasesFromServer(method = "GET", opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+  const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -38,10 +39,33 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
     mode: "same-origin",
     method,
     headers: headers,
-    body,
   });
 
   answer = await response.json();
+  
+  if (opts.subdomainSet) {
+    
+    const masks = new Array();
+    masks.push(...answer);
+
+    const domainResponse = await fetch(apiMakeDomainAddressesURL, {
+      mode: "same-origin",
+      method,
+      headers: headers,
+    });
+
+    domainMasks = await domainResponse.json();
+    masks.push(...domainMasks);
+    masks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+
+    browser.storage.local.set({ relayAddresses: masks });
+    
+    return masks;
+    
+
+  }
+
+  browser.storage.local.set({ relayAddresses: answer });
   
   return answer;
 }
@@ -311,7 +335,7 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
       response = await getServerStoragePref();
       break;
     case "getAliasesFromServer":
-      response = await getAliasesFromServer();
+      response = await getAliasesFromServer("GET", m.options);
       break;
     case "getCurrentPage":
       response = await getCurrentPage();
