@@ -24,9 +24,23 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
 function positionRelayMenu() {
   const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe");
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
+  const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
-  relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
-  relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
+  const documentPosition = document.documentElement.getBoundingClientRect();
+  
+  // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
+  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > 400);
+
+  if (positionMenuBelowIcon) {
+    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
+    relayInPageMenuIframe.classList.remove("is-position-bottom");
+  } else {
+    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    const relayInPageMenuIframeElement = document.querySelector(".fx-relay-menu-iframe iframe");
+    relayInPageMenuIframe.classList.add("is-position-bottom")
+    relayInPageMenu.style.top = newIconPosition.top - relayInPageMenuIframeElement.clientHeight - 20 + "px";
+  }
 }
 
 function createElementWithClassList(elemType, elemClass) {
@@ -221,6 +235,7 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
   if (m.method == "updateIframeHeight") {
     updateIframeHeight(m.height);
+    positionRelayMenu();
   }  
 });
 

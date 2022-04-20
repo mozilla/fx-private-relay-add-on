@@ -72,17 +72,20 @@
 }
 
 .fx-relay-menu-iframe::before {
-  content: " ";
+  content: url(/icons/menu-caret-up.svg);
   display: block;
   position: absolute;
-  top: -7px;
+  top: -12px;
   right: 40px;
-  height: 20px;
   width: 20px;
-  background: var(--relayGrey10);
-  z-index: 1;
-  transform: rotate(45deg);
+  z-index: 99;
   animation: fxRelayFadeIn 0.2s ease forwards;
+}
+
+.fx-relay-menu-iframe.is-position-bottom::before {
+  top: auto;
+  bottom: -7px;
+  content: url(/icons/menu-caret-down.svg);
 }
 
 .fx-relay-menu-wrapper {
