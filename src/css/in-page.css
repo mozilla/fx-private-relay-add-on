@@ -1,44 +1,4 @@
 .fx-relay-menu-body {
-  --relayBlue3: #0060df;
-  --relayBlue4: #0250bb;
-  --relayBlueHover: #003eaa;
-  --relayBlueActive: #002275;
-  --relayButtonFocus: 0 0 1px 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, 0.3);
-  --relayFxGradient: linear-gradient(
-    -90deg,
-    #ff9100 0%,
-    #f10366 50%,
-    #6173ff 100%
-  );
-  --relayGrey10: #e7e7e7;
-  --relayGrey20: #ededf0;
-  --relayGrey30: #d7d7db;
-  --relayGrey40: #b1b1b3;
-  --relayGrey50: #737373;
-  --relayGrey60: #4a4a4f;
-  --relayGrey70: #38383d;
-  --relayGrey80: #2a2a2e;
-  --relayGrey90: #0c0c0d;
-  --relayInk: #20123a;
-  --relayInk70: #363959;
-  --relayMetropolisBold: "Metropolis Bold", "SF Pro Text", "Segoe UI", Roboto,
-    "Open Sans", sans-serif;
-  --relayMetropolisMedium: "Metropolis Medium", "SF Pro Text", "Segoe UI",
-    Roboto, "Open Sans", sans-serif;
-  --relayMetropolisLight: "Metropolis Light", "SF Pro Text", "Segoe UI", Roboto,
-    "Open Sans", sans-serif;
-  --relayInterUiRegular: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
-    "Open Sans", sans-serif;
-  --relayIconDimension: 30px;
-  --relayViolet: #9059ff;
-
-  font-family: open-sans, sans-serif;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-  font-size: 16px;
-}
-
-.fx-relay-menu-body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -49,7 +9,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: var(--relayInterUiRegular);
+  font-family: var(--fontStackBase);
   font-size: 16px;
 }
 
@@ -59,7 +19,7 @@
 
 .is-premium .fx-relay-menu-header {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
+  border-radius: var(--borderRadiusSm);
   border: none;
   background-color: var(--colorWhite);
 }
@@ -71,8 +31,8 @@
 }
 
 .fx-relay-menu-header {
-  padding: 8px;
-  border-bottom: 1px solid var(--relayGrey20);
+  padding: var(--spacingSm);
+  border-bottom: 1px solid var(--colorGrey10);
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -86,7 +46,7 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: 8px;
+  gap: var(--spacingSm);
 }
 
 .fx-relay-menu-logo-image-fx-relay {
@@ -98,8 +58,8 @@
 }
 
 .fx-relay-menu-dashboard-link {
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--spacingXs);
+  border-radius: var(--borderRadiusSm);
   display: flex;
   align-items: center;
   font-size: 14px;
@@ -111,13 +71,13 @@
 
 .fx-relay-menu-dashboard-link:hover,
 .fx-relay-menu-dashboard-link:focus {
-  background-color: var(--relayGrey20);
+  background-color: var(--colorGrey10);
 }
 
 .fx-relay-menu-dashboard-link:hover span,
 .fx-relay-menu-dashboard-link:focus span {
   display: block;
-  margin: 0 4px;
+  margin: 0 var(--spacingXs);
 }
 
 /* Main Content */
@@ -129,7 +89,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px 16px 0;
+  padding: var(--spacingMd) var(--spacingMd) 0;
 }
 
 .fx-relay-menu-content.fx-content-signed-in-premium{
@@ -141,7 +101,7 @@
 }
 
 .fx-relay-menu-content p {
-  margin: 0 0 16px;
+  margin: 0 0 var(--spacingMd);
   padding: 0;
   text-align: center;
 }
@@ -149,18 +109,18 @@
 /* Mask List */
 
 .fx-relay-menu-masks-lists {
-  margin-top: 8px;
+  margin-top: var(--spacingSm);
 }
 
 .fx-relay-menu-masks-list {
-  border-radius: 4px;
+  border-radius: var(--borderRadiusSm);
   background-color: var(--colorGrey10);
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMd);
   overflow: hidden;
 }
 
 .fx-relay-menu-masks-list.t-website {
-  border-radius: 4px;
+  border-radius: var(--borderRadiusSm);
   background-color: var(--colorWhite);
   outline: 2px solid var(--colorBlue50);
 }
@@ -190,7 +150,7 @@
 
 .fx-relay-menu-masks-list > span {
   border-bottom: 1px solid var(--colorGrey20);
-  padding: 8px;
+  padding: var(--spacingSm);
   font-size: 12px;
   line-height: 1rem;
   text-align: center;
@@ -216,7 +176,7 @@
   border: none;
   background-color: transparent;
   width: 100%;
-  padding: 8px 16px;
+  padding: var(--spacingSm) var(--spacingMd);
   cursor: pointer;
   text-align: left;
   overflow: hidden;
@@ -238,7 +198,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: var(--spacingSm);
 }
 
 .fx-relay-menu-masks-list-loading img {
@@ -250,7 +210,7 @@
 /* Premium Search List */
 .fx-relay-menu-masks-search {
   background-color: var(--colorGrey10);
-  padding: 8px 0 0;
+  padding: var(--spacingSm) 0 0;
 }
 
 .fx-relay-menu-masks-search.is-hidden {
@@ -258,15 +218,16 @@
 }
 
 .fx-relay-menu-masks-search-form {
-  padding: 4px 8px;
-  margin-bottom: 8px;
+  padding: var(--spacingXs) var(--spacingSm);
+  margin-bottom: var(--spacingSm);
 }
 
 .fx-relay-menu-masks-search-input {
   display: block;
   width: 100%;
-  padding: 12px 16px;
-  border-radius: 4px;
+  /* Custom padding to match Nebula */
+  padding: 12px var(--spacingMd);
+  border-radius: var(--borderRadiusSm);
   background-color: var(--colorWhite);
   border: none;
   outline: 1px solid var(--colorGrey30);
@@ -280,7 +241,7 @@
 .fx-relay-menu-masks-search-results ul {
   list-style: none;
   margin: 0;
-  padding: 0 0 8px;
+  padding: 0 0 var(--spacingSm);
 }
 
 .fx-relay-menu-masks-search-result-label {
@@ -298,8 +259,8 @@
 
 .fx-relay-menu-content-footer {
   background-color: var(--colorWhite);
-  padding: 16px;
-  border-radius: 4px;
+  padding: var(--spacingMd);
+  border-radius: var(--borderRadiusSm);
   box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.13);
 }
 
