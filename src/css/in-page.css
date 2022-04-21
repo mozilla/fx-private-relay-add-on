@@ -13,6 +13,10 @@
   font-size: 16px;
 }
 
+.fx-relay-menu-body.is-premium.is-loading  {
+  background-color: var(--colorWhite);
+}
+
 .fx-relay-menu-body.is-premium  {
   background-color: var(--colorGrey10);
 }
@@ -59,19 +63,27 @@
 
 .fx-relay-menu-dashboard-link {
   padding: var(--spacingXs);
-  border-radius: var(--borderRadiusSm);
   display: flex;
   align-items: center;
   font-size: 14px;
-}
-
-.fx-relay-menu-dashboard-link span {
-  display: none;
+  position: relative;
 }
 
 .fx-relay-menu-dashboard-link:hover,
 .fx-relay-menu-dashboard-link:focus {
   background-color: var(--colorGrey10);
+  border-radius: 100%;
+}
+
+.fx-relay-menu-dashboard-link span {
+  display: none;
+  color: var(--colorWhite);
+  background-color: var(--colorGrey40);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingXs) var(--spacingSm);
+  position: absolute;
+  top: calc( 100% + var(--spacingXs));
+  right: 0;
 }
 
 .fx-relay-menu-dashboard-link:hover span,
@@ -83,6 +95,7 @@
 /* Main Content */
 .fx-relay-menu {
   padding: 0;
+  position: relative;
 }
 
 .fx-relay-menu-content {
@@ -266,4 +279,72 @@
 
 .fx-relay-menu-content-footer .fx-relay-c-button {
   margin-bottom: 0;
+}
+
+/* Page Loader */
+.fx-relay-menu-loading-bar {
+  width: 100%;
+  height: 5px;  
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+.fx-relay-menu-loading-bar-wrapper {
+  width: 100%;
+	height: 2px;
+	position: absolute;
+	left: 50%;
+  top: 1px;
+}
+
+.fx-relay-menu-loading-bar-border {
+	height: 100%;
+	width: 100%;
+	position: relative;
+	left: -50%;
+	top: -50%;
+	padding: 0;
+  background-color: var(--colorViolet20);
+  padding: 0;
+}
+
+.fx-relay-menu-loading-bar-whitespace {
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+	margin: 0 auto;
+	overflow: hidden;
+	position: relative;
+  
+}
+
+.fx-relay-menu-loading-bar-line {
+	position: absolute;
+	height: 100%;
+	width: 60%;
+	background-color: var(--colorViolet70);
+	animation: cssload-slide 1s  ease-in-out infinite;
+}
+
+@keyframes cssload-slide {
+	0% {
+		left: -100%;
+	}
+	
+	100% {
+		left: 100%;
+	}
+}
+
+.is-loading .fx-relay-menu-loading-bar {
+  display: block;
+}
+
+.is-loading .fx-relay-menu {
+  min-height: 200px;
+}
+
+.is-loading .fx-relay-menu-content {
+  visibility: hidden;
 }

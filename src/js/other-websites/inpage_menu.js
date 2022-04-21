@@ -65,19 +65,18 @@ async function getServerStoragePref() {
   }
 }
 
-async function getMasks(options = {subdomainSet: false}) {
+async function getMasks(options = { subdomainSet: false }) {
   const serverStoragePref = await getServerStoragePref();
 
   if (serverStoragePref) {
     try {
       return await browser.runtime.sendMessage({
         method: "getAliasesFromServer",
-        options
+        options,
       });
     } catch (error) {
-      
       console.warn(`getAliasesFromServer Error: ${error}`);
-      
+
       // API Error — Fallback to local storage
       const { relayAddresses } = await browser.storage.local.get(
         "relayAddresses"
@@ -108,7 +107,11 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   });
 }
 
-async function populateMaskList(maskList, masks, options = {replaceMaskAddressWithLabel: false}) {
+async function populateMaskList(
+  maskList,
+  masks,
+  options = { replaceMaskAddressWithLabel: false }
+) {
   const list = maskList.querySelector("ul");
 
   if (masks.length === 0) {
@@ -199,6 +202,7 @@ function applySearchFilter(query) {
 const buildContent = {
   loggedIn: {
     free: async (relaySiteOrigin) => {
+      const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
       const signedInContentFree = document.querySelector(
         ".fx-content-signed-in-free"
@@ -207,12 +211,6 @@ const buildContent = {
       const signedInContentPremium = document.querySelector(
         ".fx-content-signed-in-premium"
       );
-
-        // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
-      document.getElementById("fxRelayMenuBody").classList.remove("is-premium");
-      signedInContentFree?.classList.remove("is-hidden");
-      signedInContentPremium?.remove();
-
 
       // Create "You have .../.. remaining relay address" message
       const remainingAliasesSpan = document.querySelector(
@@ -296,13 +294,21 @@ const buildContent = {
       //   getUnlimitedAliasesBtn.remove();
       // }
 
+      fxRelayMenuBody.classList.remove("is-loading");
+      // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
+      fxRelayMenuBody.classList.remove("is-premium");
+      signedInContentFree?.classList.remove("is-hidden");
+      signedInContentPremium?.remove();
+
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
-        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        height: fxRelayMenuBody.scrollHeight,
       });
     },
     premium: async () => {
       console.log("loggedIn/premium");
+
+      const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
       const signedInContentFree = document.querySelector(
         ".fx-content-signed-in-free"
@@ -319,23 +325,28 @@ const buildContent = {
       const searchInput = document.querySelector(
         ".fx-relay-menu-masks-search-input"
       );
+
       searchInput.placeholder = browser.i18n.getMessage("labelSearch");
 
       // Resize iframe
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
-        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        height: fxRelayMenuBody.scrollHeight,
       });
 
       const searchResults = document.querySelector(
         ".fx-relay-menu-masks-search-results"
       );
       const searchResultsList = searchResults.querySelector("ul");
-      
+
       // Check if user may have custom domain masks
-      const premiumSubdomainSet = await browser.storage.local.get("premiumSubdomainSet");
-            
-      const masks = await getMasks({subdomainSet: premiumSubdomainSet.hasOwnProperty("premiumSubdomainSet")});
+      const premiumSubdomainSet = await browser.storage.local.get(
+        "premiumSubdomainSet"
+      );
+
+      const masks = await getMasks({
+        subdomainSet: premiumSubdomainSet.hasOwnProperty("premiumSubdomainSet"),
+      });
 
       if (masks.length === 0) {
         // TODO: Add style/class to remove border-radius from header/footer sections
@@ -346,7 +357,7 @@ const buildContent = {
         // Resize iframe
         await browser.runtime.sendMessage({
           method: "updateIframeHeight",
-          height: document.getElementById("fxRelayMenuBody").scrollHeight,
+          height: fxRelayMenuBody.scrollHeight,
         });
 
         return;
@@ -360,7 +371,7 @@ const buildContent = {
       // Resize iframe
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
-        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        height: fxRelayMenuBody.scrollHeight,
       });
 
       searchResultsList.style.height = `${searchResultsList.offsetHeight}px`;
@@ -388,12 +399,20 @@ const buildContent = {
       generateAliasBtn.textContent = browser.i18n.getMessage(
         "pageInputIconGenerateNewAlias_mask"
       );
-  
+
+      fxRelayMenuBody.classList.remove("is-loading");
+
+      // Resize iframe
+      await browser.runtime.sendMessage({
+        method: "updateIframeHeight",
+        height: fxRelayMenuBody.scrollHeight,
+      });
+
       // Focus on "Generate New Alias" button
       generateAliasBtn.focus();
 
       return;
-    }
+    },
   },
   loggedOut: () => {
     console.log("loggedOut");
@@ -440,6 +459,8 @@ const buildContent = {
 
     // Focus on "Go to Firefox Relay" button
     signUpButton.focus();
+
+    document.getElementById("fxRelayMenuBody").classList.remove("is-loading");
 
     // Bug: There's a race condition on how fast to detect the iframe being loaded. The setTimeout solves it for now.
     setTimeout(async () => {

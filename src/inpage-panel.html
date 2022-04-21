@@ -10,7 +10,7 @@
     <script src="/js/shared/metrics.js"></script>
     <script src="/js/other-websites/inpage_menu.js"></script>
   </head>
-  <body id="fxRelayMenuBody" class="fx-relay-menu-body fx-relay is-premium">
+  <body id="fxRelayMenuBody" class="fx-relay-menu-body fx-relay is-premium is-loading">
     <header class="fx-relay-menu-header">
       <h1 class="fx-relay-menu-logo">
         <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="">
@@ -18,10 +18,19 @@
       </h1>
       <a role="link" class="fx-relay-menu-dashboard-link" tabindex="0" href="https://relay.firefox.com">
         <span>Manage</span>
-        <img src="/icons/nebula-external-link.svg" alt="">
+        <img src="/icons/nebula-external-link-blue.svg" alt="">
       </a>
     </header>
     <main class="fx-relay-menu">
+      <div class="fx-relay-menu-loading-bar">
+        <div class="fx-relay-menu-loading-bar-wrapper">
+          <div class="fx-relay-menu-loading-bar-border">
+            <div class="fx-relay-menu-loading-bar-whitespace">
+              <div class="fx-relay-menu-loading-bar-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Logged Out -->
       <section class="fx-relay-menu-content fx-content-signed-out is-hidden">
         <p class="fx-relay-menu-sign-up-message"></p>
@@ -63,7 +72,7 @@
         <a tabindex="0" class="fx-relay-c-button t-secondary fx-relay-menu-get-unlimited-aliases" href="https://relay.firefox.com/premium"></a>
       </section>
 
-      <section class="fx-relay-menu-content fx-content-signed-in-premium">
+      <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
         <!-- <p class="fx-relay-menu-remaining-aliases"></p> -->
         <div class="fx-relay-menu-masks-search">
           <form class="fx-relay-menu-masks-search-form">
