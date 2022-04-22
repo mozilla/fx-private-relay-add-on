@@ -340,12 +340,13 @@ const buildContent = {
       const searchResultsList = searchResults.querySelector("ul");
 
       // Check if user may have custom domain masks
-      const premiumSubdomainSet = await browser.storage.local.get(
-        "premiumSubdomainSet"
-      );
+      const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+
+      // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+      const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");
 
       const masks = await getMasks({
-        subdomainSet: premiumSubdomainSet.hasOwnProperty("premiumSubdomainSet"),
+        subdomainSet: isPremiumSubdomainSet,
       });
 
       if (masks.length === 0) {
@@ -353,6 +354,17 @@ const buildContent = {
 
         const search = document.querySelector(".fx-relay-menu-masks-search");
         search.remove();
+
+        fxRelayMenuBody.classList.remove("is-loading");
+
+        const generateAliasBtn = document.querySelector(
+          ".fx-relay-menu-generate-alias-btn"
+        );
+  
+        generateAliasBtn.textContent = browser.i18n.getMessage(
+          "pageInputIconGenerateNewAlias_mask"
+        );
+  
 
         // Resize iframe
         await browser.runtime.sendMessage({
