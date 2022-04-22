@@ -1,4 +1,4 @@
-async function showModal(modalType) {
+async function showModal() {
   const { relaySiteOrigin } = await browser.storage.local.get(
     "relaySiteOrigin"
   );
@@ -127,7 +127,7 @@ if (!browser.menus) {
   }, true);
 }
 
-browser.runtime.onMessage.addListener((message, sender, response) => {
+browser.runtime.onMessage.addListener((message, _sender, _response) => {
 
   if (message.type === "fillTargetWithRelayAddress") {    
 

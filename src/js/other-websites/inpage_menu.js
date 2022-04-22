@@ -1,5 +1,3 @@
-/* global preventDefaultBehavior */
-
 function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
   browser.runtime.sendMessage({method:"iframeCloseRelayInPageMenu"});
@@ -48,7 +46,7 @@ function handleKeydownEvents(e) {
 
 async function isUserSignedIn() {
   const userApiToken = await browser.storage.local.get("apiToken");
-  return userApiToken.hasOwnProperty("apiToken");
+  return Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
 }
 
 async function inpageContentInit() {

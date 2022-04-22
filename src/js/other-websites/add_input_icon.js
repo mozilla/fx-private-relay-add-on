@@ -8,7 +8,7 @@ function closeRelayInPageMenu() {
   return;
 }
 
-function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
+function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
 
@@ -29,6 +29,8 @@ function positionRelayMenu() {
   relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 function createElementWithClassList(elemType, elemClass) {
   const newElem = document.createElement(elemType);
   newElem.classList.add(elemClass);
@@ -37,7 +39,7 @@ function createElementWithClassList(elemType, elemClass) {
 
 async function isUserSignedIn() {
   const userApiToken = await browser.storage.local.get("apiToken");
-  return userApiToken.hasOwnProperty("apiToken");
+  return Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
 }
 
 function buildInpageIframe(opts) {
@@ -93,9 +95,6 @@ function addPaddingRight(element, paddingInPixels) {
 let lastClickedEmailInput;
 
 async function addRelayIconToInput(emailInput) {
-  const { relaySiteOrigin } = await browser.storage.local.get(
-    "relaySiteOrigin"
-  );
   // remember the input's original parent element;
   const emailInputOriginalParentEl = emailInput.parentElement;
 
@@ -200,7 +199,7 @@ async function addRelayIconToInput(emailInput) {
   sendInPageEvent("input-icon-injected", "input-icon");
 }
 
-browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
   if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
@@ -209,7 +208,7 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m = "iframeCloseRelayInPageMenu") {
+  if (m === "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
   }  
 });

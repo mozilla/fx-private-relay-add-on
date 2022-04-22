@@ -11,7 +11,6 @@ const staticMenuData = {
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
-    contexts: ["editable"],
     enabled: true,
     visible: true,
     contexts: ["all"],
@@ -19,7 +18,6 @@ const staticMenuData = {
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
-    contexts: ["editable"],
     enabled: false,
     visible: true,
     contexts: ["all"],
@@ -60,6 +58,8 @@ const staticMenuData = {
 // identified by the following prefix followed by their alias ID:
 const reuseAliasMenuIdPrefix = "fx-private-relay-use-existing-alias_";
 
+// This object is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 const relayContextMenus = {
   init: async (currentWebsite=null) => {
     
@@ -74,7 +74,7 @@ const relayContextMenus = {
     
 
     const userApiToken = await browser.storage.local.get("apiToken");
-    const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+    const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
 
     if (!apiKeyInStorage) {
       // User is not logged in. Do not do anything.
@@ -175,7 +175,7 @@ const relayContextMenus = {
       );
       
     },
-    onLocalStorageChange: async (changes, area) => {
+    onLocalStorageChange: async (changes, _area) => {
       let changedItems = Object.keys(changes);
       for (let item of changedItems) {
         if (item === "relayAddresses") {
@@ -271,7 +271,7 @@ const relayContextMenus = {
         try {
           return await getAliasesFromServer();
         } catch (error) {
-          // API Error — Fallback to local storage
+          // API Error — Fallback to local storage
           const { relayAddresses } = await browser.storage.local.get("relayAddresses");
           return relayAddresses;
         }
@@ -364,15 +364,14 @@ if (browser.menus) {
   
     const domain = relayContextMenus.utils.getHostnameFromUrlConstructor(tab.url);
     await relayContextMenus.init(domain);
-  
-    if (menuInstanceId !== lastMenuInstanceId) {
-      return; // Menu was closed and shown again.
-    }
   });
 }
 
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
+  const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
+  const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
+  const urlManageAliases = `${relaySiteOrigin}/accounts/profile/`;
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
@@ -388,8 +387,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         action: "click",
         label: "context-menu-get-unlimited-aliases",
       });
-      const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
-      const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
       await browser.tabs.create({ url: urlPremium });
       break;
     case "fx-private-relay-manage-aliases":
@@ -398,7 +395,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         action: "click",
         label: "context-menu-relay-manage-aliases",
       });
-      const urlManageAliases = `${RELAY_SITE_ORIGIN}/accounts/profile/`;
       await browser.tabs.create({ url: urlManageAliases });
       break;
   }

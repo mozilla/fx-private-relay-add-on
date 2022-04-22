@@ -10,7 +10,7 @@ browser.runtime.onInstalled.addListener(async () => {
     return;
   }
   const userApiToken = await browser.storage.local.get("apiToken");
-  const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+  const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
   const url = browser.runtime.getURL("/first-run.html");
   if (!apiKeyInStorage) {
     await browser.tabs.create({ url });
@@ -18,6 +18,8 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare, no-unused-vars
 async function getAliasesFromServer(method = "GET", body = null, opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
@@ -41,7 +43,7 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
     body,
   });
 
-  answer = await response.json();
+  const answer = await response.json();
   
   return answer;
 }
@@ -82,6 +84,8 @@ async function getCurrentPage() {
   return currentTab;
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
@@ -94,7 +98,7 @@ async function getServerStoragePref() {
     headers: headers,
   });
 
-  answer = await response.json();
+  const answer = await response.json();
 
   return answer.server_storage;
 }
@@ -119,6 +123,8 @@ async function getOrMakeGAUUID() {
   return newGAUUID;
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 async function sendMetricsEvent(eventData) {
   const doNotTrackIsEnabled = navigator.doNotTrack === "1";
   const { dataCollection } = await browser.storage.local.get("dataCollection");
@@ -171,16 +177,16 @@ async function refreshAccountPages() {
   if (!settingsRefresh) {
     browser.storage.local.set({ settingsRefresh: true });
 
-    function tabReloader(tabs) {
+    browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabs => {
       for (let tab of tabs) {
         browser.tabs.reload(tab.id);
       }
-    };
-
-    browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabReloader);   
+    });
   }
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
@@ -259,7 +265,7 @@ async function updateAddOnAuthStatus(status) {
 
 async function displayBrowserActionBadge() {
   const userApiToken = await browser.storage.local.get("apiToken");
-  const apiKeyInStorage = userApiToken.hasOwnProperty("apiToken");
+  const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
   if (!apiKeyInStorage) {
     // Not Logged In
     return;
@@ -289,8 +295,10 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
+browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   let response;
+  const currentPage = await getCurrentPage();
+  const url = new URL(currentPage.url);
 
   switch (m.method) {
     case "displayBrowserActionBadge":
@@ -306,8 +314,6 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
       response = await getServerStoragePref();
       break;
     case "getCurrentPageHostname":
-      const currentPage = await getCurrentPage();
-      const url = new URL(currentPage.url);
       response = url.hostname;
       break;
     case "makeRelayAddress":
