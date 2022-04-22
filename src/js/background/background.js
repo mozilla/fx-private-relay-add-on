@@ -18,7 +18,23 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
+let lastTimeGetAliasesFromServerWasCalled = new Date();
+
 async function getAliasesFromServer(method = "GET", opts=null) {
+
+  const currentTime = new Date();
+  const thirtySeconds=30*1000;
+
+  // 30 Second Cool-down Clock to stop multiple API calls from happening.
+  // (Mostly collusion from the context menu and in-page menu querying close together)
+  if((currentTime - new Date(lastTimeGetAliasesFromServerWasCalled)) < thirtySeconds) {
+    const { relayAddresses } = await browser.storage.local.get("relayAddresses");  
+    return relayAddresses;
+  }
+
+  // Reset time out check
+  lastTimeGetAliasesFromServerWasCalled = currentTime;
+
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
   const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/`;
@@ -41,33 +57,25 @@ async function getAliasesFromServer(method = "GET", opts=null) {
     headers: headers,
   });
 
-  answer = await response.json();
-  
-  if (opts.subdomainSet) {
-    
-    const masks = new Array();
-    masks.push(...answer);
+  const answer = await response.json();
+  const masks = new Array();
+  masks.push(...answer);
 
+  // If the user has domain (custom) masks set, also grab them before sorting
+  if (opts.subdomainSet) {
     const domainResponse = await fetch(apiMakeDomainAddressesURL, {
       mode: "same-origin",
       method,
       headers: headers,
     });
 
-    domainMasks = await domainResponse.json();
+    const domainMasks = await domainResponse.json();
     masks.push(...domainMasks);
-    masks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-
-    browser.storage.local.set({ relayAddresses: masks });
-    
-    return masks;
-    
-
   }
-
-  browser.storage.local.set({ relayAddresses: answer });
   
-  return answer;
+  masks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  browser.storage.local.set({ relayAddresses: masks });  
+  return masks;
 }
 
 async function storePremiumAvailabilityInCountry() {
