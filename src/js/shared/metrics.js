@@ -25,6 +25,6 @@ async function getBrowser() {
   }
   if (navigator.userAgent.toLowerCase().indexOf("firefox") !== -1) {
     return "Firefox";
-  };
+  }
   return "Chrome";
 }

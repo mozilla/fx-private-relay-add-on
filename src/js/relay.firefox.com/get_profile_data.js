@@ -74,7 +74,7 @@
         body,
       });
 
-      answer = await response.json();
+      const answer = await response.json();
       return answer;
     }
 
@@ -192,7 +192,7 @@
           generated_for: updatedAlias.generated_for.length > 0 ? updatedAlias.generated_for : prevAlias.generated_for,
         };
       }
-    )};
+    )}
 
     if (siteStorageEnabled) {
       // Sync alias data from server page.
@@ -253,11 +253,12 @@
         // that needs to be ported to the "description" entry
         const storedLegacyAliasLabel =
           addonRelayAddress &&
-          addonRelayAddress.hasOwnProperty("domain") &&
+          Object.prototype.hasOwnProperty.call(addonRelayAddress, "domain") &&
           !Number.isInteger(addonRelayAddress.domain);
 
         let storedAliasLabel =
-          addonRelayAddress && addonRelayAddress.hasOwnProperty("description")
+          addonRelayAddress &&
+          Object.prototype.hasOwnProperty.call(addonRelayAddress, "description")
             ? addonRelayAddress.description
             : "";
 
