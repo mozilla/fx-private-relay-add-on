@@ -10,6 +10,8 @@ async function areInputIconsEnabled() {
   return (showInputIcons === "show-input-icons");
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 async function setCustomFonts() {
   const customFonts = [
     { font: "Metropolis Bold", weight: 800, filePath: "/fonts/Metropolis/Metropolis-Bold.woff2"},
@@ -32,6 +34,8 @@ async function setCustomFonts() {
   }
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 function preventDefaultBehavior(clickEvt) {
   clickEvt.stopPropagation();
   clickEvt.stopImmediatePropagation();

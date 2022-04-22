@@ -89,6 +89,11 @@ const email_detector_ruleset = ruleset([
     [["email", -3.907843589782715]]
 );
 
+// It looks like ESLint doesn't recognise generator functions as global,
+// so we ignore this rule here.
+// Also, this function is defined as global in the ESLint config _because_ it is created here,
+// so it's not actually a redeclaration.
+// eslint-disable-next-line no-unused-vars, no-redeclare
 function *detectEmailInputs(domRoot) {
     // First return <input type='email'>
     const typeEmailInputs = Array.from(domRoot.querySelectorAll("input[type='email']"));

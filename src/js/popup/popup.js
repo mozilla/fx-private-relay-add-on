@@ -402,11 +402,6 @@ async function showRelayPanel(tipPanelToShow) {
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
 }
 
-async function getDashboardData() {
-  const { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal } = await browser.storage.local.get();
-  return { aliasesUsedVal, emailsForwardedVal, emailsBlockedVal };
-} 
-
 
 async function getAllAliases() {
   return await browser.storage.local.get("relayAddresses");
@@ -481,7 +476,7 @@ async function popup() {
   sendRelayEvent("Panel", "opened-panel", "any-panel");
   clearBrowserActionBadge();
   const userApiToken = await browser.storage.local.get("apiToken");
-  const signedInUser = (userApiToken.hasOwnProperty("apiToken"));
+  const signedInUser = (Object.prototype.hasOwnProperty.call(userApiToken, "apiToken"));
 
   // Set custom fonts from the add-on
   await setCustomFonts();

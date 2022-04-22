@@ -1,5 +1,3 @@
-/* global preventDefaultBehavior */
-
 async function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
   await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
@@ -49,13 +47,13 @@ async function handleKeydownEvents (e) {
 
 async function isUserSignedIn() {
   const userApiToken = await browser.storage.local.get("apiToken");
-  return userApiToken.hasOwnProperty("apiToken");
+  return Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
 }
 
-async function getServerStoragePref() {
+async function getCachedServerStoragePref() {
   const serverStoragePref = await browser.storage.local.get("server_storage");
   const serverStoragePrefInStorage =
-    serverStoragePref.hasOwnProperty("server_storage");
+    Object.prototype.hasOwnProperty.call(serverStoragePref, "server_storage");
 
   if (!serverStoragePrefInStorage) {
     return await browser.runtime.sendMessage({
@@ -67,7 +65,7 @@ async function getServerStoragePref() {
 }
 
 async function getMasks(options = { fetchCustomMasks: false }) {
-  const serverStoragePref = await getServerStoragePref();
+  const serverStoragePref = await getCachedServerStoragePref();
 
   if (serverStoragePref) {
     try {
@@ -80,7 +78,7 @@ async function getMasks(options = { fetchCustomMasks: false }) {
     } catch (error) {
       console.warn(`getAliasesFromServer Error: ${error}`);
 
-      // API Error — Fallback to local storage
+      // API Error — Fallback to local storage
       const { relayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
