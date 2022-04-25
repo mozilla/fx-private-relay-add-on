@@ -23,11 +23,11 @@ let lastTimeGetAliasesFromServerWasCalled = new Date();
 async function getAliasesFromServer(method = "GET", opts=null) {
 
   const currentTime = new Date();
-  const thirtySeconds=30*1000;
+  const timeOutDelay=10*1000;
 
   // 30 Second Cool-down Clock to stop multiple API calls from happening.
   // (Mostly collusion from the context menu and in-page menu querying close together)
-  if((currentTime - new Date(lastTimeGetAliasesFromServerWasCalled)) < thirtySeconds) {
+  if((currentTime - new Date(lastTimeGetAliasesFromServerWasCalled)) < timeOutDelay) {
     const { relayAddresses } = await browser.storage.local.get("relayAddresses");  
     return relayAddresses;
   }
