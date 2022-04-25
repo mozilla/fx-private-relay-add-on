@@ -14,11 +14,11 @@
 }
 
 .fx-relay-menu-body.is-premium.is-loading  {
-  background-color: var(--colorWhite);
+  background-color: var(--colorWhite); 
 }
 
 .fx-relay-menu-body.is-premium  {
-  background-color: var(--colorGrey10);
+  background-color: var(--colorGrey05);
 }
 
 .is-premium .fx-relay-menu-header {
@@ -222,7 +222,7 @@
 
 /* Premium Search List */
 .fx-relay-menu-masks-search {
-  background-color: var(--colorGrey10);
+  background-color: var(--colorGrey05);
   padding: var(--spacingSm) 0 0;
 }
 
@@ -247,7 +247,7 @@
 }
 
 .fx-relay-menu-masks-search-results ul {
-  max-height: 250px;
+  max-height: 190px;
   overflow: scroll;
 }
 
