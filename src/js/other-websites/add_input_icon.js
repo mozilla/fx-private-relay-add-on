@@ -29,7 +29,7 @@ function positionRelayMenu() {
   const documentPosition = document.documentElement.getBoundingClientRect();
   
   // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
-  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > 400);
+  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > 405);
 
   if (positionMenuBelowIcon) {
     relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
