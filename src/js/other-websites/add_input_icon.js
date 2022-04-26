@@ -8,7 +8,7 @@ function closeRelayInPageMenu() {
   return;
 }
 
-function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
+function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
 
@@ -24,6 +24,12 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
 function positionRelayMenu() {
   const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe");
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
+
+  if (!relayIconBtn) {
+    // BUGFIX: Catch erroneous/duplicate positionRelayMenu() calls before menu is open
+    return;
+  }
+
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
   const documentPosition = document.documentElement.getBoundingClientRect();
@@ -216,12 +222,11 @@ async function addRelayIconToInput(emailInput) {
 
 function updateIframeHeight(height) {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
-  relayInPageMenuIframe.height = height;
 
   // BUG: Console error in background.js being called. The code below solves it. 
-  // if (relayInPageMenuIframe) {
-  //   relayInPageMenuIframe.height = height;
-  // }
+  if (relayInPageMenuIframe) {
+    relayInPageMenuIframe.height = height;
+  }
 
 }
 

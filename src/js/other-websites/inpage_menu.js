@@ -184,8 +184,6 @@ function applySearchFilter(query) {
     const button = maskResult.querySelector("button");
     const emailAddress = button.dataset.mask;
     const label = button.dataset.label;
-    // const labelElement = maskResult.querySelectorAll(".relay-email-address-label")[0];
-    // const label = labelElement ? labelElement.dataset.label : "";
     const matchesSearchFilter =
       label.toLowerCase().includes(query.toLowerCase()) ||
       emailAddress.toLowerCase().includes(query.toLowerCase());
@@ -287,7 +285,8 @@ const buildContent = {
         generateAliasBtn.focus();
       }
 
-      //Check if premium features are available
+      // TODO: Add premiumCountryAvailability Check 
+      // Check if premium features are available
       // const premiumCountryAvailability = (
       //   await browser.storage.local.get("premiumCountries")
       // )?.premiumCountries;
@@ -354,12 +353,6 @@ const buildContent = {
         subdomainSet: isPremiumSubdomainSet,
       });
 
-      // // Resize iframe
-      // await browser.runtime.sendMessage({
-      //   method: "updateIframeHeight",
-      //   height: fxRelayMenuBody.scrollHeight,
-      // });
-
       if (masks.length === 0) {
         // TODO: Add style/class to remove border-radius from header/footer sections
 
@@ -367,14 +360,6 @@ const buildContent = {
         search.remove();
 
         fxRelayMenuBody.classList.remove("is-loading");
-
-        // const generateAliasBtn = document.querySelector(
-        //   ".fx-relay-menu-generate-alias-btn"
-        // );
-
-        // generateAliasBtn.textContent = browser.i18n.getMessage(
-        //   "pageInputIconGenerateNewAlias_mask"
-        // );
 
         // Resize iframe
         await browser.runtime.sendMessage({
@@ -558,15 +543,7 @@ const buildContent = {
           description: currentPageHostName,
         });
 
-        // const loadingImagePath = browser.runtime.getURL("/images/loader.svg");
-        // const loadingAnimationImage = document.querySelector(
-        //   ".fx-relay-alias-loading-image img"
-        // );
-        // loadingAnimationImage.src = loadingImagePath;
-
-        // const relayInPageMenu = document.querySelector(".fx-relay-menu");
-
-        // relayInPageMenu.classList.add("fx-relay-alias-loading");
+        // TODO: Determine if this check is still necessary. Note that there's no error state defined currently.
 
         // Catch edge cases where the "Generate New Alias" button is still enabled,
         // but the user has already reached the max number of aliases.

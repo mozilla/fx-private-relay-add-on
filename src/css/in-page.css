@@ -265,6 +265,7 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--colorGrey60);
+  pointer-events: none;
 }
 
 .fx-relay-menu-content-footer {
