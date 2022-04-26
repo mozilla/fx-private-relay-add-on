@@ -18,23 +18,7 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
-let lastTimeGetAliasesFromServerWasCalled = new Date();
-
 async function getAliasesFromServer(method = "GET", opts=null) {
-
-  const currentTime = new Date();
-  const timeOutDelay=10*1000;
-
-  // 30 Second Cool-down Clock to stop multiple API calls from happening.
-  // (Mostly collusion from the context menu and in-page menu querying close together)
-  if((currentTime - new Date(lastTimeGetAliasesFromServerWasCalled)) < timeOutDelay) {
-    const { relayAddresses } = await browser.storage.local.get("relayAddresses");  
-    return relayAddresses;
-  }
-
-  // Reset time out check
-  lastTimeGetAliasesFromServerWasCalled = currentTime;
-
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
   const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/`;
