@@ -12,7 +12,8 @@ function getRelayMenuEl() {
 let activeElemIndex = 0;
 function handleKeydownEvents(e) {
   const relayInPageMenu = getRelayMenuEl();
-  const clickableElsInMenu = relayInPageMenu.querySelectorAll("button, a");
+  const clickableElsInMenu =
+    relayInPageMenu.querySelectorAll("button, a, input");
   const watchedKeys = ["Escape", "ArrowDown", "ArrowUp"];
   const watchedKeyClicked = watchedKeys.includes(e.key);
 
@@ -70,10 +71,12 @@ async function getMasks(options = { subdomainSet: false }) {
 
   if (serverStoragePref) {
     try {
-      return await browser.runtime.sendMessage({
+      const masks = await browser.runtime.sendMessage({
         method: "getAliasesFromServer",
         options,
       });
+
+      return masks;
     } catch (error) {
       console.warn(`getAliasesFromServer Error: ${error}`);
 
@@ -81,6 +84,7 @@ async function getMasks(options = { subdomainSet: false }) {
       const { relayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
+
       return relayAddresses;
     }
   }
@@ -173,14 +177,13 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 
 function applySearchFilter(query) {
   const maskResults = Array.from(
-    document.querySelectorAll(
-      ".fx-relay-menu-masks-search-results ul li button"
-    )
+    document.querySelectorAll(".fx-relay-menu-masks-search-results ul li")
   );
 
   maskResults.forEach((maskResult) => {
-    const emailAddress = maskResult.dataset.mask;
-    const label = maskResult.dataset.label;
+    const button = maskResult.querySelector("button");
+    const emailAddress = button.dataset.mask;
+    const label = button.dataset.label;
     // const labelElement = maskResult.querySelectorAll(".relay-email-address-label")[0];
     // const label = labelElement ? labelElement.dataset.label : "";
     const matchesSearchFilter =
@@ -194,9 +197,18 @@ function applySearchFilter(query) {
     }
   });
 
-  // TODO: Add #/# label
-  // filterLabelVisibleCases.textContent = aliasContainers.filter(aliasContainer => !aliasContainer.classList.contains("is-hidden")).length;
-  // filterLabelTotalCases.textContent = aliasContainers.length;
+  // Add #/# labels to search filter
+  const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+  const searchFilterVisible = document.querySelector(
+    ".js-filter-masks-visible"
+  );
+
+  searchFilterVisible.textContent = maskResults.length;
+
+  searchFilterVisible.textContent = maskResults.filter(
+    (maskResult) => !maskResult.classList.contains("is-hidden")
+  ).length;
+  searchFilterTotal.textContent = maskResults.length;
 }
 
 const buildContent = {
@@ -225,7 +237,7 @@ const buildContent = {
       const masks = await getMasks();
 
       if (masks.length !== 0) {
-        // 
+        //
       }
 
       maskLists?.forEach(async (maskList) => {
@@ -241,7 +253,6 @@ const buildContent = {
       const numAliasesRemaining = maxNumAliases - masks.length;
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
-    
       // Set Generate Mask button
       buildContent.components.setUnlimitedButton();
 
@@ -251,13 +262,11 @@ const buildContent = {
         [numAliasesRemaining, maxNumAliases]
       );
 
-      
-
       const generateAliasBtn = document.querySelector(
         ".fx-relay-menu-generate-alias-btn"
       );
 
-      if (maxNumAliasesReached) {        
+      if (maxNumAliasesReached) {
         generateAliasBtn.remove();
         sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
         remainingAliasesSpan.textContent = browser.i18n.getMessage(
@@ -302,8 +311,6 @@ const buildContent = {
       });
     },
     premium: async () => {
-      console.log("loggedIn/premium");
-
       const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
       const signedInContentFree = document.querySelector(
@@ -336,14 +343,22 @@ const buildContent = {
       const searchResultsList = searchResults.querySelector("ul");
 
       // Check if user may have custom domain masks
-      const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+      const { premiumSubdomainSet } = await browser.storage.local.get(
+        "premiumSubdomainSet"
+      );
 
       // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
-      const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");
+      const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
 
       const masks = await getMasks({
         subdomainSet: isPremiumSubdomainSet,
       });
+
+      // // Resize iframe
+      // await browser.runtime.sendMessage({
+      //   method: "updateIframeHeight",
+      //   height: fxRelayMenuBody.scrollHeight,
+      // });
 
       if (masks.length === 0) {
         // TODO: Add style/class to remove border-radius from header/footer sections
@@ -356,11 +371,10 @@ const buildContent = {
         // const generateAliasBtn = document.querySelector(
         //   ".fx-relay-menu-generate-alias-btn"
         // );
-  
+
         // generateAliasBtn.textContent = browser.i18n.getMessage(
         //   "pageInputIconGenerateNewAlias_mask"
         // );
-  
 
         // Resize iframe
         await browser.runtime.sendMessage({
@@ -369,12 +383,49 @@ const buildContent = {
         });
 
         return;
-      }
+      } else if (masks.length > 5) {
+        // If there's at least 6 masks, show the search bar
+        await populateMaskList(searchResults, masks, {
+          replaceMaskAddressWithLabel: true,
+        });
 
-      // Populate search results lists
-      await populateMaskList(searchResults, masks, {
-        replaceMaskAddressWithLabel: true,
-      });
+        searchResultsList.style.height = `${searchResultsList.offsetHeight}px`;
+
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+
+        const filterSearchInput = filterSearchForm.querySelector(
+          ".fx-relay-menu-masks-search-input"
+        );
+
+        filterSearchForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          filterSearchInput.blur();
+        });
+
+        filterSearchInput.addEventListener("input", (event) => {
+          applySearchFilter(event.target.value);
+        });
+      } else {
+        // User has between 1-5 masks. Display all of them, but
+        // do not show the search input/filter.
+
+        await populateMaskList(searchResults, masks, {
+          replaceMaskAddressWithLabel: true,
+        });
+
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+
+        const filterSearchResults = document.querySelector(
+          ".fx-relay-menu-masks-search-results"
+        );
+
+        filterSearchForm.remove();
+        filterSearchResults.classList.add("t-no-search-bar");
+      }
 
       // Resize iframe
       await browser.runtime.sendMessage({
@@ -382,36 +433,7 @@ const buildContent = {
         height: fxRelayMenuBody.scrollHeight,
       });
 
-      searchResultsList.style.height = `${searchResultsList.offsetHeight}px`;
-
-      const filterSearchForm = document.querySelector(
-        ".fx-relay-menu-masks-search-form"
-      );
-      const filterSearchInput = filterSearchForm.querySelector(
-        ".fx-relay-menu-masks-search-input"
-      );
-
-      filterSearchForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        filterSearchInput.blur();
-      });
-
-      filterSearchInput.addEventListener("input", (event) => {
-        applySearchFilter(event.target.value);
-      });
-
-      // const generateAliasBtn = document.querySelector(
-      //   ".fx-relay-menu-generate-alias-btn"
-      // );
-
-      // console.log("generateAliasBtn");
-
-      // generateAliasBtn.textContent = browser.i18n.getMessage(
-      //   "pageInputIconGenerateNewAlias_mask"
-      // );
-
       fxRelayMenuBody.classList.remove("is-loading");
-
 
       const generateAliasBtn = document.querySelector(
         ".fx-relay-menu-generate-alias-btn"
@@ -426,6 +448,27 @@ const buildContent = {
         height: fxRelayMenuBody.scrollHeight,
       });
 
+      const filterSearchInput = document.querySelector(
+        ".fx-relay-menu-masks-search-input"
+      );
+
+      if (filterSearchInput) {
+        // If there's a search bar visible, focus on that instead of the generate
+
+        const searchFilterTotal = document.querySelector(
+          ".js-filter-masks-total"
+        );
+        const searchFilterVisible = document.querySelector(
+          ".js-filter-masks-visible"
+        );
+
+        searchFilterTotal.textContent = masks.length;
+        searchFilterVisible.textContent = masks.length;
+
+        filterSearchInput.focus();
+        return;
+      }
+
       // Focus on "Generate New Alias" button
       generateAliasBtn.focus();
 
@@ -433,8 +476,6 @@ const buildContent = {
     },
   },
   loggedOut: () => {
-    console.log("loggedOut");
-
     // Remove signed in content from DOM so there are no hidden/screen readable-elements available
     document.getElementById("fxRelayMenuBody").classList.remove("is-premium");
     const signedOutContent = document.querySelector(".fx-content-signed-out");
@@ -490,14 +531,10 @@ const buildContent = {
   },
   components: {
     generateMaskButton: async () => {
-      
-        // Create "Generate Relay Address" button
+      // Create "Generate Relay Address" button
       const generateAliasBtn = document.querySelector(
         ".fx-relay-menu-generate-alias-btn"
       );
-
-      console.log("components.generateMaskButton", generateAliasBtn);
-
 
       generateAliasBtn.textContent = browser.i18n.getMessage(
         "pageInputIconGenerateNewAlias_mask"
@@ -505,8 +542,6 @@ const buildContent = {
 
       // Handle "Generate New Alias" clicks
       generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
-        console.log("generateAliasBtn/click");
-        
         sendInPageEvent("click", "input-menu-reuse-previous-alias");
         preventDefaultBehavior(generateClickEvt);
 
@@ -536,11 +571,8 @@ const buildContent = {
         // Catch edge cases where the "Generate New Alias" button is still enabled,
         // but the user has already reached the max number of aliases.
         if (newRelayAddressResponse.status === 402) {
-          console.log("newRelayAddressResponse.status/402");
-
           // relayInPageMenu.classList.remove("fx-relay-alias-loading");
           // // preserve menu height before removing child elements
-          // // TODO: Add background/function to adjust height of iframe
           // relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
 
           // [generateAliasBtn, remainingAliasesSpan].forEach((el) => {
@@ -569,29 +601,27 @@ const buildContent = {
       });
     },
     setUnlimitedButton: () => {
-        // Create "Get unlimited aliases" button
-        const getUnlimitedAliasesBtn = document.querySelector(
-          ".fx-relay-menu-get-unlimited-aliases"
-        );
+      // Create "Get unlimited aliases" button
+      const getUnlimitedAliasesBtn = document.querySelector(
+        ".fx-relay-menu-get-unlimited-aliases"
+      );
 
-        getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-          "popupGetUnlimitedAliases_mask"
-        );
-  
-        // Create "Get unlimited aliases" link
-        getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
-        getUnlimitedAliasesBtn.target = "_blank";
-        getUnlimitedAliasesBtn.addEventListener("click", () => {
-          sendInPageEvent("click", "input-menu-get-premium-btn");
-          iframeCloseRelayInPageMenu();
-        });
-    }
-  }
+      getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
+        "popupGetUnlimitedAliases_mask"
+      );
+
+      // Create "Get unlimited aliases" link
+      getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
+      getUnlimitedAliasesBtn.target = "_blank";
+      getUnlimitedAliasesBtn.addEventListener("click", () => {
+        sendInPageEvent("click", "input-menu-get-premium-btn");
+        iframeCloseRelayInPageMenu();
+      });
+    },
+  },
 };
 
-async function setGenerateMaskButton() {
-  
-}
+async function setGenerateMaskButton() {}
 
 function setManageLink(relaySiteOrigin) {
   // Create "Manage All Aliases" link

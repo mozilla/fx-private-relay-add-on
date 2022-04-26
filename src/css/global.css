@@ -202,3 +202,45 @@
       transform:rotate(360deg);
   }
 }
+
+/* Input */
+.fx-relay-c-search-input {
+    display: block;
+    width: 100%;
+    /* Custom padding to match Nebula */
+    padding: var(--spacingSm) var(--spacing2xl) var(--spacingSm) var(--spacingMd);
+    border-radius: var(--borderRadiusSm);
+    background-color: var(--colorWhite);
+    border: 2px solid transparent;
+    outline: 1px solid var(--colorGrey30);
+}
+
+.fx-relay-c-search-input:focus {
+  outline: 4px solid var(--colorInformationalFocus);
+  border: 2px solid var(--colorInformational);
+}
+
+.fx-relay-c-search-input:focus + .fx-relay-c-search-controls {
+  opacity: 1;
+}
+
+.fx-relay-c-search-controls {
+    position: absolute;
+    right: var(--spacingSm);
+    display: flex;
+    align-items: center;
+    height: 100%;
+    top: 0;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity .2s ease-out;
+}
+
+.fx-relay-filter-mask-count {
+  display: flex;
+  margin-right: var(--spacingSm);
+  align-items: center;
+  height: 100%;
+  transition: opacity .2s ease-out;
+  color: var(--colorGrey40);;
+}

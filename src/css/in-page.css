@@ -157,6 +157,10 @@
   border-bottom: 1px solid var(--colorGrey10);
 }
 
+.fx-relay-menu-masks-list.t-search ul li:last-child {
+  border-bottom: none;
+}
+
 .fx-relay-menu-masks-list.t-search button {
   /* color: var(--colorBlue50); */
 }
@@ -182,6 +186,10 @@
   width: 100%;
 }
 
+.fx-relay-menu-masks-list li.is-hidden {
+  display: none;
+}
+
 .fx-relay-menu-masks-list button {
   appearance: none;
   display: block;
@@ -193,10 +201,6 @@
   cursor: pointer;
   text-align: left;
   overflow: hidden;
-}
-
-.fx-relay-menu-masks-list button.is-hidden {
-  display: none;
 }
 
 .fx-relay-menu-masks-list button:hover {
@@ -233,28 +237,21 @@
 .fx-relay-menu-masks-search-form {
   padding: var(--spacingXs) var(--spacingSm);
   margin-bottom: var(--spacingSm);
+  position: relative;
 }
 
-.fx-relay-menu-masks-search-input {
-  display: block;
-  width: 100%;
-  /* Custom padding to match Nebula */
-  padding: 12px var(--spacingMd);
-  border-radius: var(--borderRadiusSm);
-  background-color: var(--colorWhite);
-  border: none;
-  outline: 1px solid var(--colorGrey30);
+.fx-relay-menu-masks-search-results.t-no-search-bar ul {
+  max-height: none;
+  overflow: visible;
 }
 
 .fx-relay-menu-masks-search-results ul {
   max-height: 190px;
   overflow: scroll;
-}
-
-.fx-relay-menu-masks-search-results ul {
   list-style: none;
   margin: 0;
   padding: 0 0 var(--spacingSm);
+  outline: 1px solid red;
 }
 
 .fx-relay-menu-masks-search-result-label {
