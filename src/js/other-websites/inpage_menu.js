@@ -618,31 +618,28 @@ const buildContent = {
         iframeCloseRelayInPageMenu();
       });
     },
+    setManageLink: (relaySiteOrigin) => {
+      // Create "Manage All Aliases" link
+      const relayMenuDashboardLink = document.querySelector(
+        ".fx-relay-menu-dashboard-link"
+      );
+    
+      const relayMenuDashboardLinkSpan =
+        relayMenuDashboardLink.querySelector("span");
+    
+      relayMenuDashboardLinkSpan.textContent =
+        browser.i18n.getMessage("labelManage");
+    
+      relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
+      relayMenuDashboardLink.target = "_blank";
+    
+      relayMenuDashboardLink.addEventListener("click", () => {
+        sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
+        iframeCloseRelayInPageMenu();
+      });
+    }
   },
 };
-
-async function setGenerateMaskButton() {}
-
-function setManageLink(relaySiteOrigin) {
-  // Create "Manage All Aliases" link
-  const relayMenuDashboardLink = document.querySelector(
-    ".fx-relay-menu-dashboard-link"
-  );
-
-  const relayMenuDashboardLinkSpan =
-    relayMenuDashboardLink.querySelector("span");
-
-  relayMenuDashboardLinkSpan.textContent =
-    browser.i18n.getMessage("labelManage");
-
-  relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
-  relayMenuDashboardLink.target = "_blank";
-
-  relayMenuDashboardLink.addEventListener("click", () => {
-    sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
-    iframeCloseRelayInPageMenu();
-  });
-}
 
 async function inpageContentInit() {
   const { relaySiteOrigin } = await browser.storage.local.get(
@@ -659,7 +656,7 @@ async function inpageContentInit() {
   document.addEventListener("keydown", handleKeydownEvents);
 
   // Set Manage All Masks Link
-  setManageLink(relaySiteOrigin);
+  buildContent.components.setManageLink(relaySiteOrigin);
 
   // Build Content: Logged out user
   if (!signedInUser) {
