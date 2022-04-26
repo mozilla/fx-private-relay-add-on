@@ -99,7 +99,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   preventDefaultBehavior(generateClickEvt);
 
   const maskAddress = generateClickEvt.target.dataset.mask;
-
+  
   await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
     message: {
@@ -184,8 +184,6 @@ function applySearchFilter(query) {
     const button = maskResult.querySelector("button");
     const emailAddress = button.dataset.mask;
     const label = button.dataset.label;
-    // const labelElement = maskResult.querySelectorAll(".relay-email-address-label")[0];
-    // const label = labelElement ? labelElement.dataset.label : "";
     const matchesSearchFilter =
       label.toLowerCase().includes(query.toLowerCase()) ||
       emailAddress.toLowerCase().includes(query.toLowerCase());
@@ -287,7 +285,8 @@ const buildContent = {
         generateAliasBtn.focus();
       }
 
-      //Check if premium features are available
+      // TODO: Add premiumCountryAvailability Check 
+      // Check if premium features are available
       // const premiumCountryAvailability = (
       //   await browser.storage.local.get("premiumCountries")
       // )?.premiumCountries;
@@ -354,12 +353,6 @@ const buildContent = {
         subdomainSet: isPremiumSubdomainSet,
       });
 
-      // // Resize iframe
-      // await browser.runtime.sendMessage({
-      //   method: "updateIframeHeight",
-      //   height: fxRelayMenuBody.scrollHeight,
-      // });
-
       if (masks.length === 0) {
         // TODO: Add style/class to remove border-radius from header/footer sections
 
@@ -367,14 +360,6 @@ const buildContent = {
         search.remove();
 
         fxRelayMenuBody.classList.remove("is-loading");
-
-        // const generateAliasBtn = document.querySelector(
-        //   ".fx-relay-menu-generate-alias-btn"
-        // );
-
-        // generateAliasBtn.textContent = browser.i18n.getMessage(
-        //   "pageInputIconGenerateNewAlias_mask"
-        // );
 
         // Resize iframe
         await browser.runtime.sendMessage({
