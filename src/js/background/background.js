@@ -4,9 +4,9 @@ browser.storage.local.set({ maxNumAliases: 5 });
 browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
 browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
 
-browser.runtime.onInstalled.addListener(async () => {
+browser.runtime.onInstalled.addListener(async (details) => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
-  if (firstRunShown) {
+  if (firstRunShown || details.reason !== "install") {
     return;
   }
   const userApiToken = await browser.storage.local.get("apiToken");
