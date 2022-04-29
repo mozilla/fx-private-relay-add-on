@@ -144,11 +144,7 @@ async function populateMaskList(
       listButton.appendChild(listButtonAddress);
     } else {
       // The button text for a mask will be either the description label or the full address.
-      if (mask.description) {
-        listButton.textContent = mask.description;
-      } else {
-        listButton.textContent = mask.full_address;
-      }
+      listButton.textContent = mask.description || mask.full_address;
     }
 
     listButton.addEventListener("click", fillTargetWithRelayAddress, false);
@@ -288,6 +284,7 @@ const buildContent = {
         // Focus on "Get unlimited alias" button
         getUnlimitedAliasesBtn.focus();
 
+        // In the UX, there are three+ elements (from top to bottom): "Generate more" button, the list(s) and the upgrade button. When the user has maxed out their available masks, the "Generate more" button is hidden/replaced with the upgrade button. The order change is necessary to match the UX.
         document.querySelector(".fx-relay-menu-masks-lists").style.order = "2";
       } else {
         // Set Generate Mask button
