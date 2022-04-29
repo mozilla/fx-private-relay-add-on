@@ -119,7 +119,6 @@ async function populateMaskList(
   const list = maskList.querySelector("ul");
 
   if (masks.length === 0) {
-    maskList.remove();
     return;
   }
 
@@ -164,6 +163,11 @@ async function populateMaskList(
   );
   loadingItem.remove();
   list.classList.remove("is-loading");
+
+  maskList.classList.add("is-visible");
+  
+  // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too. 
+  document.querySelector(".fx-relay-menu-masks-lists")?.classList.add("is-visible");
 
   await browser.runtime.sendMessage({
     method: "updateIframeHeight",
@@ -214,6 +218,7 @@ const buildContent = {
     free: async (relaySiteOrigin) => {
       const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
+
       const signedInContentFree = document.querySelector(
         ".fx-content-signed-in-free"
       );
@@ -221,6 +226,8 @@ const buildContent = {
       const signedInContentPremium = document.querySelector(
         ".fx-content-signed-in-premium"
       );
+
+      signedInContentPremium?.remove();
 
       // Create "You have .../.. remaining relay address" message
       const remainingAliasesSpan = document.querySelector(
@@ -234,25 +241,26 @@ const buildContent = {
       const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
       const masks = await getMasks();
 
-      if (masks.length !== 0) {
-        //
-      }
-
       maskLists?.forEach(async (maskList) => {
         // Set Mask List label names
-        const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
+
+        const label = maskList.querySelector(".fx-relay-menu-masks-list-label");        
+
         const stringId = label.dataset.stringId;
+        
         label.textContent = browser.i18n.getMessage(stringId);
 
-        // Populate mask lists
-        await populateMaskList(maskList, masks);
+        if (masks.length > 0) {
+          // Populate mask lists
+          await populateMaskList(maskList, masks);
+        }
       });
 
       const numAliasesRemaining = maxNumAliases - masks.length;
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
       // Set Generate Mask button
-      buildContent.components.setUnlimitedButton();
+      buildContent.components.setUnlimitedButton(relaySiteOrigin);
 
       // Free user: Set text informing them how many aliases they can create
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
@@ -269,6 +277,10 @@ const buildContent = {
         sendInPageEvent("viewed-menu", "input-menu-max-aliases-message");
         remainingAliasesSpan.textContent = browser.i18n.getMessage(
           "pageNoMasksRemaining"
+        );
+
+        const getUnlimitedAliasesBtn = document.querySelector(
+          ".fx-relay-menu-get-unlimited-aliases"
         );
 
         getUnlimitedAliasesBtn.classList.remove("t-secondary");
@@ -302,7 +314,6 @@ const buildContent = {
       // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
       fxRelayMenuBody.classList.remove("is-premium");
       signedInContentFree?.classList.remove("is-hidden");
-      signedInContentPremium?.remove();
 
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
@@ -353,7 +364,9 @@ const buildContent = {
         subdomainSet: isPremiumSubdomainSet,
       });
 
+      // Process the masks list:
       if (masks.length === 0) {
+
         // TODO: Add style/class to remove border-radius from header/footer sections
 
         const search = document.querySelector(".fx-relay-menu-masks-search");
@@ -361,13 +374,6 @@ const buildContent = {
 
         fxRelayMenuBody.classList.remove("is-loading");
 
-        // Resize iframe
-        await browser.runtime.sendMessage({
-          method: "updateIframeHeight",
-          height: fxRelayMenuBody.scrollHeight,
-        });
-
-        return;
       } else if (masks.length > 5) {
         // If there's at least 6 masks, show the search bar
         await populateMaskList(searchResults, masks, {
@@ -577,7 +583,7 @@ const buildContent = {
         });
       });
     },
-    setUnlimitedButton: () => {
+    setUnlimitedButton: (relaySiteOrigin) => {
       // Create "Get unlimited aliases" button
       const getUnlimitedAliasesBtn = document.querySelector(
         ".fx-relay-menu-get-unlimited-aliases"

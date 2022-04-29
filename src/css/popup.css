@@ -542,7 +542,7 @@ onboarding-panel {
 }
 
 onboarding-panel p {
-  text-align: left;
+  text-align: start;
   margin: 0 0 8px 0;
 }
 

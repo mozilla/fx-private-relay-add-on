@@ -11,6 +11,7 @@
   height: 100%;
   font-family: var(--fontStackBase);
   font-size: 16px;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .fx-relay-menu-body.is-premium.is-loading {
@@ -26,6 +27,9 @@
   border-radius: var(--borderRadiusSm);
   border: none;
   background-color: var(--colorWhite);
+  position: relative;
+  /* The z-index is necessary here to have the box-shadow above the rest of the content */
+  z-index: 1;
 }
 
 .fx-relay-menu-body *,
@@ -39,8 +43,6 @@
   border-bottom: 1px solid var(--colorGrey10);
   display: flex;
   justify-content: space-between;
-  position: relative;
-  z-index: 2;
   width: 100%;
 }
 
@@ -75,7 +77,7 @@
   border-radius: 100%;
 }
 
-.fx-relay-menu-dashboard-link span {
+.fx-relay-menu-dashboard-link .fx-relay-menu-dashboard-link-tooltip {
   display: none;
   color: var(--colorWhite);
   background-color: var(--colorGrey40);
@@ -86,8 +88,8 @@
   right: 0;
 }
 
-.fx-relay-menu-dashboard-link:hover span,
-.fx-relay-menu-dashboard-link:focus span {
+.fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
+.fx-relay-menu-dashboard-link:focus .fx-relay-menu-dashboard-link-tooltip {
   display: block;
   margin: 0 var(--spacingXs);
 }
@@ -102,7 +104,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--spacingMd) var(--spacingMd) 0;
+  padding: var(--spacingMd) var(--spacingMd);
+  gap: var(--spacingMd);
 }
 
 .fx-relay-menu-content.fx-content-signed-in-premium {
@@ -114,7 +117,7 @@
 }
 
 .fx-relay-menu-content p {
-  margin: 0 0 var(--spacingMd);
+  margin: 0;
   padding: 0;
   text-align: center;
 }
@@ -122,14 +125,24 @@
 /* Mask List */
 
 .fx-relay-menu-masks-lists {
-  margin-top: var(--spacingSm);
+  display: none;
+}
+
+.fx-relay-menu-masks-lists.is-visible {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMd);
 }
 
 .fx-relay-menu-masks-list {
   border-radius: var(--borderRadiusSm);
   background-color: var(--colorGrey10);
-  margin-bottom: var(--spacingMd);
   overflow: hidden;
+  display: none;
+}
+
+.fx-relay-menu-masks-list.is-visible {
+  display: block;
 }
 
 .fx-relay-menu-masks-list.t-website {
@@ -159,10 +172,6 @@
 
 .fx-relay-menu-masks-list.t-search ul li:last-child {
   border-bottom: none;
-}
-
-.fx-relay-menu-masks-list.t-search button {
-  /* color: var(--colorBlue50); */
 }
 
 .fx-relay-menu-masks-list > span {
@@ -199,7 +208,7 @@
   width: 100%;
   padding: var(--spacingSm) var(--spacingMd);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   overflow: hidden;
 }
 
@@ -251,13 +260,13 @@
   list-style: none;
   margin: 0;
   padding: 0 0 var(--spacingSm);
-  outline: 1px solid red;
 }
 
 .fx-relay-menu-masks-search-result-label {
   font-size: 12px;
   display: block;
   color: var(--colorGrey50);
+  /* This usage of pointer-events: none is necessary so when a user clicks on a result in the mask list, it clicks through to the parent element, which contains the information on which address to inject into the email input on page */
   pointer-events: none;
 }
 
@@ -265,6 +274,7 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--colorGrey60);
+  /* This usage of pointer-events: none is necessary so when a user clicks on a result in the mask list, it clicks through to the parent element, which contains the information on which address to inject into the email input on page */
   pointer-events: none;
 }
 
@@ -273,10 +283,6 @@
   padding: var(--spacingMd);
   border-radius: var(--borderRadiusSm);
   box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.13);
-}
-
-.fx-relay-menu-content-footer .fx-relay-c-button {
-  margin-bottom: 0;
 }
 
 /* Page Loader */
