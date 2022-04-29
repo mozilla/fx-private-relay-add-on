@@ -1,4 +1,6 @@
-.fx-relay-menu-body {
+/* Note that to use this global style sheet, you'll need to add a class of `.fx-relay` to the body of your page */
+
+.fx-relay {
   /* Spacing/Layout Tokens */
   --spacingXs: 4px;
   --spacingSm: 8px;
@@ -37,8 +39,7 @@
   --colorInformational: #0060df;
   --colorInformationalActive: #054096;
   --colorInformationalHover: #bcd0ec;
-  --colorInformationalFocus: rgba(0, 96, 223, 0.4);
-  /* #0060df @ 40% */
+  --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
 
   /* Nebula Colors: Blues */
   --colorBlue90: #09204d;
@@ -87,11 +88,6 @@
     "Open Sans", sans-serif;
   --fontStackBase: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
     "Open Sans", sans-serif;
-
-  font-family: open-sans, sans-serif;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-  font-size: 16px;
 }
 
 /* Utilities */
@@ -115,14 +111,10 @@
   outline: none;
   border: none;
   font-size: 16px;
-  margin-bottom: var(--spacingSm);
+  /* margin-bottom: var(--spacingSm); */
   cursor: pointer;
   position: relative;
   width: 100%;
-}
-
-.fx-relay-c-button:last-child {
-  margin-bottom: var(--spacingMd);
 }
 
 .fx-relay-c-button.t-primary {
