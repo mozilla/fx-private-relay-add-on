@@ -278,7 +278,7 @@ const relayContextMenus = {
       // Short-circuit if the user is premium.
       if (premium && isPremiumSubdomainSet) {
         options = {
-          subdomainSet: true
+          fetchCustomMasks: true
         }
       }
       

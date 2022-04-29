@@ -66,7 +66,7 @@ async function getServerStoragePref() {
   }
 }
 
-async function getMasks(options = { subdomainSet: false }) {
+async function getMasks(options = { fetchCustomMasks: false }) {
   const serverStoragePref = await getServerStoragePref();
 
   if (serverStoragePref) {
@@ -321,6 +321,7 @@ const buildContent = {
       });
     },
     premium: async () => {
+      
       const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
       const signedInContentFree = document.querySelector(
@@ -361,12 +362,11 @@ const buildContent = {
       const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
 
       const masks = await getMasks({
-        subdomainSet: isPremiumSubdomainSet,
+        fetchCustomMasks: isPremiumSubdomainSet,
       });
 
       // Process the masks list:
       if (masks.length === 0) {
-
         // TODO: Add style/class to remove border-radius from header/footer sections
 
         const search = document.querySelector(".fx-relay-menu-masks-search");
@@ -375,6 +375,7 @@ const buildContent = {
         fxRelayMenuBody.classList.remove("is-loading");
 
       } else if (masks.length > 5) {
+
         // If there's at least 6 masks, show the search bar
         await populateMaskList(searchResults, masks, {
           replaceMaskAddressWithLabel: true,
@@ -398,6 +399,7 @@ const buildContent = {
         filterSearchInput.addEventListener("input", (event) => {
           applySearchFilter(event.target.value);
         });
+
       } else {
         // User has between 1-5 masks. Display all of them, but
         // do not show the search input/filter.
@@ -607,10 +609,10 @@ const buildContent = {
         ".fx-relay-menu-dashboard-link"
       );
     
-      const relayMenuDashboardLinkSpan =
-        relayMenuDashboardLink.querySelector("span");
+      const relayMenuDashboardLinkTooltip =
+        relayMenuDashboardLink.querySelector(".fx-relay-menu-dashboard-link-tooltip");
     
-      relayMenuDashboardLinkSpan.textContent =
+        relayMenuDashboardLinkTooltip.textContent =
         browser.i18n.getMessage("labelManage");
     
       relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;

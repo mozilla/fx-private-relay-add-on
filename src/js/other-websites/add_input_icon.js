@@ -33,9 +33,11 @@ function positionRelayMenu() {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
   const documentPosition = document.documentElement.getBoundingClientRect();
+  const relayInPageMenuMaximumHeight = 405
   
   // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
-  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > 405);
+  // The relayInPageMenuMaximumHeight / 405 is the pixel height of the tallest version of the inpage menu. 
+  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > relayInPageMenuMaximumHeight);
 
   if (positionMenuBelowIcon) {
     relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
@@ -68,6 +70,7 @@ function buildInpageIframe(opts) {
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
   iframe.width = 320;
+  // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
   iframe.height = 300;
   iframe.title = browser.i18n.getMessage("pageInputTitle");
   iframe.tabIndex = 0;
@@ -239,7 +242,7 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m == "iframeCloseRelayInPageMenu") {
+  if (m === "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
   }  
 
