@@ -59,7 +59,7 @@
 
 /* Inline SVG arrow shape */
 .fx-relay-menu-iframe::before {
-  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><g id='Layer_2' data-name='Layer 2'><g id='Layer_1-2' data-name='Layer 1'><polygon fill='white' class='cls-1' points='10 0 15 3.5 20 7 10 7 0 7 5 3.5 10 0'/></g></g></svg>");
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><polygon fill='white' class='cls-1' points='10 0 15 3.5 20 7 10 7 0 7 5 3.5 10 0'/></svg>");
   display: block;
   position: absolute;
   top: -12px;
@@ -71,8 +71,8 @@
 
 .fx-relay-menu-iframe.is-position-bottom::before {
   top: auto;
-  bottom: -7px;
-  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><g id='Layer_2' data-name='Layer 2'><g id='Layer_1-2' data-name='Layer 1'><polygon fill='white' class='cls-1' points='10 7 5 3.5 0 0 10 0 20 0 15 3.5 10 7'/></g></g></svg>");
+  bottom: -6px;
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><polygon fill='white' class='cls-1' points='10 7 5 3.5 0 0 10 0 20 0 15 3.5 10 7'/></svg>");
 }
 
 .fx-relay-menu-wrapper {
