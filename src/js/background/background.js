@@ -46,7 +46,7 @@ async function getAliasesFromServer(method = "GET", opts=null) {
   masks.push(...answer);
 
   // If the user has domain (custom) masks set, also grab them before sorting
-  if (opts.subdomainSet) {
+  if (opts.fetchCustomMasks) {
     const domainResponse = await fetch(apiMakeDomainAddressesURL, {
       mode: "same-origin",
       method,
