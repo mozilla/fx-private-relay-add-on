@@ -416,20 +416,15 @@ const buildContent = {
         filterSearchResults.classList.add("t-no-search-bar");
       }
 
-      // Resize iframe
-      await browser.runtime.sendMessage({
-        method: "updateIframeHeight",
-        height: fxRelayMenuBody.scrollHeight,
-      });
-
-      fxRelayMenuBody.classList.remove("is-loading");
-
+    
       const generateAliasBtn = document.querySelector(
         ".fx-relay-menu-generate-alias-btn"
       );
 
       // Set Generate Mask button
       await buildContent.components.generateMaskButton();
+
+      fxRelayMenuBody.classList.remove("is-loading");
 
       // Resize iframe
       await browser.runtime.sendMessage({
@@ -547,29 +542,11 @@ const buildContent = {
           description: currentPageHostName,
         });
 
-        // TODO: Determine if this check is still necessary. Note that there's no error state defined currently.
-
         // Catch edge cases where the "Generate New Alias" button is still enabled,
-        // but the user has already reached the max number of aliases.
+        // but the user has already reached the max number of aliases. 
         if (newRelayAddressResponse.status === 402) {
-          // relayInPageMenu.classList.remove("fx-relay-alias-loading");
-          // // preserve menu height before removing child elements
-          // relayInPageMenu.style.height = relayInPageMenu.clientHeight + "px";
-
-          // [generateAliasBtn, remainingAliasesSpan].forEach((el) => {
-          //   el.remove();
-          // });
-
-          const errorMessage = document.createElement("p");
-          errorMessage.classList.add("fx-relay-error-message");
-
-          errorMessage.textContent = browser.i18n.getMessage(
-            "pageInputIconMaxAliasesError_mask",
-            [relayAddresses.length]
-          );
-
-          relayInPageMenu.insertBefore(errorMessage, relayMenuDashboardLink);
-          return;
+          generateClickEvt.target.classList.remove("is-loading");
+          throw new Error(browser.i18n.getMessage("pageInputIconMaxAliasesError_mask"));
         }
 
         await browser.runtime.sendMessage({
