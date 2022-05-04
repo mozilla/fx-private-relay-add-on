@@ -41,6 +41,12 @@
   --colorInformationalHover: #bcd0ec;
   --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
 
+  /* Nebula Colors: Button: Error */
+  --colorError: #FF4F5E;
+  --colorErrorActive: #C50042;
+  --colorErrorHover: #E22850;
+  --colorErrorFocus: #FFBDC5 ;
+
   /* Nebula Colors: Blues */
   --colorBlue90: #09204d;
   --colorBlue80: #073072;
@@ -162,6 +168,23 @@
 
 .fx-relay-c-button.is-loading.t-primary:hover {
   color: var(--colorInformationalHover);
+}
+
+.fx-relay-c-button.t-error {
+  background-color: var(--colorError);
+  color: var(--colorWhite);
+}
+
+.fx-relay-c-button.t-error:active {
+  background-color: var(--colorErrorActive);
+}
+
+.fx-relay-c-button.t-error:hover {
+  background-color: var(--colorErrorHover);
+}
+
+.fx-relay-c-button.t-error:focus {
+  outline: 4px solid var(--colorErrorFocus);
 }
 
 .fx-relay-c-button.is-loading::after {
