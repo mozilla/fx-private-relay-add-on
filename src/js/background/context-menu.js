@@ -177,7 +177,7 @@ const relayContextMenus = {
       let changedItems = Object.keys(changes);
       for (let item of changedItems) {
         if (item === "relayAddresses") {
-          // BUG: Running getAliasesFromServer() causes this localStorageChange event to loop
+          // WIP/Known Bug: Running getAliasesFromServer() causes this localStorageChange event to loop
           // await relayContextMenus.init();
         }
 
@@ -307,13 +307,7 @@ const relayContextMenus = {
       const { hostname } = new URL(url);
       return hostname;
     },  
-    getMostRecentAliases: (array, domain, options = {})=> {
-      // Flipped to match the same order as the dashboard if synced from the server
-      // TODO: Confirm if sorting by created_at makes the options object unnecessary
-      // if (options.shouldAliasOrderBeReversed) {
-      //   array.reverse();
-      // }
-
+    getMostRecentAliases: (array, domain)=> {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
@@ -322,15 +316,9 @@ const relayContextMenus = {
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
-    getSiteSpecificAliases: (array, domain, options = {})=> {
-
-      // Flipped to match the same order as the dashboard if synced from the server
-      // if (options.shouldAliasOrderBeReversed) {
-      //   array.reverse();
-      // }
-
+    getSiteSpecificAliases: (array, domain)=> {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-
+      
       const filteredAliases = array.filter(alias => alias.generated_for === domain);
 
       // If 5 results for specific domain
