@@ -8,7 +8,7 @@ function closeRelayInPageMenu() {
   return;
 }
 
-function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
+function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
 
@@ -24,9 +24,31 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn) {
 function positionRelayMenu() {
   const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe");
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
+
+  if (!relayIconBtn) {
+    // BUGFIX: Catch erroneous/duplicate positionRelayMenu() calls before menu is open
+    return;
+  }
+
+  const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
-  relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
-  relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
+  const documentPosition = document.documentElement.getBoundingClientRect();
+  const relayInPageMenuMaximumHeight = 405
+  
+  // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
+  // The relayInPageMenuMaximumHeight / 405 is the pixel height of the tallest version of the inpage menu. 
+  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > relayInPageMenuMaximumHeight);
+
+  if (positionMenuBelowIcon) {
+    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
+    relayInPageMenuIframe.classList.remove("is-position-bottom");
+  } else {
+    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    const relayInPageMenuIframeElement = document.querySelector(".fx-relay-menu-iframe iframe");
+    relayInPageMenuIframe.classList.add("is-position-bottom")
+    relayInPageMenu.style.top = newIconPosition.top - relayInPageMenuIframeElement.clientHeight - 20 + "px";
+  }
 }
 
 function createElementWithClassList(elemType, elemClass) {
@@ -47,8 +69,9 @@ function buildInpageIframe(opts) {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
-  iframe.width = 300;
-  iframe.height = 205;
+  iframe.width = 320;
+  // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
+  iframe.height = 300;
   iframe.title = browser.i18n.getMessage("pageInputTitle");
   iframe.tabIndex = 0;
   iframe.ariaHidden = "false";
@@ -56,7 +79,7 @@ function buildInpageIframe(opts) {
 
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
-    iframe.height = 150;
+    iframe.height = 200;
   }
 
   div.appendChild(iframe);
@@ -135,7 +158,7 @@ async function addRelayIconToInput(emailInput) {
   relayIconBtn.id = "fx-relay-button";
   relayIconBtn.type = "button";
   relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask");
-  const makeNewAliasImagePath = browser.runtime.getURL('/icons/make-new-alias.png');
+  const makeNewAliasImagePath = browser.runtime.getURL('/images/logo-image-fx-relay.svg');
   relayIconBtn.style.backgroundImage = `url(${makeNewAliasImagePath})`;
 
 
@@ -200,6 +223,16 @@ async function addRelayIconToInput(emailInput) {
   sendInPageEvent("input-icon-injected", "input-icon");
 }
 
+function updateIframeHeight(height) {
+  const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
+
+  // BUG: Console error in background.js being called. The code below solves it. 
+  if (relayInPageMenuIframe) {
+    relayInPageMenuIframe.height = height;
+  }
+
+}
+
 browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
@@ -209,8 +242,14 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m = "iframeCloseRelayInPageMenu") {
+  if (m.message == "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
+  }  
+
+  // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
+  if (m.method == "updateIframeHeight") {
+    updateIframeHeight(m.height);
+    positionRelayMenu();
   }  
 });
 

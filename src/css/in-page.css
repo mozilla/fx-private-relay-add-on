@@ -1,0 +1,353 @@
+.fx-relay-menu-body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--colorWhite);
+  box-sizing: border-box;
+  font-size: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--fontStackBase);
+  font-size: 16px;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fx-relay-menu-body.is-premium.is-loading {
+  background-color: var(--colorWhite);
+}
+
+.fx-relay-menu-body.is-premium {
+  background-color: var(--colorGrey05);
+}
+
+.is-premium .fx-relay-menu-header {
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  border-radius: var(--borderRadiusSm);
+  border: none;
+  background-color: var(--colorWhite);
+  position: relative;
+  /* The z-index is necessary here to have the box-shadow above the rest of the content */
+  z-index: 1;
+}
+
+.fx-relay-menu-body *,
+.fx-relay-menu-body *:before,
+.fx-relay-menu-body *:after {
+  box-sizing: inherit;
+}
+
+.fx-relay-menu-header {
+  padding: var(--spacingSm);
+  border-bottom: 1px solid var(--colorGrey10);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.fx-relay-menu-logo {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--spacingSm);
+}
+
+.fx-relay-menu-logo-image-fx-relay {
+  width: 26px;
+}
+
+.fx-relay-menu-logo-text {
+  width: 94px;
+}
+
+.fx-relay-menu-dashboard-link {
+  padding: var(--spacingXs);
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  position: relative;
+}
+
+.fx-relay-menu-dashboard-link:hover,
+.fx-relay-menu-dashboard-link:focus {
+  background-color: var(--colorGrey10);
+  border-radius: 100%;
+}
+
+.fx-relay-menu-dashboard-link .fx-relay-menu-dashboard-link-tooltip {
+  display: none;
+  color: var(--colorWhite);
+  background-color: var(--colorGrey40);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingXs) var(--spacingSm);
+  position: absolute;
+  top: calc(100% + var(--spacingXs));
+  right: 0;
+}
+
+.fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
+.fx-relay-menu-dashboard-link:focus .fx-relay-menu-dashboard-link-tooltip {
+  display: block;
+  margin: 0 var(--spacingXs);
+}
+
+/* Main Content */
+.fx-relay-menu {
+  padding: 0;
+  position: relative;
+}
+
+.fx-relay-menu-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--spacingMd) var(--spacingMd);
+  gap: var(--spacingMd);
+}
+
+.fx-relay-menu-content.fx-content-signed-in-premium {
+  padding: 0;
+}
+
+.fx-relay-menu-content.is-hidden {
+  display: none;
+}
+
+.fx-relay-menu-content p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* Mask List */
+
+.fx-relay-menu-masks-lists {
+  display: none;
+}
+
+.fx-relay-menu-masks-lists.is-visible {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMd);
+}
+
+.fx-relay-menu-masks-list {
+  border-radius: var(--borderRadiusSm);
+  background-color: var(--colorGrey10);
+  overflow: hidden;
+  display: none;
+}
+
+.fx-relay-menu-masks-list.is-visible {
+  display: block;
+}
+
+.fx-relay-menu-masks-list.t-website {
+  border-radius: var(--borderRadiusSm);
+  background-color: var(--colorWhite);
+  outline: 2px solid var(--colorBlue50);
+}
+
+.fx-relay-menu-masks-list.t-website span {
+  border-bottom: 1px solid var(--colorGrey10);
+}
+
+.fx-relay-menu-masks-list.t-website button {
+  color: var(--colorBlue50);
+}
+
+.fx-relay-menu-masks-list.t-search {
+  border-radius: 0;
+  background-color: transparent;
+  outline: 0;
+  margin-bottom: 0;
+}
+
+.fx-relay-menu-masks-list.t-search ul li {
+  border-bottom: 1px solid var(--colorGrey10);
+}
+
+.fx-relay-menu-masks-list.t-search ul li:last-child {
+  border-bottom: none;
+}
+
+.fx-relay-menu-masks-list > span {
+  border-bottom: 1px solid var(--colorGrey20);
+  padding: var(--spacingSm);
+  font-size: 12px;
+  line-height: 1rem;
+  text-align: center;
+  display: block;
+  color: var(--colorGrey50);
+}
+
+.fx-relay-menu-masks-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fx-relay-menu-masks-list li {
+  display: block;
+  width: 100%;
+}
+
+.fx-relay-menu-masks-list li.is-hidden {
+  display: none;
+}
+
+.fx-relay-menu-masks-list button {
+  appearance: none;
+  display: block;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  width: 100%;
+  padding: var(--spacingSm) var(--spacingMd);
+  cursor: pointer;
+  text-align: start;
+  overflow: hidden;
+}
+
+.fx-relay-menu-masks-list button:hover {
+  background-color: var(--colorViolet10);
+}
+
+.fx-relay-menu-masks-list button:focus {
+  background-color: var(--colorViolet05);
+}
+
+.fx-relay-menu-masks-list li.fx-relay-menu-masks-list-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacingSm);
+}
+
+.fx-relay-menu-masks-list-loading img {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+/* Premium Search List */
+.fx-relay-menu-masks-search {
+  background-color: var(--colorGrey05);
+  padding: var(--spacingSm) 0 0;
+}
+
+.fx-relay-menu-masks-search.is-hidden {
+  display: none;
+}
+
+.fx-relay-menu-masks-search-form {
+  padding: var(--spacingXs) var(--spacingSm);
+  margin-bottom: var(--spacingSm);
+  position: relative;
+}
+
+.fx-relay-menu-masks-search-results.t-no-search-bar ul {
+  max-height: none;
+  overflow: visible;
+}
+
+.fx-relay-menu-masks-search-results ul {
+  max-height: 190px;
+  overflow: scroll;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--spacingSm);
+}
+
+.fx-relay-menu-masks-search-result-label {
+  font-size: 12px;
+  display: block;
+  color: var(--colorGrey50);
+  /* This usage of pointer-events: none is necessary so when a user clicks on a result in the mask list, it clicks through to the parent element, which contains the information on which address to inject into the email input on page */
+  pointer-events: none;
+}
+
+.fx-relay-menu-masks-search-result-address {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--colorGrey60);
+  /* This usage of pointer-events: none is necessary so when a user clicks on a result in the mask list, it clicks through to the parent element, which contains the information on which address to inject into the email input on page */
+  pointer-events: none;
+}
+
+.fx-relay-menu-content-footer {
+  background-color: var(--colorWhite);
+  padding: var(--spacingMd);
+  border-radius: var(--borderRadiusSm);
+  box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.13);
+}
+
+/* Page Loader */
+.fx-relay-menu-loading-bar {
+  width: 100%;
+  height: 5px;
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+.fx-relay-menu-loading-bar-wrapper {
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  left: 50%;
+  top: 1px;
+}
+
+.fx-relay-menu-loading-bar-border {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  left: -50%;
+  top: -50%;
+  padding: 0;
+  background-color: var(--colorViolet20);
+  padding: 0;
+}
+
+.fx-relay-menu-loading-bar-whitespace {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.fx-relay-menu-loading-bar-line {
+  position: absolute;
+  height: 100%;
+  width: 60%;
+  background-color: var(--colorViolet70);
+  animation: cssload-slide 1s ease-in-out infinite;
+}
+
+@keyframes cssload-slide {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.is-loading .fx-relay-menu-loading-bar {
+  display: block;
+}
+
+.is-loading .fx-relay-menu {
+  min-height: 200px;
+}
+
+.is-loading .fx-relay-menu-content {
+  visibility: hidden;
+}

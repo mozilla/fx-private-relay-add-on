@@ -1,11 +1,9 @@
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
 .fx-relay-menu-iframe,
-.fx-relay-menu-body,
 .fx-relay-menu,
 .fx-relay-panel,
-.fx-relay-icon,
-.fx-relay-modal-wrapper {
+.fx-relay-icon {
   --relayBlue3: #0060df;
   --relayBlue4: #0250bb;
   --relayBlueHover: #003eaa;
@@ -37,18 +35,9 @@
 }
 
 .fx-relay-menu-iframe ::-moz-focus-inner,
-.fx-relay-menu-body ::-moz-focus-inner,
 .fx-relay-menu ::-moz-focus-inner,
 .fx-relay-icon ::-moz-focus-inner {
   border: 0;
-}
-
-.fx-relay-menu-body {
-  margin: 0;
-  padding: 0;
-  background: var(--relayGrey10);
-  background-color: var(--relayGrey10);
-  box-sizing: border-box;
 }
 
 .fx-relay-menu-iframe iframe { 
@@ -61,26 +50,29 @@
 }
 
 .fx-relay-menu-iframe { 
-  width: 300px;
-  min-height: 60px;
+  width: 320px;
   /* The top/right positioning here is necessary to align the box correctly (offset) underneath the "triangle" directly below the in-page Relay logo */
   top: 47px;
   right: -15px;
   position: absolute;
 }
 
+/* Inline SVG arrow shape */
 .fx-relay-menu-iframe::before {
-  content: " ";
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><polygon fill='white' class='cls-1' points='10 0 15 3.5 20 7 10 7 0 7 5 3.5 10 0'/></svg>");
   display: block;
   position: absolute;
-  top: -7px;
-  right: 20px;
-  height: 20px;
+  top: -12px;
+  right: 40px;
   width: 20px;
-  background: var(--relayGrey10);
-  z-index: 1;
-  transform: rotate(45deg);
+  z-index: 99;
   animation: fxRelayFadeIn 0.2s ease forwards;
+}
+
+.fx-relay-menu-iframe.is-position-bottom::before {
+  top: auto;
+  bottom: -6px;
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><polygon fill='white' class='cls-1' points='10 7 5 3.5 0 0 10 0 20 0 15 3.5 10 7'/></svg>");
 }
 
 .fx-relay-menu-wrapper {
@@ -96,17 +88,6 @@
   animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
-.fx-relay-menu-body .is-hidden {
-  display: none;
-}
-
-.fx-relay-modal-content fx-relay-logo-wrapper {
-  justify-content: flex-start;
-  display: flex;
-  width: 100%;
-  padding-bottom: 1em;
-}
-
 fx-relay-logotype {
   background-image: url("/images/logotype.svg");
   margin-top: 2px;
@@ -118,22 +99,10 @@ fx-relay-logotype {
 
 fx-relay-logomark {
   content: "";
-  background-image: url("/images/logomark.svg");
+  background-image: url("/images/logo-image-fx-relay.svg");
   width: 28px;
   height: 28px;
   display: block;
-}
-
-.fx-relay-new-tab {
-  border: none;
-  outline: none;
-  display: flex;
-  align-items: center;
-  color: var(--relayInk);
-  font-family: var(--relayMetropolis);
-  margin: auto;
-  text-decoration: none;
-  font-size: 16px;
 }
 
 fx-relay-logotype,
@@ -143,53 +112,7 @@ fx-relay-logomark {
   background-size: contain;
 }
 
-.fx-relay-font-met {
-  font-family: var(--relayMetropolisBold);
-}
-
-.fx-relay-modal-wrapper {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999999999999999;
-  display: flex;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-}
-
-.fx-relay-modal-content {
-  width: 300px;
-  padding: 24px 16px 16px 16px;
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 8px;
-  box-shadow: 0 7px 12px -3px rgba(28, 28, 29, 0.502);
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-button.fx-relay-modal-close-button {
-  height: 48px !important;
-  padding: 12px !important;
-  border-radius: 0 !important;
-  border: 1px solid rgba(255, 255, 255, 0) !important;
-  background-color: var(--relayGrey20) !important;
-  color: var(--relayInk) !important;
-  font-size: 17px !important;
-  min-width: 100% !important;
-  width: 100% !important;
-}
-
 /* input icon & icon messaging */
-
 .fx-relay-menu > div {
   display: flex;
   flex-direction: column;
@@ -198,165 +121,6 @@ button.fx-relay-modal-close-button {
   pointer-events: all;
   animation: fxRelayFadeIn 0.2s ease forwards;
   box-sizing: border-box;
-}
-
-.fx-relay-alias-loading {
-  position: relative;
-}
-
-.fx-relay-alias-loading .fx-relay-alias-loading-image {
-  opacity: 1;
-  /* z-index usage: This image is an overlay of the in-page Relay UI when generating a new alias */
-  z-index: 3;
-  animation: fxRelayFadeIn 1s ease;
-  display: block;
-}
-
-.fx-relay-alias-loading-image img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.fx-relay-alias-loading-image {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  right: 0;
-  background-color: #38383d21;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  display: none;
-}
-
-.fx-relay-menu-remaining-aliases, .fx-relay-modal-message {
-  font-size: 14px;
-  width: 100%;
-  padding: 16px 0px;
-  background: var(--relayGrey20);
-  color: var(--relayGrey60);
-  font-family: var(--relayMetropolisBold);
-  text-align: center;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-button.fx-relay-menu-sign-up-btn{
-  font-size: 15px;
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-color: rgba(0, 0, 0, 0);
-  outline: none;
-  width: 100%;
-  min-width: 100%;
-  font-family: var(--relayMetropolis);
-  color: var(--relayInk);
-  display: flex;
-  min-height: auto;
-  box-shadow: none;
-  box-sizing: border-box;
-  background-color: var(--relayGrey20);
-  text-align: center;
-  justify-content: center;
-  padding: 12px 24px;
-  pointer-events: all;
-  border-radius: 4px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.fx-relay-menu-dashboard-link, .fx-relay-modal-manage-aliases {
-  color: var(--relayBlue3) !important;
-  font-size: 15px;
-  font-family: var(--relayInterUiRegular);
-  text-align: center;
-  padding: 8px;
-  margin: 16px 0 0 0;
-  border-radius: 4px;
-}
-
-.fx-relay-menu-dashboard-link:hover, .fx-relay-modal-manage-aliases:hover {
-  background: var(--relayGrey20);
-  text-decoration: none;
-  color: var(--relayBlue3);
-}
-
-button.fx-relay-menu-generate-alias-btn {
-  background-color: var(--relayBlue3) !important;
-  width: 100%;
-  padding: 16px 0px;
-  border-radius: 4px !important;
-  font-family: var(--relayMetropolisMedium) !important;
-  color: rgba(255, 255, 255, 1) !important;
-  border: none !important;
-  font-size: 16px !important;
-  text-align: center !important;
-  margin-top: 4px;
-}
-
-button.fx-relay-menu-generate-alias-btn:focus-visible, button.fx-relay-menu-generate-alias-btn:focus {
-  outline: 5px solid rgba(0, 96, 223, .44);
-}
-
-.fx-relay-menu-get-unlimited-aliases {
-  border: 2px solid var(--relayBlue3);
-  width: 100%;
-  padding: 16px 0px;
-  border-radius: 4px;
-  font-family: var(--relayInterUiRegular);
-  color: var(--relayBlue3) !important;
-  font-size: 16px;
-  text-align: center;
-}
-
-.fx-relay-menu-get-unlimited-aliases:hover {
-  text-decoration: none;
-  color: white !important;
-  background-color: var(--relayBlueHover) !important;
-}
-
-button.fx-relay-menu-generate-alias-btn[disabled] {
-  pointer-events: none;
-  background-color: var(--relayGrey20) !important;
-  color: var(--relayGrey50) !important;
-}
-
-.fx-relay-menu button.fx-relay-menu-generate-alias-btn:hover {
-  background-color: var(--relayBlueHover) !important;
-}
-
-.fx-relay-menu button.fx-relay-menu-generate-alias-btn:active {
-  background-color: var(--relayBlueActive) !important;
-}
-
-.fx-relay-menu-sign-up-btn:hover,
-.fx-relay-modal-close-button:hover {
-  background-color: var(--relayGrey30) !important;
-}
-
-.fx-relay-menu-dashboard-link:focus,
-.fx-relay-menu button.fx-relay-menu-generate-alias-btn:focus,
-.fx-relay-menu-sign-up-btn:focus,
-.fx-relay-modal-close-button:focus,
-.fx-relay-menu-get-unlimited-aliases:focus {
-  box-shadow: var(--relayButtonFocus) !important;
-}
-
-.fx-relay-menu-sign-up-btn:active,
-.fx-relay-menu-dashboard-link:active,
-.fx-relay-modal-close-button:active {
-  background-color: var(--relayGrey40) !important;
-}
-
-.fx-relay-menu-sign-up-message {
-  font-size: 14px;
-  max-width: 200px;
-  display: inline-block;
-  line-height: 1.3;
-  margin: auto auto 24px auto;
-  color: black;
 }
 
 .fx-relay-icon {
@@ -389,40 +153,28 @@ button.fx-relay-button {
   height: 30px;
   max-width: 30px !important;
   min-width: 30px;
-  background-image: url("/icons/make-new-alias.png");
+  background-image: url("/images/logo-image-fx-relay.svg");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 85%;
   background-color: transparent !important;
-  outline: none !important;
   border-radius: 4px !important;
   border: 1px solid rgba(255, 255, 255, 0) !important;
   transition: all 0.2s ease;
   margin: auto;
   pointer-events: all;
   box-shadow: none !important;
+  cursor: pointer;
+  outline-color: transparent;
 }
 
-
-.fx-relay-new-tab:hover,
 .fx-relay-button:hover {
-  background-color: var(--relayGrey20) !important;
+  background-color: #f7e2ff !important;
+  outline: 2px solid #f68fff !important;
 }
 
-.fx-relay-new-tab:focus,
 .fx-relay-button:focus {
-  box-shadow: var(--relayButtonFocus);
-}
-
-.fx-relay-new-tab:active,
-.fx-relay-button:active {
-  background-color: var(--relayGrey30) !important;
-}
-
-.fx-relay-error-message {
-  font-size: 12px;
-  line-height: 1.5;
-  margin: 0 0 24px 24px;
+  outline: 2px solid #f68fff !important;
 }
 
 .fx-relay-toggle {

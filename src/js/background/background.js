@@ -18,9 +18,10 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
-async function getAliasesFromServer(method = "GET", body = null, opts=null) {
+async function getAliasesFromServer(method = "GET", opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+  const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -38,12 +39,27 @@ async function getAliasesFromServer(method = "GET", body = null, opts=null) {
     mode: "same-origin",
     method,
     headers: headers,
-    body,
   });
 
-  answer = await response.json();
+  const answer = await response.json();
+  const masks = new Array();
+  masks.push(...answer);
+
+  // If the user has domain (custom) masks set, also grab them before sorting
+  if (opts.fetchCustomMasks) {
+    const domainResponse = await fetch(apiMakeDomainAddressesURL, {
+      mode: "same-origin",
+      method,
+      headers: headers,
+    });
+
+    const domainMasks = await domainResponse.json();
+    masks.push(...domainMasks);
+  }
   
-  return answer;
+  masks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  browser.storage.local.set({ relayAddresses: masks });  
+  return masks;
 }
 
 async function storePremiumAvailabilityInCountry() {
@@ -95,6 +111,8 @@ async function getServerStoragePref() {
   });
 
   answer = await response.json();
+
+  browser.storage.local.set({ server_storage: answer.server_storage });
 
   return answer.server_storage;
 }
@@ -302,8 +320,17 @@ browser.runtime.onMessage.addListener(async (m, sender, sendResponse) => {
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);
       break;
+    case "updateIframeHeight":
+      browser.tabs.sendMessage(sender.tab.id, m);
+      break;
     case "getServerStoragePref":
       response = await getServerStoragePref();
+      break;
+    case "getAliasesFromServer":
+      response = await getAliasesFromServer("GET", m.options);
+      break;
+    case "getCurrentPage":
+      response = await getCurrentPage();
       break;
     case "getCurrentPageHostname":
       const currentPage = await getCurrentPage();

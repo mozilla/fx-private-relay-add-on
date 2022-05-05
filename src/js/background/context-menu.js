@@ -6,53 +6,51 @@ const staticMenuData = {
   existingAlias: {
     type: "radio",
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
-    contexts: ["editable"],
     enabled: true,
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
-    contexts: ["editable"],
     enabled: false,
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   manageAliases: {
     id: "fx-private-relay-manage-aliases",
     title: browser.i18n.getMessage("ManageAllAliases_mask"),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
     title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases_mask"),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   upgradeToPremiumSeperator: {
     id: "fx-private-relay-get-unlimited-aliases-separator",
     type: "separator",
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   useExistingAliasFromWebsite: {
     id: "fx-private-relay-use-existing-aliases-from-this-site",
     title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite_mask"),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   }, 
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
     title: browser.i18n.getMessage("pageInputIconRecentAliases_mask"),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   }
 }
 
@@ -179,7 +177,8 @@ const relayContextMenus = {
       let changedItems = Object.keys(changes);
       for (let item of changedItems) {
         if (item === "relayAddresses") {
-          await relayContextMenus.init();
+          // WIP/Known Bug: Running getAliasesFromServer() causes this localStorageChange event to loop
+          // await relayContextMenus.init();
         }
 
         if (item === "apiToken" && changes[item].newValue === undefined) {
@@ -267,9 +266,26 @@ const relayContextMenus = {
   }, 
   utils: {
     getAliases: async () => {
+      let options = {};
+
+      const { premium } = await browser.storage.local.get("premium");
+      // Check if user may have custom domain masks
+      const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+
+      // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+      const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");
+    
+      // Short-circuit if the user is premium.
+      if (premium && isPremiumSubdomainSet) {
+        options = {
+          fetchCustomMasks: true
+        }
+      }
+      
+      
       if (await getServerStoragePref()) {
         try {
-          return await getAliasesFromServer();
+          return await getAliasesFromServer("GET", options);
         } catch (error) {
           // API Error — Fallback to local storage
           const { relayAddresses } = await browser.storage.local.get("relayAddresses");
@@ -291,11 +307,8 @@ const relayContextMenus = {
       const { hostname } = new URL(url);
       return hostname;
     },  
-    getMostRecentAliases: (array, domain, options = {})=> {
-      // Flipped to match the same order as the dashboard if synced from the server
-      if (options.shouldAliasOrderBeReversed) {
-        array.reverse();
-      }
+    getMostRecentAliases: (array, domain)=> {
+      array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
       const filteredAliases = array.filter(alias => alias.generated_for !== domain);
@@ -303,13 +316,9 @@ const relayContextMenus = {
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
-    getSiteSpecificAliases: (array, domain, options = {})=> {
-
-      // Flipped to match the same order as the dashboard if synced from the server
-      if (options.shouldAliasOrderBeReversed) {
-        array.reverse();
-      }
-
+    getSiteSpecificAliases: (array, domain)=> {
+      array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+      
       const filteredAliases = array.filter(alias => alias.generated_for === domain);
 
       // If 5 results for specific domain
