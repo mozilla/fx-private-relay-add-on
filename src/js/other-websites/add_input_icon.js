@@ -242,7 +242,7 @@ browser.runtime.onMessage.addListener(function(m, sender, sendResponse) {
   }
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m === "iframeCloseRelayInPageMenu") {
+  if (m.message == "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
   }  
 
