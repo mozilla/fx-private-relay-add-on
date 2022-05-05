@@ -99,7 +99,7 @@ fx-relay-logotype {
 
 fx-relay-logomark {
   content: "";
-  background-image: url("/images/logomark.svg");
+  background-image: url("/images/logo-image-fx-relay.svg");
   width: 28px;
   height: 28px;
   display: block;
@@ -153,30 +153,28 @@ button.fx-relay-button {
   height: 30px;
   max-width: 30px !important;
   min-width: 30px;
-  background-image: url("/icons/make-new-alias.png");
+  background-image: url("/images/logo-image-fx-relay.svg");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 85%;
   background-color: transparent !important;
-  outline: none !important;
   border-radius: 4px !important;
   border: 1px solid rgba(255, 255, 255, 0) !important;
   transition: all 0.2s ease;
   margin: auto;
   pointer-events: all;
   box-shadow: none !important;
+  cursor: pointer;
+  outline-color: transparent;
 }
 
 .fx-relay-button:hover {
-  background-color: var(--relayGrey20) !important;
+  background-color: #f7e2ff !important;
+  outline: 2px solid #f68fff !important;
 }
 
 .fx-relay-button:focus {
-  box-shadow: var(--relayButtonFocus);
-}
-
-.fx-relay-button:active {
-  background-color: var(--relayGrey30) !important;
+  outline: 2px solid #f68fff !important;
 }
 
 .fx-relay-toggle {

@@ -364,7 +364,6 @@ const buildContent = {
 
       // Process the masks list:
       if (masks.length === 0) {
-        // TODO: Add style/class to remove border-radius from header/footer sections
         fxRelayMenuBody.classList.remove("is-loading");
 
         const search = document.querySelector(".fx-relay-menu-masks-search");
