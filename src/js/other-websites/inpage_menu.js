@@ -1,8 +1,8 @@
 /* global preventDefaultBehavior */
 
-function iframeCloseRelayInPageMenu() {
+async function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
-  browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
+  await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
 }
 
 function getRelayMenuEl() {
@@ -10,7 +10,7 @@ function getRelayMenuEl() {
 }
 
 let activeElemIndex = 0;
-function handleKeydownEvents(e) {
+async function handleKeydownEvents (e) {
   const relayInPageMenu = getRelayMenuEl();
   const clickableElsInMenu =
     relayInPageMenu.querySelectorAll("button, a, input");
@@ -29,7 +29,7 @@ function handleKeydownEvents(e) {
 
   if (e.key === "Escape") {
     preventDefaultBehavior(e);
-    iframeCloseRelayInPageMenu();
+    await iframeCloseRelayInPageMenu();
   }
 
   if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
@@ -494,7 +494,7 @@ const buildContent = {
         method: "openRelayHomepage",
       });
       sendInPageEvent("click", "input-menu-sign-up-btn");
-      iframeCloseRelayInPageMenu();
+      await iframeCloseRelayInPageMenu();
     });
 
     sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
@@ -570,9 +570,9 @@ const buildContent = {
       // Create "Get unlimited aliases" link
       getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
       getUnlimitedAliasesBtn.target = "_blank";
-      getUnlimitedAliasesBtn.addEventListener("click", () => {
+      getUnlimitedAliasesBtn.addEventListener("click", async () => {
         sendInPageEvent("click", "input-menu-get-premium-btn");
-        iframeCloseRelayInPageMenu();
+        await iframeCloseRelayInPageMenu();
       });
     },
     setManageLink: (relaySiteOrigin) => {
@@ -590,9 +590,9 @@ const buildContent = {
       relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
       relayMenuDashboardLink.target = "_blank";
     
-      relayMenuDashboardLink.addEventListener("click", () => {
+      relayMenuDashboardLink.addEventListener("click", async () => {
         sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
-        iframeCloseRelayInPageMenu();
+        await iframeCloseRelayInPageMenu();
       });
     }
   },
