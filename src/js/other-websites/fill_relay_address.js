@@ -20,11 +20,32 @@ function fillInputWithAlias(emailInput, relayAlias) {
       break;
   }
 
+  console.log(emailInput);
+  
+  emailInput.dispatchEvent(
+    new Event("focusin")
+  );
+
+  console.log("emailInput");
+
+  emailInput.value = relayAlias.address;
+
+
   emailInput.dispatchEvent(
     new InputEvent("relay-address", {
+      inputType: "insertFromPaste",
       data: relayAlias.address,
+      isComposing: true
     })
   );
+
+  emailInput.blur();
+
+  emailInput.dispatchEvent(
+    new Event("change")
+  );
+
+  
 }
 
 
