@@ -25,22 +25,4 @@
       el.dataset.localLabels = JSON.stringify(localLabels);
     }
   });
-
-  // Check for <firefox-private-relay-addon>
-  const addonDataElement = document.querySelector(
-    "firefox-private-relay-addon"
-  );
-  if (addonDataElement) {
-    // Query if the user is logged in or out
-    const isLoggedIn = document.querySelector("firefox-private-relay-addon")
-      .dataset.userLoggedIn;
-
-    if (isLoggedIn !== undefined) {
-      // As long as we get a non-undefined state, we pass it to the background script
-      await browser.runtime.sendMessage({
-        method: "updateAddOnAuthStatus",
-        status: isLoggedIn,
-      });
-    }
-  }
 })();
