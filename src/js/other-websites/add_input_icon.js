@@ -1,3 +1,5 @@
+const RELAY_INPAGE_MENU_WIDTH = 320;
+
 function closeRelayInPageMenu() {
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
   relayIconBtn?.classList.remove("fx-relay-menu-open");
@@ -21,8 +23,6 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   return;
 }
 
-const relayInPageMenuWidth = 320;
-
 function positionRelayMenu() {
   const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe");
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
@@ -35,16 +35,16 @@ function positionRelayMenu() {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
   const documentPosition = document.documentElement.getBoundingClientRect();
-  const relayInPageMenuMaximumHeight = 405
+  const RELAY_INPAGE_MENU_MAXIMUM_HEIGHT = 405
   
   // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
-  // The relayInPageMenuMaximumHeight / 405 is the pixel height of the tallest version of the inpage menu. 
-  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > relayInPageMenuMaximumHeight);
+  // The RELAY_INPAGE_MENU_MAXIMUM_HEIGHT / 405 is the pixel height of the tallest version of the inpage menu. 
+  const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > RELAY_INPAGE_MENU_MAXIMUM_HEIGHT);
 
   function _setPositionX (newIconPosition) {
     // This sets the inpage menu slightly offset from the Relay icon in the email input
     // This function checks to make sure there's enough space for that offset
-    const offsetX = (window.innerWidth < 500) ? (relayInPageMenuWidth - 32) : 255
+    const offsetX = (window.innerWidth < 500) ? (RELAY_INPAGE_MENU_WIDTH - 32) : 255
     return newIconPosition.x - offsetX + "px";
   }
 
@@ -64,7 +64,6 @@ function positionRelayMenu() {
   if (window.innerWidth < 500) {
     relayInPageMenuIframe.classList.add("is-position-right");
   }
-
 }
 
 // This function is defined as global in the ESLint config _because_ it is created here:
@@ -87,7 +86,7 @@ function buildInpageIframe(opts) {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
-  iframe.width = relayInPageMenuWidth;
+  iframe.width = RELAY_INPAGE_MENU_WIDTH;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
   iframe.height = 300;
   iframe.title = browser.i18n.getMessage("pageInputTitle");
