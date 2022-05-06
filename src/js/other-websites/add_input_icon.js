@@ -21,6 +21,8 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   return;
 }
 
+const relayInPageMenuWidth = 320;
+
 function positionRelayMenu() {
   const relayInPageMenu = document.querySelector(".fx-relay-menu-iframe");
   const relayIconBtn = document.querySelector(".fx-relay-menu-open");
@@ -39,16 +41,30 @@ function positionRelayMenu() {
   // The relayInPageMenuMaximumHeight / 405 is the pixel height of the tallest version of the inpage menu. 
   const positionMenuBelowIcon = ((((newIconPosition.top - documentPosition.top) - document.documentElement.scrollHeight) * -1) > relayInPageMenuMaximumHeight);
 
+  function _setPositionX (newIconPosition) {
+    // This sets the inpage menu slightly offset from the Relay icon in the email input
+    // This function checks to make sure there's enough space for that offset
+    const offsetX = (window.innerWidth < 500) ? (relayInPageMenuWidth - 32) : 255
+    return newIconPosition.x - offsetX + "px";
+  }
+
   if (positionMenuBelowIcon) {
-    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    relayInPageMenu.style.left = _setPositionX(newIconPosition);
     relayInPageMenu.style.top = newIconPosition.top + 40 + "px";
     relayInPageMenuIframe.classList.remove("is-position-bottom");
   } else {
-    relayInPageMenu.style.left = newIconPosition.x - 255 + "px";
+    relayInPageMenu.style.left = _setPositionX(newIconPosition);
     const relayInPageMenuIframeElement = document.querySelector(".fx-relay-menu-iframe iframe");
     relayInPageMenuIframe.classList.add("is-position-bottom")
     relayInPageMenu.style.top = newIconPosition.top - relayInPageMenuIframeElement.clientHeight - 20 + "px";
   }
+
+  // Set arrow pointing to logo based on screenwidth
+  relayInPageMenuIframe.classList.remove("is-position-right");
+  if (window.innerWidth < 500) {
+    relayInPageMenuIframe.classList.add("is-position-right");
+  }
+
 }
 
 // This function is defined as global in the ESLint config _because_ it is created here:
@@ -71,7 +87,7 @@ function buildInpageIframe(opts) {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-panel.html");
-  iframe.width = 320;
+  iframe.width = relayInPageMenuWidth;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
   iframe.height = 300;
   iframe.title = browser.i18n.getMessage("pageInputTitle");

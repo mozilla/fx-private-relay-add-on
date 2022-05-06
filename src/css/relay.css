@@ -75,6 +75,10 @@
   content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 7'><polygon fill='white' class='cls-1' points='10 7 5 3.5 0 0 10 0 20 0 15 3.5 10 7'/></svg>");
 }
 
+.fx-relay-menu-iframe.is-position-right::before {
+  right: 9px;
+}
+
 .fx-relay-menu-wrapper {
   position: fixed;
   height: 100%;
