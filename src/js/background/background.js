@@ -294,7 +294,7 @@ async function makeRelayAddress(description = null) {
 async function updateAddOnAuthStatus(status) {
   // If user is no longer logged in, remove the apiToken attribute. 
   // This will cause the "Sign in" panel to be visible when the popup is opened.
-  if (status === "False") {
+  if (status === false) {
     await browser.storage.local.remove("apiToken");
   }
 }

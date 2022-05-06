@@ -35,9 +35,15 @@
   "content_scripts": [
     {
       "matches": [
+        "http://127.0.0.1/"
+      ],
+      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/track_logout.js"]
+    },
+    {
+      "matches": [
         "http://127.0.0.1/**"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/installation_indicator.js"]
+      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/inject_addon_data.js"]
     },
     {
       "matches": [
