@@ -6,51 +6,51 @@ const staticMenuData = {
   existingAlias: {
     type: "radio",
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     enabled: true,
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     enabled: false,
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   manageAliases: {
     id: "fx-private-relay-manage-aliases",
     title: browser.i18n.getMessage("ManageAllAliases_mask"),
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
     title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases_mask"),
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   upgradeToPremiumSeperator: {
     id: "fx-private-relay-get-unlimited-aliases-separator",
     type: "separator",
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   },
   useExistingAliasFromWebsite: {
     id: "fx-private-relay-use-existing-aliases-from-this-site",
     title: browser.i18n.getMessage("pageInputIconUseExistingAliasFromTheSite_mask"),
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   }, 
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
     title: browser.i18n.getMessage("pageInputIconRecentAliases_mask"),
     visible: true,
-    contexts: ["editable"],
+    contexts: ["all"],
   }
 }
 
@@ -128,7 +128,7 @@ const relayContextMenus = {
 
       // COMPATIBILITY NOTE: The Chrome contextMenus API create() argument params do not support icons 
       if (browser.menus) {
-        staticMenuData.upgradeToPremium.icons =  {16: "/icons/placeholder-logo.png"};
+        staticMenuData.upgradeToPremium.icons =  {32: "/icons/icon_32.png"};
       }
 
       await relayContextMenus.menus.create(staticMenuData.upgradeToPremiumSeperator);

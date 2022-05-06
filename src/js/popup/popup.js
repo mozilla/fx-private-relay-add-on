@@ -15,7 +15,7 @@ function getOnboardingPanels() {
       "tipHeadline": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelHeadline"),
       "tipBody": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelBody"),
       "upgradeButton": browser.i18n.getMessage("popupUpgradeToPremiumBanner"),
-      "upgradeButtonIcon": "/icons/placeholder-logo.png",
+      "upgradeButtonIcon": "/icons/icon.svg",
     },
     "premiumPanel": {
       "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
