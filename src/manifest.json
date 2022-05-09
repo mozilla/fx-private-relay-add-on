@@ -8,14 +8,15 @@
   "default_locale": "en",
 
   "icons": {
-    "16": "icons/placeholder-logo_16.png",
-    "48": "icons/placeholder-logo.png"
+    "16": "icons/icon_16.png",
+    "48": "icons/icon_48.png",
+    "96": "icons/icon_96.png"
   },
 
   "browser_specific_settings": {
       "gecko": {
           "id": "private-relay@firefox.com",
-          "strict_min_version": "74.0"
+          "strict_min_version": "79.0"
       }
   },
 
@@ -26,7 +27,7 @@
   "browser_action": {
       "browser_style": true,
       "default_icon": {
-          "32": "icons/placeholder-logo.png"
+          "32": "icons/icon_32.png"
       },
       "default_popup": "popup.html"
   },
