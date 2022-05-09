@@ -76,6 +76,7 @@
 }
 
 .fx-relay-menu-iframe.is-position-right::before {
+  /* This static right position accounts for the "arrow" above/below the in-page menu on narrow widths  */
   right: 9px;
 }
 
