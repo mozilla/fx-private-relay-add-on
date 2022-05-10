@@ -235,6 +235,16 @@ const buildContent = {
 
       const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
       const masks = await getMasks();
+      
+      const currentPageHostName = await browser.runtime.sendMessage({
+        method: "getCurrentPageHostname",
+      });
+
+      // function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
+      //   return masks.some( mask => {
+      //     return domain === mask.generated_for;
+      //   });
+      // }
 
       maskLists?.forEach(async (maskList) => {
         // Set Mask List label names
@@ -246,8 +256,15 @@ const buildContent = {
         label.textContent = browser.i18n.getMessage(stringId);
 
         if (masks.length > 0) {
-          // Populate mask lists
-          await populateMaskList(maskList, masks);
+          // Populate mask lists, but filter by current website
+          const buildFilteredMaskList = maskList.classList.contains("fx-relay-menu-masks-free-this-website");
+
+          // TODO: Check additional field(s) besides "generated_for"
+          const filteredMasks = buildFilteredMaskList ? 
+            masks.filter(mask => mask.generated_for === currentPageHostName)
+            : masks.filter(mask => mask.generated_for !== currentPageHostName);
+          
+          await populateMaskList(maskList, filteredMasks);
         }
       });
 
