@@ -16,25 +16,31 @@
     class="fx-relay-menu-body fx-relay is-premium is-loading"
   >
     <header class="fx-relay-menu-header">
-      <h1 class="fx-relay-menu-logo">
-        <img
-          class="fx-relay-menu-logo-image-fx-relay"
-          src="/images/logo-image-fx-relay.svg"
-          alt=""
-        />
-        <img
-          class="fx-relay-menu-logo-text"
-          alt="Firefox Relay"
-          src="/images/logo-text-fx-relay.svg"
-        />
-      </h1>
-      <a
-        class="fx-relay-menu-dashboard-link"        
-        href="http://127.0.0.1"
-      >
-        <span class="fx-relay-menu-dashboard-link-tooltip"></span>
-        <img src="/icons/nebula-external-link-blue.svg" alt="" />
-      </a>
+      <div class="fx-relay-menu-header-logo-bar">
+        <h1 class="fx-relay-menu-logo">
+          <img
+            class="fx-relay-menu-logo-image-fx-relay"
+            src="/images/logo-image-fx-relay.svg"
+            alt=""
+          />
+          <img
+            class="fx-relay-menu-logo-text"
+            alt="Firefox Relay"
+            src="/images/logo-text-fx-relay.svg"
+          />
+        </h1>
+        <a
+          class="fx-relay-menu-dashboard-link"        
+          href="http://127.0.0.1"
+        >
+          <span class="fx-relay-menu-dashboard-link-tooltip"></span>
+          <img src="/icons/nebula-external-link-blue.svg" alt="" />
+        </a>
+      </div>
+      <div class="fx-relay-menu-filter-active-site">
+        <button class="fx-relay-menu-filter-active-site-button is-active" data-string-id="labelFromThisWebsite"></button>
+        <button class="fx-relay-menu-filter-active-site-button" data-string-id="labelAllEmailMasks"></button>
+      </div>
     </header>
     <main class="fx-relay-menu">
       <div class="fx-relay-menu-loading-bar">
@@ -105,6 +111,7 @@
         ></a>
       </section>
 
+      <!-- Logged In / Premium Tier -->
       <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
         <div class="fx-relay-menu-masks-search">
           <form class="fx-relay-menu-masks-search-form">
