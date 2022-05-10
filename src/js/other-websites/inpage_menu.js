@@ -239,20 +239,26 @@ const buildContent = {
         method: "getCurrentPageHostname",
       });
 
-      // function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
-      //   return masks.some( mask => {
-      //     return domain === mask.generated_for;
-      //   });
-      // }
+      function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
+        return masks.some( mask => {
+          return domain === mask.generated_for;
+        });
+      }
 
       maskLists?.forEach(async (maskList) => {
         // Set Mask List label names
-
         const label = maskList.querySelector(".fx-relay-menu-masks-list-label");        
-
         const stringId = label.dataset.stringId;
         
         label.textContent = browser.i18n.getMessage(stringId);
+
+        // If there are no masks used on the current site, we need to change the label for the other masks:
+        if (!checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) && maskList.classList.contains("fx-relay-menu-masks-free-other")) {
+          // TODO / BLOCKED: https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/pull/31 
+          // needs to merge for pageInputIconSelectFromYourCurrentEmailMasks string ID
+          // label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
+          label.textContent = "Select from your current email masks";
+        }
 
         if (masks.length > 0) {
           // Populate mask lists, but filter by current website
