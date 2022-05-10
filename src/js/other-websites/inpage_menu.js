@@ -1,3 +1,6 @@
+// Let usage. We need a global object of massk to between all inpage_menu functions 
+let masks = {};
+
 async function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
   await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
@@ -70,12 +73,11 @@ async function getMasks(options = { fetchCustomMasks: false }) {
 
   if (serverStoragePref) {
     try {
-      const masks = await browser.runtime.sendMessage({
+      return await browser.runtime.sendMessage({
         method: "getAliasesFromServer",
         options,
       });
 
-      return masks;
     } catch (error) {
       console.warn(`getAliasesFromServer Error: ${error}`);
 
@@ -98,6 +100,41 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   preventDefaultBehavior(generateClickEvt);
 
   const maskAddress = generateClickEvt.target.dataset.mask;
+  const maskAddressId = generateClickEvt.target.dataset.maskId;
+
+  console.log("toBeFiltered", masks);
+  
+
+  const maskObject = masks.find(mask => mask.id === parseInt(maskAddressId, 10));
+
+  const currentUsedOnValue = maskObject.used_on;
+
+  const used_on = {};
+
+  const currentPageHostName = await browser.runtime.sendMessage({
+    method: "getCurrentPageHostname",
+  });
+
+  console.log("currentUsedOnValue", currentUsedOnValue);
+
+  if (currentUsedOnValue === null) {
+    // This site has not been used on any site before
+    await browser.runtime.sendMessage({
+      method: "patchMaskInfo",
+      id: parseInt(maskAddressId, 10),
+      data: {
+        used_on: "example.com"
+      },
+      options: {
+        auth: true,
+      }
+    });
+  }
+
+  // TODO: Parse currentUsedOnValue object to check if current domain is listed, and if not, add it. 
+  // If you add it, patch it! 
+
+
 
   await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
@@ -105,6 +142,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
       filter: "fillInputWithAlias",
       newRelayAddressResponse: {
         address: maskAddress,
+        currentDomain: currentPageHostName,
       },
     },
   });
@@ -126,6 +164,11 @@ async function populateMaskList(
     const listButton = document.createElement("button");
 
     listButton.tabIndex = 0;
+
+    console.log("mask object", mask);
+    
+    listButton.dataset.domain = mask.domain;
+    listButton.dataset.maskId = mask.id;
     listButton.dataset.mask = mask.full_address;
     listButton.dataset.label = mask.description;
 
@@ -240,7 +283,7 @@ const buildContent = {
       );
 
       const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
-      const masks = await getMasks();
+      masks = await getMasks();
       
       const currentPageHostName = await browser.runtime.sendMessage({
         method: "getCurrentPageHostname",
@@ -380,7 +423,7 @@ const buildContent = {
       // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
       const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
 
-      const masks = await getMasks({
+      masks = await getMasks({
         fetchCustomMasks: isPremiumSubdomainSet,
       });
 
