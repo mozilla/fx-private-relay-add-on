@@ -64,6 +64,40 @@ async function getAliasesFromServer(method = "GET", opts=null) {
   return masks;
 }
 
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare, no-unused-vars
+async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
+
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/${id}/`;
+  const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/${id}/`;
+
+  const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
+  const headers = new Headers();
+  
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  
+  if (opts && opts.auth) {
+    const apiToken = await browser.storage.local.get("apiToken");
+    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  }
+
+  const apiRequestUrl = opts.domainAddress ? apiMakeDomainAddressesURL : apiMakeRelayAddressesURL;
+  
+  console.log(data);
+
+  const response = await fetch(apiRequestUrl, {
+    mode: "same-origin",
+    method,
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  return await response.json();
+}
+
 async function storePremiumAvailabilityInCountry() {
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
@@ -336,6 +370,9 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "getAliasesFromServer":
       response = await getAliasesFromServer("GET", m.options);
+      break;
+    case "patchMaskInfo":
+      await patchMaskInfo("PATCH", m.id, m.data, m.options);
       break;
     case "getCurrentPage":
       response = await getCurrentPage();
