@@ -208,6 +208,12 @@ function applySearchFilter(query) {
   searchFilterTotal.textContent = maskResults.length;
 }
 
+function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
+  return masks.some( mask => {
+    return domain === mask.generated_for;
+  });
+}
+
 const buildContent = {
   loggedIn: {
     free: async (relaySiteOrigin) => {
@@ -239,12 +245,6 @@ const buildContent = {
       const currentPageHostName = await browser.runtime.sendMessage({
         method: "getCurrentPageHostname",
       });
-
-      function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
-        return masks.some( mask => {
-          return domain === mask.generated_for;
-        });
-      }
 
       maskLists?.forEach(async (maskList) => {
         // Set Mask List label names
@@ -383,6 +383,34 @@ const buildContent = {
       const masks = await getMasks({
         fetchCustomMasks: isPremiumSubdomainSet,
       });
+
+      // Request the active tab from the background script and parse the `document.location.hostname`
+      const currentPageHostName = await browser.runtime.sendMessage({
+        method: "getCurrentPageHostname",
+      });
+      
+      if ( checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) ) {
+
+        const filterMenu = document.querySelector(".fx-relay-menu-filter-active-site");
+        filterMenu.classList.add("is-visible");
+
+        const filterMenuButtons = filterMenu.querySelectorAll("button");
+        filterMenuButtons.forEach(button => {
+          const stringId = button.dataset.stringId;
+          button.textContent = browser.i18n.getMessage(stringId);          
+        });
+        
+      }
+
+      /*
+      TODO
+      1. Check if SOME masks exist on site. 
+      If so, build that list first 
+      Q: Buil both or only build one and rebuild when click
+      Add listners funcs to buttons to show each list
+      CSS: Styls buttons
+      Note: You'll need to filter each search array by active mask list
+      */
 
       // Process the masks list:
       if (masks.length === 0) {
