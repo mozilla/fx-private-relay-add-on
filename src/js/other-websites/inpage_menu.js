@@ -60,13 +60,13 @@ async function getCachedServerStoragePref() {
       method: "getServerStoragePref",
     });
   } else {
-    return serverStoragePrefInStorage;
+    return serverStoragePref.server_storage;
   }
 }
 
 async function getMasks(options = { fetchCustomMasks: false }) {
   const serverStoragePref = await getCachedServerStoragePref();
-
+  
   if (serverStoragePref) {
     try {
       const masks = await browser.runtime.sendMessage({
@@ -89,6 +89,9 @@ async function getMasks(options = { fetchCustomMasks: false }) {
 
   // User is not syncing with the server. Use local storage.
   const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+
+  relayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  
   return relayAddresses;
 }
 

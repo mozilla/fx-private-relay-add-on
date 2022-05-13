@@ -80,6 +80,7 @@
 
     const serverProfileData = await apiRequest(apiProfileURL);
 
+
     browser.storage.local.set({
       profileID: parseInt(serverProfileData[0].id, 10),
       settings: {
@@ -87,17 +88,8 @@
       },
     });
 
-    // Get the relay address objects from the addon storage
-    const addonStorageRelayAddresses = await browser.storage.local.get(
-      "relayAddresses"
-    );
-
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
-    const addonRelayAddresses =
-      Object.keys(addonStorageRelayAddresses).length === 0
-        ? { relayAddresses: [] }
-        : addonStorageRelayAddresses;
 
     // Check if user is premium
     // Note: for the non-React website, we would look at the DOM for the
@@ -111,11 +103,6 @@
         "firefox-private-relay-addon-data"
       ).dataset.hasPremium === "true";
     browser.storage.local.set({ premium: isPremiumUser });
-
-    // Loop over the addresses on the page
-    const dashboardRelayAliasCards = document.querySelectorAll(
-      "[data-relay-address]"
-    );
 
     const localStorageRelayAddresses = [];
 
@@ -222,238 +209,53 @@
 
       browser.storage.local.set({ relayAddresses: localCopyOfServerRelayAddresses });
     } else {
-      // Scrape alias data from Profile page (Local)
-
-      // await browser.runtime.sendMessage({
-      //   method: "displayBrowserActionBadge",
-      // });
-
-      // Scrape data from /accounts/profile/ page
-      for (const aliasCard of dashboardRelayAliasCards) {
-        // Add the description (previoulsy domain) note from the addon storage to the page
-
-        const aliasCardData = aliasCard.dataset;
-        const aliasId = parseInt(aliasCardData.relayAddressId, 10);
-        const addonRelayAddress = addonRelayAddresses.relayAddresses.filter(
-          (address) => address.id == aliasId
-        )[0];
-
-        const defaultAliasLabelText = browser.i18n.getMessage(
-          "profilePageDefaulAliasLabelText"
-        );
-
-        // The labels (previously ONLY in local storage of the add-on) were set
-        // as a string entry for "domain". With the new alias object from the server,
-        // it already has an entry named "domain", which is an integer.
-        // This variable checks for three truths:
-        //   - Does the alias exists?
-        //   - Does it have an entry for "domain"?
-        //   - Is the entry NOT an integer?
-        // If all three of these are true, this user has a legacy label stored locally
-        // that needs to be ported to the "description" entry
-        const storedLegacyAliasLabel =
-          addonRelayAddress &&
-          Object.prototype.hasOwnProperty.call(addonRelayAddress, "domain") &&
-          !Number.isInteger(addonRelayAddress.domain);
-
-        let storedAliasLabel =
-          addonRelayAddress &&
-          Object.prototype.hasOwnProperty.call(addonRelayAddress, "description")
-            ? addonRelayAddress.description
-            : "";
-
-        // Cache the generated_for alias attribute when updating local storage data.
-        // Note that this data attribute only exists in aliases generated through the add-on
-        let storedAliasGeneratedFor = addonRelayAddress?.generated_for ?? "";
-
-        // This covers any legacy label field and remaps them.
-        if (storedLegacyAliasLabel) {
-          storedAliasLabel = addonRelayAddress.domain;
-        }
-
-        // This covers any legacy siteOrigin field and remaps them.
-        const storedLegacyAliasSiteOrigin = addonRelayAddress?.siteOrigin;
-        if (storedLegacyAliasSiteOrigin) {
-          storedAliasGeneratedFor = addonRelayAddress.generated_for;
-        }
-
-        const aliasLabelForm = aliasCard.querySelector(
-          "form.relay-email-address-label-form"
-        );
-        const aliasLabelInput = aliasCard.querySelector(
-          "input.relay-email-address-label"
-        );
-
-        const aliasLabelWrapper = aliasLabelForm.parentElement;
-        aliasLabelWrapper.classList.add("show-label"); // Field is visible only to users who have the addon installed
-
-        aliasLabelInput.dataset.label = storedAliasLabel;
-
-        if (storedAliasLabel !== "") {
-          aliasLabelInput.value = storedAliasLabel;
-          aliasLabelWrapper.classList.add("user-created-label");
-        } else {
-          aliasLabelInput.placeholder = defaultAliasLabelText;
-        }
-
-        // eslint-disable-next-line quotes
-        const forbiddenCharacters = `{}()=;'-<>"`;
-        const showInputErrorMessage = (errorMessageContent) => {
-          aliasLabelInput.classList.add("input-has-error");
-          aliasLabelWrapper.querySelector(".input-error").textContent =
-            errorMessageContent;
-          aliasLabelWrapper.classList.add("show-input-error");
-          return;
-        };
-
-        const pluralSingularErrorMessage = (badCharactersInValue) => {
-          const newErrorMessage = browser.i18n.getMessage(
-            "profilePageInvalidAliasCharactersError",
-            Array.isArray(badCharactersInValue) ? badCharactersInValue.join(" ") : badCharactersInValue,
-          );
-          return newErrorMessage;
-        };
-
-        const checkValueForErrors = (inputValue) => {
-          // Catch copy/paste forbidden characters
-          const forbiddenCharsInLabelValue = [];
-          forbiddenCharacters.split("").forEach((badChar) => {
-            if (
-              inputValue.includes(badChar) &&
-              !forbiddenCharsInLabelValue.includes(badChar)
-            ) {
-              forbiddenCharsInLabelValue.push(badChar);
-            }
-          });
-          return forbiddenCharsInLabelValue;
-        };
-
-        aliasLabelInput.addEventListener("keydown", (e) => {
-          // Limit keystrokes when the input has errors
-          const keyChar = e.key;
-          if (aliasLabelInput.classList.contains("input-has-error")) {
-            const charactersToAllowWhileInputHasError = [
-              "Tab",
-              "Backspace",
-              "ArrowLeft",
-              "ArrowRight",
-            ];
-            if (!charactersToAllowWhileInputHasError.includes(keyChar)) {
-              e.preventDefault();
-              return;
-            }
-          }
-          // Show error message when forbidden keys are entered
-          if (forbiddenCharacters.includes(keyChar)) {
-            return showInputErrorMessage(
-              `${keyChar} is not an allowed character`
-            );
-          }
-        });
-
-        aliasLabelInput.addEventListener("keyup", (e) => {
-          const keyChar = e.key;
-          const forbiddenCharsInValue = checkValueForErrors(
-            aliasLabelInput.value
-          );
-          if (
-            forbiddenCharsInValue.length === 0 &&
-            !forbiddenCharacters.includes(keyChar)
-          ) {
-            aliasLabelInput.classList.remove("input-has-error");
-            aliasLabelWrapper.classList.remove("show-input-error");
-            return;
-          }
-          if (forbiddenCharsInValue.length > 0) {
-            return showInputErrorMessage(
-              pluralSingularErrorMessage(forbiddenCharsInValue)
-            );
-          }
-        });
-
-        const saveAliasLabel = () => {
-          const newAliasLabel = aliasLabelInput.value;
-
-          // Don't save labels containing forbidden characters
-          if (aliasLabelInput.classList.contains("input-has-error")) {
-            return;
-          }
-
-          const forbiddenCharsInValue = checkValueForErrors(newAliasLabel);
-          if (forbiddenCharsInValue.length > 0) {
-            return showInputErrorMessage(
-              pluralSingularErrorMessage(forbiddenCharsInValue)
-            );
-          }
-
-          // Don't show saved confirmation message if the label hasn't changed
-          if (newAliasLabel === aliasLabelInput.dataset.label) {
-            return;
-          }
-
-          // Save new alias label
-          const updatedRelayAddress = localStorageRelayAddresses.filter(
-            (address) => address.id == aliasId
-          )[0];
-          updatedRelayAddress.description = newAliasLabel;
-          browser.storage.local.set({
-            relayAddresses: localStorageRelayAddresses,
-          });
-
-          // show placeholder text if the label is blank
-          if (aliasLabelInput.value === "") {
-            aliasLabelWrapper.classList.remove("user-created-label");
-            aliasLabelInput.placeholder = defaultAliasLabelText;
-          } else {
-            aliasLabelWrapper.classList.add("user-created-label");
-            aliasLabelWrapper.classList.add("show-saved-confirmation");
-          }
-
-          aliasLabelInput.dataset.label = newAliasLabel;
-          setTimeout(() => {
-            aliasLabelWrapper.classList.remove("show-saved-confirmation");
-          }, 1000);
-        };
-        aliasLabelInput.addEventListener("focusout", () => {
-          const isValid = aliasLabelForm.reportValidity();
-          if (isValid) {
-            saveAliasLabel();
-          }
-        });
-        aliasLabelForm?.addEventListener("submit", (event) => {
-          event.preventDefault();
-          saveAliasLabel();
-          aliasLabelInput.blur();
-        });
-
-        // Get and store the relay addresses from the account profile page,
-        // so they can be used later, even if the API endpoint is down
-
-        const relayAddress = {
-          id: aliasId,
-          address: aliasCardData.relayAddress,
-          description: storedAliasLabel,
-          generated_for: storedAliasGeneratedFor,
-        };
-
-        localStorageRelayAddresses.push(relayAddress);
-      }
-
+      // Since the React version handles local storage of
+      // label data by itself, we don't need to add our own listeners,
+      // and we can just fetch label data from the API.
       const { relayAddresses: existingLocalStorageRelayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
-      if (localStorageRelayAddresses.length === 0) {
+
+      // await browser.storage.local.set({ relayAddresses: {}} });
+
+
+
+      if (localStorageRelayAddresses.length === 0 && existingLocalStorageRelayAddresses) {
         localStorageRelayAddresses.push(...existingLocalStorageRelayAddresses);
       }
+
+      // Get data from server (Note: All description/generated_for fields should be BLANK)
+      const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
+
       if (localStorageRelayAddresses.length === 0) {
-        // If we weren't able to scrape alias data from the page, that means
-        // the React version of the website (with a different DOM structure)
-        // has been deployed. Since the React version handles local storage of
-        // label data by itself, we don't need to add our own listeners,
-        // and we can just fetch label data from the API.
-        const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
+        // Nothing local! Start fresh! 
         localStorageRelayAddresses.push(...serverRelayAddresses);
+        browser.storage.local.set({ relayAddresses: localStorageRelayAddresses });
+        return;
       }
+
+      // WIP/DON'T SHIP: This is a scrape method for the website to grab know label descriptions
+      // Actual fix should be to interacte with webpage local storage (however, localStorage does not have an labels stored currently) 
+      const masks = document.querySelectorAll("div[class*='Alias_controls']");
+      
+      masks.forEach(mask => {
+        const maskAddress = mask.querySelector("samp[class*='Alias_address']").textContent;
+        const maskDescriptionValue = mask.querySelector("input[class*='LabelEditor_label-input']").value;
+
+        const filteredMask = localStorageRelayAddresses.filter(mask => mask.full_address === maskAddress);
+
+        if (filteredMask.length === 0) {
+          throw new Error("No match found between local data and scrapped page data");
+        }
+        
+        if (!filteredMask[0].description || filteredMask[0].description === "") {
+          return;
+        }
+
+        filteredMask[0].description = maskDescriptionValue;
+      });
+
+      
       browser.storage.local.set({ relayAddresses: localStorageRelayAddresses });
     }
 
