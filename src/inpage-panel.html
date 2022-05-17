@@ -38,8 +38,8 @@
         </a>
       </div>
       <div class="fx-relay-menu-filter-active-site">
-        <button class="fx-relay-menu-filter-active-site-button is-active" data-string-id="labelFromThisWebsite"></button>
-        <button class="fx-relay-menu-filter-active-site-button" data-string-id="labelAllEmailMasks"></button>
+        <button class="fx-relay-menu-filter-active-site-button is-active" data-mask-list=".fx-relay-menu-masks-list-this-website" data-string-id="labelFromThisWebsite"></button>
+        <button class="fx-relay-menu-filter-active-site-button" data-mask-list=".fx-relay-menu-masks-list-all-masks"  data-string-id="labelAllEmailMasks"></button>
       </div>
     </header>
     <main class="fx-relay-menu">
@@ -127,8 +127,19 @@
               </div>
             </div>
           </form>
-          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-search-results is-loading">
-            <ul>
+          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-this-website is-loading">
+            <ul class="">
+              <li class="fx-relay-menu-masks-list-loading">
+                <img
+                  class="fx-relay-animation-spin"
+                  src="/icons/button-loading-dark.svg"
+                  alt=""
+                />
+              </li>
+            </ul>
+          </div>
+          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-all-masks is-loading">
+            <ul class="">
               <li class="fx-relay-menu-masks-list-loading">
                 <img
                   class="fx-relay-animation-spin"
