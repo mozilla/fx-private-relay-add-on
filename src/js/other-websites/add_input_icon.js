@@ -35,7 +35,7 @@ function positionRelayMenu() {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe");
   const newIconPosition = relayIconBtn.getBoundingClientRect();
   const documentPosition = document.documentElement.getBoundingClientRect();
-  const RELAY_INPAGE_MENU_MAXIMUM_HEIGHT = 405
+  const RELAY_INPAGE_MENU_MAXIMUM_HEIGHT = 435
   
   // Calculate the "safe area" of add-on in-page menu. If there's not enough room to expand below the icon, it expands above. 
   // The RELAY_INPAGE_MENU_MAXIMUM_HEIGHT / 405 is the pixel height of the tallest version of the inpage menu. 

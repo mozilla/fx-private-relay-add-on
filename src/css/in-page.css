@@ -141,12 +141,25 @@
   gap: var(--spacingMd);
 }
 
+/* Edge case for premium users where both "from this website" and "all mask" lists are visible at the same time */
+.fx-relay-menu-masks-list.is-visible + .fx-relay-menu-masks-list.is-visible {
+  display: none;
+}
+
 .fx-relay-menu-masks-list {
   border-radius: var(--borderRadiusSm);
   background-color: var(--colorGrey10);
   overflow: hidden;
   display: none;
 }
+
+/* .fx-relay-menu-masks-list-this-website {
+  background-color: red !important;
+}
+
+.fx-relay-menu-masks-list-all-masks {
+  background-color: blue !important;
+} */
 
 .fx-relay-menu-masks-list.is-visible {
   display: block;
@@ -302,14 +315,23 @@
   padding: var(--spacingXs) var(--spacingSm);
   margin-bottom: var(--spacingSm);
   position: relative;
+  display: none;
 }
 
-.fx-relay-menu-masks-search-results.t-no-search-bar ul {
+.fx-relay-menu-masks-search-form.is-visible {
+  display: block;
+}
+
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list.t-no-search-bar ul {
   max-height: none;
   overflow: visible;
 }
 
-.fx-relay-menu-masks-search-results ul {
+.fx-relay-mask-list-toggle-height .fx-relay-menu-masks-search .fx-relay-menu-masks-list ul {
+  max-height: 140px;
+}
+
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list ul {
   max-height: 190px;
   overflow: scroll;
   list-style: none;

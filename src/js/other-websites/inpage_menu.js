@@ -1,4 +1,4 @@
-// Let usage. We need a global object of massk to between all inpage_menu functions 
+// Let usage. We need a global object of massk to between all inpage_menu functions
 let masks = {};
 
 async function iframeCloseRelayInPageMenu() {
@@ -11,7 +11,7 @@ function getRelayMenuEl() {
 }
 
 let activeElemIndex = 0;
-async function handleKeydownEvents (e) {
+async function handleKeydownEvents(e) {
   const relayInPageMenu = getRelayMenuEl();
   const clickableElsInMenu =
     relayInPageMenu.querySelectorAll("button, a, input");
@@ -55,15 +55,18 @@ async function isUserSignedIn() {
 
 async function getCachedServerStoragePref() {
   const serverStoragePref = await browser.storage.local.get("server_storage");
-  const serverStoragePrefInStorage =
-    Object.prototype.hasOwnProperty.call(serverStoragePref, "server_storage");
+  const serverStoragePrefInStorage = Object.prototype.hasOwnProperty.call(
+    serverStoragePref,
+    "server_storage"
+  );
 
   if (!serverStoragePrefInStorage) {
     return await browser.runtime.sendMessage({
       method: "getServerStoragePref",
     });
   } else {
-    return serverStoragePrefInStorage;
+    // If the stored pref exists, return value
+    return serverStoragePref.server_storage;
   }
 }
 
@@ -76,7 +79,6 @@ async function getMasks(options = { fetchCustomMasks: false }) {
         method: "getAliasesFromServer",
         options,
       });
-
     } catch (error) {
       console.warn(`getAliasesFromServer Error: ${error}`);
 
@@ -101,20 +103,18 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   const maskAddress = generateClickEvt.target.dataset.mask;
   const maskAddressId = generateClickEvt.target.dataset.maskId;
 
-  console.log("toBeFiltered", masks);
-  
-
-  const maskObject = masks.find(mask => mask.id === parseInt(maskAddressId, 10));
+  const maskObject = masks.find(
+    (mask) => mask.id === parseInt(maskAddressId, 10)
+  );
 
   const currentUsedOnValue = maskObject.used_on;
 
-  const used_on = {};
+  // TODO: used_on
+  // const used_on = {};
 
   const currentPageHostName = await browser.runtime.sendMessage({
     method: "getCurrentPageHostname",
   });
-
-  console.log("currentUsedOnValue", currentUsedOnValue);
 
   if (currentUsedOnValue === null) {
     // This site has not been used on any site before
@@ -122,18 +122,16 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
       method: "patchMaskInfo",
       id: parseInt(maskAddressId, 10),
       data: {
-        used_on: "example.com"
+        used_on: "example.com",
       },
       options: {
         auth: true,
-      }
+      },
     });
   }
 
-  // TODO: Parse currentUsedOnValue object to check if current domain is listed, and if not, add it. 
-  // If you add it, patch it! 
-
-
+  // TODO: Parse currentUsedOnValue object to check if current domain is listed, and if not, add it.
+  // If you add it, patch it!
 
   await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
@@ -147,11 +145,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   });
 }
 
-async function populateMaskList(
-  maskList,
-  masks,
-  options = { replaceMaskAddressWithLabel: false }
-) {
+async function populateFreeMaskList(maskList, masks) {
   const list = maskList.querySelector("ul");
 
   if (masks.length === 0) {
@@ -164,29 +158,13 @@ async function populateMaskList(
 
     listButton.tabIndex = 0;
 
-    console.log("mask object", mask);
-    
     listButton.dataset.domain = mask.domain;
     listButton.dataset.maskId = mask.id;
     listButton.dataset.mask = mask.full_address;
     listButton.dataset.label = mask.description;
 
-    if (options.replaceMaskAddressWithLabel) {
-      // The button text for a mask will show both the description label (if set) and the full address.
-      const listButtonLabel = document.createElement("span");
-      listButtonLabel.classList.add("fx-relay-menu-masks-search-result-label");
-      const listButtonAddress = document.createElement("span");
-      listButtonAddress.classList.add(
-        "fx-relay-menu-masks-search-result-address"
-      );
-      listButtonLabel.textContent = mask.description;
-      listButtonAddress.textContent = mask.full_address;
-      listButton.appendChild(listButtonLabel);
-      listButton.appendChild(listButtonAddress);
-    } else {
-      // The button text for a mask will be either the description label or the full address.
-      listButton.textContent = mask.description || mask.full_address;
-    }
+    // The button text for a mask will be either the description label or the full address.
+    listButton.textContent = mask.description || mask.full_address;
 
     listButton.addEventListener("click", fillTargetWithRelayAddress, false);
 
@@ -202,8 +180,57 @@ async function populateMaskList(
   list.classList.remove("is-loading");
 
   maskList.classList.add("is-visible");
-  
-  // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too. 
+
+  // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too.
+  document.querySelector(".fx-relay-menu-masks-lists")?.classList.add("is-visible");
+
+  await browser.runtime.sendMessage({
+    method: "updateIframeHeight",
+    height: document.getElementById("fxRelayMenuBody").scrollHeight,
+  });
+}
+
+async function populatePremiumMaskList(maskList, masks) {
+  const list = maskList.querySelector("ul");
+
+  if (masks.length === 0) {
+    return;
+  }
+
+  masks.forEach((mask) => {
+    const listItem = document.createElement("li");
+    const listButton = document.createElement("button");
+
+    listButton.tabIndex = 0;
+    listButton.dataset.domain = mask.domain;
+    listButton.dataset.maskId = mask.id;
+    listButton.dataset.mask = mask.full_address;
+    listButton.dataset.label = mask.description;
+
+    // The button text for a mask will show both the description label (if set) and the full address.
+    const listButtonLabel = document.createElement("span");
+    listButtonLabel.classList.add("fx-relay-menu-masks-search-result-label");
+    const listButtonAddress = document.createElement("span");
+    listButtonAddress.classList.add("fx-relay-menu-masks-search-result-address");
+    listButtonLabel.textContent = mask.description;
+    listButtonAddress.textContent = mask.full_address;
+    listButton.appendChild(listButtonLabel);
+    listButton.appendChild(listButtonAddress);
+
+    listButton.addEventListener("click", fillTargetWithRelayAddress, false);
+
+    listItem.appendChild(listButton);
+    list.appendChild(listItem);
+  });
+
+  // Remove loading state
+  const loadingItem = maskList.querySelector(
+    ".fx-relay-menu-masks-list-loading"
+  );
+  loadingItem.remove();
+  list.classList.remove("is-loading");
+
+  // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too.
   document.querySelector(".fx-relay-menu-masks-lists")?.classList.add("is-visible");
 
   await browser.runtime.sendMessage({
@@ -217,11 +244,12 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 };
 
 function applySearchFilter(query) {
-  const maskResults = Array.from(
-    document.querySelectorAll(".fx-relay-menu-masks-search-results ul li")
+  // The search results will only count/return from whichever list is active/visible.
+  const maskSearchResults = Array.from(
+    document.querySelectorAll(".fx-relay-menu-masks-list.is-visible ul li")
   );
 
-  maskResults.forEach((maskResult) => {
+  maskSearchResults.forEach((maskResult) => {
     const button = maskResult.querySelector("button");
     const emailAddress = button.dataset.mask;
     const label = button.dataset.label;
@@ -236,22 +264,18 @@ function applySearchFilter(query) {
     }
   });
 
-  // Add #/# labels to search filter
+  // Set #/# labels inside search bar to show results count
   const searchFilterTotal = document.querySelector(".js-filter-masks-total");
   const searchFilterVisible = document.querySelector(
     ".js-filter-masks-visible"
   );
 
-  searchFilterVisible.textContent = maskResults.length;
-
-  searchFilterVisible.textContent = maskResults.filter(
-    (maskResult) => !maskResult.classList.contains("is-hidden")
-  ).length;
-  searchFilterTotal.textContent = maskResults.length;
+  searchFilterVisible.textContent = maskSearchResults.filter((maskResult) => !maskResult.classList.contains("is-hidden")).length;
+  searchFilterTotal.textContent = maskSearchResults.length;
 }
 
 function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
-  return masks.some( mask => {
+  return masks.some((mask) => {
     return domain === mask.generated_for;
   });
 }
@@ -260,7 +284,6 @@ const buildContent = {
   loggedIn: {
     free: async (relaySiteOrigin) => {
       const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
-
 
       const signedInContentFree = document.querySelector(
         ".fx-content-signed-in-free"
@@ -283,21 +306,24 @@ const buildContent = {
 
       const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
       masks = await getMasks();
-      
+
       const currentPageHostName = await browser.runtime.sendMessage({
         method: "getCurrentPageHostname",
       });
 
       maskLists?.forEach(async (maskList) => {
         // Set Mask List label names
-        const label = maskList.querySelector(".fx-relay-menu-masks-list-label");        
+        const label = maskList.querySelector(".fx-relay-menu-masks-list-label");
         const stringId = label.dataset.stringId;
-        
+
         label.textContent = browser.i18n.getMessage(stringId);
 
         // If there are no masks used on the current site, we need to change the label for the other masks:
-        if (!checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) && maskList.classList.contains("fx-relay-menu-masks-free-other")) {
-          // TODO / BLOCKED: https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/pull/31 
+        if (
+          !checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) &&
+          maskList.classList.contains("fx-relay-menu-masks-free-other")
+        ) {
+          // TODO: (BLOCKED) https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/pull/31
           // needs to merge for pageInputIconSelectFromYourCurrentEmailMasks string ID
           // label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
           label.textContent = "Select from your current email masks";
@@ -305,14 +331,18 @@ const buildContent = {
 
         if (masks.length > 0) {
           // Populate mask lists, but filter by current website
-          const buildFilteredMaskList = maskList.classList.contains("fx-relay-menu-masks-free-this-website");
+          const buildFilteredMaskList = maskList.classList.contains(
+            "fx-relay-menu-masks-free-this-website"
+          );
 
           // TODO: Check additional field(s) besides "generated_for"
-          const filteredMasks = buildFilteredMaskList ? 
-            masks.filter(mask => mask.generated_for === currentPageHostName)
-            : masks.filter(mask => mask.generated_for !== currentPageHostName);
-          
-          await populateMaskList(maskList, filteredMasks);
+          const filteredMasks = buildFilteredMaskList
+            ? masks.filter((mask) => mask.generated_for === currentPageHostName)
+            : masks.filter(
+                (mask) => mask.generated_for !== currentPageHostName
+              );
+
+          await populateFreeMaskList(maskList, filteredMasks);
         }
       });
 
@@ -358,7 +388,7 @@ const buildContent = {
         generateAliasBtn.focus();
       }
 
-      // TODO: Add premiumCountryAvailability Check 
+      // TODO: Add premiumCountryAvailability Check
       // Check if premium features are available
       // const premiumCountryAvailability = (
       //   await browser.storage.local.get("premiumCountries")
@@ -382,7 +412,6 @@ const buildContent = {
       });
     },
     premium: async () => {
-      
       const fxRelayMenuBody = document.getElementById("fxRelayMenuBody");
 
       const signedInContentFree = document.querySelector(
@@ -397,22 +426,11 @@ const buildContent = {
       signedInContentPremium?.classList.remove("is-hidden");
       signedInContentFree?.remove();
 
-      const searchInput = document.querySelector(
-        ".fx-relay-menu-masks-search-input"
-      );
-
-      searchInput.placeholder = browser.i18n.getMessage("labelSearch");
-
       // Resize iframe
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: fxRelayMenuBody.scrollHeight,
       });
-
-      const searchResults = document.querySelector(
-        ".fx-relay-menu-masks-search-results"
-      );
-      const searchResultsList = searchResults.querySelector("ul");
 
       // Check if user may have custom domain masks
       const { premiumSubdomainSet } = await browser.storage.local.get(
@@ -422,6 +440,7 @@ const buildContent = {
       // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
       const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
 
+      // Get masks, including subdomain/custom masks if available
       masks = await getMasks({
         fetchCustomMasks: isPremiumSubdomainSet,
       });
@@ -430,119 +449,106 @@ const buildContent = {
       const currentPageHostName = await browser.runtime.sendMessage({
         method: "getCurrentPageHostname",
       });
-      
-      if ( checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) ) {
 
-        const filterMenu = document.querySelector(".fx-relay-menu-filter-active-site");
+      // See if any masks are assosiated with the current site. 
+      // If so, we'll end up building two discret mask lists:  
+      // 1. Just masks for that specific website
+      // 2. All masks (including ones from the previous list)
+      const userHasMasksForCurrentWebsite =
+        checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName);
+
+      // If there are no masks assosiated with the current site, remove that list entirely.
+      if (!userHasMasksForCurrentWebsite) {
+        document.querySelector(".fx-relay-menu-masks-list-this-website").remove();
+      }
+
+      const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
+
+      // Now we can set the toggle buttons between the two lists.
+      if (userHasMasksForCurrentWebsite) {
+        fxRelayMenuBody.classList.add(".fx-relay-mask-list-toggle-height");
+
+        const filterMenu = document.querySelector(
+          ".fx-relay-menu-filter-active-site"
+        );
         filterMenu.classList.add("is-visible");
 
         const filterMenuButtons = filterMenu.querySelectorAll("button");
-        filterMenuButtons.forEach(button => {
+
+        filterMenuButtons.forEach((button) => {
           const stringId = button.dataset.stringId;
-          button.textContent = browser.i18n.getMessage(stringId);          
+          button.textContent = browser.i18n.getMessage(stringId);
+
+          // TODO: Move this function elsewhere
+
+          button.addEventListener("click", async (event) => {
+            await buildContent.components.setMaskListButton(event.target, maskLists, filterMenuButtons);
+          });
         });
-        
       }
 
-      /*
-      TODO
-      1. Check if SOME masks exist on site. 
-      If so, build that list first 
-      Q: Buil both or only build one and rebuild when click
-      Add listners funcs to buttons to show each list
-      CSS: Styls buttons
-      Note: You'll need to filter each search array by active mask list
-      */
+      maskLists?.forEach(async (maskList) => {
 
-      // Process the masks list:
-      if (masks.length === 0) {
-        fxRelayMenuBody.classList.remove("is-loading");
-
-        const search = document.querySelector(".fx-relay-menu-masks-search");
-        search.classList.add("is-hidden");
-
-      } else if (masks.length > 5) {
-
-        // If there's at least 6 masks, show the search bar
-        await populateMaskList(searchResults, masks, {
-          replaceMaskAddressWithLabel: true,
-        });
-
-        searchResultsList.style.height = `${searchResultsList.offsetHeight}px`;
-
-        const filterSearchForm = document.querySelector(
-          ".fx-relay-menu-masks-search-form"
+        // Check if the list we're currently building is "From this website". This logic will be used throughout the function
+        const buildFilteredMaskList = maskList.classList.contains(
+          "fx-relay-menu-masks-list-this-website"
         );
 
-        const filterSearchInput = filterSearchForm.querySelector(
-          ".fx-relay-menu-masks-search-input"
-        );
+        // TODO: Check additional field(s) besides "generated_for"
+        const filteredMasks = buildFilteredMaskList
+          ? masks.filter((mask) => mask.generated_for === currentPageHostName)
+          : masks;
 
-        filterSearchForm.addEventListener("submit", (event) => {
-          event.preventDefault();
-          filterSearchInput.blur();
-        });
+        // Process the masks list based on how many masks there are: 
+        // If there is none, we'll only show the "Generate new mask" button
+        // If there's less than five, we'll show all of them
+        // If there's MORE than five, we'll show all of them and show the search/filter bar
+        if (filteredMasks.length === 0) {
+          if (buildFilteredMaskList) {
+            // We only want to remove the the search field if there's NO masks.
+            return;
+          }
 
-        filterSearchInput.addEventListener("input", (event) => {
-          applySearchFilter(event.target.value);
-        });
+          buildContent.components.search.remove();
+        } else {
+          // Built out each list
+          await populatePremiumMaskList(maskList, filteredMasks);
+        }
+      });
 
-      } else {
-        // User has between 1-5 masks. Display all of them, but
-        // do not show the search input/filter.
-
-        await populateMaskList(searchResults, masks, {
-          replaceMaskAddressWithLabel: true,
-        });
-
-        const filterSearchForm = document.querySelector(
-          ".fx-relay-menu-masks-search-form"
-        );
-
-        const filterSearchResults = document.querySelector(
-          ".fx-relay-menu-masks-search-results"
-        );
-
-        filterSearchForm.remove();
-        filterSearchResults.classList.add("t-no-search-bar");
-      }
-
-    
-      const generateAliasBtn = document.querySelector(
-        ".fx-relay-menu-generate-alias-btn"
-      );
+      // Set the first available list to visible.
+      // If there's "From this website" masks, it will show that list first. 
+      document.querySelector(".fx-relay-menu-masks-list").classList.add("is-visible");
 
       // Set Generate Mask button
       await buildContent.components.generateMaskButton();
 
       fxRelayMenuBody.classList.remove("is-loading");
 
-      // Resize iframe
+      // Check if search has been removed. If not, init it!  
+      const search = document.querySelector(".fx-relay-menu-masks-search");
+      if (search) {
+        await buildContent.components.search.init();
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+
+        // If the visible list has enough masks to show the search bar, focus on it
+        // Note that the buildContent.components.search function also runs the updateIframeHeight event.
+        if (filterSearchForm.classList.contains("is-visible")) {
+          await buildContent.components.search.inputFocus();
+          return;
+        }
+      }
+
+      const generateAliasBtn = document.querySelector(
+        ".fx-relay-menu-generate-alias-btn"
+      );
+
       await browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: fxRelayMenuBody.scrollHeight,
       });
-
-      const filterSearchInput = document.querySelector(
-        ".fx-relay-menu-masks-search-input"
-      );
-
-      if (filterSearchInput) {
-        // If there's a search bar visible, focus on that instead of the generate
-
-        const searchFilterTotal = document.querySelector(
-          ".js-filter-masks-total"
-        );
-        const searchFilterVisible = document.querySelector(
-          ".js-filter-masks-visible"
-        );
-
-        searchFilterTotal.textContent = masks.length;
-        searchFilterVisible.textContent = masks.length;
-
-        filterSearchInput.focus();
-        return;
-      }
 
       // Focus on "Generate New Alias" button
       generateAliasBtn.focus();
@@ -605,6 +611,43 @@ const buildContent = {
     }, 10);
   },
   components: {
+    setMaskListButton: async (button, maskLists, filterMenuButtons) => {
+        // Hide all lists, show selected list
+        maskLists.forEach((maskList) => {
+          maskList.classList.remove("is-visible");
+        });
+
+        const maskListSelector = button.dataset.maskList;
+        const activeMaskList = document.querySelector(maskListSelector);
+        const activeMaskListCount = activeMaskList.querySelectorAll("li");
+
+        activeMaskList.classList.add("is-visible");
+
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+        
+        // If there's enough masks in this list, we need to show search.
+        if (activeMaskListCount.length > 5) {
+          filterSearchForm.classList.add("is-visible");
+          await buildContent.components.search.inputFocus();
+        } else {
+          filterSearchForm.classList.remove("is-visible");
+        }
+
+        // Make all buttons inactive, make selected button active
+        filterMenuButtons.forEach((maskList) => {
+          maskList.classList.remove("is-active");
+        });
+
+        button.classList.add("is-active");
+
+        // Resize iframe
+        await browser.runtime.sendMessage({
+          method: "updateIframeHeight",
+          height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        });      
+    },
     generateMaskButton: async () => {
       // Create "Generate Relay Address" button
       const generateAliasBtn = document.querySelector(
@@ -634,10 +677,12 @@ const buildContent = {
         });
 
         // Catch edge cases where the "Generate New Alias" button is still enabled,
-        // but the user has already reached the max number of aliases. 
+        // but the user has already reached the max number of aliases.
         if (newRelayAddressResponse.status === 402) {
           generateClickEvt.target.classList.remove("is-loading");
-          throw new Error(browser.i18n.getMessage("pageInputIconMaxAliasesError_mask"));
+          throw new Error(
+            browser.i18n.getMessage("pageInputIconMaxAliasesError_mask")
+          );
         }
 
         await browser.runtime.sendMessage({
@@ -672,21 +717,113 @@ const buildContent = {
       const relayMenuDashboardLink = document.querySelector(
         ".fx-relay-menu-dashboard-link"
       );
-    
+
       const relayMenuDashboardLinkTooltip =
-        relayMenuDashboardLink.querySelector(".fx-relay-menu-dashboard-link-tooltip");
-    
-        relayMenuDashboardLinkTooltip.textContent =
+        relayMenuDashboardLink.querySelector(
+          ".fx-relay-menu-dashboard-link-tooltip"
+        );
+
+      relayMenuDashboardLinkTooltip.textContent =
         browser.i18n.getMessage("labelManage");
-    
+
       relayMenuDashboardLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
       relayMenuDashboardLink.target = "_blank";
-    
+
       relayMenuDashboardLink.addEventListener("click", async () => {
         sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
         await iframeCloseRelayInPageMenu();
       });
-    }
+    },
+    search: {
+      inputFocus: async () => {
+        // If there's a search bar visible, focus on that instead of the generate
+        const filterSearchInput = document.querySelector(
+          ".fx-relay-menu-masks-search-input"
+        );
+
+        const searchFilterTotal = document.querySelector(
+          ".js-filter-masks-total"
+        );
+
+        const searchFilterVisible = document.querySelector(
+          ".js-filter-masks-visible"
+        );
+
+        const maskSearchResults = document.querySelectorAll(
+          ".fx-relay-menu-masks-list.is-visible ul li"
+        );
+
+        searchFilterTotal.textContent = maskSearchResults.length;
+        searchFilterVisible.textContent = maskSearchResults.length;
+
+        // Resize iframe
+        await browser.runtime.sendMessage({
+          method: "updateIframeHeight",
+          height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        });
+
+        filterSearchInput.focus();
+      },
+      init: async () => {
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+
+        const filterSearchInput = filterSearchForm.querySelector(
+          ".fx-relay-menu-masks-search-input"
+        );
+
+        filterSearchInput.placeholder = browser.i18n.getMessage("labelSearch");
+
+        filterSearchForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          filterSearchInput.blur();
+        });
+
+        filterSearchInput.addEventListener("input", (event) => {
+          applySearchFilter(event.target.value);
+        });
+
+        const maskLists = document.querySelectorAll(
+          ".fx-relay-menu-masks-list"
+        );
+
+        maskLists.forEach((maskList) => {
+          const maskNumber = maskList.querySelectorAll("li").length;
+          if (maskNumber > 5) {
+            if (maskList.classList.contains("is-visible")) {
+              buildContent.components.search.show();
+              return;
+            }
+
+            return;
+          }
+
+          maskList.classList.add("t-no-search-bar");
+        });
+
+        // Resize iframe
+        await browser.runtime.sendMessage({
+          method: "updateIframeHeight",
+          height: document.getElementById("fxRelayMenuBody").scrollHeight,
+        });
+      },
+      remove: () => {
+        const search = document.querySelector(".fx-relay-menu-masks-search");
+        search.remove();
+      },
+      show: () => {
+        const filterSearchForm = document.querySelector(
+          ".fx-relay-menu-masks-search-form"
+        );
+        filterSearchForm.classList.add("is-visible");
+
+        const maskListUl = document.querySelector(
+          ".fx-relay-menu-masks-list.is-visible ul"
+        );
+        maskListUl.style.height = `${maskListUl.offsetHeight}px`;
+      },
+    },
   },
 };
 
