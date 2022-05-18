@@ -186,21 +186,15 @@ async function createNewHeadersObject(opts) {
 }
 
 async function refreshAccountPages() {
-  const { settingsRefresh } = await browser.storage.local.get(
-    "settingsRefresh"
-  );
-
-  // This functions only runs once (when on the dashboard page), if the user has visited the settings page.
-  // If they revisit the settings page, it resets so that it only runs once again.
-  if (!settingsRefresh) {
-    browser.storage.local.set({ settingsRefresh: true });
-
-    browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabs => {
-      for (let tab of tabs) {
-        browser.tabs.reload(tab.id);
+  browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabs => {
+    for (let tab of tabs) {
+      const tabUrl = new URL(tab.url);
+      if (tabUrl.pathname.startsWith("/accounts/settings")) {
+        continue;
       }
-    });
-  }
+      browser.tabs.reload(tab.id);
+    }
+  });
 }
 
 // This function is defined as global in the ESLint config _because_ it is created here:
@@ -267,8 +261,6 @@ async function makeRelayAddress(description = null) {
     newRelayAddressJson,
   ]);
   browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
-
-  await refreshAccountPages();
 
   return newRelayAddressJson;
 }

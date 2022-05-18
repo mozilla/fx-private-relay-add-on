@@ -1,3 +1,20 @@
+/**
+ * @typedef {object} RandomMask
+ * @property {boolean} enabled
+ * @property {boolean} block_list_emails
+ * @property {string} description
+ * @property {number} id
+ * @property {string} address
+ * @property {string} full_address
+ * @property {1 | 2} domain
+ * @property {string} created_at
+ * @property {string} last_modified_at
+ * @property {string | null} last_uesd_at
+ * @property {number} num_forwarded
+ * @property {number} num_blocked
+ * @property {number} num_spam
+ */
+
 (async function () {
   const dahsboardInitializationObserver = new MutationObserver((mutations) => {
     mutations.forEach(mutation => {
@@ -89,6 +106,51 @@
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
+    /**
+     * Fetch the current list of random masks from the server, while preserving local labels if present
+     */
+    async function refreshLocalLabelCache() {
+      /** @type {RandomMask[]} */
+      const relayAddresses = await apiRequest(apiRelayAddressesURL);
+      await browser.storage.local.set({ relayAddresses: applyLocalLabels(relayAddresses) });
+    }
+
+    /**
+     * Copy over locally-stored labels to the given addresses
+     *
+     * If the user has disabled server-side label storage, the add-on may still
+     * store data like labels and the websites an address has been used on
+     * locally. When we refresh the address data from the server, we'll want to
+     * copy over the labels from our local cache of addresses to the new list
+     * we just fetched.
+     *
+     * @param {RandomMask[]} addresses
+     * @returns {RandomMask[]}
+     */
+    function applyLocalLabels(addresses) {
+      if (siteStorageEnabled) {
+        return addresses;
+      }
+
+      const localAddressCache = browser.storage.local.get("relayAddresses").relayAddresses ?? [];
+      return addresses.map(address => {
+        const matchingLocalAddress = localAddressCache.find((localAddress) => {
+          return (
+            localAddress.id === address.id &&
+            localAddress.address === address.address &&
+            localAddress.domain === address.domain
+          );
+        });
+
+        return {
+          ...address,
+          description: matchingLocalAddress?.description ?? address.description,
+          generated_for: matchingLocalAddress?.generated_for ?? address.generated_for,
+          used_on: matchingLocalAddress?.used_on ?? address.used_on,
+        };
+      });
+    }
+
     // Check if user is premium
     const isPremiumUser = document.querySelector(
         "firefox-private-relay-addon-data"
@@ -161,7 +223,7 @@
     // be sure it matches the local storage metadata dataset
     function getAliasesWithUpdatedMetadata(updatedAliases, prevAliases) {
       return prevAliases.map(prevAlias => {
-        const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id);
+        const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id) ?? { description: "", generated_for: ""};
         return {
           ...prevAlias,
           description: updatedAlias.description.length > 0 ? updatedAlias.description : prevAlias.description,
@@ -201,9 +263,8 @@
       const { relayAddresses: existingLocalStorageRelayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
-      if (existingLocalStorageRelayAddresses.length === 0) {
-        const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
-        browser.storage.local.set({ relayAddresses: serverRelayAddresses });
+      if (!existingLocalStorageRelayAddresses || existingLocalStorageRelayAddresses.length === 0) {
+        await refreshLocalLabelCache();
       }
     }
 
@@ -224,6 +285,16 @@
           description: update.newLabel,
         });
         await browser.storage.local.set({ relayAddresses: newAddresses });
+      }
+
+      if (event.detail.type === "aliasListUpdate") {
+        await refreshLocalLabelCache();
+      }
+
+      if (event.detail.type === "subdomainClaimed") {
+        browser.storage.local.set({
+          premiumSubdomainSet: event.detail.subdomain ?? "None",
+        });
       }
     });
 
