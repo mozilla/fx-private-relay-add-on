@@ -309,6 +309,26 @@ function hasMaskBeenUsedOnCurrentSite(mask, domain) {
   return false;
 }
 
+function haveMasksBeenUsedOnCurrentSite(masks, domain) {
+  return masks.some(mask => {
+    
+    const domainList = mask.used_on;
+
+    // Short circuit out if there's no used_on entry
+    if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+
+    const usedOnDomains = domainList.split(",");
+
+    // Domain already exists in used_on field. Just return the list!
+    if (usedOnDomains.includes(domain)) {
+      return true;
+    }
+
+    // No match found! 
+    return false;
+  })
+}
+
 const buildContent = {
   loggedIn: {
     free: async (relaySiteOrigin) => {
@@ -483,8 +503,7 @@ const buildContent = {
       // If so, we'll end up building two discret mask lists:  
       // 1. Just masks for that specific website
       // 2. All masks (including ones from the previous list)
-      const userHasMasksForCurrentWebsite =
-        checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName);
+      const userHasMasksForCurrentWebsite = (checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) || haveMasksBeenUsedOnCurrentSite(masks, currentPageHostName);
 
       // If there are no masks assosiated with the current site, remove that list entirely.
       if (!userHasMasksForCurrentWebsite) {
