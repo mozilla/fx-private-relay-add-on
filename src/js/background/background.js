@@ -85,8 +85,6 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   }
 
   const apiRequestUrl = opts.domainAddress ? apiMakeDomainAddressesURL : apiMakeRelayAddressesURL;
-  
-  console.log(data);
 
   const response = await fetch(apiRequestUrl, {
     mode: "same-origin",

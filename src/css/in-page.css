@@ -142,7 +142,7 @@
 }
 
 /* Edge case for premium users where both "from this website" and "all mask" lists are visible at the same time */
-.fx-relay-menu-masks-list.is-visible + .fx-relay-menu-masks-list.is-visible {
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list.is-visible + .fx-relay-menu-masks-list.is-visible {
   display: none;
 }
 
@@ -152,14 +152,6 @@
   overflow: hidden;
   display: none;
 }
-
-/* .fx-relay-menu-masks-list-this-website {
-  background-color: red !important;
-}
-
-.fx-relay-menu-masks-list-all-masks {
-  background-color: blue !important;
-} */
 
 .fx-relay-menu-masks-list.is-visible {
   display: block;
@@ -230,6 +222,49 @@
   cursor: pointer;
   text-align: start;
   overflow: hidden;
+  position: relative;
+}
+
+.fx-relay-menu-masks-list button.is-loading::before {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--colorViolet10);
+  content: "";
+  left: 0;
+  top: 0;
+  animation-name: fade-in;
+  animation-duration: 2s;
+  transition-timing-function: linear;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fx-relay-menu-masks-list button.is-loading::after {
+  content: url(/icons/button-loading-dark.svg);
+  position: absolute;
+  z-index: 1;
+  display: block;
+  animation-name: fx-relay-loader-spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  height: 24px;
+  width: 24px;
+  left: 50%;
+  top: 50%;
+  margin-left: -12px;
+  margin-top: -12px;
+  
 }
 
 .fx-relay-menu-masks-list button:hover {
