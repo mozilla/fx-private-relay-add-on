@@ -22,8 +22,8 @@ browser.runtime.onInstalled.addListener(async (details) => {
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function getAliasesFromServer(method = "GET", opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
-  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
-  const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/`;
+  const getRelayAddressesUrl = `${relayApiSource}/relayaddresses/`;
+  const getDomainAddressesUrl = `${relayApiSource}/domainaddresses/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -37,7 +37,7 @@ async function getAliasesFromServer(method = "GET", opts=null) {
     headers.set("Authorization", `Token ${apiToken.apiToken}`);
   }
 
-  const response = await fetch(apiMakeRelayAddressesURL, {
+  const response = await fetch(getRelayAddressesUrl, {
     mode: "same-origin",
     method,
     headers: headers,
@@ -49,7 +49,7 @@ async function getAliasesFromServer(method = "GET", opts=null) {
 
   // If the user has domain (custom) masks set, also grab them before sorting
   if (opts.fetchCustomMasks) {
-    const domainResponse = await fetch(apiMakeDomainAddressesURL, {
+    const domainResponse = await fetch(getDomainAddressesUrl, {
       mode: "same-origin",
       method,
       headers: headers,
@@ -69,8 +69,8 @@ async function getAliasesFromServer(method = "GET", opts=null) {
 async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
-  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/${id}/`;
-  const apiMakeDomainAddressesURL = `${relayApiSource}/domainaddresses/${id}/`;
+  const updateRelayAddressURL = `${relayApiSource}/relayaddresses/${id}/`;
+  const updateDomainAddressURL = `${relayApiSource}/domainaddresses/${id}/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -84,7 +84,7 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
     headers.set("Authorization", `Token ${apiToken.apiToken}`);
   }
 
-  const apiRequestUrl = opts.domainAddress ? apiMakeDomainAddressesURL : apiMakeRelayAddressesURL;
+  const apiRequestUrl = opts.domainAddress ? updateDomainAddressURL : updateRelayAddressURL;
 
   const response = await fetch(apiRequestUrl, {
     mode: "same-origin",
@@ -243,8 +243,7 @@ async function makeRelayAddress(description = null) {
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const serverStoragePermission = await getServerStoragePref();
-  const apiMakeRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
-  const newRelayAddressUrl = apiMakeRelayAddressesURL;
+  const makeRelayAddressUrl = `${relayApiSource}/relayaddresses/`;
 
   let apiBody = {
     enabled: true,
@@ -260,7 +259,7 @@ async function makeRelayAddress(description = null) {
 
   const headers = await createNewHeadersObject({auth: true});
 
-  const newRelayAddressResponse = await fetch(newRelayAddressUrl, {
+  const newRelayAddressResponse = await fetch(makeRelayAddressUrl, {
     mode: "same-origin",
     method: "POST",
     headers: headers,

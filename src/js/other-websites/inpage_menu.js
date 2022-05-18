@@ -1,4 +1,4 @@
-// Let usage. We need a global object of massk to between all inpage_menu functions
+// Let usage. We need a global object of masks to between all inpage_menu functions
 let masks = {};
 
 async function iframeCloseRelayInPageMenu() {
@@ -55,12 +55,13 @@ async function isUserSignedIn() {
 
 async function getCachedServerStoragePref() {
   const serverStoragePref = await browser.storage.local.get("server_storage");
-  const serverStoragePrefInStorage = Object.prototype.hasOwnProperty.call(
+  const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
     serverStoragePref,
     "server_storage"
   );
 
-  if (!serverStoragePrefInStorage) {
+  if (!serverStoragePrefInLocalStorage) {
+    // There is no reference to the users storage preference saved. Fetch it from the server.
     return await browser.runtime.sendMessage({
       method: "getServerStoragePref",
     });
@@ -97,16 +98,15 @@ async function getMasks(options = { fetchCustomMasks: false }) {
 }
 
 function addUsedOnDomain(domainList, currentDomain) {
-  const usedOnDomains = domainList.split(",");
-
   // Domain already exists in used_on field. Just return the list!
-  if (usedOnDomains.includes(currentDomain)) {
+  if (domainList.includes(currentDomain)) {
     return domainList;
   }
 
-  // Domain DOES NOT exist in used_on field. Add it, and put it back as a CSV string.
-  usedOnDomains.push(currentDomain);
-  return usedOnDomains.toString();
+  // Domain DOES NOT exist in used_on field. Add it to the domainList and put it back as a CSV string.
+  // If there's already an entry, add a comma too
+  domainList += (domainList  !== "") ? `,${currentDomain}` : currentDomain;
+  return domainList;
 }
 
 async function fillTargetWithRelayAddress(generateClickEvt) {
@@ -164,6 +164,8 @@ async function populateFreeMaskList(maskList, masks) {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
+
   masks.forEach((mask) => {
     const listItem = document.createElement("li");
     const listButton = document.createElement("button");
@@ -181,8 +183,10 @@ async function populateFreeMaskList(maskList, masks) {
     listButton.addEventListener("click", fillTargetWithRelayAddress, false);
 
     listItem.appendChild(listButton);
-    list.appendChild(listItem);
+    fragment.appendChild(listItem);
   });
+
+  list.appendChild(fragment);
 
   // Remove loading state
   const loadingItem = maskList.querySelector(
@@ -298,10 +302,8 @@ function hasMaskBeenUsedOnCurrentSite(mask, domain) {
   // Short circuit out if there's no used_on entry
   if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
 
-  const usedOnDomains = domainList.split(",");
-
   // Domain already exists in used_on field. Just return the list!
-  if (usedOnDomains.includes(domain)) {
+  if (domainList.includes(domain)) {
     return true;
   }
 
@@ -317,13 +319,10 @@ function haveMasksBeenUsedOnCurrentSite(masks, domain) {
     // Short circuit out if there's no used_on entry
     if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
 
-    const usedOnDomains = domainList.split(",");
-
     // Domain already exists in used_on field. Just return the list!
-    if (usedOnDomains.includes(domain)) {
+    if (domainList.includes(domain)) {
       return true;
     }
-
     // No match found! 
     return false;
   })
@@ -372,10 +371,7 @@ const buildContent = {
           !checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName) &&
           maskList.classList.contains("fx-relay-menu-masks-free-other")
         ) {
-          // TODO: (BLOCKED) https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/pull/31
-          // needs to merge for pageInputIconSelectFromYourCurrentEmailMasks string ID
-          // label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
-          label.textContent = "Select from your current email masks";
+          label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
         }
 
         if (masks.length > 0) {
@@ -384,7 +380,6 @@ const buildContent = {
             "fx-relay-menu-masks-free-this-website"
           );
 
-          // TODO: Check additional field(s) besides "generated_for"
           const filteredMasks = buildFilteredMaskList
             ? masks.filter(
                 (mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
@@ -500,7 +495,7 @@ const buildContent = {
       });
 
       // See if any masks are assosiated with the current site. 
-      // If so, we'll end up building two discret mask lists:  
+      // If so, we'll end up building two discrete mask lists:  
       // 1. Just masks for that specific website
       // 2. All masks (including ones from the previous list)
       const userHasMasksForCurrentWebsite = (checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) || haveMasksBeenUsedOnCurrentSite(masks, currentPageHostName);
@@ -542,7 +537,6 @@ const buildContent = {
           "fx-relay-menu-masks-list-this-website"
         );
 
-        // TODO: Check additional field(s) besides "generated_for"
         const filteredMasks = buildFilteredMaskList
           ? masks.filter((mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName))
           : masks;
@@ -584,7 +578,7 @@ const buildContent = {
         // If the visible list has enough masks to show the search bar, focus on it
         // Note that the buildContent.components.search function also runs the updateIframeHeight event.
         if (filterSearchForm.classList.contains("is-visible")) {
-          await buildContent.components.search.inputFocus();
+          await buildContent.components.search.initResultsCountAndFocusOnInput();
           return;
         }
       }
@@ -678,7 +672,7 @@ const buildContent = {
         // If there's enough masks in this list, we need to show search.
         if (activeMaskListCount.length > 5) {
           filterSearchForm.classList.add("is-visible");
-          await buildContent.components.search.inputFocus();
+          await buildContent.components.search.initResultsCountAndFocusOnInput();
         } else {
           filterSearchForm.classList.remove("is-visible");
         }
@@ -783,7 +777,7 @@ const buildContent = {
       });
     },
     search: {
-      inputFocus: async () => {
+      initResultsCountAndFocusOnInput: async () => {
         // If there's a search bar visible, focus on that instead of the generate
         const filterSearchInput = document.querySelector(
           ".fx-relay-menu-masks-search-input"
