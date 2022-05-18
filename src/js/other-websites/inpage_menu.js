@@ -60,7 +60,8 @@ async function getCachedServerStoragePref() {
       method: "getServerStoragePref",
     });
   } else {
-    return serverStoragePrefInStorage;
+    // The user has this pref set. Return the value
+    return serverStoragePref.server_storage;
   }
 }
 
