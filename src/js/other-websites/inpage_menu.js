@@ -294,13 +294,11 @@ function checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, domain) {
 
 function hasMaskBeenUsedOnCurrentSite(mask, domain) {
   const domainList = mask.used_on;
-  console.log("hasMaskBeenUsedOnCurrentSite/domainList", domainList);
 
   // Short circuit out if there's no used_on entry
   if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
 
   const usedOnDomains = domainList.split(",");
-  console.log("usedOnDomains", usedOnDomains);
 
   // Domain already exists in used_on field. Just return the list!
   if (usedOnDomains.includes(domain)) {
@@ -360,8 +358,6 @@ const buildContent = {
           label.textContent = "Select from your current email masks";
         }
 
-        console.log("masks", masks);
-
         if (masks.length > 0) {
           // Populate mask lists, but filter by current website
           const buildFilteredMaskList = maskList.classList.contains(
@@ -376,9 +372,6 @@ const buildContent = {
             : masks.filter(
               (mask) => mask.generated_for !== currentPageHostName && !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
-          
-          console.log("filteredMasks", filteredMasks);
-              
 
           await populateFreeMaskList(maskList, filteredMasks);
         }
@@ -407,9 +400,20 @@ const buildContent = {
           "pageNoMasksRemaining"
         );
 
+        // Check if premium features are available
+        const premiumCountryAvailability = (
+          await browser.storage.local.get("premiumCountries")
+        )?.premiumCountries;
+
         const getUnlimitedAliasesBtn = document.querySelector(
           ".fx-relay-menu-get-unlimited-aliases"
         );
+
+        // If the user cannot upgrade, prompt them to join the waitlist
+        if ( premiumCountryAvailability?.premium_available_in_country !== true ) {
+          getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
+          // TODO: (?) Change URL to waitlist page, adjust telemetry to measure 
+        }
 
         getUnlimitedAliasesBtn.classList.remove("t-secondary");
         getUnlimitedAliasesBtn.classList.add("t-primary");
@@ -425,19 +429,6 @@ const buildContent = {
         // Focus on "Generate New Alias" button
         generateAliasBtn.focus();
       }
-
-      // TODO: Add premiumCountryAvailability Check
-      // Check if premium features are available
-      // const premiumCountryAvailability = (
-      //   await browser.storage.local.get("premiumCountries")
-      // )?.premiumCountries;
-
-      // if (
-      //   premiumCountryAvailability?.premium_available_in_country !== true ||
-      //   !maxNumAliasesReached
-      // ) {
-      //   getUnlimitedAliasesBtn.remove();
-      // }
 
       fxRelayMenuBody.classList.remove("is-loading");
       // User is signed in/free: Remove the premium section from DOM so there are no hidden/screen readable-elements available
