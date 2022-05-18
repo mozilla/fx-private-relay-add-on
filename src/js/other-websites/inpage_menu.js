@@ -96,9 +96,24 @@ async function getMasks(options = { fetchCustomMasks: false }) {
   return relayAddresses;
 }
 
+function addUsedOnDomain(domainList, currentDomain) {
+  const usedOnDomains = domainList.split(",");
+
+  // Domain already exists in used_on field. Just return the list!
+  if (usedOnDomains.includes(currentDomain)) {
+    return domainList;
+  }
+
+  // Domain DOES NOT exist in used_on field. Add it, and put it back as a CSV string.
+  usedOnDomains.push(currentDomain);
+  return usedOnDomains.toString();
+}
+
 async function fillTargetWithRelayAddress(generateClickEvt) {
   sendInPageEvent("click", "input-menu-reuse-alias");
   preventDefaultBehavior(generateClickEvt);
+
+  generateClickEvt.target.classList.add("is-loading");
 
   const maskAddress = generateClickEvt.target.dataset.mask;
   const maskAddressId = generateClickEvt.target.dataset.maskId;
@@ -109,29 +124,26 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
 
   const currentUsedOnValue = maskObject.used_on;
 
-  // TODO: used_on
-  // const used_on = {};
-
   const currentPageHostName = await browser.runtime.sendMessage({
     method: "getCurrentPageHostname",
   });
 
-  if (currentUsedOnValue === null) {
-    // This site has not been used on any site before
-    await browser.runtime.sendMessage({
-      method: "patchMaskInfo",
-      id: parseInt(maskAddressId, 10),
-      data: {
-        used_on: "example.com",
-      },
-      options: {
-        auth: true,
-      },
-    });
-  }
+  // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
+  const used_on = (currentUsedOnValue === null) ? `${currentPageHostName},` : addUsedOnDomain(currentUsedOnValue, currentPageHostName)
+  
+  // Update server info with site usage
+  await browser.runtime.sendMessage({
+    method: "patchMaskInfo",
+    id: parseInt(maskAddressId, 10),
+    data: {
+      used_on
+    },
+    options: {
+      auth: true,
+    },
+  });
 
-  // TODO: Parse currentUsedOnValue object to check if current domain is listed, and if not, add it.
-  // If you add it, patch it!
+  // TODO: Add telemetry event (?)
 
   await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
@@ -274,10 +286,29 @@ function applySearchFilter(query) {
   searchFilterTotal.textContent = maskSearchResults.length;
 }
 
-function checkIfAnyMasksAreUsedOnCurrentWebsite(masks, domain) {
+function checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, domain) {
   return masks.some((mask) => {
     return domain === mask.generated_for;
   });
+}
+
+function hasMaskBeenUsedOnCurrentSite(mask, domain) {
+  const domainList = mask.used_on;
+  console.log("hasMaskBeenUsedOnCurrentSite/domainList", domainList);
+
+  // Short circuit out if there's no used_on entry
+  if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+
+  const usedOnDomains = domainList.split(",");
+  console.log("usedOnDomains", usedOnDomains);
+
+  // Domain already exists in used_on field. Just return the list!
+  if (usedOnDomains.includes(domain)) {
+    return true;
+  }
+
+  // No match found! 
+  return false;
 }
 
 const buildContent = {
@@ -320,7 +351,7 @@ const buildContent = {
 
         // If there are no masks used on the current site, we need to change the label for the other masks:
         if (
-          !checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName) &&
+          !checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName) &&
           maskList.classList.contains("fx-relay-menu-masks-free-other")
         ) {
           // TODO: (BLOCKED) https://github.com/mozilla-l10n/fx-private-relay-add-on-l10n/pull/31
@@ -328,6 +359,8 @@ const buildContent = {
           // label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
           label.textContent = "Select from your current email masks";
         }
+
+        console.log("masks", masks);
 
         if (masks.length > 0) {
           // Populate mask lists, but filter by current website
@@ -337,10 +370,15 @@ const buildContent = {
 
           // TODO: Check additional field(s) besides "generated_for"
           const filteredMasks = buildFilteredMaskList
-            ? masks.filter((mask) => mask.generated_for === currentPageHostName)
+            ? masks.filter(
+                (mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+              )
             : masks.filter(
-                (mask) => mask.generated_for !== currentPageHostName
+              (mask) => mask.generated_for !== currentPageHostName && !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
+          
+          console.log("filteredMasks", filteredMasks);
+              
 
           await populateFreeMaskList(maskList, filteredMasks);
         }
@@ -455,7 +493,7 @@ const buildContent = {
       // 1. Just masks for that specific website
       // 2. All masks (including ones from the previous list)
       const userHasMasksForCurrentWebsite =
-        checkIfAnyMasksAreUsedOnCurrentWebsite(masks, currentPageHostName);
+        checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName);
 
       // If there are no masks assosiated with the current site, remove that list entirely.
       if (!userHasMasksForCurrentWebsite) {
@@ -496,7 +534,7 @@ const buildContent = {
 
         // TODO: Check additional field(s) besides "generated_for"
         const filteredMasks = buildFilteredMaskList
-          ? masks.filter((mask) => mask.generated_for === currentPageHostName)
+          ? masks.filter((mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName))
           : masks;
 
         // Process the masks list based on how many masks there are: 
@@ -518,7 +556,7 @@ const buildContent = {
 
       // Set the first available list to visible.
       // If there's "From this website" masks, it will show that list first. 
-      document.querySelector(".fx-relay-menu-masks-list").classList.add("is-visible");
+      document.querySelector(".fx-relay-menu-masks-list")?.classList.add("is-visible");
 
       // Set Generate Mask button
       await buildContent.components.generateMaskButton();
