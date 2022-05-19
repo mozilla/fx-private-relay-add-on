@@ -67,6 +67,7 @@ async function getAliasesFromServer(method = "GET", opts=null) {
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
+  console.log("patchMaskInfo");
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const updateRelayAddressURL = `${relayApiSource}/relayaddresses/${id}/`;
