@@ -129,7 +129,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   });
 
   // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
-  const used_on = (currentUsedOnValue === null) ? `${currentPageHostName},` : addUsedOnDomain(currentUsedOnValue, currentPageHostName)
+  const used_on = (currentUsedOnValue === null || currentUsedOnValue === undefined || currentUsedOnValue === "") ? `${currentPageHostName},` : addUsedOnDomain(currentUsedOnValue, currentPageHostName)
   
   // Update server info with site usage
   await browser.runtime.sendMessage({
