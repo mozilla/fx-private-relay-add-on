@@ -1,3 +1,5 @@
+/* global patchMaskInfo */
+
 // The static data used to create different context menu items. 
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
 // See these docs to better understead the context menu paramaters
@@ -97,8 +99,10 @@ const relayContextMenus = {
       
       const aliases = await relayContextMenus.utils.getAliases();
 
+      console.log("checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite", await relayContextMenus.utils.checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite(currentWebsite));
+      
       // Create Use Existing Alias submenu
-      if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
+      if (currentWebsite &&  await relayContextMenus.utils.checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite(currentWebsite) && userHasSomeAliasesCreated ) {
         await relayContextMenus.menus.create(staticMenuData.existingAlias, {
           createExistingAliases: true,
           parentMenu: staticMenuData.useExistingAliasFromWebsite,
@@ -153,7 +157,6 @@ const relayContextMenus = {
         reuseAliasMenuIdPrefix,
         ""
       );
-
       // Get stored alias data
       const { relayAddresses } = await browser.storage.local.get("relayAddresses");
 
@@ -162,6 +165,29 @@ const relayContextMenus = {
         return alias.id === parseInt(selectedAliasId, 10);
       });
 
+      console.log("tab", tab);
+    
+      const currentUsedOnValue = selectedAliasObject[0].used_on;
+    
+      const currentPage = new URL(tab.url);
+      const currentPageHostName = currentPage.hostname;
+
+      console.log("currentPageHostName", currentPageHostName);
+    
+      console.log("currentUsedOnValue", currentUsedOnValue);
+    
+      // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
+      const used_on = (currentUsedOnValue === null || currentUsedOnValue === "" ||  currentUsedOnValue === undefined)
+        ? `${currentPageHostName},` : relayContextMenus.utils.addUsedOnDomain(currentUsedOnValue, currentPageHostName);
+      
+      console.log("tosync/used_on", used_on);
+
+      // Update server info with site usage
+      const data = {used_on};
+      const options = {auth:true};
+      
+      await patchMaskInfo("PATCH", parseInt(selectedAliasId, 10), data, options);
+      
       browser.tabs.sendMessage(
         tab.id,
         {
@@ -300,10 +326,10 @@ const relayContextMenus = {
       return relayAddresses;
       
     },
-    getGeneratedForHistory: async (website) => {
+    checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite: async (website) => {
       const { relayAddresses } = await browser.storage.local.get("relayAddresses");
       
-      return relayAddresses.some(alias => website === alias.generated_for);
+      return relayAddresses.some(alias => website === alias.generated_for || alias.used_on.includes(website));
     },
     getHostnameFromUrlConstructor: (url) => {
       const { hostname } = new URL(url);
@@ -313,15 +339,24 @@ const relayContextMenus = {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
-      const filteredAliases = array.filter(alias => alias.generated_for !== domain);
+      const filteredAliases = array.filter((alias) => alias.generated_for !== domain && !alias.used_on.includes(domain));
+
+      
+      
 
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
     getSiteSpecificAliases: (array, domain)=> {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-      
-      const filteredAliases = array.filter(alias => alias.generated_for === domain);
+
+      array.forEach(array => {
+        console.log(array);
+      })
+
+      const filteredAliases = array.filter(alias => alias.generated_for === domain || relayContextMenus.utils.hasMaskBeenUsedOnCurrentSite(alias, domain));
+
+      console.log("getSiteSpecificAliases", filteredAliases, domain);
 
       // If 5 results for specific domain
       return filteredAliases.slice(0, 5);
@@ -350,6 +385,31 @@ const relayContextMenus = {
         // Note: If user is already premium, this will return false.
         return !premium && premiumCountryAvailability?.premium_available_in_country === true;
       },
+    },
+    addUsedOnDomain: (domainList, currentDomain) => {
+      // Domain already exists in used_on field. Just return the list!
+      if (domainList.includes(currentDomain)) {
+        return domainList;
+      }
+    
+      // Domain DOES NOT exist in used_on field. Add it to the domainList and put it back as a CSV string.
+      // If there's already an entry, add a comma too
+      domainList += (domainList !== "") ? `,${currentDomain}` : currentDomain;
+      return domainList;
+    },
+    hasMaskBeenUsedOnCurrentSite: (mask, domain) => {
+      const domainList = mask.used_on;
+    
+      // Short circuit out if there's no used_on entry
+      if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+    
+      // Domain already exists in used_on field. Just return the list!
+      if (domainList.includes(domain)) {
+        return true;
+      }
+    
+      // No match found! 
+      return false;
     },
     onCreatedCallback: ()=> {
       // Catch errors when trying to create the same menu twice.
