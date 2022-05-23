@@ -118,10 +118,11 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   const maskAddress = generateClickEvt.target.dataset.mask;
   const maskAddressId = generateClickEvt.target.dataset.maskId;
 
+  
   const maskObject = masks.find(
     (mask) => mask.id === parseInt(maskAddressId, 10)
-  );
-
+    );
+    
   const currentUsedOnValue = maskObject.used_on;
 
   const currentPageHostName = await browser.runtime.sendMessage({
@@ -140,6 +141,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
     },
     options: {
       auth: true,
+      mask_type: maskObject.mask_type,
     },
   });
 

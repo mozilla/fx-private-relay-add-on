@@ -252,6 +252,7 @@
 .fx-relay-menu-masks-list button.is-loading::after {
   content: url(/icons/button-loading-dark.svg);
   position: absolute;
+  /* Z-index: This block overlays the button's content with a spinning circle. The z-index get's it over that content. */
   z-index: 1;
   display: block;
   animation-name: fx-relay-loader-spin;
@@ -262,6 +263,7 @@
   width: 24px;
   left: 50%;
   top: 50%;
+  /* This is an older centering trick, which is half of the heigh/width. transform did not work as expected. */
   margin-left: -12px;
   margin-top: -12px;
   
@@ -316,12 +318,14 @@
   cursor: pointer;
 }
 
+/* This adds a thin, vertical line seperating the two "From this website" and "All email masks" tabs. (For premium users) */
 .fx-relay-menu-filter-active-site-button + .fx-relay-menu-filter-active-site-button::after {
   content: "";
   top: 0;
   left: 0;
   width: 1px;
   height: calc(100% + var(--fxRelayMenuFilterActiveSiteButtonBorderHeight));
+  /* Z-index: Needed to appear over the tabs section */
   z-index: 1;
   background-color: var(--colorGrey20);
   position: absolute;

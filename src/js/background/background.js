@@ -22,22 +22,12 @@ browser.runtime.onInstalled.addListener(async (details) => {
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function getAliasesFromServer(method = "GET", opts=null) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
-  const getRelayAddressesUrl = `${relayApiSource}/relayaddresses/`;
-  const getDomainAddressesUrl = `${relayApiSource}/domainaddresses/`;
+  const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
+  const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
 
-  const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
-  const headers = new Headers();
-  
-  headers.set("X-CSRFToken", csrfCookieValue);
-  headers.set("Content-Type", "application/json");
-  headers.set("Accept", "application/json");
-  
-  if (opts && opts.auth) {
-    const apiToken = await browser.storage.local.get("apiToken");
-    headers.set("Authorization", `Token ${apiToken.apiToken}`);
-  }
+  const headers = await createNewHeadersObject({auth: true});
 
-  const response = await fetch(getRelayAddressesUrl, {
+  const response = await fetch(relayApiUrlRelayAddresses, {
     mode: "same-origin",
     method,
     headers: headers,
@@ -49,7 +39,7 @@ async function getAliasesFromServer(method = "GET", opts=null) {
 
   // If the user has domain (custom) masks set, also grab them before sorting
   if (opts.fetchCustomMasks) {
-    const domainResponse = await fetch(getDomainAddressesUrl, {
+    const domainResponse = await fetch(relayApiUrlDomainAddresses, {
       mode: "same-origin",
       method,
       headers: headers,
@@ -69,8 +59,8 @@ async function getAliasesFromServer(method = "GET", opts=null) {
 async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
-  const updateRelayAddressURL = `${relayApiSource}/relayaddresses/${id}/`;
-  const updateDomainAddressURL = `${relayApiSource}/domainaddresses/${id}/`;
+  const relayApiUrlRelayAddressId = `${relayApiSource}/relayaddresses/${id}/`;
+  const relayApiUrlPatchAddressId = `${relayApiSource}/domainaddresses/${id}/`;
 
   const csrfCookieValue = await browser.storage.local.get("csrfCookieValue");
   const headers = new Headers();
@@ -84,7 +74,8 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
     headers.set("Authorization", `Token ${apiToken.apiToken}`);
   }
 
-  const apiRequestUrl = opts.domainAddress ? updateDomainAddressURL : updateRelayAddressURL;
+  // Check which type of mask this is: Custom or Random
+  const apiRequestUrl = opts.mask_type === "custom" ? relayApiUrlPatchAddressId : relayApiUrlRelayAddressId;
 
   const response = await fetch(apiRequestUrl, {
     mode: "same-origin",
@@ -138,9 +129,9 @@ async function getServerStoragePref() {
   const { profileID } = await browser.storage.local.get("profileID");
   const headers = await createNewHeadersObject({ auth: true });
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");
-  const url = `${relayApiSource}/profiles/${profileID}/`;
+  const relayApiUrlProfilesId = `${relayApiSource}/profiles/${profileID}/`;
 
-  const response = await fetch(url, {
+  const response = await fetch(relayApiUrlProfilesId, {
     mode: "same-origin",
     method: "GET",
     headers: headers,
@@ -243,23 +234,25 @@ async function makeRelayAddress(description = null) {
 
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   const serverStoragePermission = await getServerStoragePref();
-  const makeRelayAddressUrl = `${relayApiSource}/relayaddresses/`;
+  const relayApiUrlRelayAddress = `${relayApiSource}/relayaddresses/`;
 
   let apiBody = {
     enabled: true,
     description: "",
     generated_for: "",
+    used_on: "",
   };
 
-  // Only send description/generated_for fields in the request if the user is opt'd into server storage
+  // Only send description/generated_for/used_on fields in the request if the user is opt'd into server storage
   if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
+    apiBody.used_on = description + ",";
   }
 
   const headers = await createNewHeadersObject({auth: true});
 
-  const newRelayAddressResponse = await fetch(makeRelayAddressUrl, {
+  const newRelayAddressResponse = await fetch(relayApiUrlRelayAddress, {
     mode: "same-origin",
     method: "POST",
     headers: headers,

@@ -190,6 +190,7 @@
 .fx-relay-c-button.is-loading::after {
   content: url(/icons/button-loading.svg);
   position: absolute;
+  /* Z-index: This block overlays the button's content with a spinning circle. The z-index get's it over that content. */
   z-index: 1;
   display: block;
   animation-name: fx-relay-loader-spin;
