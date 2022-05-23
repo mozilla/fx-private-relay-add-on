@@ -16,25 +16,31 @@
     class="fx-relay-menu-body fx-relay is-premium is-loading"
   >
     <header class="fx-relay-menu-header">
-      <h1 class="fx-relay-menu-logo">
-        <img
-          class="fx-relay-menu-logo-image-fx-relay"
-          src="/images/logo-image-fx-relay.svg"
-          alt=""
-        />
-        <img
-          class="fx-relay-menu-logo-text"
-          alt="Firefox Relay"
-          src="/images/logo-text-fx-relay.svg"
-        />
-      </h1>
-      <a
-        class="fx-relay-menu-dashboard-link"        
-        href="http://127.0.0.1"
-      >
-        <span class="fx-relay-menu-dashboard-link-tooltip"></span>
-        <img src="/icons/nebula-external-link-blue.svg" alt="" />
-      </a>
+      <div class="fx-relay-menu-header-logo-bar">
+        <h1 class="fx-relay-menu-logo">
+          <img
+            class="fx-relay-menu-logo-image-fx-relay"
+            src="/images/logo-image-fx-relay.svg"
+            alt=""
+          />
+          <img
+            class="fx-relay-menu-logo-text"
+            alt="Firefox Relay"
+            src="/images/logo-text-fx-relay.svg"
+          />
+        </h1>
+        <a
+          class="fx-relay-menu-dashboard-link"        
+          href="http://127.0.0.1"
+        >
+          <span class="fx-relay-menu-dashboard-link-tooltip"></span>
+          <img src="/icons/nebula-external-link-blue.svg" alt="" />
+        </a>
+      </div>
+      <div class="fx-relay-menu-filter-active-site">
+        <button class="fx-relay-menu-filter-active-site-button is-active" data-mask-list=".fx-relay-menu-masks-list-this-website" data-string-id="labelFromThisWebsite"></button>
+        <button class="fx-relay-menu-filter-active-site-button" data-mask-list=".fx-relay-menu-masks-list-all-masks"  data-string-id="labelAllEmailMasks"></button>
+      </div>
     </header>
     <main class="fx-relay-menu">
       <div class="fx-relay-menu-loading-bar">
@@ -66,15 +72,18 @@
 
         <div class="fx-relay-menu-masks-lists">
           <!-- Reused Alias Menu -->
-          <!-- WIP/TODO: Markup for follow up "site used on" feature -->
-          <!-- <div class="fx-relay-menu-masks-list t-website fx-relay-menu-masks-free-this-website">
+          <div class="fx-relay-menu-masks-list t-website fx-relay-menu-masks-free-this-website">
             <span data-string-id="pageInputIconPreviouslyUsedMask" class="fx-relay-menu-masks-list-label"></span>
-            <ul>
-              <li>
-                <button >Label name</button>
+            <ul class="is-loading">
+              <li class="fx-relay-menu-masks-list-loading">
+                <img
+                  class="fx-relay-animation-spin"
+                  src="/icons/button-loading-dark.svg"
+                  alt=""
+                />
               </li>
             </ul>
-          </div> -->
+          </div>
 
           <div class="fx-relay-menu-masks-list fx-relay-menu-masks-free-other">
             <span
@@ -102,6 +111,7 @@
         ></a>
       </section>
 
+      <!-- Logged In / Premium Tier -->
       <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
         <div class="fx-relay-menu-masks-search">
           <form class="fx-relay-menu-masks-search-form">
@@ -117,8 +127,19 @@
               </div>
             </div>
           </form>
-          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-search-results is-loading">
-            <ul>
+          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-this-website is-loading">
+            <ul class="">
+              <li class="fx-relay-menu-masks-list-loading">
+                <img
+                  class="fx-relay-animation-spin"
+                  src="/icons/button-loading-dark.svg"
+                  alt=""
+                />
+              </li>
+            </ul>
+          </div>
+          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-all-masks is-loading">
+            <ul class="">
               <li class="fx-relay-menu-masks-list-loading">
                 <img
                   class="fx-relay-animation-spin"

@@ -7,26 +7,19 @@ function fillInputWithAlias(emailInput, relayAlias) {
     return false;
   }
 
-  switch (relayAlias.domain) {
-    case 1:
-      emailInput.value = relayAlias.address + "@relay.firefox.com";
-      break;
-    case 2:
-      emailInput.value = relayAlias.address + "@mozmail.com";
-      break;
-    default:
-      // User does not sync data so no relayAlias.domain is available
-      emailInput.value = relayAlias.address
-      break;
-  }
+  // If this is a newly created relayAlias, it will be an object with lots of info to parse. 
+  // Otherwise, it's a reused mask, so it's just the email address. 
+  const emailMask = (relayAlias.full_address) ? relayAlias.full_address : relayAlias.address
+
+  // Set the value of the target field to the selected/generated mask
+  emailInput.value = emailMask;
 
   emailInput.dispatchEvent(
     new InputEvent("relay-address", {
-      data: relayAlias.address,
+      data: emailMask,
     })
   );
 }
-
 
 // COMPATIBILITY NOTE: browser.menus.getTargetElement is not available so 
 // we have to listen for any contextmenu click to determe the target element.

@@ -23,10 +23,13 @@
 }
 
 .is-premium .fx-relay-menu-header {
+  border: none;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
   border-radius: var(--borderRadiusSm);
-  border: none;
   background-color: var(--colorWhite);
+}
+
+.is-premium .fx-relay-menu-header-logo-bar {
   position: relative;
   /* The z-index is necessary here to have the box-shadow above the rest of the content */
   z-index: 1;
@@ -39,11 +42,14 @@
 }
 
 .fx-relay-menu-header {
-  padding: var(--spacingSm);
   border-bottom: 1px solid var(--colorGrey10);
+}
+
+.fx-relay-menu-header-logo-bar {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  padding: var(--spacingSm);
 }
 
 .fx-relay-menu-logo {
@@ -89,7 +95,8 @@
 }
 
 .fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
-.fx-relay-menu-dashboard-link:focus .fx-relay-menu-dashboard-link-tooltip {
+.fx-relay-menu-dashboard-link:focus .fx-relay-menu-dashboard-link-tooltip,
+.fx-relay-menu-dashboard-link:focus-visible .fx-relay-menu-dashboard-link-tooltip {
   display: block;
   margin: 0 var(--spacingXs);
 }
@@ -132,6 +139,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacingMd);
+}
+
+/* Edge case for premium users where both "from this website" and "all mask" lists are visible at the same time */
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list.is-visible + .fx-relay-menu-masks-list.is-visible {
+  display: none;
 }
 
 .fx-relay-menu-masks-list {
@@ -210,6 +222,51 @@
   cursor: pointer;
   text-align: start;
   overflow: hidden;
+  position: relative;
+}
+
+.fx-relay-menu-masks-list button.is-loading::before {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--colorViolet10);
+  content: "";
+  left: 0;
+  top: 0;
+  animation-name: fade-in;
+  animation-duration: 2s;
+  transition-timing-function: linear;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fx-relay-menu-masks-list button.is-loading::after {
+  content: url(/icons/button-loading-dark.svg);
+  position: absolute;
+  /* Z-index: This block overlays the button's content with a spinning circle. The z-index get's it over that content. */
+  z-index: 1;
+  display: block;
+  animation-name: fx-relay-loader-spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  height: 24px;
+  width: 24px;
+  left: 50%;
+  top: 50%;
+  /* This is an older centering trick, which is half of the heigh/width. transform did not work as expected. */
+  margin-left: -12px;
+  margin-top: -12px;
+  
 }
 
 .fx-relay-menu-masks-list button:hover {
@@ -233,6 +290,56 @@
   display: inline-block;
 }
 
+/* Premium: Filter by Active Site */
+.fx-relay-menu-filter-active-site {
+  display: none;
+  overflow: hidden;
+}
+
+.fx-relay-menu-filter-active-site.is-visible {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+.fx-relay-menu-filter-active-site-button {
+  --fxRelayMenuFilterActiveSiteButtonBorderHeight: 3px;
+  width: 50%;
+  background: transparent;
+  appearance: none;
+  outline: none;
+  border: none;
+  border-bottom: var(--fxRelayMenuFilterActiveSiteButtonBorderHeight) solid transparent;
+  color: var(--colorGrey50);
+  text-align: center;
+  padding: var(--spacingMd) 0;
+  position: relative;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* This adds a thin, vertical line seperating the two "From this website" and "All email masks" tabs. (For premium users) */
+.fx-relay-menu-filter-active-site-button + .fx-relay-menu-filter-active-site-button::after {
+  content: "";
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: calc(100% + var(--fxRelayMenuFilterActiveSiteButtonBorderHeight));
+  /* Z-index: Needed to appear over the tabs section */
+  z-index: 1;
+  background-color: var(--colorGrey20);
+  position: absolute;
+}
+
+.fx-relay-menu-filter-active-site-button.is-active {
+  color: var(--colorBlue50);
+  border-bottom-color: var(--colorBlue50);
+}
+
+.fx-relay-menu-filter-active-site-button:hover, .fx-relay-menu-filter-active-site-button:focus {
+  color: var(--colorBlue50);
+}
+
 /* Premium Search List */
 .fx-relay-menu-masks-search {
   background-color: var(--colorGrey05);
@@ -247,16 +354,26 @@
   padding: var(--spacingXs) var(--spacingSm);
   margin-bottom: var(--spacingSm);
   position: relative;
+  display: none;
 }
 
-.fx-relay-menu-masks-search-results.t-no-search-bar ul {
+.fx-relay-menu-masks-search-form.is-visible {
+  display: block;
+}
+
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list.t-no-search-bar ul {
   max-height: none;
   overflow: visible;
 }
 
-.fx-relay-menu-masks-search-results ul {
+.fx-relay-mask-list-toggle-height .fx-relay-menu-masks-search .fx-relay-menu-masks-list ul {
+  max-height: 140px;
+}
+
+.fx-relay-menu-masks-search .fx-relay-menu-masks-list ul {
   max-height: 190px;
-  overflow: scroll;
+  overflow-y: scroll;
+  scrollbar-width: thin;
   list-style: none;
   margin: 0;
   padding: 0 0 var(--spacingSm);
