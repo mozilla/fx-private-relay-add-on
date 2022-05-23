@@ -1,3 +1,5 @@
+/* global patchMaskInfo */
+
 // The static data used to create different context menu items. 
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
 // See these docs to better understead the context menu paramaters
@@ -58,6 +60,22 @@ const staticMenuData = {
 // identified by the following prefix followed by their alias ID:
 const reuseAliasMenuIdPrefix = "fx-private-relay-use-existing-alias_";
 
+async function getCachedServerStoragePref() {
+  const serverStoragePref = await browser.storage.local.get("server_storage");
+  const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
+    serverStoragePref,
+    "server_storage"
+  );
+
+  if (!serverStoragePrefInLocalStorage) {
+    // There is no reference to the users storage preference saved. Fetch it from the server.
+    return await getServerStoragePref();
+  } else {
+    // If the stored pref exists, return value
+    return serverStoragePref.server_storage;
+  }
+}
+
 // This object is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare
 const relayContextMenus = {
@@ -71,7 +89,6 @@ const relayContextMenus = {
     if (browser.storage.onChanged.hasListener(relayContextMenus.listeners.onLocalStorageChange)) {
       await browser.storage.onChanged.removeListener(relayContextMenus.listeners.onLocalStorageChange);
     }
-    
 
     const userApiToken = await browser.storage.local.get("apiToken");
     const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
@@ -96,9 +113,12 @@ const relayContextMenus = {
       const userHasSomeAliasesCreated = (await relayContextMenus.utils.getUserStatus.getNumberOfAliases() > 0);
       
       const aliases = await relayContextMenus.utils.getAliases();
+      
+      const masksWereGeneratedOrUsedOnCurrentWebsite = await relayContextMenus.utils.checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite(currentWebsite);
 
+      
       // Create Use Existing Alias submenu
-      if (currentWebsite &&  await relayContextMenus.utils.getGeneratedForHistory(currentWebsite) && userHasSomeAliasesCreated ) {
+      if (currentWebsite &&  masksWereGeneratedOrUsedOnCurrentWebsite && userHasSomeAliasesCreated ) {
         await relayContextMenus.menus.create(staticMenuData.existingAlias, {
           createExistingAliases: true,
           parentMenu: staticMenuData.useExistingAliasFromWebsite,
@@ -116,7 +136,6 @@ const relayContextMenus = {
           currentWebsite
         }, aliases)
       }
-
     }
 
     // Create "Manage all aliases" link
@@ -153,15 +172,42 @@ const relayContextMenus = {
         reuseAliasMenuIdPrefix,
         ""
       );
-
       // Get stored alias data
-      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+      const relayAddresses = await relayContextMenus.utils.getAliases();
 
       // Select the correct alias from the stored alias data
       const selectedAliasObject = relayAddresses.filter((alias) => {
         return alias.id === parseInt(selectedAliasId, 10);
       });
 
+      const serverStoragePref = await getCachedServerStoragePref();
+
+    
+      const currentMaskType = selectedAliasObject[0].mask_type;
+      const currentUsedOnValue = selectedAliasObject[0].used_on;
+    
+      const currentPage = new URL(tab.url);
+      const currentPageHostName = currentPage.hostname;
+ 
+      // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
+      const used_on = (currentUsedOnValue === null || currentUsedOnValue === "" ||  currentUsedOnValue === undefined)
+        ? `${currentPageHostName},` : relayContextMenus.utils.addUsedOnDomain(currentUsedOnValue, currentPageHostName);
+
+      // Update server info with site usage
+      const data = {used_on};
+      const options = {
+        auth:true,
+        mask_type: currentMaskType,
+      };
+
+      // Save what site this mask was used on before filling input
+      if (serverStoragePref) {
+        await patchMaskInfo("PATCH", parseInt(selectedAliasId, 10), data, options);
+      } else {
+        selectedAliasObject[0].used_on = used_on;
+        browser.storage.local.set({ relayAddresses: relayAddresses });
+      }
+      
       browser.tabs.sendMessage(
         tab.id,
         {
@@ -221,7 +267,7 @@ const relayContextMenus = {
         // https://github.com/mozilla/fx-private-relay-add-on/issues/239 
         // There is a bug in the order in which the aliases are stored when synced with the server versus local storage. 
         // We need to determine which method is used to determine if need to flip that order.  
-        const shouldAliasOrderBeReversed = await getServerStoragePref();
+        const shouldAliasOrderBeReversed = await getCachedServerStoragePref();
 
         const filteredAliases = options.exisitingSite
           ? relayContextMenus.utils.getSiteSpecificAliases(
@@ -243,10 +289,16 @@ const relayContextMenus = {
           return Promise.resolve(1);
         }
 
+        const STRING_LENGTH = 30;
+        
         for (const alias of filteredAliases) {
-          const title = alias.description ? alias.description : alias.address;
+          let title = alias.description ? alias.description : alias.full_address;
+
+          if (title.length > STRING_LENGTH) {
+            title = title.substr(0, (STRING_LENGTH - 1)) + '…'
+          }
+
           const id = reuseAliasMenuIdPrefix + alias.id;
-          
           
           data.title = title;
           data.id = id;
@@ -268,6 +320,7 @@ const relayContextMenus = {
   }, 
   utils: {
     getAliases: async () => {
+      
       let options = {};
 
       const { premium } = await browser.storage.local.get("premium");
@@ -283,11 +336,13 @@ const relayContextMenus = {
           fetchCustomMasks: true
         }
       }
+
+      const serverStoragePref = await getCachedServerStoragePref();
       
-      
-      if (await getServerStoragePref()) {
+      if (serverStoragePref) {
         try {
-          return await getAliasesFromServer("GET", options);
+          const resp = await getAliasesFromServer("GET", options);
+          return resp;
         } catch (error) {
           // API Error — Fallback to local storage
           const { relayAddresses } = await browser.storage.local.get("relayAddresses");
@@ -300,10 +355,15 @@ const relayContextMenus = {
       return relayAddresses;
       
     },
-    getGeneratedForHistory: async (website) => {
-      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
-      
-      return relayAddresses.some(alias => website === alias.generated_for);
+    checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite: async (website) => {
+      const relayAddresses = await relayContextMenus.utils.getAliases();
+
+      // Short circuit if not current site detected
+      if (website === null) {
+        return false;
+      }
+
+      return relayAddresses.some(alias => website === alias.generated_for || alias.used_on?.includes(website));
     },
     getHostnameFromUrlConstructor: (url) => {
       const { hostname } = new URL(url);
@@ -313,15 +373,15 @@ const relayContextMenus = {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
-      const filteredAliases = array.filter(alias => alias.generated_for !== domain);
+      const filteredAliases = array.filter((alias) => alias.generated_for !== domain && !alias.used_on?.includes(domain));
 
       // Limit to 5
       return filteredAliases.slice(0, 5);
     },
     getSiteSpecificAliases: (array, domain)=> {
       array.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-      
-      const filteredAliases = array.filter(alias => alias.generated_for === domain);
+
+      const filteredAliases = array.filter(alias => alias.generated_for === domain || relayContextMenus.utils.hasMaskBeenUsedOnCurrentSite(alias, domain));
 
       // If 5 results for specific domain
       return filteredAliases.slice(0, 5);
@@ -334,12 +394,12 @@ const relayContextMenus = {
         if (premium) return true;
         
         const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
-        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+        const relayAddresses = await relayContextMenus.utils.getAliases();
 
         return (maxNumAliases - relayAddresses.length) > 0;
       },
       getNumberOfAliases: async () => {
-        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+        const relayAddresses = await relayContextMenus.utils.getAliases();
         return relayAddresses.length;
       },
       canUpgradeToPremium: async()=> {
@@ -350,6 +410,31 @@ const relayContextMenus = {
         // Note: If user is already premium, this will return false.
         return !premium && premiumCountryAvailability?.premium_available_in_country === true;
       },
+    },
+    addUsedOnDomain: (domainList, currentDomain) => {
+      // Domain already exists in used_on field. Just return the list!
+      if (domainList.includes(currentDomain)) {
+        return domainList;
+      }
+    
+      // Domain DOES NOT exist in used_on field. Add it to the domainList and put it back as a CSV string.
+      // If there's already an entry, add a comma too
+      domainList += (domainList !== "") ? `,${currentDomain}` : currentDomain;
+      return domainList;
+    },
+    hasMaskBeenUsedOnCurrentSite: (mask, domain) => {
+      const domainList = mask.used_on;
+    
+      // Short circuit out if there's no used_on entry
+      if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+    
+      // Domain already exists in used_on field. Just return the list!
+      if (domainList.includes(domain)) {
+        return true;
+      }
+    
+      // No match found! 
+      return false;
     },
     onCreatedCallback: ()=> {
       // Catch errors when trying to create the same menu twice.
@@ -377,7 +462,6 @@ if (browser.menus) {
     await relayContextMenus.init(domain);
   });
 }
-
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
