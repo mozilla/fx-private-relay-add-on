@@ -372,7 +372,8 @@
 
 .fx-relay-menu-masks-search .fx-relay-menu-masks-list ul {
   max-height: 190px;
-  overflow: scroll;
+  overflow-y: scroll;
+  scrollbar-width: thin;
   list-style: none;
   margin: 0;
   padding: 0 0 var(--spacingSm);
