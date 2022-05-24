@@ -50,7 +50,8 @@
     const { relayApiSource } = await browser.storage.local.get("relayApiSource");
 
     const apiProfileURL = `${relayApiSource}/profiles/`;
-    const apiRelayAddressesURL = `${relayApiSource}/relayaddresses/`;
+    const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
+    const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
 
     async function apiRequest(url, method = "GET", body = null, opts=null) {
 
@@ -108,11 +109,20 @@
 
     /**
      * Fetch the current list of random masks from the server, while preserving local labels if present
+     *
+     * @param {{ fetchCustomMasks?: boolean }} options - Set `fetchCustomMasks` to `true` if the user is a Premium user.
      */
-    async function refreshLocalLabelCache() {
+    async function refreshLocalLabelCache(options = {}) {
       /** @type {RandomMask[]} */
-      const relayAddresses = await apiRequest(apiRelayAddressesURL);
-      await browser.storage.local.set({ relayAddresses: applyLocalLabels(relayAddresses) });
+      const relayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      const domainAddresses = options.fetchCustomMasks
+        ? await apiRequest(relayApiUrlDomainAddresses)
+        : [];
+      await browser.storage.local.set({
+        relayAddresses:
+          applyLocalLabels(relayAddresses)
+          .concat(applyLocalLabels(domainAddresses)),
+      });
     }
 
     /**
@@ -211,10 +221,12 @@
         const body = {
           description: alias.description ?? "",
           generated_for: alias.generated_for ?? "",
+          used_on: alias.used_on ?? "",
         };
 
-        if (body.description.length > 0 || body.generated_for.length > 0) {
-          await apiRequest(`${apiRelayAddressesURL}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
+        if (body.description.length > 0 || body.generated_for.length > 0 || body.used_on.length > 0) {
+          const endpoint = alias.mask_type === "custom" ? relayApiUrlDomainAddresses : relayApiUrlRelayAddresses;
+          await apiRequest(`${endpoint}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
         }
       }
     }
@@ -228,6 +240,7 @@
           ...prevAlias,
           description: updatedAlias.description.length > 0 ? updatedAlias.description : prevAlias.description,
           generated_for: updatedAlias.generated_for.length > 0 ? updatedAlias.generated_for : prevAlias.generated_for,
+          used_on: updatedAlias.used_on.length > 0 ? updatedAlias.used_on : prevAlias.used_on,
         };
       }
     )}
@@ -235,36 +248,39 @@
     if (siteStorageEnabled) {
       // Sync alias data from server page.
       // If local storage items exist AND have label metadata stored, sync it to the server.
-      const serverRelayAddresses = await apiRequest(apiRelayAddressesURL);
+      const serverRelayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      const serverDomainAddresses = isPremiumUser
+        ? await apiRequest(relayApiUrlDomainAddresses)
+        : [];
 
       // let usage: This data may be overwritten when merging the local storage dataset with the server set.
-      let localCopyOfServerRelayAddresses = serverRelayAddresses;
+      let localCopyOfServerMasks = serverRelayAddresses.concat(serverDomainAddresses);
 
       // Check/cache local storage
-      const { relayAddresses } = await browser.storage.local.get(
+      const localMasks = (await browser.storage.local.get(
         "relayAddresses"
-      );
+      )).relayAddresses;
 
       if (
-        relayAddresses &&
-        relayAddresses.length > 0 &&
-        aliasesHaveStoredMetadata(relayAddresses) && // Make sure there is meta data in the local dataset
-        !aliasesHaveStoredMetadata(localCopyOfServerRelayAddresses) // Make sure there is no meta data in the server dataset
+        localMasks &&
+        localMasks.length > 0 &&
+        aliasesHaveStoredMetadata(localMasks) && // Make sure there is meta data in the local dataset
+        !aliasesHaveStoredMetadata(localCopyOfServerMasks) // Make sure there is no meta data in the server dataset
       ) {
-        await sendMetaDataToServer(relayAddresses);
-        localCopyOfServerRelayAddresses = getAliasesWithUpdatedMetadata(
-          localCopyOfServerRelayAddresses,
-          relayAddresses
+        await sendMetaDataToServer(localMasks);
+        localCopyOfServerMasks = getAliasesWithUpdatedMetadata(
+          localCopyOfServerMasks,
+          localMasks
         );
       }
 
-      browser.storage.local.set({ relayAddresses: localCopyOfServerRelayAddresses });
+      browser.storage.local.set({ relayAddresses: localCopyOfServerMasks });
     } else {
       const { relayAddresses: existingLocalStorageRelayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
       if (!existingLocalStorageRelayAddresses || existingLocalStorageRelayAddresses.length === 0) {
-        await refreshLocalLabelCache();
+        await refreshLocalLabelCache({ fetchCustomMasks: isPremiumUser });
       }
     }
 
@@ -288,7 +304,7 @@
       }
 
       if (event.detail.type === "aliasListUpdate") {
-        await refreshLocalLabelCache();
+        await refreshLocalLabelCache({ fetchCustomMasks: isPremiumUser });
       }
 
       if (event.detail.type === "subdomainClaimed") {

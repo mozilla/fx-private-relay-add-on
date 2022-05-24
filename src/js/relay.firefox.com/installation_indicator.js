@@ -15,7 +15,10 @@
       const localLabels = localRandomAliasCache
         .filter(address => address.description.length > 0)
         .map(address => ({
-          type: "random",
+          // `type` can be removed as soon as the website is updated to watch
+          // for mask_type
+          type: address.mask_type ?? "random",
+          mask_type: address.mask_type,
           id: Number.parseInt(address.id, 10),
           description: address.description,
           generated_for: address.generated_for,
