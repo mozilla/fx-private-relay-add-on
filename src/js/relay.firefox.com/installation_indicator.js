@@ -15,7 +15,7 @@
       const localLabels = localRandomAliasCache
         .filter(address => address.description.length > 0)
         .map(address => ({
-          type: "random",
+          type: address.type ?? "random",
           id: Number.parseInt(address.id, 10),
           description: address.description,
           generated_for: address.generated_for,
