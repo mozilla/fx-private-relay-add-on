@@ -129,7 +129,7 @@ requirements for AMO signing, the pre-release versions are [Calendar
 Versioned](https://calver.org/) as `YYYY.MM.DD.minutes-since-midnight`
 
 The signed `.xpi` file is named
-`firefox_relay-${{ YYYY.MM.DD.minutes }}-an+fx.xpi` and automatically attached
+`firefox_relay-${{ YYYY.MM.DD.minutes }}.xpi` and automatically attached
 to each release, under the release "Assets" section.
 
 #### Make the new version

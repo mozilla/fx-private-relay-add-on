@@ -93,7 +93,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: fx-private-relay-stage.xpi
-          path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
+          path: web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}.xpi
 
       - uses: actions/upload-artifact@v2
         with:
@@ -156,7 +156,7 @@ jobs:
       #     repo: fx-private-relay-add-on
       #     release_id: ${{ fromJson(steps.create_release.outputs.data).id }}
       #     body: # TODO: Figure out how to pass the binary data of
-      #           #       ./web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}-an+fx.xpi
+      #           #       ./web-ext-artifacts/firefox_relay-${{ steps.version.outputs.version }}.xpi
       #           #       here.
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
