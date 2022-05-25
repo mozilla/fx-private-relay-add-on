@@ -132,18 +132,27 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
   const used_on = (currentUsedOnValue === null || currentUsedOnValue === undefined || currentUsedOnValue === "") ? `${currentPageHostName},` : addUsedOnDomain(currentUsedOnValue, currentPageHostName)
   
-  // Update server info with site usage
-  await browser.runtime.sendMessage({
-    method: "patchMaskInfo",
-    id: parseInt(maskAddressId, 10),
-    data: {
-      used_on
-    },
-    options: {
-      auth: true,
-      mask_type: maskObject.mask_type,
-    },
-  });
+  const serverStoragePref = await getCachedServerStoragePref();
+  
+  if (serverStoragePref) {
+    // Update server info with site usage
+    await browser.runtime.sendMessage({
+      method: "patchMaskInfo",
+      id: parseInt(maskAddressId, 10),
+      data: {
+        used_on
+      },
+      options: {
+        auth: true,
+        mask_type: maskObject.mask_type,
+      },
+    });
+  } else {
+    // Add in used_on to current mask object and re-sync labels
+    // TODO/BUG: Deleting masks drops this data
+    maskObject.used_on = used_on;
+    browser.storage.local.set({ relayAddresses: masks });
+  }
 
   // TODO: Add telemetry event (?)
 
@@ -389,6 +398,8 @@ const buildContent = {
             : masks.filter(
               (mask) => mask.generated_for !== currentPageHostName && !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
+
+          filteredMasks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
           await populateFreeMaskList(maskList, filteredMasks);
         }
