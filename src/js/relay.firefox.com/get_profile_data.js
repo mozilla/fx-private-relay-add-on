@@ -152,9 +152,6 @@
           );
         });
 
-        console.log("localAddressCache/matchingLocalAddress?.used_on", matchingLocalAddress?.used_on);
-        console.log("localAddressCache/address.used_on", address.used_on);
-
         return {
           ...address,
           description: matchingLocalAddress?.description ?? address.description,
