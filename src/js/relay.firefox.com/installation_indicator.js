@@ -22,6 +22,7 @@
           id: Number.parseInt(address.id, 10),
           description: address.description,
           generated_for: address.generated_for,
+          used_on: address.used_on,
           address: address.address,
         })
       );

@@ -152,6 +152,9 @@
           );
         });
 
+        console.log("localAddressCache/matchingLocalAddress?.used_on", matchingLocalAddress?.used_on);
+        console.log("localAddressCache/address.used_on", address.used_on);
+
         return {
           ...address,
           description: matchingLocalAddress?.description ?? address.description,
@@ -212,6 +215,10 @@
         if (typeof alias.generated_for === "string" && alias.generated_for.length > 0) {
           return true;
         }
+
+        if (typeof alias.used_on === "string" && alias.used_on.length > 0) {
+          return true;
+        }
       }
     }
 
@@ -235,7 +242,7 @@
     // be sure it matches the local storage metadata dataset
     function getAliasesWithUpdatedMetadata(updatedAliases, prevAliases) {
       return prevAliases.map(prevAlias => {
-        const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id) ?? { description: "", generated_for: ""};
+        const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id) ?? { description: "", generated_for: "", used_on: ""};
         return {
           ...prevAlias,
           description: updatedAlias.description.length > 0 ? updatedAlias.description : prevAlias.description,
