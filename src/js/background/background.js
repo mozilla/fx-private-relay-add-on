@@ -284,6 +284,8 @@ async function makeRelayAddress(description = null) {
   const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
     newRelayAddressJson,
   ]);
+
+  updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   
   browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
   return newRelayAddressJson;

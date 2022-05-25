@@ -399,6 +399,8 @@ const buildContent = {
               (mask) => mask.generated_for !== currentPageHostName && !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
 
+          filteredMasks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+
           await populateFreeMaskList(maskList, filteredMasks);
         }
       });
