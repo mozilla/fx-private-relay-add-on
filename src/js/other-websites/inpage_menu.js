@@ -408,6 +408,21 @@ const buildContent = {
       const numAliasesRemaining = maxNumAliases - masks.length;
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
+      // Check if premium features are available
+      const premiumCountryAvailability = (
+        await browser.storage.local.get("premiumCountries")
+      )?.premiumCountries;
+
+      const getUnlimitedAliasesBtn = document.querySelector(
+        ".fx-relay-menu-get-unlimited-aliases"
+      );
+
+      // If the user cannot upgrade, prompt them to join the waitlist
+      if ( premiumCountryAvailability?.premium_available_in_country !== true ) {
+        getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
+        // TODO: (?) Change URL to waitlist page, adjust telemetry to measure 
+      }
+
       // Set Generate Mask button
       buildContent.components.setUnlimitedButton(relaySiteOrigin);
 
@@ -427,21 +442,6 @@ const buildContent = {
         remainingAliasesSpan.textContent = browser.i18n.getMessage(
           "pageNoMasksRemaining"
         );
-
-        // Check if premium features are available
-        const premiumCountryAvailability = (
-          await browser.storage.local.get("premiumCountries")
-        )?.premiumCountries;
-
-        const getUnlimitedAliasesBtn = document.querySelector(
-          ".fx-relay-menu-get-unlimited-aliases"
-        );
-
-        // If the user cannot upgrade, prompt them to join the waitlist
-        if ( premiumCountryAvailability?.premium_available_in_country !== true ) {
-          getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
-          // TODO: (?) Change URL to waitlist page, adjust telemetry to measure 
-        }
 
         getUnlimitedAliasesBtn.classList.remove("t-secondary");
         getUnlimitedAliasesBtn.classList.add("t-primary");
