@@ -433,6 +433,10 @@ const buildContent = {
           "pageNoMasksRemaining"
         );
 
+        const getUnlimitedAliasesBtn = document.querySelector(
+          ".fx-relay-menu-get-unlimited-aliases"
+        );
+
         getUnlimitedAliasesBtn.classList.remove("t-secondary");
         getUnlimitedAliasesBtn.classList.add("t-primary");
         // Focus on "Get unlimited alias" button
