@@ -414,8 +414,21 @@ async function getRemainingAliases() {
   return { relayAddresses, maxNumAliases };
 }
 
+async function getBrowser() {
+  if (typeof browser.runtime.getBrowserInfo === "function") {
+    /** @type {{ name: string, vendor: string, version: string, buildID: string }} */
+    const browserInfo = await browser.runtime.getBrowserInfo();
+    return browserInfo.name;
+  }
+  if (navigator.userAgent.toLowerCase().indexOf("firefox") !== -1) {
+    return "Firefox";
+  }
+  return "Chrome";
+}
 
-function enableSettingsPanel() {
+async function enableSettingsPanel() {
+
+  
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -426,6 +439,18 @@ function enableSettingsPanel() {
       }
     });
   });
+
+  const currentBrowser = await getBrowser();
+
+  if (currentBrowser === "Chrome") {
+    const supportLink = document.querySelector(".js-setting-suppprt-link");
+    const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
+    supportLink.href = chromeSupportLink;
+  }
+
+
+  
+
 }
 
 
@@ -490,7 +515,7 @@ async function popup() {
     showRelayPanel(1);
   }
 
-  enableSettingsPanel();
+  await enableSettingsPanel();
   enableDataOptOut();
   enableInputIconDisabling();
 
