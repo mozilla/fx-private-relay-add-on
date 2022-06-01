@@ -408,8 +408,13 @@ const buildContent = {
       const numAliasesRemaining = maxNumAliases - masks.length;
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
+      // Check if premium features are available
+      const premiumCountryAvailability = (
+        await browser.storage.local.get("premiumCountries")
+      )?.premiumCountries;
+
       // Set Generate Mask button
-      buildContent.components.setUnlimitedButton(relaySiteOrigin);
+      buildContent.components.setUnlimitedButton(relaySiteOrigin, premiumCountryAvailability);
 
       // Free user: Set text informing them how many aliases they can create
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
@@ -428,20 +433,9 @@ const buildContent = {
           "pageNoMasksRemaining"
         );
 
-        // Check if premium features are available
-        const premiumCountryAvailability = (
-          await browser.storage.local.get("premiumCountries")
-        )?.premiumCountries;
-
         const getUnlimitedAliasesBtn = document.querySelector(
           ".fx-relay-menu-get-unlimited-aliases"
         );
-
-        // If the user cannot upgrade, prompt them to join the waitlist
-        if ( premiumCountryAvailability?.premium_available_in_country !== true ) {
-          getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
-          // TODO: (?) Change URL to waitlist page, adjust telemetry to measure 
-        }
 
         getUnlimitedAliasesBtn.classList.remove("t-secondary");
         getUnlimitedAliasesBtn.classList.add("t-primary");
@@ -749,21 +743,34 @@ const buildContent = {
         });
       });
     },
-    setUnlimitedButton: (relaySiteOrigin) => {
+    setUnlimitedButton: (relaySiteOrigin, premiumCountryAvailability) => {
       // Create "Get unlimited aliases" button
       const getUnlimitedAliasesBtn = document.querySelector(
         ".fx-relay-menu-get-unlimited-aliases"
       );
 
-      getUnlimitedAliasesBtn.textContent = browser.i18n.getMessage(
-        "popupGetUnlimitedAliases_mask"
-      );
+      // If the user cannot upgrade, prompt them to join the waitlist
+      const unlimitedTextContent = premiumCountryAvailability?.premium_available_in_country ? 
+        browser.i18n.getMessage("popupGetUnlimitedAliases_mask") :
+        browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
+
+      // If the user cannot upgrade, update the UTM params
+      const unlimitedHref = premiumCountryAvailability?.premium_available_in_country ? 
+        `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link` :
+        `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=join-waitlist-link`
+
+      // If the user cannot upgrade, update the GA event ID
+      const unlimitedInPageEventId = premiumCountryAvailability?.premium_available_in_country ? 
+        "input-menu-get-premium-btn" :
+        "input-menu-join-waitlist-btn"
+      
+      getUnlimitedAliasesBtn.textContent = unlimitedTextContent;
 
       // Create "Get unlimited aliases" link
-      getUnlimitedAliasesBtn.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`;
+      getUnlimitedAliasesBtn.href = unlimitedHref;
       getUnlimitedAliasesBtn.target = "_blank";
       getUnlimitedAliasesBtn.addEventListener("click", async () => {
-        sendInPageEvent("click", "input-menu-get-premium-btn");
+        sendInPageEvent("click", unlimitedInPageEventId);
         await iframeCloseRelayInPageMenu();
       });
     },
