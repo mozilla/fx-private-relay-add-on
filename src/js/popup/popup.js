@@ -443,7 +443,7 @@ async function enableSettingsPanel() {
   const currentBrowser = await getBrowser();
 
   if (currentBrowser === "Chrome") {
-    const supportLink = document.querySelector(".js-setting-suppprt-link");
+    const supportLink = document.getElementById("popupSettingsLeaveFeedbackLink");
     const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
