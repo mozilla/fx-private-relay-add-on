@@ -15,6 +15,7 @@ function fillInputWithAlias(emailInput, relayAlias) {
   // Set the value of the target field to the selected/generated mask
   emailInput.value = emailMask;
 
+
   emailInput.dispatchEvent(new Event('input', {bubbles:true}));
 
 }
@@ -37,23 +38,9 @@ browser.runtime.onMessage.addListener((message, _sender, _response) => {
 
     // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
     const emailInput = browser.menus ? browser.menus.getTargetElement(message.targetElementId): clickedEl;
-    // console.log(emailInput.value);
-
-     fillInputWithAlias(emailInput, message.relayAddress);
-    // const relayMasks = message.relayAddress;
-    // const emailMask = (relayMasks.full_address) ? relayMasks.full_address : relayMasks.address;
-
-    // forceSetVal(emailInput, emailMask);
-
+    fillInputWithAlias(emailInput, message.relayAddress);
   }
 });
 
-// function forceSetVal(emailInput, emailMask) {
-//   if (!emailInput || !relayAlias) {
-//     return false;
-//   }
 
-//   emailInput.value = emailMask;
-//   emailInput.dispatchEvent(new Event('input', {bubbles:true}));
 
-// }
