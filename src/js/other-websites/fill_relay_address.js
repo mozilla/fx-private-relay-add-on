@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-redeclare
 function fillInputWithAlias(emailInput, relayAlias) {
+
   // BUG: Duplicate fillInputWithAlias calls without proper input content
   // The relayAlias/emailInput arguments check below is a work-around to let the duplicate call(s) fail silently. 
   // To debug, check all instances where fillInputWithAlias() is being called and isolate it. 
@@ -14,12 +15,11 @@ function fillInputWithAlias(emailInput, relayAlias) {
   // Set the value of the target field to the selected/generated mask
   emailInput.value = emailMask;
 
-  emailInput.dispatchEvent(
-    new InputEvent("relay-address", {
-      data: emailMask,
-    })
-  );
+
+  emailInput.dispatchEvent(new Event('input', {bubbles:true}));
+
 }
+
 
 // COMPATIBILITY NOTE: browser.menus.getTargetElement is not available so 
 // we have to listen for any contextmenu click to determe the target element.
@@ -37,9 +37,10 @@ browser.runtime.onMessage.addListener((message, _sender, _response) => {
   if (message.type === "fillTargetWithRelayAddress") {    
 
     // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
-    const emailInput = browser.menus
-          ? browser.menus.getTargetElement(message.targetElementId)
-          : clickedEl
-    return fillInputWithAlias(emailInput, message.relayAddress);
+    const emailInput = browser.menus ? browser.menus.getTargetElement(message.targetElementId): clickedEl;
+    fillInputWithAlias(emailInput, message.relayAddress);
   }
 });
+
+
+
