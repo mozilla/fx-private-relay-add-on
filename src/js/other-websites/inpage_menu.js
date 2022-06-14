@@ -105,7 +105,7 @@ function addUsedOnDomain(domainList, currentDomain) {
 
   // Domain DOES NOT exist in used_on field. Add it to the domainList and put it back as a CSV string.
   // If there's already an entry, add a comma too
-  domainList += (domainList  !== "") ? `,${currentDomain}` : currentDomain;
+  domainList += domainList !== "" ? `,${currentDomain}` : currentDomain;
   return domainList;
 }
 
@@ -118,11 +118,10 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   const maskAddress = generateClickEvt.target.dataset.mask;
   const maskAddressId = generateClickEvt.target.dataset.maskId;
 
-  
   const maskObject = masks.find(
     (mask) => mask.id === parseInt(maskAddressId, 10)
-    );
-    
+  );
+
   const currentUsedOnValue = maskObject.used_on;
 
   const currentPageHostName = await browser.runtime.sendMessage({
@@ -130,17 +129,22 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
   });
 
   // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
-  const used_on = (currentUsedOnValue === null || currentUsedOnValue === undefined || currentUsedOnValue === "") ? `${currentPageHostName},` : addUsedOnDomain(currentUsedOnValue, currentPageHostName)
-  
+  const used_on =
+    currentUsedOnValue === null ||
+    currentUsedOnValue === undefined ||
+    currentUsedOnValue === ""
+      ? `${currentPageHostName},`
+      : addUsedOnDomain(currentUsedOnValue, currentPageHostName);
+
   const serverStoragePref = await getCachedServerStoragePref();
-  
+
   if (serverStoragePref) {
     // Update server info with site usage
     await browser.runtime.sendMessage({
       method: "patchMaskInfo",
       id: parseInt(maskAddressId, 10),
       data: {
-        used_on
+        used_on,
       },
       options: {
         auth: true,
@@ -209,7 +213,9 @@ async function populateFreeMaskList(maskList, masks) {
   maskList.classList.add("is-visible");
 
   // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too.
-  document.querySelector(".fx-relay-menu-masks-lists")?.classList.add("is-visible");
+  document
+    .querySelector(".fx-relay-menu-masks-lists")
+    ?.classList.add("is-visible");
 
   await browser.runtime.sendMessage({
     method: "updateIframeHeight",
@@ -238,7 +244,9 @@ async function populatePremiumMaskList(maskList, masks) {
     const listButtonLabel = document.createElement("span");
     listButtonLabel.classList.add("fx-relay-menu-masks-search-result-label");
     const listButtonAddress = document.createElement("span");
-    listButtonAddress.classList.add("fx-relay-menu-masks-search-result-address");
+    listButtonAddress.classList.add(
+      "fx-relay-menu-masks-search-result-address"
+    );
     listButtonLabel.textContent = mask.description;
     listButtonAddress.textContent = mask.full_address;
     listButton.appendChild(listButtonLabel);
@@ -258,7 +266,9 @@ async function populatePremiumMaskList(maskList, masks) {
   list.classList.remove("is-loading");
 
   // The free UI has both lists wrapped up in a hidden-by-default element, so this makes it visible too.
-  document.querySelector(".fx-relay-menu-masks-lists")?.classList.add("is-visible");
+  document
+    .querySelector(".fx-relay-menu-masks-lists")
+    ?.classList.add("is-visible");
 
   await browser.runtime.sendMessage({
     method: "updateIframeHeight",
@@ -297,7 +307,9 @@ function applySearchFilter(query) {
     ".js-filter-masks-visible"
   );
 
-  searchFilterVisible.textContent = maskSearchResults.filter((maskResult) => !maskResult.classList.contains("is-hidden")).length;
+  searchFilterVisible.textContent = maskSearchResults.filter(
+    (maskResult) => !maskResult.classList.contains("is-hidden")
+  ).length;
   searchFilterTotal.textContent = maskSearchResults.length;
 }
 
@@ -311,32 +323,35 @@ function hasMaskBeenUsedOnCurrentSite(mask, domain) {
   const domainList = mask.used_on;
 
   // Short circuit out if there's no used_on entry
-  if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+  if (domainList === null || domainList === "" || domainList === undefined) {
+    return false;
+  }
 
   // Domain already exists in used_on field. Just return the list!
   if (domainList.includes(domain)) {
     return true;
   }
 
-  // No match found! 
+  // No match found!
   return false;
 }
 
 function haveMasksBeenUsedOnCurrentSite(masks, domain) {
-  return masks.some(mask => {
-    
+  return masks.some((mask) => {
     const domainList = mask.used_on;
 
     // Short circuit out if there's no used_on entry
-    if (domainList === null || domainList === "" ||  domainList === undefined) { return false; }
+    if (domainList === null || domainList === "" || domainList === undefined) {
+      return false;
+    }
 
     // Domain already exists in used_on field. Just return the list!
     if (domainList.includes(domain)) {
       return true;
     }
-    // No match found! 
+    // No match found!
     return false;
-  })
+  });
 }
 
 const buildContent = {
@@ -379,10 +394,15 @@ const buildContent = {
 
         // If there are no masks used on the current site, we need to change the label for the other masks:
         if (
-          !checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName) &&
+          !checkIfAnyMasksWereGeneratedOnCurrentWebsite(
+            masks,
+            currentPageHostName
+          ) &&
           maskList.classList.contains("fx-relay-menu-masks-free-other")
         ) {
-          label.textContent = browser.i18n.getMessage("pageInputIconSelectFromYourCurrentEmailMasks");
+          label.textContent = browser.i18n.getMessage(
+            "pageInputIconSelectFromYourCurrentEmailMasks"
+          );
         }
 
         if (masks.length > 0) {
@@ -393,10 +413,14 @@ const buildContent = {
 
           const filteredMasks = buildFilteredMaskList
             ? masks.filter(
-                (mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+                (mask) =>
+                  mask.generated_for === currentPageHostName ||
+                  hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               )
             : masks.filter(
-              (mask) => mask.generated_for !== currentPageHostName && !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+                (mask) =>
+                  mask.generated_for !== currentPageHostName &&
+                  !hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
 
           filteredMasks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
@@ -414,7 +438,10 @@ const buildContent = {
       )?.premiumCountries;
 
       // Set Generate Mask button
-      buildContent.components.setUnlimitedButton(relaySiteOrigin, premiumCountryAvailability);
+      buildContent.components.setUnlimitedButton(
+        relaySiteOrigin,
+        premiumCountryAvailability
+      );
 
       // Free user: Set text informing them how many aliases they can create
       remainingAliasesSpan.textContent = browser.i18n.getMessage(
@@ -501,15 +528,21 @@ const buildContent = {
         method: "getCurrentPageHostname",
       });
 
-      // See if any masks are assosiated with the current site. 
-      // If so, we'll end up building two discrete mask lists:  
+      // See if any masks are assosiated with the current site.
+      // If so, we'll end up building two discrete mask lists:
       // 1. Just masks for that specific website
       // 2. All masks (including ones from the previous list)
-      const userHasMasksForCurrentWebsite = (checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) || haveMasksBeenUsedOnCurrentSite(masks, currentPageHostName);
+      const userHasMasksForCurrentWebsite =
+        checkIfAnyMasksWereGeneratedOnCurrentWebsite(
+          masks,
+          currentPageHostName
+        ) || haveMasksBeenUsedOnCurrentSite(masks, currentPageHostName);
 
       // If there are no masks assosiated with the current site, remove that list entirely.
       if (!userHasMasksForCurrentWebsite) {
-        document.querySelector(".fx-relay-menu-masks-list-this-website").remove();
+        document
+          .querySelector(".fx-relay-menu-masks-list-this-website")
+          .remove();
       }
 
       const maskLists = document.querySelectorAll(".fx-relay-menu-masks-list");
@@ -532,23 +565,30 @@ const buildContent = {
           // TODO: Move this function elsewhere
 
           button.addEventListener("click", async (event) => {
-            await buildContent.components.setMaskListButton(event.target, maskLists, filterMenuButtons);
+            await buildContent.components.setMaskListButton(
+              event.target,
+              maskLists,
+              filterMenuButtons
+            );
           });
         });
       }
 
       maskLists?.forEach(async (maskList) => {
-
         // Check if the list we're currently building is "From this website". This logic will be used throughout the function
         const buildFilteredMaskList = maskList.classList.contains(
           "fx-relay-menu-masks-list-this-website"
         );
 
         const filteredMasks = buildFilteredMaskList
-          ? masks.filter((mask) => mask.generated_for === currentPageHostName || hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName))
+          ? masks.filter(
+              (mask) =>
+                mask.generated_for === currentPageHostName ||
+                hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+            )
           : masks;
 
-        // Process the masks list based on how many masks there are: 
+        // Process the masks list based on how many masks there are:
         // If there is none, we'll only show the "Generate new mask" button
         // If there's less than five, we'll show all of them
         // If there's MORE than five, we'll show all of them and show the search/filter bar
@@ -566,15 +606,17 @@ const buildContent = {
       });
 
       // Set the first available list to visible.
-      // If there's "From this website" masks, it will show that list first. 
-      document.querySelector(".fx-relay-menu-masks-list")?.classList.add("is-visible");
+      // If there's "From this website" masks, it will show that list first.
+      document
+        .querySelector(".fx-relay-menu-masks-list")
+        ?.classList.add("is-visible");
 
       // Set Generate Mask button
       await buildContent.components.generateMaskButton();
 
       fxRelayMenuBody.classList.remove("is-loading");
 
-      // Check if search has been removed. If not, init it!  
+      // Check if search has been removed. If not, init it!
       const search = document.querySelector(".fx-relay-menu-masks-search");
       if (search) {
         await buildContent.components.search.init();
@@ -661,41 +703,41 @@ const buildContent = {
   },
   components: {
     setMaskListButton: async (button, maskLists, filterMenuButtons) => {
-        // Hide all lists, show selected list
-        maskLists.forEach((maskList) => {
-          maskList.classList.remove("is-visible");
-        });
+      // Hide all lists, show selected list
+      maskLists.forEach((maskList) => {
+        maskList.classList.remove("is-visible");
+      });
 
-        const maskListSelector = button.dataset.maskList;
-        const activeMaskList = document.querySelector(maskListSelector);
-        const activeMaskListCount = activeMaskList.querySelectorAll("li");
+      const maskListSelector = button.dataset.maskList;
+      const activeMaskList = document.querySelector(maskListSelector);
+      const activeMaskListCount = activeMaskList.querySelectorAll("li");
 
-        activeMaskList.classList.add("is-visible");
+      activeMaskList.classList.add("is-visible");
 
-        const filterSearchForm = document.querySelector(
-          ".fx-relay-menu-masks-search-form"
-        );
-        
-        // If there's enough masks in this list, we need to show search.
-        if (activeMaskListCount.length > 5) {
-          filterSearchForm.classList.add("is-visible");
-          await buildContent.components.search.initResultsCountAndFocusOnInput();
-        } else {
-          filterSearchForm.classList.remove("is-visible");
-        }
+      const filterSearchForm = document.querySelector(
+        ".fx-relay-menu-masks-search-form"
+      );
 
-        // Make all buttons inactive, make selected button active
-        filterMenuButtons.forEach((maskList) => {
-          maskList.classList.remove("is-active");
-        });
+      // If there's enough masks in this list, we need to show search.
+      if (activeMaskListCount.length > 5) {
+        filterSearchForm.classList.add("is-visible");
+        await buildContent.components.search.initResultsCountAndFocusOnInput();
+      } else {
+        filterSearchForm.classList.remove("is-visible");
+      }
 
-        button.classList.add("is-active");
+      // Make all buttons inactive, make selected button active
+      filterMenuButtons.forEach((maskList) => {
+        maskList.classList.remove("is-active");
+      });
 
-        // Resize iframe
-        await browser.runtime.sendMessage({
-          method: "updateIframeHeight",
-          height: document.getElementById("fxRelayMenuBody").scrollHeight,
-        });      
+      button.classList.add("is-active");
+
+      // Resize iframe
+      await browser.runtime.sendMessage({
+        method: "updateIframeHeight",
+        height: document.getElementById("fxRelayMenuBody").scrollHeight,
+      });
     },
     generateMaskButton: async () => {
       // Create "Generate Relay Address" button
@@ -750,20 +792,23 @@ const buildContent = {
       );
 
       // If the user cannot upgrade, prompt them to join the waitlist
-      const unlimitedTextContent = premiumCountryAvailability?.premium_available_in_country ? 
-        browser.i18n.getMessage("popupGetUnlimitedAliases_mask") :
-        browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
+      const unlimitedTextContent =
+        premiumCountryAvailability?.premium_available_in_country
+          ? browser.i18n.getMessage("popupGetUnlimitedAliases_mask")
+          : browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
 
       // If the user cannot upgrade, update the UTM params
-      const unlimitedHref = premiumCountryAvailability?.premium_available_in_country ? 
-        `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link` :
-        `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=join-waitlist-link`
+      const unlimitedHref =
+        premiumCountryAvailability?.premium_available_in_country
+          ? `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`
+          : `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=join-waitlist-link`;
 
       // If the user cannot upgrade, update the GA event ID
-      const unlimitedInPageEventId = premiumCountryAvailability?.premium_available_in_country ? 
-        "input-menu-get-premium-btn" :
-        "input-menu-join-waitlist-btn"
-      
+      const unlimitedInPageEventId =
+        premiumCountryAvailability?.premium_available_in_country
+          ? "input-menu-get-premium-btn"
+          : "input-menu-join-waitlist-btn";
+
       getUnlimitedAliasesBtn.textContent = unlimitedTextContent;
 
       // Create "Get unlimited aliases" link
