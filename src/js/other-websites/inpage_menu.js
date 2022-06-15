@@ -320,6 +320,10 @@ function applySearchFilter(query) {
 }
 
 function checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, domain) {
+  // BUG: Using includes without spliting on ",", there can 
+  // be some false positive results for entries that share the same root domain. 
+  // eg: Github mask would show up on example.github.io
+  // See full conversation: https://github.com/mozilla/fx-private-relay-add-on/pull/342#discussion_r897755698
   return masks.some((mask) => {
     return domain === mask.generated_for;
   });
@@ -343,6 +347,10 @@ function hasMaskBeenUsedOnCurrentSite(mask, domain) {
 }
 
 function haveMasksBeenUsedOnCurrentSite(masks, domain) {
+  // BUG: Using includes without spliting on ",", there can 
+  // be some false positive results for entries that share the same root domain. 
+  // eg: Github mask would show up on example.github.io
+  // See full conversation: https://github.com/mozilla/fx-private-relay-add-on/pull/342#discussion_r897755698
   return masks.some((mask) => {
     const domainList = mask.used_on;
 

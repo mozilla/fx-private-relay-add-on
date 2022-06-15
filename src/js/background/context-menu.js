@@ -239,7 +239,7 @@ const relayContextMenus = {
           options
         );
       } else {
-        // Set the used_on field for the selected mask and the re-save the entire masks collection to local storage. 
+        // Set the used_on field for the selected mask and the re-save the entire masks collection to local storage.
         selectedAliasObject[0].used_on = used_on;
         browser.storage.local.set({ relayAddresses: relayAddresses });
       }
@@ -411,6 +411,10 @@ const relayContextMenus = {
         return false;
       }
 
+      // BUG: Using includes without spliting on ",", there can 
+      // be some false positive results for entries that share the same root domain. 
+      // eg: Github mask would show up on example.github.io
+      // See full conversation: https://github.com/mozilla/fx-private-relay-add-on/pull/342#discussion_r897755698
       return relayAddresses.some(
         (alias) =>
           website === alias.generated_for || alias.used_on?.includes(website)
@@ -477,7 +481,6 @@ const relayContextMenus = {
       },
     },
     checkAndStoreUsedOnDomain: (domainList, currentDomain) => {
-
       // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
       if (
         currentDomain === null ||
