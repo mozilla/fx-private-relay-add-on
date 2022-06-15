@@ -483,9 +483,9 @@ const relayContextMenus = {
     checkAndStoreUsedOnDomain: (domainList, currentDomain) => {
       // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
       if (
-        currentDomain === null ||
-        currentDomain === "" ||
-        currentDomain === undefined
+        domainList === null ||
+        domainList === "" ||
+        domainList === undefined
       ) {
         return currentDomain;
       }
