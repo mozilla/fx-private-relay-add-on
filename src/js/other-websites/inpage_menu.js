@@ -97,7 +97,16 @@ async function getMasks(options = { fetchCustomMasks: false }) {
   return relayAddresses;
 }
 
-function addUsedOnDomain(domainList, currentDomain) {
+function checkAndStoreUsedOnDomain(domainList, currentDomain) {
+  // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
+  if (
+    currentDomain === null ||
+    currentDomain === "" ||
+    currentDomain === undefined
+  ) {
+    return currentDomain;
+  }
+  
   // Domain already exists in used_on field. Just return the list!
   if (domainList.includes(currentDomain)) {
     return domainList;
@@ -128,14 +137,11 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
     method: "getCurrentPageHostname",
   });
 
-  // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
-  const used_on =
-    currentUsedOnValue === null ||
-    currentUsedOnValue === undefined ||
-    currentUsedOnValue === ""
-      ? `${currentPageHostName},`
-      : addUsedOnDomain(currentUsedOnValue, currentPageHostName);
-
+  const used_on = checkAndStoreUsedOnDomain(
+    currentUsedOnValue,
+    currentPageHostName
+  );
+  
   const serverStoragePref = await getCachedServerStoragePref();
 
   if (serverStoragePref) {

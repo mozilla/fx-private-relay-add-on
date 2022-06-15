@@ -218,16 +218,10 @@ const relayContextMenus = {
       const currentPage = new URL(tab.url);
       const currentPageHostName = currentPage.hostname;
 
-      // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
-      const used_on =
-        currentUsedOnValue === null ||
-        currentUsedOnValue === "" ||
-        currentUsedOnValue === undefined
-          ? `${currentPageHostName},`
-          : relayContextMenus.utils.addUsedOnDomain(
-              currentUsedOnValue,
-              currentPageHostName
-            );
+      const used_on = relayContextMenus.utils.checkAndStoreUsedOnDomain(
+        currentUsedOnValue,
+        currentPageHostName
+      );
 
       // Update server info with site usage
       const data = { used_on };
@@ -245,6 +239,7 @@ const relayContextMenus = {
           options
         );
       } else {
+        // Set the used_on field for the selected mask and the re-save the entire masks collection to local storage. 
         selectedAliasObject[0].used_on = used_on;
         browser.storage.local.set({ relayAddresses: relayAddresses });
       }
@@ -481,7 +476,17 @@ const relayContextMenus = {
         );
       },
     },
-    addUsedOnDomain: (domainList, currentDomain) => {
+    checkAndStoreUsedOnDomain: (domainList, currentDomain) => {
+
+      // If the used_on field is blank, then just set it to the current page/hostname. Otherwise, add/check if domain exists in the field
+      if (
+        currentDomain === null ||
+        currentDomain === "" ||
+        currentDomain === undefined
+      ) {
+        return currentDomain;
+      }
+
       // Domain already exists in used_on field. Just return the list!
       if (domainList.includes(currentDomain)) {
         return domainList;
