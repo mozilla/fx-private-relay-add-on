@@ -2,14 +2,10 @@
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 500px;
-  background: url("/images/email-tout-bg.svg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: top center;
-  width: var(--panelWidth);
-  height: var(--panelHeight);
+  background-color: var(--colorGrey05);
+  min-width: var(--panelWidth);
+  min-height: var(--panelHeight);
   color: var(--relayInk70);
-  background-image: url("/images/email-tout-bg.svg");
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -110,6 +106,10 @@ a.setting-label:active {
 
 .setting-link:last-of-type {
   margin-bottom: 0;
+}
+
+fx-relay-logo-wrapper {
+  background-color: white;
 }
 
 .settings-header,
@@ -222,6 +222,7 @@ panel-content {
   right: 0;
   left: 0;
   bottom: 0;
+  overflow: hidden;
 }
 
 .button {
@@ -299,7 +300,6 @@ main-panel {
 .aliases-remaining {
   margin: 0;
   font-family: var(--relayInterUiRegular);
-  background: white;
   text-align: start;
 }
 
