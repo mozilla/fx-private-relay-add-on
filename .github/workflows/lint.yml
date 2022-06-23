@@ -18,6 +18,9 @@ jobs:
 
       - name: "Set up node"
         uses: actions/setup-node@v2.4.0
+        with:
+          node-version: 14
+          cache: 'npm'
 
       - name: "Install"
         run: | 
