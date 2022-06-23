@@ -6,7 +6,7 @@
   "dependencies": {},
   "devDependencies": {
     "eslint": "^8.13.0",
-    "web-ext": "^6.8.0"
+    "web-ext": "^7.1.0"
   },
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/mozilla/fx-private-relay-add-on#readme",
   "volta": {
-    "node": "12.22.6",
-    "npm": "6.14.15"
+    "node": "16.15.1",
+    "npm": "8.12.1"
   }
 }
