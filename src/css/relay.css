@@ -41,7 +41,7 @@
   border: 0;
 }
 
-.fx-relay-menu-iframe iframe { 
+.fx-relay-menu-iframe iframe {
   border-radius: 4px;
   background: var(--relayGrey10);
   background-color: var(--relayGrey10);
@@ -50,7 +50,7 @@
   animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
-.fx-relay-menu-iframe { 
+.fx-relay-menu-iframe {
   width: 320px;
   /* The top/right positioning here is necessary to align the box correctly (offset) underneath the "triangle" directly below the in-page Relay logo */
   top: 47px;
@@ -146,7 +146,7 @@ fx-relay-logomark {
   pointer-events: none;
   padding: 0 !important;
   width: 100%;
-  z-index: 99999999999999999;
+  z-index: 10;
 }
 
 .fx-relay-email-input-wrapper > input {
