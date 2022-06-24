@@ -364,43 +364,11 @@ const relayContextMenus = {
   },
   utils: {
     getAliases: async () => {
-      let options = {};
-
-      const { premium } = await browser.storage.local.get("premium");
-      // Check if user may have custom domain masks
-      const { premiumSubdomainSet } = await browser.storage.local.get(
-        "premiumSubdomainSet"
-      );
-
-      // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
-      const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
-
-      // Short-circuit if the user is premium.
-      if (premium && isPremiumSubdomainSet) {
-        options = {
-          fetchCustomMasks: true,
-        };
-      }
-
-      const serverStoragePref = await getCachedServerStoragePref();
-
-      if (serverStoragePref) {
-        try {
-          const resp = await getAliasesFromServer("GET", options);
-          return resp;
-        } catch (error) {
-          // API Error — Fallback to local storage
-          const { relayAddresses } = await browser.storage.local.get(
-            "relayAddresses"
-          );
-          return relayAddresses;
-        }
-      }
-
       // User is not syncing with the server. Use local storage.
       const { relayAddresses } = await browser.storage.local.get(
         "relayAddresses"
       );
+
       return relayAddresses;
     },
     checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite: async (website) => {
@@ -546,6 +514,7 @@ if (browser.menus) {
       tab.url
     );
     await relayContextMenus.init(domain);
+ 
   });
 }
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
