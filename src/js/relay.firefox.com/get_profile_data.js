@@ -199,7 +199,7 @@
       premiumSubdomainSet,
     });
 
-    // Loop through an array of aliases and see if any of them have descriptions or generated_for set.
+    // Loop through an array of aliases and see if any of them have descriptions, generated_for, or used_on set.
     function aliasesHaveStoredMetadata(aliases) {
       for (const alias of aliases) {
         if (

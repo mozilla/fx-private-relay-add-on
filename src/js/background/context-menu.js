@@ -382,13 +382,9 @@ const relayContextMenus = {
         return false;
       }
 
-      // BUG: Using includes without spliting on ",", there can 
-      // be some false positive results for entries that share the same root domain. 
-      // eg: Github mask would show up on example.github.io
-      // See full conversation: https://github.com/mozilla/fx-private-relay-add-on/pull/342#discussion_r897755698
       return relayAddresses.some(
         (alias) =>
-          website === alias.generated_for || alias.used_on?.includes(website)
+          website === alias.generated_for || alias.used_on?.split(",").includes(website)
       );
     },
     getHostnameFromUrlConstructor: (url) => {
@@ -401,7 +397,7 @@ const relayContextMenus = {
       // Remove any sites that match the current site (inverse of getSiteSpecificAliases())
       const filteredAliases = array.filter(
         (alias) =>
-          alias.generated_for !== domain && !alias.used_on?.includes(domain)
+          alias.generated_for !== domain && !alias.used_on?.split(",").includes(domain)
       );
 
       // Limit to 5
@@ -462,7 +458,7 @@ const relayContextMenus = {
       }
 
       // Domain already exists in used_on field. Just return the list!
-      if (domainList.includes(currentDomain)) {
+      if (domainList.split(",").includes(currentDomain)) {
         return domainList;
       }
 
@@ -484,7 +480,7 @@ const relayContextMenus = {
       }
 
       // Domain already exists in used_on field. Just return the list!
-      if (domainList.includes(domain)) {
+      if (domainList.split(",").includes(domain)) {
         return true;
       }
 
