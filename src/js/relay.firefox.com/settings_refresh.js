@@ -11,6 +11,9 @@
       browser.runtime.sendMessage({
         method: "refreshAccountPages",
       });
+      browser.runtime.sendMessage({
+        method: "getServerStoragePref",
+      });
     }
   });
 })();
