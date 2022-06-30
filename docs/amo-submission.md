@@ -2,7 +2,7 @@
 Summary
 -------
 
-This document outlines how to submit and release the Firefox Relay add-on (extension) to the different add-on stores.
+This document outlines how to submit and release the Firefox Relay add-on to AMO.
 
 **📝 Mana Page:** [https://mana.mozilla.org/wiki/pages/viewpage.action?spaceKey=SECPRV&title=Firefox+Relay+Add-on+Submission+Process](https://mana.mozilla.org/wiki/pages/viewpage.action?spaceKey=SECPRV&title=Firefox+Relay+Add-on+Submission+Process)
 
@@ -79,15 +79,14 @@ Intended distribution (AMO or Self-hosted): AMO
 
 
 
-### Step 3: Configure and generate add on zip files for Firefox and Chrome respectively
+### Step 3: Configure and generate add on zip files for Firefox
 ------------------------------------------
 
 
 1.  Make sure you checkout the newest verison: run `git checkout <version number>`
 2.  Run `npm run config:prod` to configure the add on
 3.  Run `npm run build:prod` to generate the add on for **Firefox**
-4.  Run `npm run package:chrome` to generate the add on for **Chrome**
-5.  In the /`web-ext-artifacts` folder, you should be able to find 2 zip files of the new release:
+5.  In the /`web-ext-artifacts` folder, you should be able to find a zip file of the new release.
 
         Tip: The `package.json` file has a list of other command helpful command lines
 
