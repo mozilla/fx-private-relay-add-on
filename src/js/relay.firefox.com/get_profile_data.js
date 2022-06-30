@@ -100,9 +100,7 @@
 
     browser.storage.local.set({
       profileID: parseInt(serverProfileData[0].id, 10),
-      settings: {
-        server_storage: serverProfileData[0].server_storage,
-      },
+      server_storage: serverProfileData[0].server_storage,
     });
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
