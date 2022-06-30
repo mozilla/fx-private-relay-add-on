@@ -43,7 +43,7 @@ Note: Make sure to give the AMO team **at least a week** from the time the form 
 Intended distribution (AMO or Self-hosted): AMO
 
 
-**Releasing to AMO / Chrome Web Store  
+**Releasing to AMO
 **
 ------------------------------------------
 
