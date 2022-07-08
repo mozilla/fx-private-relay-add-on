@@ -87,7 +87,8 @@ jobs:
           # But when pushing a tag, just pass on the manifest.json version to other steps:
           else
             echo "DOING TAG";
-            echo ::set-output name=version::${$(jq ".version" src/manifest.json)//\"/};
+            export VERSION=$(jq ".version" src/manifest.json);
+            echo ::set-output name=version::${VERSION//\"/};
           fi
         env:
           REF_TYPE: ${{ github.ref_type }}
