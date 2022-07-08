@@ -64,8 +64,13 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
-      - name: "Configure add-on for stage site"
+      - name: "Configure add-on for the stage site"
         run: npm run config:stage
+        if: github.ref_type == 'branch'
+
+      - name: "Configure add-on for the production site"
+        run: npm run config:stage
+        if: github.ref_type == 'tag'
 
       - name: "Set YYYY.MM.DD.minutes version"
         id: version
@@ -75,6 +80,13 @@ jobs:
           mv manifest.json~ src/manifest.json
           git diff
           echo ::set-output name=version::$(echo $VERSION)
+        if: github.ref_type == 'branch'
+
+      - name: "Set production version"
+        id: version
+        # Just pass the value of the `version` key in manifest.json on to other steps
+        run: echo ::set-output name=version::${$(jq ".version" src/manifest.json)//\"/}
+        if: github.ref_type == 'tag'
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
