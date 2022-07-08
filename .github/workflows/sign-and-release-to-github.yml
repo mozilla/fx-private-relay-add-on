@@ -72,21 +72,23 @@ jobs:
         run: npm run config:stage
         if: github.ref_type == 'tag'
 
-      - name: "Set YYYY.MM.DD.minutes version"
+      - name: "Set the version"
         id: version
         run: |
-          export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
-          jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~
-          mv manifest.json~ src/manifest.json
-          git diff
-          echo ::set-output name=version::$(echo $VERSION)
-        if: github.ref_type == 'branch'
-
-      - name: "Set production version"
-        id: version
-        # Just pass the value of the `version` key in manifest.json on to other steps
-        run: echo ::set-output name=version::${$(jq ".version" src/manifest.json)//\"/}
-        if: github.ref_type == 'tag'
+          # For regular pushes, mark the version as YYYY.MM.DD.minutes:
+          if [ REF_TYPE == "branch" ];
+          then
+            export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
+            jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~
+            mv manifest.json~ src/manifest.json
+            git diff
+            echo ::set-output name=version::$(echo $VERSION)
+          # But when pushing a tag, just pass on the manifest.json version to other steps:
+          else
+            echo ::set-output name=version::${$(jq ".version" src/manifest.json)//\"/}
+          fi
+        env:
+          REF_TYPE: ${{ github.ref_type }}
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
