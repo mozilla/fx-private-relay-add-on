@@ -64,17 +64,32 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
-      - name: "Configure add-on for stage site"
+      - name: "Configure add-on for the stage site"
         run: npm run config:stage
+        if: github.ref_type == 'branch'
 
-      - name: "Set YYYY.MM.DD.minutes version"
+      - name: "Configure add-on for the production site"
+        run: npm run config:prod
+        if: github.ref_type == 'tag'
+
+      - name: "Set the version"
         id: version
         run: |
-          export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))"
-          jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~
-          mv manifest.json~ src/manifest.json
-          git diff
-          echo ::set-output name=version::$(echo $VERSION)
+          # For regular pushes, mark the version as YYYY.MM.DD.minutes:
+          if [ $REF_TYPE == "branch" ];
+          then
+            export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))";
+            jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~;
+            mv manifest.json~ src/manifest.json;
+            git diff;
+            echo ::set-output name=version::$(echo $VERSION);
+          # But when pushing a tag, just pass on the manifest.json version to other steps:
+          else
+            export VERSION=$(jq ".version" src/manifest.json);
+            echo ::set-output name=version::${VERSION//\"/};
+          fi
+        env:
+          REF_TYPE: ${{ github.ref_type }}
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
@@ -85,6 +100,7 @@ jobs:
               git config user.email "<>"
               git tag ${{ steps.version.outputs.version }}
               git push origin --tags
+        if: github.ref_type == 'branch'
 
       - name: "Make release notes"
         id: release_notes
