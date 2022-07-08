@@ -76,10 +76,8 @@ jobs:
         id: version
         run: |
           # For regular pushes, mark the version as YYYY.MM.DD.minutes:
-          echo $REF_TYPE;
-          if [ $REF_TYPE == "brssanch" ];
+          if [ $REF_TYPE == "branch" ];
           then
-            echo "DOING BRANCH";
             export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))";
             jq ".version = \"$VERSION\"" src/manifest.json > manifest.json~;
             mv manifest.json~ src/manifest.json;
@@ -87,7 +85,6 @@ jobs:
             echo ::set-output name=version::$(echo $VERSION);
           # But when pushing a tag, just pass on the manifest.json version to other steps:
           else
-            echo "DOING TAG";
             export VERSION=$(jq ".version" src/manifest.json);
             echo ::set-output name=version::${VERSION//\"/};
           fi
@@ -103,6 +100,7 @@ jobs:
               git config user.email "<>"
               git tag ${{ steps.version.outputs.version }}
               git push origin --tags
+        if: github.ref_type == 'branch'
 
       - name: "Make release notes"
         id: release_notes
