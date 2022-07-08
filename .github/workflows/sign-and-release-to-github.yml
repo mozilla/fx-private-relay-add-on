@@ -77,7 +77,7 @@ jobs:
         run: |
           # For regular pushes, mark the version as YYYY.MM.DD.minutes:
           echo $REF_TYPE;
-          if [ $REF_TYPE == "branch" ];
+          if [ $REF_TYPE == "brssanch" ];
           then
             echo "DOING BRANCH";
             export VERSION="$(date +%Y.%-m.%-d.)$(echo $(( $(date '+%-H *60 + %-M') )))";
