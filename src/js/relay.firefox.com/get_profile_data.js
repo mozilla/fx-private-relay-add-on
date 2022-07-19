@@ -44,7 +44,7 @@
     // Get the api token from the account profile page
     const profileMainElement = document.querySelector("#profile-main");
     const apiToken = profileMainElement.dataset.apiToken;
-    browser.storage.local.set({ apiToken });
+    await browser.storage.local.set({ apiToken });
 
     // API URL is ${RELAY_SITE_ORIGIN}/api/v1/
     const { relayApiSource } = await browser.storage.local.get("relayApiSource");
@@ -118,8 +118,8 @@
         : [];
       await browser.storage.local.set({
         relayAddresses:
-          applyLocalLabels(relayAddresses)
-          .concat(applyLocalLabels(domainAddresses)),
+          (await applyLocalLabels(relayAddresses))
+          .concat(await applyLocalLabels(domainAddresses)),
       });
     }
 
@@ -133,14 +133,14 @@
      * we just fetched.
      *
      * @param {RandomMask[]} addresses
-     * @returns {RandomMask[]}
+     * @returns {Promise<RandomMask[]>}
      */
-    function applyLocalLabels(addresses) {
+    async function applyLocalLabels(addresses) {
       if (siteStorageEnabled) {
         return addresses;
       }
 
-      const localAddressCache = browser.storage.local.get("relayAddresses").relayAddresses ?? [];
+      const localAddressCache = (await browser.storage.local.get("relayAddresses")).relayAddresses ?? [];
       return addresses.map(address => {
         const matchingLocalAddress = localAddressCache.find((localAddress) => {
           return (
