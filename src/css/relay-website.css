@@ -1,11 +1,17 @@
-.is-visible-with-addon {
-    /* !important to ensure this overwrites website styles, regardless of specificity */
-    display: initial !important;
-    visibility: visible !important;
-}
+/*
+    Styles in the `add-on-overrides` layer (which the add-on injects)
+    should override those in the `add-on-overridable` layer.
+*/
+@layer add-on-overridable, add-on-overrides;
 
-.is-hidden-with-addon {
-    /* !important to ensure this overwrites website styles, regardless of specificity */
-    display: none !important;
-    visibility: collapse !important;
+@layer add-on-overrides {
+    .is-visible-with-addon {
+        display: initial;
+        visibility: visible;
+    }
+
+    .is-hidden-with-addon {
+        display: none;
+        visibility: collapse;
+    }
 }
