@@ -3,6 +3,8 @@ name: continuous prerelease to GitHub
 on:
   push:
     branches: [ "*" ]
+    # When pushing version number tags (not prefixed with a v):
+    tags: [ "[0-9]+.[0-9]+.[0-9]+" ]
   workflow_dispatch:
 
 jobs:
