@@ -146,7 +146,6 @@ fx-relay-logomark {
   pointer-events: none;
   padding: 0 !important;
   width: 100%;
-  z-index: 99999999999999999;
 }
 
 .fx-relay-email-input-wrapper > input {
