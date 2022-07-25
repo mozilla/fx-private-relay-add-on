@@ -60,6 +60,19 @@ settings {
   transition: all 0.5s ease;
 }
 
+report-issue {
+  background-color: rgba(255, 255, 255, 1);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  z-index: 2;
+  transform: translateX(360px);
+  transition: all 0.5s ease;
+}
+
 .setting {
   padding: 12px 0;
   border-bottom: 1px solid var(--relayGrey20);
@@ -139,6 +152,21 @@ fx-relay-logo-wrapper {
   visibility: hidden;
   transition: all 0.3s ease;
 }
+
+
+.show-report-issue report-issue {
+  visibility: visible;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+.show-report-issue fx-relay-logo-wrapper,
+.show-report-issue settings {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
 
 fx-relay-logo-wrapper,
 .signed-in-panel {
