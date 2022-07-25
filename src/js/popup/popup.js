@@ -510,7 +510,6 @@ async function getBrowser() {
 
 async function enableSettingsPanel() {
 
-  
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -529,6 +528,86 @@ async function enableSettingsPanel() {
     const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
+}
+
+
+async function enableReportIssuePanel() {
+  const reportIssueToggle = document.querySelector(".settings-report-issue");
+  const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
+  const submissionSuccessContinue = document.querySelector(".report-continue");
+
+  [reportIssueToggle, reportIssueSettingsReturn, submissionSuccessContinue].forEach(e => {
+    e.addEventListener("click", () => {
+      document.body.classList.toggle("show-report-issue");
+      const eventLabel = document.body.classList.contains("show-report-issue") ? "opened-report-issue" : "closed-report-issue";
+      if (document.body.classList.contains("show-report-issue")) {
+        sendRelayEvent("Panel", "click", eventLabel);
+      }
+    });
+  });
+
+  reportURL();
+  showReportInputOtherTextField();
+  showSuccessReportSubmission();
+
+  const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
+
+  console.log(reportForm);
+
+  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
+}
+
+function handleReportIssueFormSubmission(event) {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const formJSON = Object.fromEntries(data.entries());
+  console.log(JSON.stringify(formJSON, null, 2));
+}
+
+async function showSuccessReportSubmission() {
+  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+  const reportSuccess = document.querySelector(".report-success");
+  const reportContent = document.querySelector(".report-issue-content");
+
+  reportIssueSubmitBtn.addEventListener("click", () => {
+    reportSuccess.classList.remove("is-hidden");
+    reportContent.classList.add("is-hidden");
+
+  });
+}
+
+async function reportURL() {
+  // Add Site URL placeholder
+  const currentPage = await getCurrentPage();
+  const url = new URL(currentPage.url);
+  const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
+  inputFieldUrl.value = url.hostname;
+}
+
+async function showReportInputOtherTextField() {
+  const otherCheckbox = document.querySelector('input[name="issue-case-other"');
+  const otherTextField = document.querySelector('input[name="issue-case-other-details"');
+  otherCheckbox.addEventListener("click", () => {
+    otherTextField.classList.toggle("is-hidden");
+  })
+
+  // Add placeholder to report input on 'Other' selection
+  const inputFieldOtherDetails = document.querySelector('input[name="issue-case-other-details"]');
+
+  // Clear placeholder on click
+  inputFieldOtherDetails.addEventListener("click", () => {
+    if (inputFieldOtherDetails.value === browser.i18n.getMessage("popupReportIssueCaseOtherDetails")) {
+      inputFieldOtherDetails.value = "";
+    }
+  })
+}
+
+async function getCurrentPage() {
+  const [currentTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return currentTab;
 }
 
 
@@ -594,6 +673,8 @@ async function popup() {
   }
 
   await enableSettingsPanel();
+  await enableReportIssuePanel();
+
   enableDataOptOut();
   enableInputIconDisabling();
 
