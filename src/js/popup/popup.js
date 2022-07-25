@@ -169,11 +169,11 @@ const serverStoragePanel = {
     });
 
     serverStoragePanelWrapper.classList.remove("is-hidden");
-    
+
     serverStoragePanelWrapper
       .querySelectorAll(".is-hidden")
       .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
-    
+
     const serverStoragePanelButtonDismiss =
       serverStoragePanelWrapper.querySelector(".js-button-dismiss");
 
@@ -185,7 +185,7 @@ const serverStoragePanel = {
       serverStoragePanel.event.dismiss,
       false
     );
-    
+
     serverStoragePanelButtonAllow.addEventListener(
       "click",
       serverStoragePanel.event.allow,
@@ -199,7 +199,7 @@ const serverStoragePanel = {
       serverStoragePanel.hide();
       showRelayPanel(1);
     },
-    
+
     allow: async (e) => {
       e.preventDefault();
 
@@ -208,7 +208,7 @@ const serverStoragePanel = {
       );
 
       serverStoragePanel.event.dontShowPanelAgain();
-      
+
       browser.tabs.create({
         url: `${relaySiteOrigin}/accounts/profile/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=allow-labels-sync#sync-labels`,
         active: true,
@@ -217,7 +217,7 @@ const serverStoragePanel = {
       window.close();
     },
 
-    dontShowPanelAgain: ()=> {
+    dontShowPanelAgain: () => {
       browser.storage.local.set({ serverStoragePrompt: true });
     }
   },
@@ -242,7 +242,7 @@ async function choosePanel(panelId, premium, premiumSubdomainSet){
   }
 }
 
-function checkUserSubdomain(premiumSubdomainSet){
+function checkUserSubdomain(premiumSubdomainSet) {
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
@@ -324,7 +324,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
-  
+
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
@@ -453,7 +453,7 @@ async function showRelayPanel(tipPanelToShow) {
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      return updatePanel(numRemaining, tipPanelToShow+=nextPanel);
+      return updatePanel(numRemaining, tipPanelToShow += nextPanel);
     });
   });
 
@@ -481,7 +481,7 @@ async function showRelayPanel(tipPanelToShow) {
   if (numRemaining === 0) {
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
-  return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
+  return sendRelayEvent("Panel", "viewed-panel", "authenticated-user-panel");
 }
 
 
@@ -629,7 +629,7 @@ async function enableInputIconDisabling() {
   const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
   stylePrefToggle(userIconChoice);
 
-  inputIconVisibilityToggle.addEventListener("click", async() => {
+  inputIconVisibilityToggle.addEventListener("click", async () => {
     const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
     await browser.runtime.sendMessage({
       method: "updateInputIconPref",
@@ -688,7 +688,7 @@ async function popup() {
       window.close();
     });
   });
-  
+
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
 
 

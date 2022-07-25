@@ -193,19 +193,25 @@ fx-relay-logo-wrapper,
   right: 24px;
 }
 
-.settings-toggle:hover {
+.settings-report-issue {
+  left: 0;
+  margin: auto;
+  position: relative;
+}
+
+.settings-toggle:hover, .settings-report-issue-return:hover {
   opacity: .8;
 }
 
-.settings-toggle:focus {
+.settings-toggle:focus, .settings-report-issue-return:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
-.settings-toggle:active {
+.settings-toggle:active, .settings-report-issue-return:active {
   opacity: 1;
 }
 
-.settings-toggle {
+.settings-toggle, .settings-report-issue-return  {
   border-radius: 50%;
   background-repeat: no-repeat;
   background-size: 18px;
@@ -680,19 +686,18 @@ onboarding-panel p, .education-body {
   transition: opacity 0.2s ease;
 }
 
-
-.settings-toggle:hover::after,
+.settings-toggle:hover::after, .settings-report-issue-return:hover::after,
 .panel-nav:hover::after, .premium-panel-nav:hover::after {
   opacity: .8;
   transition: opacity 0.2s ease;
 }
 
-.settings-toggle:focus,
-.panel-nav:focus, .premium-panel-nav:focus {
+.settings-toggle:focus, .settings-report-issue-return:focus,
+.panel-nav:focus, .js-panel-nav:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
-.settings-toggle:active::after,
+.settings-toggle:active::after, .settings-report-issue-return:active::after,
 .panel-nav:active::after, .premium-panel-nav:active::after {
   opacity: 1;
   transition: opacity 0.2s ease;
