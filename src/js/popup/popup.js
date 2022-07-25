@@ -428,7 +428,6 @@ async function getBrowser() {
 
 async function enableSettingsPanel() {
 
-  
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -448,8 +447,29 @@ async function enableSettingsPanel() {
     supportLink.href = chromeSupportLink;
   }
 
+}
 
+
+async function enableReportIssuePanel() {
   
+  const reportIssueToggle = document.querySelectorAll(".settings-report-issue");
+  reportIssueToggle.forEach(toggle => {
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("show-report-issue");
+      const eventLabel = document.body.classList.contains("show-report-issue") ? "opened-settings" : "closed-settings";
+      if (document.body.classList.contains("show-report-issue")) {
+        sendRelayEvent("Panel", "click", eventLabel);
+      }
+    });
+  });
+
+  // const currentBrowser = await getBrowser();
+
+  // if (currentBrowser === "Chrome") {
+  //   const supportLink = document.getElementById("popupSettingsLeaveFeedbackLink");
+  //   const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
+  //   supportLink.href = chromeSupportLink;
+  // }
 
 }
 
@@ -516,6 +536,8 @@ async function popup() {
   }
 
   await enableSettingsPanel();
+  await enableReportIssuePanel();
+
   enableDataOptOut();
   enableInputIconDisabling();
 
