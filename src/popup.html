@@ -37,7 +37,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="fx-relay-panel">
+<body class="fx-relay-panel fx-relay">
   <panel-content>
     <fx-relay-logo-wrapper>
       <fx-relay-logomark></fx-relay-logomark>
@@ -92,7 +92,7 @@
 
         <!-- Website field -->
         <div class="report-section">
-          <label for="report-website" class="report-label i18n-content" data-i18n-attribute="title"
+          <label class="report-label i18n-content" for="report-website"  data-i18n-attribute="title"
             data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
           <input type="text" id="report-website" name="report-website" value="" />
         </div>
@@ -119,7 +119,7 @@
         </div>
       </fieldset>
 
-      <input class="i18n-content register-domain-cta button sign-in-btn blue-primary-btn" id="submit-report" name="submit-report" type="submit" data-i18n-message-id="popupSettingsSubmitReport" />
+      <input class="i18n-content fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit" data-i18n-message-id="popupSettingsSubmitReport" />
 
       <!-- Report Issues go here -->
     </report-issue>

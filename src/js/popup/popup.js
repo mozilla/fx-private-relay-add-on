@@ -628,6 +628,7 @@ async function showReportInputOtherTextField() {
       inputFieldOtherDetails.value = "";
     }
   })
+
 }
 
 async function getCurrentPage() {

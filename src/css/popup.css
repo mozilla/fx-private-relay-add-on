@@ -60,18 +60,32 @@ settings, report-issue {
   transition: all 0.5s ease;
   font-size: 14px;
   line-height: 1.4;
+  padding: 0 24px;
 }
 
 .report-issue-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 0;
   border: 0 none;
+}
+
+.report-section {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.report-label::after {
+  content: ":";
 }
 
 .report-section ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
 .report-section li {
@@ -84,8 +98,9 @@ settings, report-issue {
   margin-right: 8px;
 }
 
-.report-label::after {
-  content: ":";
+.report-section input[type=text]{
+  width: 100%;
+  padding: 4px;
 }
 
 .setting {
@@ -101,9 +116,7 @@ settings, report-issue {
 
 .setting-label {
   display: inline-block;
-  color: var(--relayInk70); 
-  padding-left: 24px;
-  padding-right: 24px;
+  color: var(--relayInk70);
 }
 
 a.setting-label {
@@ -124,6 +137,7 @@ a.setting-label:active {
 
 .settings-list {
   padding: 0;
+  margin: 0;
   list-style-type: none;
   margin: 0;
 }
