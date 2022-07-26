@@ -449,7 +449,6 @@ async function enableSettingsPanel() {
 
 }
 
-
 async function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
@@ -463,7 +462,6 @@ async function enableReportIssuePanel() {
       }
     });
   });
-
   reportURL();
   showReportInputOtherTextField();
 }
@@ -493,7 +491,6 @@ async function showReportInputOtherTextField() {
       inputFieldOtherDetails.value = "";
     }
   })
-
 }
 
 async function getCurrentPage() {

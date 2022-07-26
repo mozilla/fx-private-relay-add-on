@@ -54,13 +54,14 @@
           <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
             class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
             data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
-          <!-- Report Webcompat Issue -->
+          <!-- Report Issue Panel Prompt -->
           <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
             data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
         </li>
       </ul>
     </settings>
 
+    <!-- Report Issue Panel -->
     <report-issue>
       <div class="settings-header">
         <button class="close-settings settings-report-issue-return i18n-attribute" data-i18n-attribute="title"
@@ -69,9 +70,9 @@
       </div>
       <fieldset class="report-issue-content">
 
-        <!-- Website field -->
+        <!-- Report URL -->
         <div class="report-section">
-          <label class="report-label i18n-content" for="report-website"  data-i18n-attribute="title"
+          <label class="report-label i18n-content" for="report-website" data-i18n-attribute="title"
             data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
           <input type="text" id="report-website" name="report-website" value="" />
         </div>
@@ -79,28 +80,33 @@
           <!-- Select issue checkboxes -->
           <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
           <ul>
-            <li> 
+            <li>
+              <!-- Case One -->
               <input type="checkbox" id="issueCaseOne" name="issueCaseOne" checked />
               <label class="i18n-content" for="issueCaseOne" data-i18n-message-id="popupReportIssueCaseOne"></label>
             </li>
             <li>
+              <!-- Case Two -->
               <input type="checkbox" id="issueCaseTwo" name="issueCaseTwo" />
               <label class="i18n-content" for="issueCaseTwo" data-i18n-message-id="popupReportIssueCaseTwo"></label>
             </li>
             <li>
+              <!-- Case Three-->
               <input type="checkbox" id="issue-case-other" name="issue-case-other" />
-              <label class="i18n-content" for="issue-case-other" data-i18n-message-id="popupReportIssueCaseOther"></label>
+              <label class="i18n-content" for="issue-case-other"
+                data-i18n-message-id="popupReportIssueCaseOther"></label>
             </li>
             <li>
-              <input class="i18n-content report-other-field is-hidden" type="text" id="issue-case-other-details" name="issue-case-other-details" data-i18n-message-id="popupReportIssueCaseOtherDetails" />
+              <!-- 'Other' option input field -->
+              <input class="i18n-content report-other-field is-hidden" type="text" id="issue-case-other-details"
+                name="issue-case-other-details" data-i18n-message-id="popupReportIssueCaseOtherDetails" />
             </li>
           </ul>
         </div>
       </fieldset>
-
-      <input class="i18n-content fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit" data-i18n-message-id="popupSettingsSubmitReport" />
-
-      <!-- Report Issues go here -->
+      <!-- Submit Report btn -->
+      <input class="i18n-content fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit"
+        data-i18n-message-id="popupSettingsSubmitReport" />
     </report-issue>
 
     <sign-up-panel class="sign-up-panel hidden">
