@@ -190,12 +190,12 @@ fx-relay-logo-wrapper,
   background-image: url("/images/preferences.svg");
   right: 24px;
 }
-
+/* 
 .settings-report-issue {
   left: 0;
   margin: auto;
   position: relative;
-}
+} */
 
 .settings-toggle:hover, .settings-report-issue-return:hover {
   opacity: .8;
