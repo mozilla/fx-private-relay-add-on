@@ -1,3 +1,4 @@
+
 .fx-relay-panel {
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
@@ -294,6 +295,7 @@ panel-content {
   font-family: var(--relayMetropolis);
   font-weight: 800;
   font-size: 15px;
+  border: 0 none;
   text-decoration: none;
   color: rgba(255, 255, 255, 1);
   min-width: 200px;

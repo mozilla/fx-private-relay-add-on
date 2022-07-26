@@ -4,8 +4,9 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Firefox Relay</title>
-  <link rel="stylesheet" href="css/relay.css">
-  <link rel="stylesheet" href="css/popup.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/relay.css">
+  <link rel="stylesheet" href="/css/popup.css">
   <script src="/js/libs/browser-polyfill.min.js"></script>
   <script src="/js/shared/i18n.js"></script>
   <script src="/js/shared/data-opt-out-toggle.js"></script>
@@ -87,12 +88,17 @@
               <label class="i18n-content" for="issueCaseTwo" data-i18n-message-id="popupReportIssueCaseTwo"></label>
             </li>
             <li>
-              <input type="checkbox" id="issueCaseOther" name="issueCaseOther" />
-              <label class="i18n-content" for="issueCaseOther" data-i18n-message-id="popupReportIssueCaseOther"></label>
+              <input type="checkbox" id="issue-case-other" name="issue-case-other" />
+              <label class="i18n-content" for="issue-case-other" data-i18n-message-id="popupReportIssueCaseOther"></label>
+            </li>
+            <li>
+              <input class="i18n-content report-other-field is-hidden" type="text" id="issue-case-other-details" name="issue-case-other-details" data-i18n-message-id="popupReportIssueCaseOtherDetails" />
             </li>
           </ul>
         </div>
       </fieldset>
+
+      <input class="i18n-content register-domain-cta button sign-in-btn blue-primary-btn" id="submit-report" name="submit-report" type="submit" data-i18n-message-id="popupSettingsSubmitReport" />
 
       <!-- Report Issues go here -->
     </report-issue>

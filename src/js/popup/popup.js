@@ -464,15 +464,33 @@ async function enableReportIssuePanel() {
     });
   });
 
-  addSiteURLtoReportIssueField();
+  reportURL();
+  showReportInputOtherTextField();
 }
 
-async function addSiteURLtoReportIssueField() {
+async function reportURL() {
+  // Add Site URL placeholder
   const currentPage = await getCurrentPage();
   const url = new URL(currentPage.url);
+  const inputFieldUrl = document.querySelector('input[name="report-website"]');
+  inputFieldUrl.value = url.hostname;
+}
 
-  const inputField = document.querySelector('input[name="report-website"]');
-  inputField.value = url.hostname;
+async function showReportInputOtherTextField() {
+  const otherCheckbox = document.querySelector('input[name="issue-case-other"');
+  const otherTextField = document.querySelector('input[name="issue-case-other-details"');
+
+  otherCheckbox.addEventListener("click", () => {
+    otherTextField.classList.toggle("is-hidden");
+  })
+
+  // Add placeholder to report input on 'Other' selection
+  const inputFieldOtherDetails = document.querySelector('input[name="issue-case-other-details"]');
+
+  // Clear on click
+  inputFieldOtherDetails.addEventListener("click", () => {
+    inputFieldOtherDetails.value = "";
+  })
 }
 
 async function getCurrentPage() {
@@ -482,7 +500,6 @@ async function getCurrentPage() {
   });
   return currentTab;
 }
-
 
 async function enableInputIconDisabling() {
   const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
