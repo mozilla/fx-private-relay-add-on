@@ -487,10 +487,13 @@ async function showReportInputOtherTextField() {
   // Add placeholder to report input on 'Other' selection
   const inputFieldOtherDetails = document.querySelector('input[name="issue-case-other-details"]');
 
-  // Clear on click
+  // Clear placeholder on click
   inputFieldOtherDetails.addEventListener("click", () => {
-    inputFieldOtherDetails.value = "";
+    if (inputFieldOtherDetails.value === browser.i18n.getMessage("popupReportIssueCaseOtherDetails")) {
+      inputFieldOtherDetails.value = "";
+    }
   })
+
 }
 
 async function getCurrentPage() {
