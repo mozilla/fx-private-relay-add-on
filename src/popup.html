@@ -54,8 +54,8 @@
             class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
             data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
           <!-- Report Webcompat Issue -->
-          <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click" 
-             data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
+          <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
+            data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
         </li>
       </ul>
     </settings>
@@ -66,6 +66,34 @@
           data-i18n-message-id="popupSettingsReturn"></button>
         <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
       </div>
+      <fieldset class="report-issue-content">
+
+        <!-- Website field -->
+        <div class="report-section">
+          <label for="report-website" class="report-label i18n-content" data-i18n-attribute="title"
+            data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
+          <input type="text" id="report-website" name="report-website" value="" />
+        </div>
+        <div class="report-section">
+          <!-- Select issue checkboxes -->
+          <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+          <ul>
+            <li> 
+              <input type="checkbox" id="issueCaseOne" name="issueCaseOne" checked />
+              <label class="i18n-content" for="issueCaseOne" data-i18n-message-id="popupReportIssueCaseOne"></label>
+            </li>
+            <li>
+              <input type="checkbox" id="issueCaseTwo" name="issueCaseTwo" />
+              <label class="i18n-content" for="issueCaseTwo" data-i18n-message-id="popupReportIssueCaseTwo"></label>
+            </li>
+            <li>
+              <input type="checkbox" id="issueCaseOther" name="issueCaseOther" />
+              <label class="i18n-content" for="issueCaseOther" data-i18n-message-id="popupReportIssueCaseOther"></label>
+            </li>
+          </ul>
+        </div>
+      </fieldset>
+
       <!-- Report Issues go here -->
     </report-issue>
 
