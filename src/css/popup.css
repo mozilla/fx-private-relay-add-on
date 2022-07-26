@@ -47,7 +47,7 @@ p {
   text-align: center;
 }
 
-settings {
+settings, report-issue {
   background-color: rgba(255, 255, 255, 1);
   position: absolute;
   top: 0;
@@ -58,19 +58,34 @@ settings {
   z-index: 2;
   transform: translateX(360px);
   transition: all 0.5s ease;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-report-issue {
-  background-color: rgba(255, 255, 255, 1);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  visibility: hidden;
-  z-index: 2;
-  transform: translateX(360px);
-  transition: all 0.5s ease;
+.report-issue-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 0 none;
+}
+
+.report-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.report-section li {
+  display: flex;
+  align-items:flex-start;
+  margin-bottom: 8px;
+}
+
+.report-section input[type=checkbox]{
+  margin-right: 8px;
+}
+
+.report-label::after {
+  content: ":";
 }
 
 .setting {
@@ -86,9 +101,7 @@ report-issue {
 
 .setting-label {
   display: inline-block;
-  font-size: 13px;
-  color: var(--relayInk70);
-  line-height: 1.4;
+  color: var(--relayInk70); 
   padding-left: 24px;
   padding-right: 24px;
 }
@@ -192,12 +205,10 @@ fx-relay-logo-wrapper,
   background-image: url("/images/preferences.svg");
   right: 24px;
 }
-/* 
+
 .settings-report-issue {
-  left: 0;
-  margin: auto;
-  position: relative;
-} */
+  cursor: pointer;
+}
 
 .settings-toggle:hover, .settings-report-issue-return:hover {
   opacity: .8;
