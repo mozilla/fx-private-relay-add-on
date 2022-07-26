@@ -610,7 +610,6 @@ async function getCurrentPage() {
   return currentTab;
 }
 
-
 async function enableInputIconDisabling() {
   const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
 
