@@ -451,7 +451,6 @@ async function enableSettingsPanel() {
 
 
 async function enableReportIssuePanel() {
-
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
 
@@ -465,6 +464,23 @@ async function enableReportIssuePanel() {
     });
   });
 
+  addSiteURLtoReportIssueField();
+}
+
+async function addSiteURLtoReportIssueField() {
+  const currentPage = await getCurrentPage();
+  const url = new URL(currentPage.url);
+
+  const inputField = document.querySelector('input[name="report-website"]');
+  inputField.value = url.hostname;
+}
+
+async function getCurrentPage() {
+  const [currentTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return currentTab;
 }
 
 
