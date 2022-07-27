@@ -90,7 +90,6 @@
         <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
       </div>
       <fieldset class="report-issue-content">
-
         <!-- Report URL -->
         <div class="report-section">
           <label class="report-label i18n-content" for="report-website" data-i18n-attribute="title"
@@ -124,11 +123,17 @@
             </li>
           </ul>
         </div>
-      </fieldset>
-      <!-- Submit Report btn -->
-      <input class="i18n-content fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit"
+        <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit"
         data-i18n-message-id="popupSettingsSubmitReport" />
+      </fieldset>
+
+      <div class="report-success is-hidden">
+        <!--Add Success Content here-->
+      </div>
+
+      <!-- Submit Report btn -->
     </report-issue>
+
 
     <sign-up-panel class="sign-up-panel hidden">
       <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>

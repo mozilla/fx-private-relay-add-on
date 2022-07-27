@@ -47,7 +47,7 @@ p {
   text-align: center;
 }
 
-settings, report-issue {
+settings, report-issue, report-issue-success {
   background-color: rgba(255, 255, 255, 1);
   position: absolute;
   top: 0;
@@ -180,7 +180,6 @@ fx-relay-logo-wrapper {
   transition: all 0.3s ease;
 }
 
-
 .show-report-issue report-issue {
   visibility: visible;
   transform: translateX(0);
@@ -193,7 +192,6 @@ fx-relay-logo-wrapper {
   visibility: hidden;
   transition: all 0.3s ease;
 }
-
 
 fx-relay-logo-wrapper,
 .signed-in-panel {

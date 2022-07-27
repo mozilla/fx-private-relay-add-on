@@ -544,6 +544,8 @@ async function enableReportIssuePanel() {
       }
     });
   });
+
+
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
@@ -668,6 +670,7 @@ async function popup() {
   if (signedInUser) {
     showRelayPanel(1);
   }
+
 
   await enableSettingsPanel();
   await enableReportIssuePanel();
