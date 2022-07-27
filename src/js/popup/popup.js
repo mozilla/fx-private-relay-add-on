@@ -446,13 +446,12 @@ async function enableSettingsPanel() {
     const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
-
 }
 
 async function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
-
+  
   [reportIssueToggle, reportIssueSettingsReturn].forEach(e => {
     e.addEventListener("click", () => {
       document.body.classList.toggle("show-report-issue");
@@ -462,8 +461,23 @@ async function enableReportIssuePanel() {
       }
     });
   });
+
+
   reportURL();
   showReportInputOtherTextField();
+  showSuccessReportSubmission();
+}
+
+async function showSuccessReportSubmission() {
+  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+  const reportSuccess = document.querySelector(".report-success");
+  const reportContent = document.querySelector(".report-issue-content");
+
+  reportIssueSubmitBtn.addEventListener("click", () => {
+    reportSuccess.classList.remove("is-hidden");
+    reportContent.classList.add("is-hidden");
+
+  });
 }
 
 async function reportURL() {
@@ -477,7 +491,6 @@ async function reportURL() {
 async function showReportInputOtherTextField() {
   const otherCheckbox = document.querySelector('input[name="issue-case-other"');
   const otherTextField = document.querySelector('input[name="issue-case-other-details"');
-
   otherCheckbox.addEventListener("click", () => {
     otherTextField.classList.toggle("is-hidden");
   })
@@ -561,6 +574,7 @@ async function popup() {
   if (signedInUser) {
     showRelayPanel(1);
   }
+
 
   await enableSettingsPanel();
   await enableReportIssuePanel();
