@@ -451,8 +451,9 @@ async function enableSettingsPanel() {
 async function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
-  
-  [reportIssueToggle, reportIssueSettingsReturn].forEach(e => {
+  const submissionSuccessContinue = document.querySelector(".report-continue");
+
+  [reportIssueToggle, reportIssueSettingsReturn, submissionSuccessContinue].forEach(e => {
     e.addEventListener("click", () => {
       document.body.classList.toggle("show-report-issue");
       const eventLabel = document.body.classList.contains("show-report-issue") ? "opened-report-issue" : "closed-report-issue";

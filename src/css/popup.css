@@ -102,6 +102,25 @@ settings, report-issue, report-issue-success {
   padding: 4px;
 }
 
+.report-success {
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.report-success h1 {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.report-continue {
+  cursor: pointer;
+  color: var(--relayBlue3);
+}
+
+
 .setting {
   padding: 12px 0;
   border-bottom: 1px solid var(--relayGrey20);
