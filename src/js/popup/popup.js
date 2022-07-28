@@ -467,6 +467,16 @@ async function enableReportIssuePanel() {
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
+
+  const reportForm = document.querySelector(".report-issue-content");
+  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
+}
+
+function handleReportIssueFormSubmission(event) {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const formJSON = Object.fromEntries(data.entries());
+  console.log(JSON.stringify(formJSON, null, 2));
 }
 
 async function showSuccessReportSubmission() {
