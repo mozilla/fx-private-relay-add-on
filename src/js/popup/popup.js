@@ -550,10 +550,14 @@ async function enableReportIssuePanel() {
   showReportInputOtherTextField();
   showSuccessReportSubmission();
 
+<<<<<<< HEAD
   const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
 
   console.log(reportForm);
 
+=======
+  const reportForm = document.querySelector(".report-issue-content");
+>>>>>>> b0f8727 (test mock data on console)
   reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
