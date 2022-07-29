@@ -545,11 +545,11 @@ async function enableReportIssuePanel() {
     });
   });
 
-
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
 
@@ -558,6 +558,12 @@ async function enableReportIssuePanel() {
 =======
   const reportForm = document.querySelector(".report-issue-content");
 >>>>>>> b0f8727 (test mock data on console)
+=======
+  const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
+
+  console.log(reportForm);
+  
+>>>>>>> 9cf7225 (Check JSON format for results)
   reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
