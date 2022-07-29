@@ -463,12 +463,14 @@ async function enableReportIssuePanel() {
     });
   });
 
-
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
 
-  const reportForm = document.querySelector(".report-issue-content");
+  const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
+
+  console.log(reportForm);
+  
   reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
@@ -495,7 +497,7 @@ async function reportURL() {
   // Add Site URL placeholder
   const currentPage = await getCurrentPage();
   const url = new URL(currentPage.url);
-  const inputFieldUrl = document.querySelector('input[name="report-website"]');
+  const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
   inputFieldUrl.value = url.hostname;
 }
 

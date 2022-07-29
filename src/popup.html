@@ -68,12 +68,12 @@
           data-i18n-message-id="popupSettingsReturn"></button>
         <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
       </div>
-      <fieldset class="report-issue-content">
+      <form class="report-issue-content">
         <!-- Report URL -->
         <div class="report-section">
-          <label class="report-label i18n-content" for="report-website" data-i18n-attribute="title"
+          <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
             data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
-          <input type="text" id="report-website" name="report-website" value="" />
+          <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
         </div>
         <div class="report-section">
           <!-- Select issue checkboxes -->
@@ -81,13 +81,13 @@
           <ul>
             <li>
               <!-- Case One -->
-              <input type="checkbox" id="issueCaseOne" name="issueCaseOne" checked />
-              <label class="i18n-content" for="issueCaseOne" data-i18n-message-id="popupReportIssueCaseOne"></label>
+              <input type="checkbox" id="email-mask-not-accepted" name="email-mask-not-accepted" checked />
+              <label class="i18n-content" for="email-mask-not-accepted" data-i18n-message-id="popupReportIssueCaseOne"></label>
             </li>
             <li>
               <!-- Case Two -->
-              <input type="checkbox" id="issueCaseTwo" name="issueCaseTwo" />
-              <label class="i18n-content" for="issueCaseTwo" data-i18n-message-id="popupReportIssueCaseTwo"></label>
+              <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
+              <label class="i18n-content" for="add_on_visual_issue" data-i18n-message-id="popupReportIssueCaseTwo"></label>
             </li>
             <li>
               <!-- Case Three-->
@@ -102,9 +102,9 @@
             </li>
           </ul>
         </div>
-        <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" id="submit-report" name="submit-report" type="submit"
-        data-i18n-message-id="popupSettingsSubmitReport" />
-      </fieldset>
+        <button class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" disabled type="submit"
+        data-i18n-message-id="popupSettingsSubmitReport"></button>
+      </form>
 
       <!-- Report Submission Success Panel -->
       <div class="report-success is-hidden">
