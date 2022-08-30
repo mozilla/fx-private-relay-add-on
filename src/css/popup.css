@@ -1,3 +1,4 @@
+
 .fx-relay-panel {
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
@@ -10,6 +11,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
+  font-family: var(--fontStackBase);
 }
 
 .fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
@@ -824,46 +826,11 @@ onboarding-panel p {
   box-shadow: var(--relayButtonFocus);
 }
 
-/* Countdown */
-
-/* 
 .countdown-timer {
-  dl {
-    display: flex;
-    gap: $spacing-sm;
-
-    > div {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: $spacing-xs;
-      width: 60px;
-      background-color: $color-purple-90;
-      border: 2px solid $color-white;
-      border-radius: $border-radius-md;
-      color: $color-white;
-      box-shadow: $box-shadow-sm;
-      padding: $spacing-sm;
-      font-family: $font-stack-firefox;
-
-      dt {
-        @include text-body-md;
-        font-weight: 600;
-      }
-
-      dd {
-        @include text-title-sm;
-        font-weight: 700;
-      }
-
-      @media (prefers-reduced-motion) {
-        &.remaining-seconds {
-          display: none;
-        }
-      }
-    }
-  }
-} */
+  align-self: center;
+  margin: 0;
+  font-family: var(--relayMetropolisBold);
+}
 
 .countdown-timer dl {
   display: flex;
@@ -875,15 +842,14 @@ onboarding-panel p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 60px;
-  background-color: purple;
-  border: 2px solid white;
+  gap: var(--spacingXs);
+  width: var(--layoutLg);
+  background-color: var(--colorViolet80);
   border-radius: 8px;
   color: white;
-  /* box-shadow: $box-shadow-sm; */
+  border: 2px solid var(--colorWhite);
+  box-shadow: 0px 5px 8px var(--colorGrey20);
   padding: 8px;
-  font-family: var(--relayMetropolisMedium);
 }
 
 .countdown-timer dt {
@@ -892,7 +858,8 @@ onboarding-panel p {
 
 .countdown-timer dd {
   font-weight: 700;
-  font-size: 1.5em;
+  font-size: 2.3em;
   margin: 0;
+  font-family: var(--fontStackFirefoxBold);
 }
 

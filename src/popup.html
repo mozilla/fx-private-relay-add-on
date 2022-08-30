@@ -5,6 +5,7 @@
     <title>Firefox Relay</title>
     <link rel="stylesheet" href="css/relay.css">
     <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/global.css">
     <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/i18n.js"></script>
     <script src="/js/shared/data-opt-out-toggle.js"></script>
@@ -13,7 +14,7 @@
     <script src="js/shared/metrics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body class="fx-relay-panel">
+  <body class="fx-relay-panel fx-relay">
     <panel-content>
       <fx-relay-logo-wrapper>
         <fx-relay-logomark></fx-relay-logomark>
@@ -62,6 +63,7 @@
         <onboarding-panel>
           <!-- End Intro Pricing Panel: End September 27 -->
           <div class="dashboard-stats-wrapper end-of-intro-pricing">
+            <!-- Dashboard Statistics-->
             <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
@@ -82,7 +84,7 @@
                 </li>
               </ul>
             </div>
-            <!--Countdown End of Intro Pricing-->
+            <!--Countdown Timer-->
             <figure class="countdown-timer end-of-intro-pricing">
               <dl>
                 <div>
@@ -104,7 +106,6 @@
               </dl>
             </figure>
           </div>
-            
           <!--Non Premium Panel-->
           <div class="content-wrapper is-hidden">
             <div class="img-wrapper">
@@ -127,7 +128,7 @@
           </div>
           <!-- Premium Panel-->
           <div class="premium-wrapper is-hidden">
-            <!-- Premium Statistics-->
+            <!-- Dashboard Statistics-->
             <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
@@ -148,7 +149,7 @@
                 </li>
               </ul>
             </div>
-            <!-- Premium Dashboard-->
+            <!-- Register Domain Component -->
             <div class="register-domain-component is-hidden">
               <div class="img-wrapper">
                 <img class="email-domain-illustration">
