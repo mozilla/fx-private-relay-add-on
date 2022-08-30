@@ -56,28 +56,16 @@ function getEducationalStrings() {
 // End of intro pricing banner
 function showCountdownTimer() {
    
-  const countdownTimer = document.querySelector(".countdown-timer");
-  const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
-  const currentTime = new Date();
+  setRemainingTimeParts();
 
-  // const timeInterval = setInterval(() => {
-    const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+  const timeInterval = setInterval(() => {
+    
+    const remainingTimeInMs =  setRemainingTimeParts();
 
-  const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
-  const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
-  const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
-  const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
-
-
-   countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
-   countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
-   countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
-   countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
- 
-  //  if (getRemainingTimeParts(remainingTimeInMs).total <= 0 ) {
-  //   clearInterval(timeInterval);
-  //  }
-  //  }, 1000);
+   if (getRemainingTimeParts(remainingTimeInMs).total <= 0 ) {
+    clearInterval(timeInterval);
+   }
+   }, 1000);
    
    function getRemainingTimeParts(remainingMilliseconds) {
     const remainingDays = Math.floor(
@@ -107,6 +95,26 @@ function showCountdownTimer() {
       remainingMinutes,
       remainingSeconds,
     }
+  }
+
+  function setRemainingTimeParts() {
+  const countdownTimer = document.querySelector(".countdown-timer");
+    const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
+    const currentTime = new Date();
+
+    const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+
+    const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
+    const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
+    const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
+    const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
+
+    countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
+    countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
+    countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
+    countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
+  
+    return remainingTimeInMs;
   }
 }
 
@@ -404,9 +412,13 @@ async function showRelayPanel(tipPanelToShow) {
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
-  setInterval(() => {
-    showCountdownTimer();
-   }, 1000);
+  // setInterval(() => {
+  //   showCountdownTimer();
+  //  }, 1000);
+
+
+  showCountdownTimer();
+
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
