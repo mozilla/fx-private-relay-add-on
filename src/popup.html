@@ -61,8 +61,8 @@
       </span>
         <onboarding-panel>
           <!-- End Intro Pricing Panel: End September 27 -->
-          <div class="content-wrapper">
-            <div class="premium-dashboard">
+          <div class="dashboard-stats-wrapper end-of-intro-pricing">
+            <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
                   <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
@@ -79,12 +79,12 @@
                 <li class="dashboard-info">
                   <!--TODO: Add Email Trackers String and Endpoint -->
                   <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
-                  <div class="dashboard-stats emails-forwarded"></div>
+                  <div class="dashboard-stats email-trackers-removed"></div>
                 </li>
               </ul>
             </div>
-
-            <figure class="countdown-timer">
+            <!--Countdown End of Intro Pricing-->
+            <figure class="countdown-timer end-of-intro-pricing">
               <!-- <time
                 dateTime={`P${remainingDays}DT${remainingHours}H`}
                 aria-label={l10n.getString("offer-countdown-timer-alt", {
@@ -112,6 +112,7 @@
                 </dl>
               </time>
             </figure>
+          </div>
             
           <!--Non Premium Panel-->
           <div class="content-wrapper is-hidden">
@@ -136,7 +137,7 @@
           <!-- Premium Panel-->
           <div class="premium-wrapper is-hidden">
             <!-- Premium Statistics-->
-            <div class="premium-dashboard is-hidden">
+            <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
                   <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>

@@ -60,7 +60,7 @@ function showCountdownTimer() {
 
   const timeInterval = setInterval(() => {
     
-    const remainingTimeInMs =  setRemainingTimeParts();
+   const remainingTimeInMs =  setRemainingTimeParts();
 
    if (getRemainingTimeParts(remainingTimeInMs).total <= 0 ) {
     clearInterval(timeInterval);
@@ -97,24 +97,24 @@ function showCountdownTimer() {
     }
   }
 
-  function setRemainingTimeParts() {
-  const countdownTimer = document.querySelector(".countdown-timer");
-    const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
-    const currentTime = new Date();
+    function setRemainingTimeParts() {
+      const countdownTimer = document.querySelector(".countdown-timer");
+      const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
+      const currentTime = new Date();
 
-    const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+      const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
 
-    const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
-    const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
-    const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
-    const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
+      const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
+      const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
+      const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
+      const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
 
-    countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
-    countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
-    countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
-    countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
-  
-    return remainingTimeInMs;
+      countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
+      countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
+      countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
+      countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
+
+      return remainingTimeInMs;
   }
 }
 
@@ -237,6 +237,9 @@ async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
   //   serverStoragePanel.init(premium);
   // } else 
   if (premium) {
+    const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
+    endOfIntroPricing.classList.add("is-hidden");
+
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper
@@ -297,9 +300,14 @@ async function showRelayPanel(tipPanelToShow) {
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-  const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
-  const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
-  const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
+
+  // Dashboard Statistics
+  const dashboardStatistics = document.querySelector(".dashboard-stats-list");
+  const aliasesUsedValEl = dashboardStatistics.querySelector(".aliases-used");
+  const emailsBlockedValEl = dashboardStatistics.querySelector(".emails-blocked");
+  const emailsForwardedValEl = dashboardStatistics.querySelector(".emails-forwarded");
+  const emailTrackersRemovedValEl = dashboardStatistics.querySelector(".email-trackers-removed");
+
 
   //Check if premium features are available
   const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
@@ -385,12 +393,13 @@ async function showRelayPanel(tipPanelToShow) {
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
 
-    //Premium Panel content
     registerDomainImgEl.src = panelStrings.registerDomainImg;
+
+    //Dashboard Statistics
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
-
+    emailTrackersRemovedValEl.textContent = emailsForwardedVal;
 
     //If Premium features are not available, do not show upgrade CTA on the panel
     if (premiumCountryAvailability?.premium_available_in_country === true) {
@@ -407,15 +416,12 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  //Dashboard Data
+  //Dashboard Statistics
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
-  // setInterval(() => {
-  //   showCountdownTimer();
-  //  }, 1000);
-
+  console.log(aliasesUsedVal);
 
   showCountdownTimer();
 
