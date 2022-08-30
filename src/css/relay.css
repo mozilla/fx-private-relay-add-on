@@ -11,6 +11,7 @@
   --relayButtonFocus: 0 0 1px 1px #0a84ff, 0 0 0 4px rgba(10, 132, 255, 0.3);
   --relayFxGradient: linear-gradient(-90deg, #ff9100 0%, #f10366 50%, #6173ff 100%);
   --colorGrey05: #f9f9fa;
+  --colorWhite: #ffffff;
   --relayGrey10: hsl(240, 9%, 98%);
   --relayGrey20: #ededf0;
   --relayGrey30: #d7d7db;

@@ -53,6 +53,63 @@ function getEducationalStrings() {
   };
 }
 
+// End of intro pricing banner
+function showCountdownTimer() {
+   
+  const countdownTimer = document.querySelector(".countdown-timer");
+  const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
+  const currentTime = new Date();
+
+  // const timeInterval = setInterval(() => {
+    const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+
+  const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
+  const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
+  const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
+  const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
+
+
+   countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
+   countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
+   countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
+   countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
+ 
+  //  if (getRemainingTimeParts(remainingTimeInMs).total <= 0 ) {
+  //   clearInterval(timeInterval);
+  //  }
+  //  }, 1000);
+   
+   function getRemainingTimeParts(remainingMilliseconds) {
+    const remainingDays = Math.floor(
+      remainingMilliseconds / (1000 * 60 * 60 * 24)
+    );
+    const remainingHours = Math.floor(
+      (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
+        (1000 * 60 * 60)
+    );
+    const remainingMinutes = Math.floor(
+      (remainingMilliseconds -
+        remainingDays * (1000 * 60 * 60 * 24) -
+        remainingHours * (1000 * 60 * 60)) /
+        (1000 * 60)
+    );
+    const remainingSeconds = Math.floor(
+      (remainingMilliseconds -
+        remainingDays * (1000 * 60 * 60 * 24) -
+        remainingHours * (1000 * 60 * 60) -
+        remainingMinutes * (1000 * 60)) /
+        1000
+    );
+  
+    return {
+      remainingDays,
+      remainingHours,
+      remainingMinutes,
+      remainingSeconds,
+    }
+  }
+}
+
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
   document.body.classList.add("sign-up");
@@ -347,7 +404,9 @@ async function showRelayPanel(tipPanelToShow) {
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
 
-
+  setInterval(() => {
+    showCountdownTimer();
+   }, 1000);
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;

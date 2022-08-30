@@ -50,7 +50,7 @@
       </sign-up-panel>
 
       <main-panel class="signed-in-panel hidden">
-        <span class="panel-status">
+        <span class="panel-status is-hidden">
           <p class="aliases-remaining remaining-plural"></p>
           <a 
             class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden" 
@@ -60,8 +60,61 @@
           </a>
       </span>
         <onboarding-panel>
-          <!--Non Premium Panel-->
+          <!-- End Intro Pricing Panel: End September 27 -->
           <div class="content-wrapper">
+            <div class="premium-dashboard">
+              <ul>
+                <li class="dashboard-info">
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
+                  <div class="dashboard-stats aliases-used"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
+                </li>
+                <li class="dashboard-info">
+                  <!--TODO: Add Email Trackers String and Endpoint -->
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
+                </li>
+              </ul>
+            </div>
+
+            <figure class="countdown-timer">
+              <!-- <time
+                dateTime={`P${remainingDays}DT${remainingHours}H`}
+                aria-label={l10n.getString("offer-countdown-timer-alt", {
+                  remaining_days: remainingDays,
+                  remaining_hours: remainingHours,
+                })}
+              > -->
+                <dl>
+                  <div>
+                    <dt>Days</dt>
+                    <dd class="countdown-data-days"></dd>
+                  </div>
+                  <div>
+                    <dt>Hours</dt>
+                    <dd class="countdown-data-hours"></dd>
+                  </div>
+                  <div>
+                    <dt>Minutes</dt>
+                    <dd class="countdown-data-minutes"></dd>
+                  </div>
+                  <div>
+                    <dt>Seconds</dt>
+                    <dd class="countdown-data-seconds"></dd>
+                  </div>
+                </dl>
+              </time>
+            </figure>
+            
+          <!--Non Premium Panel-->
+          <div class="content-wrapper is-hidden">
             <div class="img-wrapper">
               <img class="onboarding-img">
             </div>
@@ -82,7 +135,7 @@
           </div>
           <!-- Premium Panel-->
           <div class="premium-wrapper is-hidden">
-            <!-- Premium Dashboard-->
+            <!-- Premium Statistics-->
             <div class="premium-dashboard is-hidden">
               <ul>
                 <li class="dashboard-info">
