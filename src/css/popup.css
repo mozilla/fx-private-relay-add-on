@@ -473,7 +473,7 @@ onboarding-panel {
   position: absolute;
   background-repeat: no-repeat;
   background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/blocked-icon.svg");
+  background-image: url("/icons/forward-icon.svg");
   transition: opacity 0.2s ease;
 }
 
@@ -486,7 +486,7 @@ onboarding-panel {
   position: absolute;
   background-repeat: no-repeat;
   background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/forward-icon.svg");
+  background-image: url("/icons/email-trackers-icon.svg");
   transition: opacity 0.2s ease;
 }
 
