@@ -452,48 +452,33 @@ onboarding-panel {
   padding-left: 30px;
 }
 
-.dashboard-stats-list li:nth-child(2)::before {
-  content: "";
-  width: 20px; 
-  height: 20px;
-  margin-left: -25px;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/blocked-icon.svg");
-  transition: opacity 0.2s ease;
-}
-
-
-.dashboard-stats-list li:nth-child(3)::before {
-  content: "";
-  width: 20px; 
-  height: 20px;
-  margin-left: -25px;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/forward-icon.svg");
-  transition: opacity 0.2s ease;
-}
-
-
-.dashboard-stats-list li:nth-child(4)::before {
-  content: "";
-  width: 20px; 
-  height: 20px;
-  margin-left: -25px;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/email-trackers-icon.svg");
-  transition: opacity 0.2s ease;
-}
-
 .dashboard-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.dashboard-info::before {
+  content: "";
+  width: 20px; 
+  height: 20px;
+  margin-left: -25px;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0);
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-info:nth-child(2)::before {
+  background-image: url("/icons/blocked-icon.svg");
+}
+
+.dashboard-info:nth-child(3)::before {
+  background-image: url("/icons/forward-icon.svg");
+}
+
+.dashboard-info:nth-child(4)::before {
+  background-image: url("/icons/email-trackers-icon.svg");
 }
 
 .dashboard-stats {
@@ -505,17 +490,21 @@ onboarding-panel {
 .email-domain-illustration {
   margin: 0 auto;
   display: block;
+  height: 80px;
 }
 
 .register-domain-component {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  height: 250px;
+  height: auto;
+  justify-content: space-between;
 }
 
 .register-domain-cta {
   max-width: 200px;
+  font-size: 1rem;
+  padding: var(--spacingXs) var(--spacingSm);
   text-align: center;
 }
 
@@ -531,6 +520,7 @@ onboarding-panel {
   padding-top: 24px;
   justify-content: space-between;
   gap: 16px;
+  height: auto;
 }
 
 #educationalSignBackIn {

@@ -84,32 +84,24 @@
             </div>
             <!--Countdown End of Intro Pricing-->
             <figure class="countdown-timer end-of-intro-pricing">
-              <!-- <time
-                dateTime={`P${remainingDays}DT${remainingHours}H`}
-                aria-label={l10n.getString("offer-countdown-timer-alt", {
-                  remaining_days: remainingDays,
-                  remaining_hours: remainingHours,
-                })}
-              > -->
-                <dl>
-                  <div>
-                    <dt>Days</dt>
-                    <dd class="countdown-data-days"></dd>
-                  </div>
-                  <div>
-                    <dt>Hours</dt>
-                    <dd class="countdown-data-hours"></dd>
-                  </div>
-                  <div>
-                    <dt>Minutes</dt>
-                    <dd class="countdown-data-minutes"></dd>
-                  </div>
-                  <div>
-                    <dt>Seconds</dt>
-                    <dd class="countdown-data-seconds"></dd>
-                  </div>
-                </dl>
-              </time>
+              <dl>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownDays"></dt>
+                  <dd class="countdown-data-days"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownHours"></dt>
+                  <dd class="countdown-data-hours"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownMinutes"></dt>
+                  <dd class="countdown-data-minutes"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownSeconds"></dt>
+                  <dd class="countdown-data-seconds"></dd>
+                </div>
+              </dl>
             </figure>
           </div>
             
@@ -145,6 +137,10 @@
                 <li class="dashboard-info">
                   <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
                   <div class="dashboard-stats emails-blocked"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
                 </li>
                 <li class="dashboard-info">
                   <span class="email-trackers-removed-text i18n-content" data-i18n-message-id="popupEmailTrackersRemoved"></span>

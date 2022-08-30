@@ -263,7 +263,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet != "None") {
+  if (premiumSubdomainSet !== "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -301,13 +301,24 @@ async function showRelayPanel(tipPanelToShow) {
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
 
-  // Dashboard Statistics
-  const dashboardStatistics = document.querySelector(".dashboard-stats-list");
-  const aliasesUsedValEl = dashboardStatistics.querySelector(".aliases-used");
-  const emailsBlockedValEl = dashboardStatistics.querySelector(".emails-blocked");
-  const emailsForwardedValEl = dashboardStatistics.querySelector(".emails-forwarded");
-  const emailTrackersRemovedValEl = dashboardStatistics.querySelector(".email-trackers-removed");
+  //Dashboard Statistics
+  const dashboardStatistics = document.querySelectorAll(".dashboard-stats-list");
 
+  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+
+  dashboardStatistics.forEach((statSet) => {
+    const aliasesUsedValEl = statSet.querySelector(".aliases-used");
+    const emailsBlockedValEl = statSet.querySelector(".emails-blocked");
+    const emailsForwardedValEl = statSet.querySelector(".emails-forwarded");
+    const emailTrackersRemovedValEl = statSet.querySelector(".email-trackers-removed");
+
+    aliasesUsedValEl.textContent = aliasesUsedVal;
+    emailsBlockedValEl.textContent = emailsBlockedVal;
+    emailsForwardedValEl.textContent = emailsForwardedVal;
+    emailTrackersRemovedValEl.textContent = emailsForwardedVal;
+  });
 
   //Check if premium features are available
   const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
@@ -395,12 +406,6 @@ async function showRelayPanel(tipPanelToShow) {
 
     registerDomainImgEl.src = panelStrings.registerDomainImg;
 
-    //Dashboard Statistics
-    aliasesUsedValEl.textContent = aliasesUsedVal;
-    emailsBlockedValEl.textContent = emailsBlockedVal;
-    emailsForwardedValEl.textContent = emailsForwardedVal;
-    emailTrackersRemovedValEl.textContent = emailsForwardedVal;
-
     //If Premium features are not available, do not show upgrade CTA on the panel
     if (premiumCountryAvailability?.premium_available_in_country === true) {
       const premiumCTA = document.querySelector(".premium-cta");
@@ -415,13 +420,6 @@ async function showRelayPanel(tipPanelToShow) {
 
     return;
   };
-
-  //Dashboard Statistics
-  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
-  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
-  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-
-  console.log(aliasesUsedVal);
 
   showCountdownTimer();
 
