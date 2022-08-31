@@ -70,14 +70,13 @@ function showCountdownTimer() {
     
    const remainingTimeInMs =  setRemainingTimeParts();
 
-   console.log(getRemainingTimeParts(remainingTimeInMs).total);
-
-   if (getRemainingTimeParts(remainingTimeInMs).total <= 52596000009) {
+  // When timer runs out, set it back to default non premium view
+   if (remainingTimeInMs <= 0) {
     clearInterval(timeInterval);
     resetNonPremiumPanel();
    }
    }, 1000);
-   
+
    function getRemainingTimeParts(remainingMilliseconds) {
     const remainingDays = Math.floor(
       remainingMilliseconds / (1000 * 60 * 60 * 24)
