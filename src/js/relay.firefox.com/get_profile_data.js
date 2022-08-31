@@ -184,9 +184,13 @@
     const emailsBlockedVal = document.querySelector(
       "firefox-private-relay-addon-data"
     ).dataset.emailsBlockedVal;
+    const emailTrackersRemovedVal = document.querySelector(
+      "firefox-private-relay-addon-data"
+    ).dataset.emailTrackersRemovedVal;
     const premiumSubdomainSet = document.querySelector(
       "firefox-private-relay-addon-data"
     ).dataset.premiumSubdomainSet;
+
     browser.storage.local.set({
       fxaSubscriptionsUrl,
       premiumProdId,
@@ -194,6 +198,7 @@
       aliasesUsedVal,
       emailsForwardedVal,
       emailsBlockedVal,
+      emailTrackersRemovedVal,
       premiumSubdomainSet,
     });
 

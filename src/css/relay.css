@@ -29,8 +29,6 @@
   --relayInterUiRegular: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto, "Open Sans", sans-serif;
   --relayIconDimension: 30px;
   --relayViolet: #9059ff;
-
-  /* font-family: open-sans, sans-serif; */
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
   font-size: 16px;

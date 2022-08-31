@@ -304,9 +304,13 @@ async function showRelayPanel(tipPanelToShow) {
   //Dashboard Statistics
   const dashboardStatistics = document.querySelectorAll(".dashboard-stats-list");
 
+  //Get profile data from site
   const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+  const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
+
+  console.log(typeof(emailTrackersRemovedVal));
 
   dashboardStatistics.forEach((statSet) => {
     const aliasesUsedValEl = statSet.querySelector(".aliases-used");
@@ -317,7 +321,7 @@ async function showRelayPanel(tipPanelToShow) {
     aliasesUsedValEl.textContent = aliasesUsedVal;
     emailsBlockedValEl.textContent = emailsBlockedVal;
     emailsForwardedValEl.textContent = emailsForwardedVal;
-    emailTrackersRemovedValEl.textContent = emailsForwardedVal;
+    emailTrackersRemovedValEl.textContent = emailTrackersRemovedVal;
   });
 
   //Check if premium features are available
