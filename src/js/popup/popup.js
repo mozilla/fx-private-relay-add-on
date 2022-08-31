@@ -53,6 +53,14 @@ function getEducationalStrings() {
   };
 }
 
+function resetNonPremiumPanel() {
+  const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
+  const nonPremiumPanel = document.querySelector(".content-wrapper");
+
+  endOfIntroPricingElem.classList.add("is-hidden");
+  nonPremiumPanel.classList.remove("is-hidden");
+}
+
 // End of intro pricing banner
 function showCountdownTimer() {
    
@@ -62,8 +70,11 @@ function showCountdownTimer() {
     
    const remainingTimeInMs =  setRemainingTimeParts();
 
-   if (getRemainingTimeParts(remainingTimeInMs).total <= 0 ) {
+   console.log(getRemainingTimeParts(remainingTimeInMs).total);
+
+   if (getRemainingTimeParts(remainingTimeInMs).total <= 52596000009) {
     clearInterval(timeInterval);
+    resetNonPremiumPanel();
    }
    }, 1000);
    
@@ -275,8 +286,8 @@ function checkUserSubdomain(premiumSubdomainSet){
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
-  const tipHeadlineEl = onboardingPanelWrapper.querySelector("h1");
-  const tipBodyEl = onboardingPanelWrapper.querySelector("p");
+  const tipHeadlineEl = onboardingPanelWrapper.querySelector(".onboarding-h1");
+  const tipBodyEl = onboardingPanelWrapper.querySelector(".onboarding-p");
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
@@ -309,8 +320,6 @@ async function showRelayPanel(tipPanelToShow) {
   const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
   const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
   const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
-
-  console.log(typeof(emailTrackersRemovedVal));
 
   dashboardStatistics.forEach((statSet) => {
     const aliasesUsedValEl = statSet.querySelector(".aliases-used");
@@ -619,7 +628,6 @@ async function popup() {
   document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
     dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
   });
-
 
   document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
     premiumLink.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=popup&utm_content=get-premium-link`;

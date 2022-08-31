@@ -158,6 +158,26 @@
   outline: 4px solid var(--colorInformationalFocus);
 }
 
+.fx-relay-c-button.t-basic {
+  color: var(--colorInformational);
+  text-align: start;
+  justify-content: flex-start;
+  padding: 0;
+  align-items: unset;
+}
+
+.fx-relay-c-button.t-basic:hover {
+  color: var(--colorInformationalHover);
+}
+
+.fx-relay-c-button.t-basic:active {
+  color: var(--colorInformationalActive);
+}
+
+.fx-relay-c-button.t-basic:focus {
+  outline: 4px solid var(--colorInformationalFocus);
+}
+
 .fx-relay-c-button.is-loading.t-primary {
   color: var(--colorInformational);
 }
@@ -258,3 +278,4 @@
   transition: opacity 0.2s ease-out;
   color: var(--colorGrey40);
 }
+

@@ -246,7 +246,7 @@ panel-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--relayBlue3);
+  background: var(--colorInformational);
   color: var(--relayInk);
   font-family: var(--relayMetropolis);
   font-weight: 800;
@@ -308,7 +308,7 @@ main-panel {
 .premium-cta {
   margin: 0;
   font-family: var(--relayInterUiRegular);
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: 700;
   text-decoration: none;
 }
@@ -358,7 +358,7 @@ footer {
   width: 100%;
   font-size: 15px;
   padding: 4px 8px;
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: 600;
   text-decoration: none;
   margin: 0 auto 16px auto;
@@ -367,6 +367,7 @@ footer {
 }
 
 .footer-button:hover {
+  color: var(--colorInformationalHover)
 }
 
 .footer-button:active {
@@ -374,6 +375,7 @@ footer {
 }
 
 .footer-button:focus {
+  color: var(--colorInformationalFocus)
 }
 
 /* onboarding */
@@ -409,9 +411,9 @@ onboarding-panel {
   justify-content: space-around;
 }
 
-.dashboard-stats-wrapper {
+.end-of-intro-pricing-wrapper {
   display: flex;
-  height: 300px;
+  height: 360px;
   width: 100%;
   flex-direction: column;
   justify-content: space-around;
@@ -582,7 +584,7 @@ onboarding-panel p {
 }
 
 .survey-link {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   margin: 12px auto 0 0;
   border-radius: 2px;
 }
@@ -769,7 +771,7 @@ onboarding-panel p {
 }
 
 .newsflash-description a {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: bold;
   padding-top: 8px;
   text-decoration: none;
@@ -801,17 +803,17 @@ onboarding-panel p {
   font-weight: bold;
   text-align: center;
   text-decoration: none;
-  border: 2px solid var(--relayBlue3);
+  border: 2px solid var(--colorInformational);
   cursor: pointer;
 }
 
 .newsflash-button-dismiss {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   background: none;
 }
 
 .newsflash-button-allow {
-  background: var(--relayBlue3);
+  background: var(--colorInformational);
   color: white;
 }
 
@@ -824,6 +826,14 @@ onboarding-panel p {
 .newsflash-button-allow:focus,
 .newsflash-button-dismiss:focus {
   box-shadow: var(--relayButtonFocus);
+}
+
+.end-of-intro-pricing h1 {
+  font-size: 1.3em;
+}
+
+.end-of-intro-pricing p {
+  line-height: 120%;
 }
 
 .countdown-timer {
