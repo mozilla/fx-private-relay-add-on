@@ -65,11 +65,8 @@ function resetNonPremiumPanel() {
 
 // End of intro pricing banner
 function showCountdownTimer() {
-   
   setRemainingTimeParts();
-
   const timeInterval = setInterval(() => {
-    
    const remainingTimeInMs =  setRemainingTimeParts();
 
   // When timer runs out, set it back to default non premium view
