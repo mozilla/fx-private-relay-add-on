@@ -56,9 +56,11 @@ function getEducationalStrings() {
 function resetNonPremiumPanel() {
   const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
   const nonPremiumPanel = document.querySelector(".content-wrapper");
+  const panelStatus = document.querySelector(".panel-status");
 
   endOfIntroPricingElem.classList.add("is-hidden");
   nonPremiumPanel.classList.remove("is-hidden");
+  panelStatus.classList.remove("is-hidden");
 }
 
 // End of intro pricing banner
