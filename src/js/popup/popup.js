@@ -64,8 +64,10 @@ function resetNonPremiumPanel() {
 }
 
 // End of intro pricing banner
-function showCountdownTimer() {
+function showCountdownTimer(introPricingOfferEndDate) {
+
   setRemainingTimeParts();
+
   const timeInterval = setInterval(() => {
    const remainingTimeInMs =  setRemainingTimeParts();
 
@@ -108,9 +110,7 @@ function showCountdownTimer() {
 
     function setRemainingTimeParts() {
       const countdownTimer = document.querySelector(".countdown-timer");
-      const introPricingOfferEndDate = new Date(Date.UTC(2022, 8, 27, 16));
       const currentTime = new Date();
-
       const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
 
       const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
@@ -332,8 +332,8 @@ async function showRelayPanel(tipPanelToShow) {
   });
 
   //Check if premium features are available
-  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
-
+  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
+ 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
   
@@ -432,7 +432,11 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  showCountdownTimer();
+  // Set End Date here
+  const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
+  const introPricingOfferEndDate = new Date(introPricingEndDateISO);
+  
+  showCountdownTimer(introPricingOfferEndDate);
 
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();

@@ -87,10 +87,10 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   return await response.json();
 }
 
-async function storePremiumAvailabilityInCountry() {
+async function storeRuntimeData() {
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
-  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
+  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries?.PREMIUM_PLANS;
   if (typeof existingPremiumAvailability === "object" && existingPremiumAvailability.fetchedAt > (Date.now() - 7 * 24 * 60 * 60 * 1000)) {
     return;
   }
@@ -100,17 +100,22 @@ async function storePremiumAvailabilityInCountry() {
     return;
   }
   const currentPremiumAvailabilityResponse = await fetch(
-    `${relayApiSource}/premium_countries`,
+    `${relayApiSource}/runtime_data`,
     {
       headers: { Accept: "application/json" },
     },
   );
   const currentPremiumAvailability = await currentPremiumAvailabilityResponse.json();
+
   browser.storage.local.set({
     premiumCountries: {
-      ...currentPremiumAvailability,
+      PREMIUM_PLANS: currentPremiumAvailability.PREMIUM_PLANS,
       fetchedAt: Date.now(),
     },
+    introPricingEndDate: {
+      INTRO_PRICING_END: currentPremiumAvailability.INTRO_PRICING_END,
+      fetchedAt: Date.now(),
+    }
   })
 }
 
@@ -394,5 +399,5 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
 
 (async () => {
   await displayBrowserActionBadge();
-  await storePremiumAvailabilityInCountry();
+  await storeRuntimeData();
 })();
