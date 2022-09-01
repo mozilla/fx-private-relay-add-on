@@ -442,7 +442,7 @@ async function showRelayPanel(tipPanelToShow) {
   const introPricingOfferEndDate = new Date(introPricingEndDateISO);
   
   // Display End of Intro Pricing
-  if (premiumCountryAvailability?.premium_available_in_country === true) {
+  if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
     showCountdownTimer(introPricingOfferEndDate);
   }
   else {
