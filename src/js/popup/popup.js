@@ -66,15 +66,20 @@ function resetNonPremiumPanel() {
 // End of intro pricing banner
 function showCountdownTimer(introPricingOfferEndDate) {
 
+  const remainingTimeInMs =  setRemainingTimeParts();
+
+  if (remainingTimeInMs <= 0) {
+    resetNonPremiumPanel();
+   }
+
   setRemainingTimeParts();
 
   const timeInterval = setInterval(() => {
-   const remainingTimeInMs =  setRemainingTimeParts();
-
   // When timer runs out, set it back to default non premium view
+  const remainingTimeInMs =  setRemainingTimeParts();
+
    if (remainingTimeInMs <= 0) {
     clearInterval(timeInterval);
-    resetNonPremiumPanel();
    }
    }, 1000);
 
@@ -436,7 +441,13 @@ async function showRelayPanel(tipPanelToShow) {
   const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
   const introPricingOfferEndDate = new Date(introPricingEndDateISO);
   
-  showCountdownTimer(introPricingOfferEndDate);
+  // Display End of Intro Pricing
+  if (premiumCountryAvailability?.premium_available_in_country === true) {
+    showCountdownTimer(introPricingOfferEndDate);
+  }
+  else {
+    resetNonPremiumPanel();
+  }
 
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
