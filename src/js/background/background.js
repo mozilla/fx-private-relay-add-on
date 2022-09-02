@@ -90,8 +90,18 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 async function storeRuntimeData() {
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
-  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries?.PREMIUM_PLANS;
-  if (typeof existingPremiumAvailability === "object" && existingPremiumAvailability.fetchedAt > (Date.now() - 7 * 24 * 60 * 60 * 1000)) {
+  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries;
+  const existingIntroPricingEndDate = (await browser.storage.local.get("introPricingEndDate")).introPricingEndDate;
+  
+  // If we already fetched Premium availability in the past seven days,
+  // don't fetch it again.
+  const checkingRemainingDays = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  if (typeof existingPremiumAvailability === "object" && 
+      typeof existingIntroPricingEndDate === "object" && 
+      existingPremiumAvailability.fetchedAt > checkingRemainingDays &&
+      existingIntroPricingEndDate.fetchedAt > checkingRemainingDays
+      ) 
+      {
     return;
   }
 
