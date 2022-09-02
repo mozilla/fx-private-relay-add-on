@@ -53,6 +53,85 @@ function getEducationalStrings() {
   };
 }
 
+function resetNonPremiumPanel() {
+  const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
+  const nonPremiumPanel = document.querySelector(".content-wrapper");
+  const panelStatus = document.querySelector(".panel-status");
+
+  endOfIntroPricingElem.classList.add("is-hidden");
+  nonPremiumPanel.classList.remove("is-hidden");
+  panelStatus.classList.remove("is-hidden");
+}
+
+// End of intro pricing banner
+function showCountdownTimer(introPricingOfferEndDate) {
+
+  const remainingTimeInMs =  setRemainingTimeParts();
+
+  if (remainingTimeInMs <= 0) {
+    resetNonPremiumPanel();
+   }
+
+  setRemainingTimeParts();
+
+  const timeInterval = setInterval(() => {
+  // When timer runs out, set it back to default non premium view
+  const remainingTimeInMs =  setRemainingTimeParts();
+
+   if (remainingTimeInMs <= 0) {
+    clearInterval(timeInterval);
+   }
+   }, 1000);
+
+   function getRemainingTimeParts(remainingMilliseconds) {
+    const remainingDays = Math.floor(
+      remainingMilliseconds / (1000 * 60 * 60 * 24)
+    );
+    const remainingHours = Math.floor(
+      (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
+        (1000 * 60 * 60)
+    );
+    const remainingMinutes = Math.floor(
+      (remainingMilliseconds -
+        remainingDays * (1000 * 60 * 60 * 24) -
+        remainingHours * (1000 * 60 * 60)) /
+        (1000 * 60)
+    );
+    const remainingSeconds = Math.floor(
+      (remainingMilliseconds -
+        remainingDays * (1000 * 60 * 60 * 24) -
+        remainingHours * (1000 * 60 * 60) -
+        remainingMinutes * (1000 * 60)) /
+        1000
+    );
+  
+    return {
+      remainingDays,
+      remainingHours,
+      remainingMinutes,
+      remainingSeconds,
+    }
+  }
+
+    function setRemainingTimeParts() {
+      const countdownTimer = document.querySelector(".countdown-timer");
+      const currentTime = new Date();
+      const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+
+      const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
+      const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
+      const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
+      const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
+
+      countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
+      countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
+      countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
+      countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
+
+      return remainingTimeInMs;
+  }
+}
+
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
   document.body.classList.add("sign-up");
@@ -172,6 +251,9 @@ async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
   //   serverStoragePanel.init(premium);
   // } else 
   if (premium) {
+    const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
+    endOfIntroPricing.classList.add("is-hidden");
+
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper
@@ -195,7 +277,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet != "None") {
+  if (premiumSubdomainSet !== "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -207,8 +289,8 @@ function checkUserSubdomain(premiumSubdomainSet){
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
-  const tipHeadlineEl = onboardingPanelWrapper.querySelector("h1");
-  const tipBodyEl = onboardingPanelWrapper.querySelector("p");
+  const tipHeadlineEl = onboardingPanelWrapper.querySelector(".onboarding-h1");
+  const tipBodyEl = onboardingPanelWrapper.querySelector(".onboarding-p");
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
@@ -232,13 +314,31 @@ async function showRelayPanel(tipPanelToShow) {
   //Premium Panel
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
-  const aliasesUsedValEl = premiumPanelWrapper.querySelector(".aliases-used");
-  const emailsBlockedValEl = premiumPanelWrapper.querySelector(".emails-blocked");
-  const emailsForwardedValEl = premiumPanelWrapper.querySelector(".emails-forwarded");
+
+  //Dashboard Statistics
+  const dashboardStatistics = document.querySelectorAll(".dashboard-stats-list");
+
+  //Get profile data from site
+  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+  const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
+
+  dashboardStatistics.forEach((statSet) => {
+    const aliasesUsedValEl = statSet.querySelector(".aliases-used");
+    const emailsBlockedValEl = statSet.querySelector(".emails-blocked");
+    const emailsForwardedValEl = statSet.querySelector(".emails-forwarded");
+    const emailTrackersRemovedValEl = statSet.querySelector(".email-trackers-removed");
+
+    aliasesUsedValEl.textContent = aliasesUsedVal;
+    emailsBlockedValEl.textContent = emailsBlockedVal;
+    emailsForwardedValEl.textContent = emailsForwardedVal;
+    emailTrackersRemovedValEl.textContent = emailTrackersRemovedVal;
+  });
 
   //Check if premium features are available
-  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries;
-
+  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
+ 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
   
@@ -320,12 +420,7 @@ async function showRelayPanel(tipPanelToShow) {
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
 
-    //Premium Panel content
     registerDomainImgEl.src = panelStrings.registerDomainImg;
-    aliasesUsedValEl.textContent = aliasesUsedVal;
-    emailsBlockedValEl.textContent = emailsBlockedVal;
-    emailsForwardedValEl.textContent = emailsForwardedVal;
-
 
     //If Premium features are not available, do not show upgrade CTA on the panel
     if (premiumCountryAvailability?.premium_available_in_country === true) {
@@ -342,11 +437,17 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  //Dashboard Data
-  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
-  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
-  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-
+  // Set End Date here
+  const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
+  const introPricingOfferEndDate = new Date(introPricingEndDateISO);
+  
+  // Display End of Intro Pricing
+  if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
+    showCountdownTimer(introPricingOfferEndDate);
+  }
+  else {
+    resetNonPremiumPanel();
+  }
 
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
@@ -540,7 +641,6 @@ async function popup() {
   document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
     dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
   });
-
 
   document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
     premiumLink.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=popup&utm_content=get-premium-link`;

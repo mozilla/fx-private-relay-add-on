@@ -439,9 +439,7 @@ const buildContent = {
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
       // Check if premium features are available
-      const premiumCountryAvailability = (
-        await browser.storage.local.get("premiumCountries")
-      )?.premiumCountries;
+      const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries?.PREMIUM_PLANS;
 
       // Set Generate Mask button
       buildContent.components.setUnlimitedButton(

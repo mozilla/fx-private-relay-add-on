@@ -1,8 +1,9 @@
+
 .fx-relay-panel {
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 500px;
-  background-color: var(--colorGrey05);
+  background-color: var(--colorWhite);
   min-width: var(--panelWidth);
   min-height: var(--panelHeight);
   color: var(--relayInk70);
@@ -10,6 +11,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
+  font-family: var(--fontStackBase);
 }
 
 .fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
@@ -244,7 +246,7 @@ panel-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--relayBlue3);
+  background: var(--colorInformational);
   color: var(--relayInk);
   font-family: var(--relayMetropolis);
   font-weight: 800;
@@ -306,7 +308,7 @@ main-panel {
 .premium-cta {
   margin: 0;
   font-family: var(--relayInterUiRegular);
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: 700;
   text-decoration: none;
 }
@@ -356,7 +358,7 @@ footer {
   width: 100%;
   font-size: 15px;
   padding: 4px 8px;
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: 600;
   text-decoration: none;
   margin: 0 auto 16px auto;
@@ -365,6 +367,7 @@ footer {
 }
 
 .footer-button:hover {
+  color: var(--colorInformationalHover)
 }
 
 .footer-button:active {
@@ -372,6 +375,7 @@ footer {
 }
 
 .footer-button:focus {
+  color: var(--colorInformationalFocus)
 }
 
 /* onboarding */
@@ -385,6 +389,7 @@ onboarding-panel {
   flex-direction: column;
   position: relative;
   transition: all 0.2s ease;
+  background: white;
 }
 
 /* Premium Panel */
@@ -398,10 +403,17 @@ onboarding-panel {
   display: none;
 }
 
-
 .content-wrapper {
   display: flex;
   height: 300px;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.end-of-intro-pricing-wrapper {
+  display: flex;
+  height: 360px;
   width: 100%;
   flex-direction: column;
   justify-content: space-around;
@@ -413,61 +425,64 @@ onboarding-panel {
   display: flex;
 }
 
-.premium-dashboard {
+.dashboard-stats-list {
   width: 100%;
   border-radius: 8px;
   padding: 0 15px;
   background: #F7F7F7;
 }
 
-.premium-dashboard ul {
+.dashboard-stats-list ul {
   list-style-type: none;
   padding: 0;
 }
 
-.premium-dashboard li:first-child {
+.dashboard-stats-list li:first-child {
   font-weight: 600;
   padding-bottom: 12px;
 }
 
-.premium-dashboard li:nth-child(2) {
+.dashboard-stats-list li:nth-child(2) {
   padding: 12px 0;
 }
 
-.premium-dashboard li:not(:first-child){
+.dashboard-stats-list li:nth-child(3) {
+  padding: 12px 0;
+}
+
+.dashboard-stats-list li:not(:first-child){
   border-top: 1px solid var(--relayGrey20);
   padding-top: 12px;
   padding-left: 30px;
-}
-
-.premium-dashboard li:nth-child(2)::before {
-  content: "";
-  width: 20px; 
-  height: 20px;
-  margin-left: -25px;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/blocked-icon.svg");
-  transition: opacity 0.2s ease;
-}
-
-.premium-dashboard li:nth-child(3)::before {
-  content: "";
-  width: 20px; 
-  height: 20px;
-  margin-left: -25px;
-  position: absolute;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: url("/icons/forward-icon.svg");
-  transition: opacity 0.2s ease;
 }
 
 .dashboard-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.dashboard-info::before {
+  content: "";
+  width: 20px; 
+  height: 20px;
+  margin-left: -25px;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0);
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-info:nth-child(2)::before {
+  background-image: url("/icons/blocked-icon.svg");
+}
+
+.dashboard-info:nth-child(3)::before {
+  background-image: url("/icons/forward-icon.svg");
+}
+
+.dashboard-info:nth-child(4)::before {
+  background-image: url("/icons/email-trackers-icon.svg");
 }
 
 .dashboard-stats {
@@ -479,17 +494,21 @@ onboarding-panel {
 .email-domain-illustration {
   margin: 0 auto;
   display: block;
+  height: 80px;
 }
 
 .register-domain-component {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  height: 250px;
+  height: auto;
+  justify-content: space-between;
 }
 
 .register-domain-cta {
   max-width: 200px;
+  font-size: 1rem;
+  padding: var(--spacingXs) var(--spacingSm);
   text-align: center;
 }
 
@@ -505,6 +524,7 @@ onboarding-panel {
   padding-top: 24px;
   justify-content: space-between;
   gap: 16px;
+  height: auto;
 }
 
 #educationalSignBackIn {
@@ -564,7 +584,7 @@ onboarding-panel p {
 }
 
 .survey-link {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   margin: 12px auto 0 0;
   border-radius: 2px;
 }
@@ -751,7 +771,7 @@ onboarding-panel p {
 }
 
 .newsflash-description a {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   font-weight: bold;
   padding-top: 8px;
   text-decoration: none;
@@ -783,17 +803,17 @@ onboarding-panel p {
   font-weight: bold;
   text-align: center;
   text-decoration: none;
-  border: 2px solid var(--relayBlue3);
+  border: 2px solid var(--colorInformational);
   cursor: pointer;
 }
 
 .newsflash-button-dismiss {
-  color: var(--relayBlue3);
+  color: var(--colorInformational);
   background: none;
 }
 
 .newsflash-button-allow {
-  background: var(--relayBlue3);
+  background: var(--colorInformational);
   color: white;
 }
 
@@ -806,5 +826,50 @@ onboarding-panel p {
 .newsflash-button-allow:focus,
 .newsflash-button-dismiss:focus {
   box-shadow: var(--relayButtonFocus);
+}
+
+.end-of-intro-pricing h1 {
+  font-size: 1.3em;
+}
+
+.end-of-intro-pricing p {
+  line-height: 120%;
+}
+
+.countdown-timer {
+  align-self: center;
+  margin: 0;
+  font-family: var(--relayMetropolisBold);
+}
+
+.countdown-timer dl {
+  display: flex;
+  gap: 8px;
+}
+
+.countdown-timer dl > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacingXs);
+  width: var(--layoutLg);
+  background-color: var(--colorViolet80);
+  border-radius: 8px;
+  color: white;
+  border: 2px solid var(--colorWhite);
+  box-shadow: 0px 5px 8px var(--colorGrey20);
+  padding: 8px;
+}
+
+.countdown-timer dt {
+  font-weight: 600;
+}
+
+.countdown-timer dd {
+  font-weight: 700;
+  font-size: 2.3em;
+  margin: 0;
+  font-family: var(--fontStackFirefoxBold);
 }
 

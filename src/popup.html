@@ -5,6 +5,7 @@
     <title>Firefox Relay</title>
     <link rel="stylesheet" href="css/relay.css">
     <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/global.css">
     <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/i18n.js"></script>
     <script src="/js/shared/data-opt-out-toggle.js"></script>
@@ -13,7 +14,7 @@
     <script src="js/shared/metrics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body class="fx-relay-panel">
+  <body class="fx-relay-panel fx-relay">
     <panel-content>
       <fx-relay-logo-wrapper>
         <fx-relay-logomark></fx-relay-logomark>
@@ -50,7 +51,7 @@
       </sign-up-panel>
 
       <main-panel class="signed-in-panel hidden">
-        <span class="panel-status">
+        <span class="panel-status is-hidden">
           <p class="aliases-remaining remaining-plural"></p>
           <a 
             class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden" 
@@ -60,8 +61,60 @@
           </a>
       </span>
         <onboarding-panel>
+
+          <!-- TEMPORARY FEATURE -->
+          <!-- End Intro Pricing Panel: End September 27 -->
+          <div class="end-of-intro-pricing-wrapper end-of-intro-pricing">
+            <!-- Dashboard Statistics-->
+            <div class="dashboard-stats-list">
+              <ul>
+                <li class="dashboard-info">
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
+                  <div class="dashboard-stats aliases-used"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
+                </li>
+                <li class="dashboard-info">
+                  <span class="email-trackers-removed-text i18n-content" data-i18n-message-id="popupEmailTrackersRemoved"></span>
+                  <div class="dashboard-stats email-trackers-removed"></div>
+                </li>
+              </ul>
+            </div>
+            <!--Countdown-->
+            <figure class="countdown-timer end-of-intro-pricing">
+              <dl>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownDays"></dt>
+                  <dd class="countdown-data-days"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownHours"></dt>
+                  <dd class="countdown-data-hours"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownMinutes"></dt>
+                  <dd class="countdown-data-minutes"></dd>
+                </div>
+                <div>
+                  <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownSeconds"></dt>
+                  <dd class="countdown-data-seconds"></dd>
+                </div>
+              </dl>
+            </figure>
+            <h1 class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingHeadline"></h1>
+            <p class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingBody"></p>
+            <a class="get-premium-link fx-relay-c-button t-basic i18n-content" data-i18n-message-id="popupEndOfIntroPricingCTA"></a>
+          </div>
+          <!-- End of End Intro Pricing Panel -->
+
           <!--Non Premium Panel-->
-          <div class="content-wrapper">
+          <div class="content-wrapper is-hidden">
             <div class="img-wrapper">
               <img class="onboarding-img">
             </div>
@@ -82,8 +135,8 @@
           </div>
           <!-- Premium Panel-->
           <div class="premium-wrapper is-hidden">
-            <!-- Premium Dashboard-->
-            <div class="premium-dashboard is-hidden">
+            <!-- Dashboard Statistics-->
+            <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
                   <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
@@ -97,9 +150,13 @@
                   <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
                   <div class="dashboard-stats emails-forwarded"></div>
                 </li>
+                <li class="dashboard-info">
+                  <span class="email-trackers-removed-text i18n-content" data-i18n-message-id="popupEmailTrackersRemoved"></span>
+                  <div class="dashboard-stats email-trackers-removed"></div>
+                </li>
               </ul>
             </div>
-            <!-- Premium Dashboard-->
+            <!-- Register Domain Component -->
             <div class="register-domain-component is-hidden">
               <div class="img-wrapper">
                 <img class="email-domain-illustration">
