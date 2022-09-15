@@ -109,21 +109,30 @@ async function storeRuntimeData() {
   if (!relayApiSource) {
     return;
   }
-  const currentPremiumAvailabilityResponse = await fetch(
+  const runtimeDataResponse = await fetch(
     `${relayApiSource}/runtime_data`,
     {
       headers: { Accept: "application/json" },
     },
   );
-  const currentPremiumAvailability = await currentPremiumAvailabilityResponse.json();
-
+  const runtimeData = await runtimeDataResponse.json();
+  console.log(runtimeData);
+  
   browser.storage.local.set({
     premiumCountries: {
-      PREMIUM_PLANS: currentPremiumAvailability.PREMIUM_PLANS,
+      PREMIUM_PLANS: runtimeData.PREMIUM_PLANS,
+      fetchedAt: Date.now(),
+    },
+    bundlePlans: {
+      BUNDLE_PLANS: runtimeData.BUNDLE_PLANS,
+      fetchedAt: Date.now(),
+    },
+    phonePlans: {
+      PHONE_PLANS: runtimeData.PHONE_PLANS,
       fetchedAt: Date.now(),
     },
     introPricingEndDate: {
-      INTRO_PRICING_END: currentPremiumAvailability.INTRO_PRICING_END,
+      INTRO_PRICING_END: runtimeData.INTRO_PRICING_END,
       fetchedAt: Date.now(),
     }
   })

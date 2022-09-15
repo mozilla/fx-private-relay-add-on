@@ -1,14 +1,34 @@
-function getOnboardingPanels() {
+
+ async function getOnboardingPanels() {
+  const savings = "50%"; // For "Save 50%!" in the Bundle promo body
+  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+
+  const languageCode = navigator.language.split("-")[0].toLowerCase();
+
+  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  // TODO: object needs to have a monthly value. Change 'yearly' to 'monthly'
+
   return {
-    "panel1": {
+     "panel1": {
+      "imgSrc": "announcements/panel-bundle-announcement.svg",
+      "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+      "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
+    },
+    // Phone Masking Announcement
+    "panel2": {
+      "imgSrc": "announcements/panel-phone-masking-announcement.svg",
+      "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
+      "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
+    },
+    "panel3": {
       "imgSrc": "announcements/panel-announcement-critical-emails.svg",
       "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
       "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
-    "panel2": {
+    "panel4": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
       "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-      "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -49,6 +69,11 @@ function getEducationalStrings() {
       "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
       "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
       "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    },
+    "promotionalBundleWithVPN": {
+      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
+      "headline": browser.i18n.getMessage("popupBundlePromoHeadline", ["$5.99"]),
+      "description": browser.i18n.getMessage("popupBundlePromoBody", ["$5.99"]),
     }
   };
 }
@@ -295,11 +320,11 @@ async function showRelayPanel(tipPanelToShow) {
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
-  const onboardingPanelStrings = getOnboardingPanels();
+  const onboardingPanelStrings = await getOnboardingPanels();
   const educationalStrings = getEducationalStrings();
 
   document.querySelectorAll(".total-panels").forEach(panel => {
-    panel.textContent = 2;
+    panel.textContent = 4;
   });
 
   if (!browser.menus) {
@@ -338,7 +363,9 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if premium features are available
   const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
- 
+  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
   
@@ -379,8 +406,7 @@ async function showRelayPanel(tipPanelToShow) {
     }
 
     if (announcementIndex === 2) {
-      switchEducationPanel("educationalSignBackIn");
-
+      switchEducationPanel("promotionalBundleWithVPN");
     }
 
     // if (announcementIndex === 3) {
@@ -402,7 +428,7 @@ async function showRelayPanel(tipPanelToShow) {
 
     
     // Override class for Chrome browsers to not display sign-back in
-    if (!browser.menus && (panelId === 2)){
+    if (!browser.menus && (panelId === 3)){
       onboardingPanelWrapper.classList.add("is-last-panel")
     }
     

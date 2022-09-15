@@ -535,12 +535,12 @@ onboarding-panel {
   line-height: 120%;
 }
 
-.is-last-panel .next-panel,
+/* .is-last-panel .next-panel,
 #educationalCriticalEmails .previous-panel,
 #educationalSignBackIn .next-panel {
   opacity: 0;
   pointer-events: none;
-}
+} */
 
 #educationalSignBackIn .education-img {
   width: 100px;
@@ -649,11 +649,11 @@ onboarding-panel p {
   transform: rotate(180deg);
 }
 
-.panel1 .previous-panel,
+/* .panel1 .previous-panel,
 .panel2 .next-panel {
   pointer-events: none;
   opacity: 0;
-}
+} */
 
 .panel-num, .js-panel-num {
   margin: auto 12px auto;
