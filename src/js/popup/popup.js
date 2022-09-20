@@ -9,32 +9,40 @@ async function checkWaffleFlag(flag) {
   return false;
  }
  
- async function getOnboardingPanels() {
+ async function getPromoPanels() {
   const savings = "50%"; // For "Save 50%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
 
   return {
-     "panel1": {
+    // Bundle Announcement
+    "panel1": {
       "imgSrc": "announcements/panel-bundle-announcement.svg",
       "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
       "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
+      "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
     },
     // Phone Masking Announcement
     "panel2": {
       "imgSrc": "announcements/panel-phone-masking-announcement.svg",
       "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
       "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
+      "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
     },
-    "panel3": {
+  }
+ }
+
+ async function getOnboardingPanels() {
+  return {
+    "panel1": {
       "imgSrc": "announcements/panel-announcement-critical-emails.svg",
       "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
       "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
     },
-    "panel4": {
+    "panel2": {
       "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
       "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-    "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+      "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -326,11 +334,23 @@ async function showRelayPanel(tipPanelToShow) {
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
   const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
-  const onboardingPanelStrings = await getOnboardingPanels();
+  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
+  const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
   const educationalStrings = getEducationalStrings();
+  let onboardingPanelStrings = await getOnboardingPanels();
 
+  // If Bundle & Phone flags are enabled, show the promo announcements and promo elements
+  if (checkWaffleFlag("bundle")) {
+    console.log(promoElements);
+    promoElements.forEach(i => {
+      i.classList.remove("is-hidden");
+    });
+    onboardingPanelStrings = await getPromoPanels();
+  }
+
+  // Number of panels available
   document.querySelectorAll(".total-panels").forEach(panel => {
-    panel.textContent = 4;
+    panel.textContent = 2;
   });
 
   if (!browser.menus) {
@@ -432,7 +452,6 @@ async function showRelayPanel(tipPanelToShow) {
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
 
-    
     // Override class for Chrome browsers to not display sign-back in
     if (!browser.menus && (panelId === 3)){
       onboardingPanelWrapper.classList.add("is-last-panel")
@@ -448,6 +467,7 @@ async function showRelayPanel(tipPanelToShow) {
     tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
     tipHeadlineEl.textContent = panelStrings.tipHeadline;
     tipBodyEl.textContent = panelStrings.tipBody;
+    tipCtaEl.textContent = panelStrings.tipCta;
     currentPanel.textContent = `${panelId}`;
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;

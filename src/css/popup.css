@@ -405,10 +405,9 @@ onboarding-panel {
 
 .content-wrapper {
   display: flex;
-  height: 300px;
   width: 100%;
   flex-direction: column;
-  justify-content: space-around;
+  gap: var(--spacingSm);
 }
 
 .end-of-intro-pricing-wrapper {
@@ -553,30 +552,50 @@ onboarding-panel {
 .education-headline {
   font-family: var(--relayInterUiRegular);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .onboarding-h1 {
-  font-size: 16px;
+  font-size: 15px;
   font-family: var(--relayMetropolis);
+  margin: 0;
 }
 
 onboarding-panel p {
   text-align: start;
-  margin: 0 0 8px 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 130%;
 }
 
-.onboarding-img, .email-domain-illustration, .education-img {
-  max-width: 100%;
-  max-height: 100%;
+.onboarding-cta {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  color: var(--colorInformational);
+  align-self: flex-start;
 }
+
+.onboarding-cta:hover {
+  color: var(--colorInformationalHover);
+}
+
+.onboarding-cta:focus {
+  color: var(--colorInformationalFocus);
+}
+
+.onboarding-img {
+  width: 100%;
+}
+
+
 
 .img-wrapper {
-  margin-top: 16px;
   max-height: 100%;
   overflow: hidden;
   text-align: center;
-  padding: 16px;
+  margin: 0;
 }
 
 .maxAliasesPanel .onboarding-pagination {
@@ -873,3 +892,13 @@ onboarding-panel p {
   font-family: var(--fontStackFirefoxBold);
 }
 
+.new-label {
+  background: var(--colorViolet70);
+  color: white;
+  font-size: 0.75em;
+  font-weight: 700;
+  align-self: flex-start;
+  text-transform: uppercase;
+  border-radius: var(--spacingXs);
+  padding: var(--spacingXs) var(--spacingSm);
+}
