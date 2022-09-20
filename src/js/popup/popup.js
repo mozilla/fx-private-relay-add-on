@@ -341,7 +341,6 @@ async function showRelayPanel(tipPanelToShow) {
 
   // If Bundle & Phone flags are enabled, show the promo announcements and promo elements
   if (checkWaffleFlag("bundle")) {
-    console.log(promoElements);
     promoElements.forEach(i => {
       i.classList.remove("is-hidden");
     });
