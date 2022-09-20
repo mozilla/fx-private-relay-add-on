@@ -403,7 +403,7 @@ onboarding-panel {
   display: none;
 }
 
-.content-wrapper {
+.content-wrapper, .premium-wrapper {
   display: flex;
   width: 100%;
   flex-direction: column;
@@ -416,12 +416,6 @@ onboarding-panel {
   width: 100%;
   flex-direction: column;
   justify-content: space-around;
-}
-
-.premium-wrapper {
-  width: 100%;
-  flex-direction: column;
-  display: flex;
 }
 
 .dashboard-stats-list {
@@ -501,7 +495,7 @@ onboarding-panel {
   display: flex;
   flex-direction: column;
   height: auto;
-  justify-content: space-between;
+  gap: var(--spacingSm);
 }
 
 .register-domain-cta {
@@ -520,18 +514,9 @@ onboarding-panel {
 .educational-component {
   display: flex;
   flex-direction: row;
-  padding-top: 24px;
+  padding: var(--spacingSm) 0;
   justify-content: space-between;
-  gap: 16px;
   height: auto;
-}
-
-#educationalSignBackIn {
-  padding-top: 16px;
-}
-
-.education-body {
-  line-height: 120%;
 }
 
 /* .is-last-panel .next-panel,
@@ -555,13 +540,13 @@ onboarding-panel {
   font-size: 15px;
 }
 
-.onboarding-h1 {
+.onboarding-h1, .educational-headline {
   font-size: 15px;
   font-family: var(--relayMetropolis);
   margin: 0;
 }
 
-onboarding-panel p {
+onboarding-panel p, .education-body {
   text-align: start;
   margin: 0;
   font-size: 13px;
@@ -623,8 +608,8 @@ onboarding-panel p {
   border: none;
   outline: none;
   border-radius: 50%;
-  height: 20px;
-  width: 20px;
+  height: 15px;
+  width: 15px;
   padding: 4px;
   position: relative;
   background-color: rgba(0, 0, 0, 0);
@@ -675,28 +660,29 @@ onboarding-panel p {
 } */
 
 .panel-num, .js-panel-num {
-  margin: auto 12px auto;
-  width: 55px;
+  /* margin: auto 12px auto; */
+  width: auto;
+  margin: 0;
+  text-align: center;
+  justify-self: center;
   font-family: var(--relayMetropolisBold);
 }
 
 .current-panel,
 .panel-num, .js-panel-num {
   font-weight: 600;
-  font-size: 17px;
+  font-size: 14px;
+  padding: 0 var(--spacingXs);
   text-align: center;
-  display: inline-block;
+  display: inline;
 }
 
-.current-panel {
-  width: 20px;
-  margin-right: 4px;
+.current-panel, .total-panels-premium, .total-panels-nonpremium {
+  margin: 0 var(--spacingXs);
+  padding-right: var(--spacingXs);
 }
 
-.total-panels {
-  margin-left: 5px;
-  display: inline-block;
-}
+
 
 /* For mobile screens with a bigger height viewport than the browser popup.
    This takes the --panelHeight + 1px as its min-height. */

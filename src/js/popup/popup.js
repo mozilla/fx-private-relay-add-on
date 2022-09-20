@@ -16,33 +16,45 @@ async function checkWaffleFlag(flag) {
 
   return {
     // Bundle Announcement
-    "panel1": {
-      "imgSrc": "announcements/panel-bundle-announcement.svg",
-      "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-      "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
-      "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+    "announcements": {
+      "panel1": {
+        "imgSrc": "announcements/panel-bundle-announcement.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
+        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+      },
+      // Phone Masking Announcement
+      "panel2": {
+        "imgSrc": "announcements/panel-phone-masking-announcement.svg",
+        "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
+        "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
+        "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
+      },
     },
-    // Phone Masking Announcement
-    "panel2": {
-      "imgSrc": "announcements/panel-phone-masking-announcement.svg",
-      "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
-      "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
-      "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
-    },
+    "premiumPanel": {
+      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
+      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline_mask"),
+      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
+      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
+      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
+      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
+    }
   }
  }
 
  async function getOnboardingPanels() {
   return {
-    "panel1": {
-      "imgSrc": "announcements/panel-announcement-critical-emails.svg",
-      "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
-    },
-    "panel2": {
-      "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-      "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    "announcements": {
+      "panel1": {
+        "imgSrc": "announcements/panel-announcement-critical-emails.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
+        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
+      },
+      "panel2": {
+        "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
+        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+      },
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -64,30 +76,25 @@ async function checkWaffleFlag(flag) {
 
 function getEducationalStrings() {
   return {
-    "educationalComponent1": {
+    "panel1": {
       "img": "/images/panel-images/educational-matrix/educationalImg1.png",
       "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
       "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
     },
-    "educationalAttachmentSizeLimit": {
+    "panel2": {
       "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
       "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
       "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
     },
-    "educationalCriticalEmails": {
+    "panel3": {
       "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
       "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
       "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
     },
-    "educationalSignBackIn": {
+    "panel4": {
       "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
       "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
       "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
-    },
-    "promotionalBundleWithVPN": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
-      "headline": browser.i18n.getMessage("popupBundlePromoHeadline", ["$5.99"]),
-      "description": browser.i18n.getMessage("popupBundlePromoBody", ["$5.99"]),
     }
   };
 }
@@ -316,7 +323,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet !== "None") {
+  if (premiumSubdomainSet === "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -336,7 +343,7 @@ async function showRelayPanel(tipPanelToShow) {
   const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
   const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
   const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
-  const educationalStrings = getEducationalStrings();
+  let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
 
   // If Bundle & Phone flags are enabled, show the promo announcements and promo elements
@@ -345,11 +352,19 @@ async function showRelayPanel(tipPanelToShow) {
       i.classList.remove("is-hidden");
     });
     onboardingPanelStrings = await getPromoPanels();
+    premiumPanelStrings = await getPromoPanels();
   }
 
+  const NonPremiumAnnouncementLength = Object.keys(onboardingPanelStrings.announcements).length;
+  const PremiumAnnouncementLength = Object.keys(onboardingPanelStrings.announcements).length;
+
   // Number of panels available
-  document.querySelectorAll(".total-panels").forEach(panel => {
-    panel.textContent = 2;
+  document.querySelectorAll(".total-panels-nonpremium").forEach(panel => {
+    panel.textContent = NonPremiumAnnouncementLength;
+  });
+
+  document.querySelectorAll(".total-panels-premium").forEach(panel => {
+    panel.textContent = PremiumAnnouncementLength;
   });
 
   if (!browser.menus) {
@@ -403,49 +418,33 @@ async function showRelayPanel(tipPanelToShow) {
   const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
   const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
+  const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
   const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
 
-  //Load first announcement item
-  const educationStringsSelection = educationalStrings["educationalCriticalEmails"];
-  const educationalComponentStrings = educationStringsSelection;
-  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
-  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
-  educationalImgEl.src = educationalComponentStrings.img;
-  currentEducationalPanel.textContent = `${tipPanelToShow}`;
-  educationalModule.setAttribute("id", "educationalCriticalEmails");
-  
   if (!browser.menus) {
     panelPremiumPagination.classList.add("hidden");
   }
 
-  const updateEducationPanel = async (announcementIndex) => {
-    currentEducationalPanel.textContent = [`${tipPanelToShow}`];
-    if (announcementIndex === 1) {
-      switchEducationPanel("educationalCriticalEmails");
-      // educationalModule.classList.remove("is-last-panel");
+  const updatePremiumPanel = async (panelId) => {
 
-      if (!browser.menus) {
-        // Override class for Chrome browsers to not display sign-back in
-        educationalModule.classList.add("is-last-panel");
-      }
+    const panelToShow =  `panel${panelId}`;
+    premiumPanelWrapper.setAttribute("id", panelToShow);
+    const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
+
+    console.log(panelStrings);
+    if (!panelStrings) {
+      // Exit early if on a non-onboarding
+      return;
     }
 
-    if (announcementIndex === 2) {
-      switchEducationPanel("promotionalBundleWithVPN");
-    }
-
-    // if (announcementIndex === 3) {
-    //   switchEducationPanel("educationalSignBackIn");
-    // }
-  }
-
-  function switchEducationPanel(announcementType) {
-    const updateEducationPanel = educationalStrings[announcementType];
-    attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
-    attachmentSizeLimitBody.textContent = updateEducationPanel.description;
-    educationalImgEl.src = updateEducationPanel.img;
-    educationalModule.setAttribute("id", announcementType);
-  }
+    attachmentSizeLimitHeadline.textContent = panelStrings.tipHeadline;
+    attachmentSizeLimitBody.textContent = panelStrings.tipBody;
+    educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
+    educationalCtaEl.src = panelStrings.tipCta;
+    currentEducationalPanel.textContent = `${tipPanelToShow}`;
+  
+    return;
+  };
 
   const updatePanel = async (numRemaining, panelId) => {
     const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
@@ -509,6 +508,7 @@ async function showRelayPanel(tipPanelToShow) {
   getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
 
   document.body.classList.add("relay-panel");
+  updatePremiumPanel(tipPanelToShow);
   updatePanel(numRemaining, tipPanelToShow);
 
   document.querySelectorAll(".panel-nav").forEach(navBtn => {
@@ -527,7 +527,7 @@ async function showRelayPanel(tipPanelToShow) {
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      updateEducationPanel(tipPanelToShow+=nextPanel);
+      updatePremiumPanel(tipPanelToShow+=nextPanel);
     });
   });
 
