@@ -116,11 +116,14 @@ async function storeRuntimeData() {
     },
   );
   const runtimeData = await runtimeDataResponse.json();
-  console.log(runtimeData);
   
   browser.storage.local.set({
     premiumCountries: {
       PREMIUM_PLANS: runtimeData.PREMIUM_PLANS,
+      fetchedAt: Date.now(),
+    },
+    waffleFlags: {
+      WAFFLE_FLAGS: runtimeData.WAFFLE_FLAGS,
       fetchedAt: Date.now(),
     },
     bundlePlans: {

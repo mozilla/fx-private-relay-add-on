@@ -1,12 +1,18 @@
 
+async function checkWaffleFlag(flag) {
+  const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
+  for (let i of waffleFlagArray) {
+    if (i[0] === flag && i[1] === true) {
+      return true;
+    }
+  }
+  return false;
+ }
+ 
  async function getOnboardingPanels() {
   const savings = "50%"; // For "Save 50%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-
-  const languageCode = navigator.language.split("-")[0].toLowerCase();
-
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-  // TODO: object needs to have a monthly value. Change 'yearly' to 'monthly'
 
   return {
      "panel1": {
