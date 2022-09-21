@@ -481,6 +481,7 @@ onboarding-panel {
 
 .register-domain-component {
   margin: 0 auto;
+  padding-top: var(--spacingMd);
   display: flex;
   flex-direction: column;
   height: auto;

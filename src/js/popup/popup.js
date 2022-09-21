@@ -35,9 +35,6 @@ async function checkWaffleFlag(flag) {
       },
     },
     "premiumPanel": {
-      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
-      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline_mask"),
-      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
@@ -72,9 +69,6 @@ async function checkWaffleFlag(flag) {
       "upgradeButtonIcon": "/icons/icon.svg",
     },
     "premiumPanel": {
-      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
-      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline_mask"),
-      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
@@ -109,85 +103,6 @@ function getEducationalStrings() {
     }
   };
 }
-
-// function resetNonPremiumPanel() {
-//   const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
-//   const nonPremiumPanel = document.querySelector(".content-wrapper");
-//   const panelStatus = document.querySelector(".panel-status");
-
-//   endOfIntroPricingElem.classList.add("is-hidden");
-//   nonPremiumPanel.classList.remove("is-hidden");
-//   panelStatus.classList.remove("is-hidden");
-// }
-
-// End of intro pricing banner
-// function showCountdownTimer(introPricingOfferEndDate) {
-
-//   const remainingTimeInMs =  setRemainingTimeParts();
-
-//   if (remainingTimeInMs <= 0) {
-//     resetNonPremiumPanel();
-//    }
-
-//   setRemainingTimeParts();
-
-//   const timeInterval = setInterval(() => {
-//   // When timer runs out, set it back to default non premium view
-//   const remainingTimeInMs =  setRemainingTimeParts();
-
-//    if (remainingTimeInMs <= 0) {
-//     clearInterval(timeInterval);
-//    }
-//    }, 1000);
-
-//    function getRemainingTimeParts(remainingMilliseconds) {
-//     const remainingDays = Math.floor(
-//       remainingMilliseconds / (1000 * 60 * 60 * 24)
-//     );
-//     const remainingHours = Math.floor(
-//       (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
-//         (1000 * 60 * 60)
-//     );
-//     const remainingMinutes = Math.floor(
-//       (remainingMilliseconds -
-//         remainingDays * (1000 * 60 * 60 * 24) -
-//         remainingHours * (1000 * 60 * 60)) /
-//         (1000 * 60)
-//     );
-//     const remainingSeconds = Math.floor(
-//       (remainingMilliseconds -
-//         remainingDays * (1000 * 60 * 60 * 24) -
-//         remainingHours * (1000 * 60 * 60) -
-//         remainingMinutes * (1000 * 60)) /
-//         1000
-//     );
-  
-//     return {
-//       remainingDays,
-//       remainingHours,
-//       remainingMinutes,
-//       remainingSeconds,
-//     }
-//   }
-
-//     function setRemainingTimeParts() {
-//       const countdownTimer = document.querySelector(".countdown-timer");
-//       const currentTime = new Date();
-//       const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
-
-//       const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
-//       const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
-//       const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
-//       const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
-
-//       countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
-//       countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
-//       countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
-//       countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
-
-//       return remainingTimeInMs;
-//   }
-// }
 
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
@@ -301,16 +216,8 @@ const serverStoragePanel = {
 
 async function choosePanel(panelId, premium, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  
-  // Turned off label sync prompt for premium release
-  // const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
-  // if (shouldShowServerStoragePromptPanel) {
-  //   serverStoragePanel.init(premium);
-  // } else 
-  if (premium) {
-    // const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
-    // endOfIntroPricing.classList.add("is-hidden");
 
+  if (premium) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
     premiumPanelWrapper
@@ -335,7 +242,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet === "None") {
+  if (premiumSubdomainSet !== "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -352,7 +259,6 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
-  const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
   const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
   const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
   let premiumPanelStrings = getEducationalStrings();
@@ -362,7 +268,7 @@ async function showRelayPanel(tipPanelToShow) {
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
   
   // If Bundle & Phone flags are enabled, show the promo announcements and promo elements, else hide it
-  if (!checkWaffleFlag("bundle") && checkWaffleFlag("phones")
+  if (checkWaffleFlag("bundle") && checkWaffleFlag("phones")
    && isBundleAvailableInCountry && isPhoneAvailableInCountry
   ) {
     promoElements.forEach(i => {
@@ -414,13 +320,11 @@ async function showRelayPanel(tipPanelToShow) {
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
   //Educational Panel
-  const educationalModule = premiumPanelWrapper.querySelector(".educational-component");
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
   const educationHeadlineEl = premiumPanelWrapper.querySelector(".education-headline");
   const educationBodyEl = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
   const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
-  const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
 
   const updatePremiumPanel = async (panelId) => {
     const panelToShow =  `panel${panelId}`;
@@ -443,6 +347,8 @@ async function showRelayPanel(tipPanelToShow) {
     educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
     educationalCtaEl.textContent = panelStrings.tipCta;
     currentEducationalPanel.textContent = `${tipPanelToShow}`;
+
+    registerDomainImgEl.src = `/images/panel-images/email-domain-illustration.svg`;
 
     // Remove panel status if user has unlimited aliases, so no negative alias left count
     if (premium) {
@@ -469,7 +375,8 @@ async function showRelayPanel(tipPanelToShow) {
     setPagination(panelId, totalPanels);
 
     // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
-    if (numRemaining === 0 && !bundlePhoneMaskingAvailable) {
+    // Otherwise, show Phone masking and Bundle promo
+    if (!premium && numRemaining === 0 && !bundlePhoneMaskingAvailable) {
       panelStrings = onboardingPanelStrings["maxAliasesPanel"];
       onboardingPanelWrapper.classList = "maxAliasesPanel";
 
@@ -490,7 +397,6 @@ async function showRelayPanel(tipPanelToShow) {
     currentPanel.textContent = `${panelId}`;
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
-    registerDomainImgEl.src = panelStrings.registerDomainImg;
 
     //If Premium features are not available, do not show upgrade CTA on the panel
     if (premiumCountryAvailability?.premium_available_in_country === true) {
@@ -505,34 +411,19 @@ async function showRelayPanel(tipPanelToShow) {
     const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
     const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
     const totalPanelsEl = document.querySelector(".total-panels");
-
     // Number of panels available for free users
     totalPanelsEl.textContent = totalPanels;
-
     prevButton.classList.remove("is-invisible");
     nextButton.classList.remove("is-invisible");
-
+    // If user is at the start of the carousel, hide next button
     if (activePanel === 1) {
       prevButton.classList.add("is-invisible");
     }
-
+    // If user is at the end of the carousel, hide next button
     if (activePanel === totalPanels) {
       nextButton.classList.add("is-invisible");
     }
-
   }
-
-  // Set End Date here
-  // const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
-  // const introPricingOfferEndDate = new Date(introPricingEndDateISO);
-  
-  // // Display End of Intro Pricing
-  // if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
-  //   showCountdownTimer(introPricingOfferEndDate);
-  // }
-  // else {
-  //   resetNonPremiumPanel();
-  // }
 
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
@@ -729,6 +620,12 @@ async function popup() {
   document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=register-email-domain#mpp-choose-subdomain`;
   });
+
+  // Add backlink to pricing section from promo CTAs
+  const promoCTAEl = document.querySelectorAll(".js-promo-link");
+  promoCTAEl.forEach(i => {
+    i.href = `${relaySiteOrigin}/premium#pricing`;
+  })
 
 }
 
