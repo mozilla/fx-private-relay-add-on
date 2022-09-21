@@ -523,7 +523,6 @@ onboarding-panel {
   justify-content: center;
   align-items: center;
   flex: 1.5;
-  object-fit: scale-down;
   height: auto;
   max-width: 120px;
 }
@@ -575,10 +574,14 @@ onboarding-panel p, .education-body {
   cursor: pointer;
   font-weight: 600;
   font-size: 12.5px;
-  line-height: 200%;
+  line-height: 170%;
   text-decoration: underline;
   color: var(--colorInformational);
   align-self: flex-start;
+}
+
+.js-new-label {
+  display: none;
 }
 
 .onboarding-cta:hover {
@@ -679,7 +682,6 @@ onboarding-panel p, .education-body {
   margin: 0;
   text-align: center;
   justify-self: center;
-  font-family: var(--relayMetropolisBold);
 }
 
 .current-panel,

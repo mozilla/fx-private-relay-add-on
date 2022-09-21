@@ -259,7 +259,7 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
-  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
+  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-new-label");
   const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
   let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
@@ -272,7 +272,7 @@ async function showRelayPanel(tipPanelToShow) {
    && isBundleAvailableInCountry && isPhoneAvailableInCountry
   ) {
     promoElements.forEach(i => {
-      i.classList.remove("is-hidden");
+      i.style.display = "block";
     });
     onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
     onboardingPanelStrings = await getPromoPanels();

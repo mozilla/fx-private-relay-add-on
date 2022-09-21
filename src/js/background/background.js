@@ -133,10 +133,6 @@ async function storeRuntimeData() {
     phonePlans: {
       PHONE_PLANS: runtimeData.PHONE_PLANS,
       fetchedAt: Date.now(),
-    },
-    introPricingEndDate: {
-      INTRO_PRICING_END: runtimeData.INTRO_PRICING_END,
-      fetchedAt: Date.now(),
     }
   })
 }
