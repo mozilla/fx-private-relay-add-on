@@ -507,25 +507,24 @@ onboarding-panel {
   justify-content: space-between;
   height: auto;
   gap: var(--spacingMd);
+  align-items: start;
 }
-
-/* .is-last-panel .next-panel,
-#educationalCriticalEmails .previous-panel,
-#educationalSignBackIn .next-panel {
-  opacity: 0;
-  pointer-events: none;
-} */
 
 .education-description {
   display: flex;
   flex-direction: column;
+  flex: 2;
+  width: 100%;
 }
 
 .education-img-wrapper {
-  width: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1.5;
+  object-fit: scale-down;
+  height: auto;
+  max-width: 120px;
 }
 
 #bundle-phones-promo .education-img-wrapper {
@@ -536,14 +535,15 @@ onboarding-panel {
   align-items: center;
   overflow: hidden;
   object-fit: cover;
-  max-width: 120px;
-  min-width: 120px;
+  height: auto;
 }
 
 .education-img {
-  min-width: 100%;
-  min-height: 100%;
-  flex-shrink: 0;
+  width: 100%;
+  height: auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 .education-headline {
@@ -625,18 +625,17 @@ onboarding-panel p, .education-body {
   margin: auto;
 }
 
-.panel-nav, .js-panel-nav {
+.panel-nav, .premium-panel-nav {
   border: none;
   outline: none;
   border-radius: 50%;
-  height: 15px;
   width: 15px;
   padding: 4px;
   position: relative;
   background-color: rgba(0, 0, 0, 0);
 }
 
-.panel-nav::after, .js-panel-nav::after {
+.panel-nav::after, .premium-panel-nav::after {
   content: "";
   display: inline-block;
   position: absolute;
@@ -647,25 +646,25 @@ onboarding-panel p, .education-body {
   background-position: center center;
   background-size: 90%;
   background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0);
   background-image: url("/images/arrowhead-left.svg");
   opacity: .4;
   transition: opacity 0.2s ease;
 }
 
+
 .settings-toggle:hover::after,
-.panel-nav:hover::after, .js-panel-nav::after {
+.panel-nav:hover::after, .premium-panel-nav:hover::after {
   opacity: .8;
   transition: opacity 0.2s ease;
 }
 
 .settings-toggle:focus,
-.panel-nav:focus, .js-panel-nav:focus {
+.panel-nav:focus, .premium-panel-nav:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
 .settings-toggle:active::after,
-.panel-nav:active::after, .js-panel-nav::after {
+.panel-nav:active::after, .premium-panel-nav:active::after {
   opacity: 1;
   transition: opacity 0.2s ease;
 }
@@ -674,14 +673,7 @@ onboarding-panel p, .education-body {
   transform: rotate(180deg);
 }
 
-/* .panel1 .previous-panel,
-.panel2 .next-panel {
-  pointer-events: none;
-  opacity: 0;
-} */
-
 .panel-num, .js-panel-num {
-  /* margin: auto 12px auto; */
   width: auto;
   margin: 0;
   text-align: center;
@@ -698,7 +690,7 @@ onboarding-panel p, .education-body {
   display: inline;
 }
 
-.current-panel, .total-panels-premium, .total-panels-nonpremium {
+.current-panel, .total-panels {
   margin: 0 var(--spacingXs);
   padding-right: var(--spacingXs);
 }

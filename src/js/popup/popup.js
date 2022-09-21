@@ -362,12 +362,12 @@ async function showRelayPanel(tipPanelToShow) {
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
   
   // If Bundle & Phone flags are enabled, show the promo announcements and promo elements, else hide it
-  if (checkWaffleFlag("bundle") && checkWaffleFlag("phones")
+  if (!checkWaffleFlag("bundle") && checkWaffleFlag("phones")
    && isBundleAvailableInCountry && isPhoneAvailableInCountry
   ) {
-    // promoElements.forEach(i => {
-    //   i.classList.remove("is-hidden");
-    // });
+    promoElements.forEach(i => {
+      i.classList.remove("is-hidden");
+    });
     onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
     onboardingPanelStrings = await getPromoPanels();
     premiumPanelStrings = await getPromoPanels();
@@ -375,11 +375,8 @@ async function showRelayPanel(tipPanelToShow) {
 
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
-    delete onboardingPanelStrings.panel2;
-    panelPagination.classList.add("is-hidden");
-    // document.querySelectorAll(".total-panels").forEach(panel => {
-    //   panel.textContent = 1;
-    // });
+    delete onboardingPanelStrings.announcements.panel3;
+    delete premiumPanelStrings.announcements.panel4;
   }
 
   //Premium Panel
@@ -425,17 +422,10 @@ async function showRelayPanel(tipPanelToShow) {
   const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
   const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
 
-  if (!browser.menus) {
-    panelPremiumPagination.classList.add("hidden");
-  }
-
   const updatePremiumPanel = async (panelId) => {
     const panelToShow =  `panel${panelId}`;
     premiumPanelWrapper.setAttribute("id", panelToShow);
     const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
-    const totalPanels = Object.keys(premiumPanelStrings.announcements).length;
-    setPagination(totalPanels);
-
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
@@ -445,11 +435,20 @@ async function showRelayPanel(tipPanelToShow) {
       educationBodyEl.classList.add("small-font-size");
     }
 
+    const totalPanels = Object.keys(premiumPanelStrings.announcements).length;
+    setPagination(panelId, totalPanels);
+
     educationHeadlineEl.textContent = panelStrings.tipHeadline;
     educationBodyEl.textContent = panelStrings.tipBody;
     educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
     educationalCtaEl.textContent = panelStrings.tipCta;
     currentEducationalPanel.textContent = `${tipPanelToShow}`;
+
+    // Remove panel status if user has unlimited aliases, so no negative alias left count
+    if (premium) {
+      const panelStatus = document.querySelector(".panel-status");
+      panelStatus.classList.add("is-hidden");
+    }
 
     return;
   };
@@ -463,11 +462,6 @@ async function showRelayPanel(tipPanelToShow) {
     
     const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
-
-    // Override class for Chrome browsers to not display sign-back in
-    if (!browser.menus && (panelId === 3)){
-      onboardingPanelWrapper.classList.add("is-last-panel")
-    }
     
     const totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
     let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
@@ -503,13 +497,7 @@ async function showRelayPanel(tipPanelToShow) {
       const premiumCTA = document.querySelector(".premium-cta");
       premiumCTA.classList.remove("is-hidden");
     }
-
-    // Remove panel status if user has unlimited aliases, so no negative alias left count
-    if (premium) {
-      const panelStatus = document.querySelector(".panel-status");
-      panelStatus.classList.add("is-hidden");
-    }
-
+    
     return;
   };
 
@@ -568,13 +556,13 @@ async function showRelayPanel(tipPanelToShow) {
     });
   });
 
-  document.querySelectorAll(".js-panel-nav").forEach(navBtn => {
+  document.querySelectorAll(".premium-panel-nav").forEach(navBtn => {
     navBtn.addEventListener("click", () => {
       sendRelayEvent("Panel", "click", "panel-navigation-arrow");
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      updatePremiumPanel(tipPanelToShow+=nextPanel);
+      return updatePremiumPanel(tipPanelToShow+=nextPanel);
     });
   });
 
