@@ -19,6 +19,7 @@ async function checkWaffleFlag(flag) {
     "announcements": {
       "panel1": {
         "imgSrc": "announcements/panel-bundle-announcement.svg",
+        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
         "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
         "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
         "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
@@ -26,6 +27,7 @@ async function checkWaffleFlag(flag) {
       // Phone Masking Announcement
       "panel2": {
         "imgSrc": "announcements/panel-phone-masking-announcement.svg",
+        "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
         "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
         "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
         "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
@@ -431,7 +433,6 @@ async function showRelayPanel(tipPanelToShow) {
     premiumPanelWrapper.setAttribute("id", panelToShow);
     const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
 
-    console.log(panelStrings);
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
@@ -439,8 +440,8 @@ async function showRelayPanel(tipPanelToShow) {
 
     attachmentSizeLimitHeadline.textContent = panelStrings.tipHeadline;
     attachmentSizeLimitBody.textContent = panelStrings.tipBody;
-    educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
-    educationalCtaEl.src = panelStrings.tipCta;
+    educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
+    educationalCtaEl.textContent = panelStrings.tipCta;
     currentEducationalPanel.textContent = `${tipPanelToShow}`;
   
     return;
