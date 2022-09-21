@@ -197,20 +197,6 @@ fx-relay-logo-wrapper,
   font-size: 15px;
 }
 
-.hidden {
-  position: absolute;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.is-hidden {
-  position: absolute;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .hidden,
 panel-content {
   transition: all 0.2s ease;
@@ -297,6 +283,7 @@ main-panel {
   width: 100%;
   font-size: 13px;
   font-family: var(--relayInterUiRegular);
+  margin-bottom: var(--spacingLg);
 }
 
 .aliases-remaining {
@@ -519,7 +506,7 @@ onboarding-panel {
   padding: var(--spacingSm) 0;
   justify-content: space-between;
   height: auto;
-  gap: var(--spacingLg);
+  gap: var(--spacingMd);
 }
 
 /* .is-last-panel .next-panel,
@@ -529,15 +516,28 @@ onboarding-panel {
   pointer-events: none;
 } */
 
+.education-description {
+  display: flex;
+  flex-direction: column;
+}
+
 .education-img-wrapper {
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#bundle-phones-promo .education-img-wrapper {
   box-shadow: var(--boxShadowSm);
   border-radius: var(--borderRadiusMd);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  object-fit: cover;
+  max-width: 120px;
   min-width: 120px;
-  height: 150px;
 }
 
 .education-img {
@@ -565,10 +565,15 @@ onboarding-panel p, .education-body {
   line-height: 130%;
 }
 
+/* Add this class if description is too long */
+.small-font-size {
+  font-size: 11px;
+}
+
 .onboarding-cta {
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12.5px;
   line-height: 200%;
   text-decoration: underline;
   color: var(--colorInformational);
@@ -585,9 +590,8 @@ onboarding-panel p, .education-body {
 
 .onboarding-img {
   width: 100%;
+  margin-bottom: var(--spacingSm);
 }
-
-
 
 .img-wrapper {
   max-height: 100%;
@@ -598,6 +602,10 @@ onboarding-panel p, .education-body {
 
 .maxAliasesPanel .onboarding-pagination {
   display: none !important;
+}
+
+.maxAliasesPanel .onboarding-img {
+  width: 200px;
 }
 
 .survey-link {
@@ -900,4 +908,24 @@ onboarding-panel p, .education-body {
   text-transform: uppercase;
   border-radius: var(--spacingXs);
   padding: var(--spacingXs) var(--spacingSm);
+}
+
+.is-invisible {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.hidden {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.is-hidden {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }

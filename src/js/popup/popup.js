@@ -15,8 +15,8 @@ async function checkWaffleFlag(flag) {
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
 
   return {
-    // Bundle Announcement
     "announcements": {
+      // Bundle Announcement
       "panel1": {
         "imgSrc": "announcements/panel-bundle-announcement.svg",
         "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
@@ -29,6 +29,7 @@ async function checkWaffleFlag(flag) {
         "imgSrc": "announcements/panel-phone-masking-announcement.svg",
         "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
         "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
+        "longText": true,
         "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
         "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
       },
@@ -48,11 +49,16 @@ async function checkWaffleFlag(flag) {
   return {
     "announcements": {
       "panel1": {
+        "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
+        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+      },
+      "panel2": {
         "imgSrc": "announcements/panel-announcement-critical-emails.svg",
         "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
         "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
       },
-      "panel2": {
+      "panel3": {
         "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
         "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
         "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
@@ -78,107 +84,110 @@ async function checkWaffleFlag(flag) {
 
 function getEducationalStrings() {
   return {
-    "panel1": {
-      "img": "/images/panel-images/educational-matrix/educationalImg1.png",
-      "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
-      "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
-    },
-    "panel2": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
-      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-    },
-    "panel3": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
-      "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
-    },
-    "panel4": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
-      "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-      "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    "announcements": {
+      "panel1": {
+        "imgSrcPremium": "/educational-matrix/educationalImg1.png",
+        "tipHeadline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
+        "tipBody": browser.i18n.getMessage("popupEducationalComponent1Body"),
+      },
+      "panel2": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-attachment-limit.svg",
+        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+      },
+      "panel3": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-block-emails.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
+        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
+      },
+      "panel4": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-sign-back-in.svg",
+        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+        "longText": true,
+      }
     }
   };
 }
 
-function resetNonPremiumPanel() {
-  const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
-  const nonPremiumPanel = document.querySelector(".content-wrapper");
-  const panelStatus = document.querySelector(".panel-status");
+// function resetNonPremiumPanel() {
+//   const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
+//   const nonPremiumPanel = document.querySelector(".content-wrapper");
+//   const panelStatus = document.querySelector(".panel-status");
 
-  endOfIntroPricingElem.classList.add("is-hidden");
-  nonPremiumPanel.classList.remove("is-hidden");
-  panelStatus.classList.remove("is-hidden");
-}
+//   endOfIntroPricingElem.classList.add("is-hidden");
+//   nonPremiumPanel.classList.remove("is-hidden");
+//   panelStatus.classList.remove("is-hidden");
+// }
 
 // End of intro pricing banner
-function showCountdownTimer(introPricingOfferEndDate) {
+// function showCountdownTimer(introPricingOfferEndDate) {
 
-  const remainingTimeInMs =  setRemainingTimeParts();
+//   const remainingTimeInMs =  setRemainingTimeParts();
 
-  if (remainingTimeInMs <= 0) {
-    resetNonPremiumPanel();
-   }
+//   if (remainingTimeInMs <= 0) {
+//     resetNonPremiumPanel();
+//    }
 
-  setRemainingTimeParts();
+//   setRemainingTimeParts();
 
-  const timeInterval = setInterval(() => {
-  // When timer runs out, set it back to default non premium view
-  const remainingTimeInMs =  setRemainingTimeParts();
+//   const timeInterval = setInterval(() => {
+//   // When timer runs out, set it back to default non premium view
+//   const remainingTimeInMs =  setRemainingTimeParts();
 
-   if (remainingTimeInMs <= 0) {
-    clearInterval(timeInterval);
-   }
-   }, 1000);
+//    if (remainingTimeInMs <= 0) {
+//     clearInterval(timeInterval);
+//    }
+//    }, 1000);
 
-   function getRemainingTimeParts(remainingMilliseconds) {
-    const remainingDays = Math.floor(
-      remainingMilliseconds / (1000 * 60 * 60 * 24)
-    );
-    const remainingHours = Math.floor(
-      (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
-        (1000 * 60 * 60)
-    );
-    const remainingMinutes = Math.floor(
-      (remainingMilliseconds -
-        remainingDays * (1000 * 60 * 60 * 24) -
-        remainingHours * (1000 * 60 * 60)) /
-        (1000 * 60)
-    );
-    const remainingSeconds = Math.floor(
-      (remainingMilliseconds -
-        remainingDays * (1000 * 60 * 60 * 24) -
-        remainingHours * (1000 * 60 * 60) -
-        remainingMinutes * (1000 * 60)) /
-        1000
-    );
+//    function getRemainingTimeParts(remainingMilliseconds) {
+//     const remainingDays = Math.floor(
+//       remainingMilliseconds / (1000 * 60 * 60 * 24)
+//     );
+//     const remainingHours = Math.floor(
+//       (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
+//         (1000 * 60 * 60)
+//     );
+//     const remainingMinutes = Math.floor(
+//       (remainingMilliseconds -
+//         remainingDays * (1000 * 60 * 60 * 24) -
+//         remainingHours * (1000 * 60 * 60)) /
+//         (1000 * 60)
+//     );
+//     const remainingSeconds = Math.floor(
+//       (remainingMilliseconds -
+//         remainingDays * (1000 * 60 * 60 * 24) -
+//         remainingHours * (1000 * 60 * 60) -
+//         remainingMinutes * (1000 * 60)) /
+//         1000
+//     );
   
-    return {
-      remainingDays,
-      remainingHours,
-      remainingMinutes,
-      remainingSeconds,
-    }
-  }
+//     return {
+//       remainingDays,
+//       remainingHours,
+//       remainingMinutes,
+//       remainingSeconds,
+//     }
+//   }
 
-    function setRemainingTimeParts() {
-      const countdownTimer = document.querySelector(".countdown-timer");
-      const currentTime = new Date();
-      const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
+//     function setRemainingTimeParts() {
+//       const countdownTimer = document.querySelector(".countdown-timer");
+//       const currentTime = new Date();
+//       const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
 
-      const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
-      const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
-      const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
-      const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
+//       const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
+//       const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
+//       const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
+//       const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
 
-      countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
-      countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
-      countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
-      countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
+//       countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
+//       countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
+//       countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
+//       countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
 
-      return remainingTimeInMs;
-  }
-}
+//       return remainingTimeInMs;
+//   }
+// }
 
 function showSignUpPanel() {
   const signUpOrInPanel = document.querySelector(".sign-up-panel");
@@ -290,7 +299,7 @@ const serverStoragePanel = {
   },
 };
 
-async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
+async function choosePanel(panelId, premium, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
   
   // Turned off label sync prompt for premium release
@@ -299,8 +308,8 @@ async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
   //   serverStoragePanel.init(premium);
   // } else 
   if (premium) {
-    const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
-    endOfIntroPricing.classList.add("is-hidden");
+    // const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
+    // endOfIntroPricing.classList.add("is-hidden");
 
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
@@ -317,7 +326,8 @@ async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
     if (premiumWrapper.length) {
       premiumWrapper[0].remove();
     }
-    return numRemaining === 0 ? "maxAliasesPanel" : `panel${panelId}`;
+
+    return `panel${panelId}`;
   }
 }
 
@@ -348,26 +358,20 @@ async function showRelayPanel(tipPanelToShow) {
   let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
 
-  // If Bundle & Phone flags are enabled, show the promo announcements and promo elements
-  if (checkWaffleFlag("bundle")) {
-    promoElements.forEach(i => {
-      i.classList.remove("is-hidden");
-    });
+  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+  
+  // If Bundle & Phone flags are enabled, show the promo announcements and promo elements, else hide it
+  if (checkWaffleFlag("bundle") && checkWaffleFlag("phones")
+   && isBundleAvailableInCountry && isPhoneAvailableInCountry
+  ) {
+    // promoElements.forEach(i => {
+    //   i.classList.remove("is-hidden");
+    // });
+    onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
     onboardingPanelStrings = await getPromoPanels();
     premiumPanelStrings = await getPromoPanels();
   }
-
-  const NonPremiumAnnouncementLength = Object.keys(onboardingPanelStrings.announcements).length;
-  const PremiumAnnouncementLength = Object.keys(onboardingPanelStrings.announcements).length;
-
-  // Number of panels available
-  document.querySelectorAll(".total-panels-nonpremium").forEach(panel => {
-    panel.textContent = NonPremiumAnnouncementLength;
-  });
-
-  document.querySelectorAll(".total-panels-premium").forEach(panel => {
-    panel.textContent = PremiumAnnouncementLength;
-  });
 
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
@@ -405,8 +409,6 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if premium features are available
   const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
-  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
-  const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
@@ -417,8 +419,8 @@ async function showRelayPanel(tipPanelToShow) {
   //Educational Panel
   const educationalModule = premiumPanelWrapper.querySelector(".educational-component");
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
-  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+  const educationHeadlineEl = premiumPanelWrapper.querySelector(".education-headline");
+  const educationBodyEl = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
   const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
   const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
@@ -428,27 +430,38 @@ async function showRelayPanel(tipPanelToShow) {
   }
 
   const updatePremiumPanel = async (panelId) => {
-
     const panelToShow =  `panel${panelId}`;
     premiumPanelWrapper.setAttribute("id", panelToShow);
     const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
+    const totalPanels = Object.keys(premiumPanelStrings.announcements).length;
+    setPagination(totalPanels);
 
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
     }
+    educationBodyEl.classList.remove("small-font-size");
+    if (panelStrings.longText) {
+      educationBodyEl.classList.add("small-font-size");
+    }
 
-    attachmentSizeLimitHeadline.textContent = panelStrings.tipHeadline;
-    attachmentSizeLimitBody.textContent = panelStrings.tipBody;
+    educationHeadlineEl.textContent = panelStrings.tipHeadline;
+    educationBodyEl.textContent = panelStrings.tipBody;
     educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
     educationalCtaEl.textContent = panelStrings.tipCta;
     currentEducationalPanel.textContent = `${tipPanelToShow}`;
-  
+
     return;
   };
 
   const updatePanel = async (numRemaining, panelId) => {
-    const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
+    const bundlePhoneMaskingAvailable = 
+      checkWaffleFlag("bundle") 
+      && checkWaffleFlag("phones")
+      && isBundleAvailableInCountry 
+      && isPhoneAvailableInCountry;
+    
+    const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
 
     // Override class for Chrome browsers to not display sign-back in
@@ -456,8 +469,21 @@ async function showRelayPanel(tipPanelToShow) {
       onboardingPanelWrapper.classList.add("is-last-panel")
     }
     
-    const panelStrings = onboardingPanelStrings[`${panelToShow}`];
+    const totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
+    let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
 
+    setPagination(panelId, totalPanels);
+
+    // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
+    if (numRemaining === 0 && !bundlePhoneMaskingAvailable) {
+      panelStrings = onboardingPanelStrings["maxAliasesPanel"];
+      onboardingPanelWrapper.classList = "maxAliasesPanel";
+
+      if (premiumCountryAvailability?.premium_available_in_country === true) {
+        const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
+        upgradeButton.classList.remove("is-hidden");
+      }
+    }
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
@@ -470,7 +496,6 @@ async function showRelayPanel(tipPanelToShow) {
     currentPanel.textContent = `${panelId}`;
     upgradeButtonEl.textContent = panelStrings.upgradeButton;
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
-
     registerDomainImgEl.src = panelStrings.registerDomainImg;
 
     //If Premium features are not available, do not show upgrade CTA on the panel
@@ -488,17 +513,38 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
+  const setPagination = (activePanel, totalPanels) => {
+    const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
+    const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
+    const totalPanelsEl = document.querySelector(".total-panels");
+
+    // Number of panels available for free users
+    totalPanelsEl.textContent = totalPanels;
+
+    prevButton.classList.remove("is-invisible");
+    nextButton.classList.remove("is-invisible");
+
+    if (activePanel === 1) {
+      prevButton.classList.add("is-invisible");
+    }
+
+    if (activePanel === totalPanels) {
+      nextButton.classList.add("is-invisible");
+    }
+
+  }
+
   // Set End Date here
-  const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
-  const introPricingOfferEndDate = new Date(introPricingEndDateISO);
+  // const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
+  // const introPricingOfferEndDate = new Date(introPricingEndDateISO);
   
-  // Display End of Intro Pricing
-  if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
-    showCountdownTimer(introPricingOfferEndDate);
-  }
-  else {
-    resetNonPremiumPanel();
-  }
+  // // Display End of Intro Pricing
+  // if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
+  //   showCountdownTimer(introPricingOfferEndDate);
+  // }
+  // else {
+  //   resetNonPremiumPanel();
+  // }
 
   //Nonpremium panel status 
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
@@ -544,12 +590,6 @@ async function showRelayPanel(tipPanelToShow) {
   relayPanel.classList.remove("hidden");
 
   if (numRemaining === 0) {
-    
-    if (premiumCountryAvailability?.premium_available_in_country === true) {
-      const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-      upgradeButton.classList.remove("is-hidden");
-    }
-
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");

@@ -51,7 +51,7 @@
       </sign-up-panel>
 
       <main-panel class="signed-in-panel hidden">
-        <span class="panel-status is-hidden">
+        <span class="panel-status">
           <p class="aliases-remaining remaining-plural"></p>
           <a 
             class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden" 
@@ -64,9 +64,8 @@
 
           <!-- TEMPORARY FEATURE -->
           <!-- End Intro Pricing Panel: End September 27 -->
-          <div class="end-of-intro-pricing-wrapper end-of-intro-pricing">
-            <!-- Dashboard Statistics-->
-            <div class="dashboard-stats-list">
+          <!-- <div class="end-of-intro-pricing-wrapper end-of-intro-pricing">
+             <div class="dashboard-stats-list">
               <ul>
                 <li class="dashboard-info">
                   <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
@@ -85,9 +84,9 @@
                   <div class="dashboard-stats email-trackers-removed"></div>
                 </li>
               </ul>
-            </div>
+            </div> -->
             <!--Countdown-->
-            <figure class="countdown-timer end-of-intro-pricing">
+            <!-- <figure class="countdown-timer end-of-intro-pricing">
               <dl>
                 <div>
                   <dt class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingCountdownDays"></dt>
@@ -110,18 +109,18 @@
             <h1 class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingHeadline"></h1>
             <p class="i18n-content" data-i18n-message-id="popupEndOfIntroPricingBody"></p>
             <a class="close-popup-after-click get-premium-link fx-relay-c-button t-basic i18n-content" data-event-action="click" data-event-label="end-of-intro-pricing-upgrade" data-i18n-message-id="popupEndOfIntroPricingCTA"></a>
-          </div>
+          </div> -->
           <!-- End of End Intro Pricing Panel -->
 
           <!--Non Premium Panel-->
-          <div class="content-wrapper is-hidden">
+          <div class="content-wrapper">
             <div class="img-wrapper">
               <img class="onboarding-img">
             </div>
             <div class="new-label i18n-content is-hidden js-promo-item" data-i18n-message-id="popupPromoNewLabel"></div>
             <h1 class="onboarding-h1"></h1>
             <p class="onboarding-p"></p>
-            <a class="onboarding-cta is-hidden js-promo-item"></a>
+            <a class="onboarding-cta js-promo-item"></a>
             <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link" data-event-action="click">
               <img class="upgrade-banner-icon">
               <p class="upgrade-banner"></p>
@@ -130,7 +129,7 @@
               <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
               <span class="panel-num">
                 <span class="current-panel"></span>/
-                  <span class="total-panels-nonpremium"></span>
+                  <span class="total-panels"></span>
               </span>
               <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
             </div>
@@ -169,19 +168,20 @@
             <!-- Educational Matrix Module Dashboard-->
             <div class="educational-component is-hidden">
               <div class="education-img-wrapper">
-                <img class="education-img">
+                <img class="education-img is-hidden">
               </div>
               <div class="education-description">
+                <div class="new-label i18n-content js-promo-item" data-i18n-message-id="popupPromoNewLabel"></div>
                 <h1 class="education-headline"></h1>
                 <p class="education-body"></p>
-                <a class="onboarding-cta is-hidden js-promo-item"></a>
+                <a class="onboarding-cta js-promo-item"></a>
               </div>
 
               <div class="onboarding-pagination">
                 <button class="js-panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
                 <span class="js-panel-num">
                   <span class="current-panel"></span>/
-                    <span class="total-panels-premium"></span>
+                    <span class="total-panels"></span>
                 </span>
                 <button class="js-panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
               </div>
