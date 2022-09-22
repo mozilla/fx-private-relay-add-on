@@ -133,7 +133,11 @@ async function storeRuntimeData() {
     phonePlans: {
       PHONE_PLANS: runtimeData.PHONE_PLANS,
       fetchedAt: Date.now(),
-    }
+    },
+    periodicalPremiumPlans: {
+      PERIODICAL_PREMIUM_PLANS: runtimeData.PERIODICAL_PREMIUM_PLANS,
+      fetchedAt: Date.now(),
+    },
   })
 }
 

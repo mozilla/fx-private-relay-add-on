@@ -386,10 +386,10 @@ onboarding-panel {
   padding: 8px 16px 0px 16px;
   font-family: var(--relayInterUiRegular);
 }
-
+/* 
 .content-wrapper.is-hidden, .premium-wrapper.is-hidden {
   display: none;
-}
+} */
 
 .content-wrapper, .premium-wrapper {
   display: flex;
@@ -594,7 +594,6 @@ onboarding-panel p, .education-body {
 
 .onboarding-img {
   width: 100%;
-  margin-bottom: var(--spacingSm);
 }
 
 .img-wrapper {
@@ -905,12 +904,6 @@ onboarding-panel p, .education-body {
   padding: var(--spacingXs) var(--spacingSm);
 }
 
-.is-invisible {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .hidden {
   position: absolute;
   opacity: 0;
@@ -918,9 +911,13 @@ onboarding-panel p, .education-body {
   pointer-events: none;
 }
 
-.is-hidden {
+.is-hidden, .hidden {
   position: absolute;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+.is-invisible {
+  opacity: 0;
 }

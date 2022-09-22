@@ -10,9 +10,15 @@ async function checkWaffleFlag(flag) {
  }
  
  async function getPromoPanels() {
-  const savings = "50%"; // For "Save 50%!" in the Bundle promo body
+  const savings = "22%"; // For "Save 50%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+  const userLocale = navigator.language;
+  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+    style: "currency",
+    currency: getBundleCurrency,
+  }).format(getBundlePrice);
 
   return {
     "announcements": {
@@ -21,7 +27,7 @@ async function checkWaffleFlag(flag) {
         "imgSrc": "announcements/panel-bundle-announcement.svg",
         "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
         "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [getBundlePrice, savings]),
+        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
         "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
       },
       // Phone Masking Announcement
@@ -220,11 +226,6 @@ async function choosePanel(panelId, premium, premiumSubdomainSet){
   if (premium) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
-    premiumPanelWrapper
-      .querySelectorAll(".is-hidden")
-      .forEach((premiumFeature) =>
-        premiumFeature.classList.remove("is-hidden")
-      );
     //Toggle register domain or education module
     checkUserSubdomain(premiumSubdomainSet);
     return "premiumPanel";
@@ -242,7 +243,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet !== "None") {
+  if (premiumSubdomainSet === "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
@@ -259,7 +260,7 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
-  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-new-label");
+  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
   const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
   let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
@@ -272,7 +273,7 @@ async function showRelayPanel(tipPanelToShow) {
    && isBundleAvailableInCountry && isPhoneAvailableInCountry
   ) {
     promoElements.forEach(i => {
-      i.style.display = "block";
+      i.classList.remove("is-hidden");
     });
     onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
     onboardingPanelStrings = await getPromoPanels();
@@ -519,10 +520,6 @@ async function enableSettingsPanel() {
     const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
-
-
-  
-
 }
 
 
