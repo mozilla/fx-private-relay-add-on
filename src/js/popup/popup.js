@@ -8,6 +8,7 @@ async function checkWaffleFlag(flag) {
   }
   return false;
  }
+
  
  async function getPromoPanels() {
   const savings = "22%"; // For "Save 50%!" in the Bundle promo body
@@ -252,6 +253,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   }
 }
 
+
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
@@ -269,7 +271,7 @@ async function showRelayPanel(tipPanelToShow) {
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
   
   // If Bundle & Phone flags are enabled, show the promo announcements and promo elements, else hide it
-  if (checkWaffleFlag("bundle") && checkWaffleFlag("phones")
+  if (await checkWaffleFlag("bundle") && await checkWaffleFlag("phones")
    && isBundleAvailableInCountry && isPhoneAvailableInCountry
   ) {
     promoElements.forEach(i => {
@@ -362,8 +364,8 @@ async function showRelayPanel(tipPanelToShow) {
 
   const updatePanel = async (numRemaining, panelId) => {
     const bundlePhoneMaskingAvailable = 
-      checkWaffleFlag("bundle") 
-      && checkWaffleFlag("phones")
+      await checkWaffleFlag("bundle") 
+      && await checkWaffleFlag("phones")
       && isBundleAvailableInCountry 
       && isPhoneAvailableInCountry;
     
