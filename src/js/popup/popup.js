@@ -22,22 +22,22 @@ async function checkWaffleFlag(flag) {
 
   return {
     "announcements": {
-      // Bundle Announcement
-      "panel1": {
-        "imgSrc": "announcements/panel-bundle-announcement.svg",
-        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
-        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
-        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
-      },
-      // Phone Masking Announcement
-      "panel2": {
+       // Phone Masking Announcement
+       "panel1": {
         "imgSrc": "announcements/panel-phone-masking-announcement.svg",
         "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
         "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
         "longText": true,
         "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
         "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
+      },
+      // Bundle Announcement
+      "panel2": {
+        "imgSrc": "announcements/panel-bundle-announcement.svg",
+        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
+        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
       },
     },
     "premiumPanel": {
