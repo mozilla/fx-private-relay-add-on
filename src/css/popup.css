@@ -386,10 +386,6 @@ onboarding-panel {
   padding: 8px 16px 0px 16px;
   font-family: var(--relayInterUiRegular);
 }
-/* 
-.content-wrapper.is-hidden, .premium-wrapper.is-hidden {
-  display: none;
-} */
 
 .content-wrapper, .premium-wrapper {
   display: flex;
