@@ -32,14 +32,15 @@ async function checkWaffleFlag(flag) {
         "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
         "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
       },
-       // Bundle Announcement
-       "panel2": {
-        "imgSrc": "announcements/panel-bundle-announcement.svg",
-        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
-        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-        "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
-        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
-      },
+      // TODO: Enable this when bundle pricing has been confirmed
+      // Bundle Announcement
+      //  "panel2": {
+      //   "imgSrc": "announcements/panel-bundle-announcement.svg",
+      //   "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
+      //   "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+      //   "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
+      //   "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+      // },
     },
     "premiumPanel": {
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
@@ -267,12 +268,16 @@ async function showRelayPanel(tipPanelToShow) {
   let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
 
-  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  // const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
   
-  // If Bundle & Phone flags are enabled, show the promo announcements and promo elements, else hide it
-  if (await checkWaffleFlag("bundle") && await checkWaffleFlag("phones")
-   && isBundleAvailableInCountry && isPhoneAvailableInCountry
+  const phoneMaskingAvailable =    await checkWaffleFlag("phones") && isPhoneAvailableInCountry;
+  // TODO: Enable this when bundle pricing has been confirmed
+  // const bundleAvailable =    await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
+
+  if (
+    phoneMaskingAvailable 
+    // && bundleAvailable
   ) {
     promoElements.forEach(i => {
       i.classList.remove("is-hidden");
@@ -363,11 +368,8 @@ async function showRelayPanel(tipPanelToShow) {
   };
 
   const updatePanel = async (numRemaining, panelId) => {
-    const bundlePhoneMaskingAvailable = 
-      await checkWaffleFlag("bundle") 
-      && await checkWaffleFlag("phones")
-      && isBundleAvailableInCountry 
-      && isPhoneAvailableInCountry;
+    // TODO: Add " && bundleAvailable " when bundle pricing has been confirmed
+    const bundlePhoneMaskingAvailable = phoneMaskingAvailable;
     
     const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
@@ -411,6 +413,7 @@ async function showRelayPanel(tipPanelToShow) {
   };
 
   const setPagination = (activePanel, totalPanels) => {
+    const pagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
     const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
     const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
     const totalPanelsEl = document.querySelector(".total-panels");
@@ -425,6 +428,9 @@ async function showRelayPanel(tipPanelToShow) {
     // If user is at the end of the carousel, hide next button
     if (activePanel === totalPanels) {
       nextButton.classList.add("is-invisible");
+    }
+    if (totalPanels === 1) {
+      pagination.classList.add("is-hidden");
     }
   }
 

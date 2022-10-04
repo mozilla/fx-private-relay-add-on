@@ -523,7 +523,9 @@ onboarding-panel {
   max-width: 120px;
 }
 
-#bundle-phones-promo .education-img-wrapper {
+#bundle-phones-promo #panel1 .education-img-wrapper,
+#bundle-phones-promo #panel2 .education-img-wrapper
+ {
   box-shadow: var(--boxShadowSm);
   border-radius: var(--borderRadiusMd);
   display: flex;
