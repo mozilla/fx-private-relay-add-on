@@ -11,15 +11,16 @@ async function checkWaffleFlag(flag) {
 
  
  async function getPromoPanels() {
-  const savings = "22%"; // For "Save 50%!" in the Bundle promo body
-  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
-  const userLocale = navigator.language;
-  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
-    style: "currency",
-    currency: getBundleCurrency,
-  }).format(getBundlePrice);
+  // TODO: Enable this when bundle pricing has been confirmed
+  // const savings = "22%"; // For "Save 50%!" in the Bundle promo body
+  // const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+  // const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  // const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+  // const userLocale = navigator.language;
+  // const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+  //   style: "currency",
+  //   currency: getBundleCurrency,
+  // }).format(getBundlePrice);
 
   return {
     "announcements": {
