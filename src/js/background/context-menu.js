@@ -436,12 +436,12 @@ const relayContextMenus = {
       canUpgradeToPremium: async () => {
         const { premium } = await browser.storage.local.get("premium");
 
-        const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries?.PREMIUM_PLANS
+        const premiumCountryAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS
 
         // Note: If user is already premium, this will return false.
         return (
           !premium &&
-          premiumCountryAvailability?.premium_available_in_country === true
+          premiumCountryAvailability?.available_in_country === true
         );
       },
     },

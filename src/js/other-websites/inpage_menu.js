@@ -439,7 +439,7 @@ const buildContent = {
       const maxNumAliasesReached = numAliasesRemaining <= 0;
 
       // Check if premium features are available
-      const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries?.PREMIUM_PLANS;
+      const premiumCountryAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS
 
       // Set Generate Mask button
       buildContent.components.setUnlimitedButton(
@@ -797,19 +797,19 @@ const buildContent = {
 
       // If the user cannot upgrade, prompt them to join the waitlist
       const unlimitedTextContent =
-        premiumCountryAvailability?.premium_available_in_country
+        premiumCountryAvailability?.available_in_country
           ? browser.i18n.getMessage("popupGetUnlimitedAliases_mask")
           : browser.i18n.getMessage("pageInputIconJoinPremiumWaitlist");
 
       // If the user cannot upgrade, update the UTM params
       const unlimitedHref =
-        premiumCountryAvailability?.premium_available_in_country
+        premiumCountryAvailability?.available_in_country
           ? `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`
           : `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=join-waitlist-link`;
 
       // If the user cannot upgrade, update the GA event ID
       const unlimitedInPageEventId =
-        premiumCountryAvailability?.premium_available_in_country
+        premiumCountryAvailability?.available_in_country
           ? "input-menu-get-premium-btn"
           : "input-menu-join-waitlist-btn";
 
