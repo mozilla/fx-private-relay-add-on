@@ -169,12 +169,6 @@
     const fxaSubscriptionsUrl = document.querySelector(
       "firefox-private-relay-addon-data"
     ).dataset.fxaSubscriptionsUrl;
-    const premiumProdId = document.querySelector(
-      "firefox-private-relay-addon-data"
-    ).dataset.premiumProdId;
-    const premiumPriceId = document.querySelector(
-      "firefox-private-relay-addon-data"
-    ).dataset.premiumPriceId;
     const aliasesUsedVal = document.querySelector(
       "firefox-private-relay-addon-data"
     ).dataset.aliasesUsedVal;
@@ -193,8 +187,6 @@
 
     browser.storage.local.set({
       fxaSubscriptionsUrl,
-      premiumProdId,
-      premiumPriceId,
       aliasesUsedVal,
       emailsForwardedVal,
       emailsBlockedVal,
