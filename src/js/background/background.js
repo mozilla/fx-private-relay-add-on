@@ -95,7 +95,7 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 }
 
 async function storeRuntimeData(opts={forceUpdate: false}) {  
-  const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries;
+  const existingPremiumAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans;
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
   const checkingRemainingDays = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -120,10 +120,6 @@ async function storeRuntimeData(opts={forceUpdate: false}) {
   const runtimeData = await runtimeDataResponse.json();
   
   browser.storage.local.set({
-    premiumCountries: {
-      PREMIUM_PLANS: runtimeData.PREMIUM_PLANS,
-      fetchedAt: Date.now(),
-    },
     waffleFlags: {
       WAFFLE_FLAGS: runtimeData.WAFFLE_FLAGS,
       fetchedAt: Date.now(),
