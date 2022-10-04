@@ -311,7 +311,7 @@ async function showRelayPanel(tipPanelToShow) {
   });
 
   //Check if premium features are available
-  const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
+  const premiumCountryAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
@@ -380,7 +380,7 @@ async function showRelayPanel(tipPanelToShow) {
       panelStrings = onboardingPanelStrings["maxAliasesPanel"];
       onboardingPanelWrapper.classList = "maxAliasesPanel";
 
-      if (premiumCountryAvailability?.premium_available_in_country === true) {
+      if (premiumCountryAvailability?.available_in_country === true) {
         const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
         upgradeButton.classList.remove("is-hidden");
       }
@@ -399,7 +399,7 @@ async function showRelayPanel(tipPanelToShow) {
     upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
 
     //If Premium features are not available, do not show upgrade CTA on the panel
-    if (premiumCountryAvailability?.premium_available_in_country === true) {
+    if (premiumCountryAvailability?.available_in_country === true) {
       const premiumCTA = document.querySelector(".premium-cta");
       premiumCTA.classList.remove("is-hidden");
     }
@@ -461,7 +461,7 @@ async function showRelayPanel(tipPanelToShow) {
     remainingAliasMessage.classList.add("is-hidden");
   }
 
-  if (premiumCountryAvailability?.premium_available_in_country === true) {
+  if (premiumCountryAvailability?.available_in_country === true) {
     getUnlimitedAliases.classList.remove("is-hidden");
   }
 
