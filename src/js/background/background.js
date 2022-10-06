@@ -361,7 +361,11 @@ async function displayBrowserActionBadge() {
 browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   let response;
   const currentPage = await getCurrentPage();
-  const url = new URL(currentPage.url);
+  let url = false;
+
+  if (currentPage.url) {
+    url = new URL(currentPage.url);
+  }
 
   switch (m.method) {
     case "displayBrowserActionBadge":
@@ -389,7 +393,7 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       response = await getCurrentPage();
       break;
     case "getCurrentPageHostname":
-      response = url.hostname;
+      if (url) { response = url.hostname }
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
