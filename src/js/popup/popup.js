@@ -246,7 +246,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
-  if (premiumSubdomainSet === "None") {
+  if (premiumSubdomainSet !== "None") {
     registerDomainComponent.classList.add("is-hidden");
   }
 
