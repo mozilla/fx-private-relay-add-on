@@ -95,6 +95,7 @@ jobs:
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
+        if: github.ref_type == 'branch'
 
       - name: "Tag"
         run: |
@@ -115,7 +116,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: fx-private-relay-stage-chromium.zip
+          name: fx-private-relay-extension.zip
           path: src/
 
       - name: Mark GitHub Deployment as successful
