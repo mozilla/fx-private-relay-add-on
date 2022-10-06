@@ -1,14 +1,74 @@
-function getOnboardingPanels() {
+
+async function checkWaffleFlag(flag) {
+  const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
+  for (let i of waffleFlagArray) {
+    if (i[0] === flag && i[1] === true) {
+      return true;
+    }
+  }
+  return false;
+ }
+
+ 
+ async function getPromoPanels() {
+  // TODO: Enable this when bundle pricing has been confirmed
+  // const savings = "22%"; // For "Save 50%!" in the Bundle promo body
+  // const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+  // const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  // const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+  // const userLocale = navigator.language;
+  // const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+  //   style: "currency",
+  //   currency: getBundleCurrency,
+  // }).format(getBundlePrice);
+
   return {
-    "panel1": {
-      "imgSrc": "announcements/panel-announcement-critical-emails.svg",
-      "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
+    "announcements": {
+      // Phone Masking Announcement
+      "panel1": {
+        "imgSrc": "announcements/panel-phone-masking-announcement.svg",
+        "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
+        "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
+        "longText": true,
+        "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
+        "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
+      },
+      // TODO: Enable this when bundle pricing has been confirmed
+      // Bundle Announcement
+      //  "panel2": {
+      //   "imgSrc": "announcements/panel-bundle-announcement.svg",
+      //   "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
+      //   "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+      //   "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
+      //   "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+      // },
     },
-    "panel2": {
-      "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
-      "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-      "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    "premiumPanel": {
+      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
+      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
+      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
+    }
+  }
+ }
+
+ async function getOnboardingPanels() {
+  return {
+    "announcements": {
+      "panel1": {
+        "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
+        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+      },
+      "panel2": {
+        "imgSrc": "announcements/panel-announcement-critical-emails.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
+        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
+      },
+      "panel3": {
+        "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
+        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+      },
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
@@ -18,9 +78,6 @@ function getOnboardingPanels() {
       "upgradeButtonIcon": "/icons/icon.svg",
     },
     "premiumPanel": {
-      "registerDomainButton": browser.i18n.getMessage("popupRegisterDomainButton_mask"),
-      "registerDomainHeadline": browser.i18n.getMessage("popupRegisterDomainHeadline_mask"),
-      "registerDomainImg": "/images/panel-images/email-domain-illustration.svg",
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
       "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
@@ -30,106 +87,30 @@ function getOnboardingPanels() {
 
 function getEducationalStrings() {
   return {
-    "educationalComponent1": {
-      "img": "/images/panel-images/educational-matrix/educationalImg1.png",
-      "headline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
-      "description": browser.i18n.getMessage("popupEducationalComponent1Body"),
-    },
-    "educationalAttachmentSizeLimit": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-attachment-limit.svg",
-      "headline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-      "description": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-    },
-    "educationalCriticalEmails": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-block-emails.svg",
-      "headline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-      "description": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
-    },
-    "educationalSignBackIn": {
-      "img": "/images/panel-images/educational-matrix/educationalImg-sign-back-in.svg",
-      "headline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-      "description": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+    "announcements": {
+      "panel1": {
+        "imgSrcPremium": "/educational-matrix/educationalImg1.png",
+        "tipHeadline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
+        "tipBody": browser.i18n.getMessage("popupEducationalComponent1Body"),
+      },
+      "panel2": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-attachment-limit.svg",
+        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
+        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
+      },
+      "panel3": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-block-emails.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
+        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
+      },
+      "panel4": {
+        "imgSrcPremium": "/educational-matrix/educationalImg-sign-back-in.svg",
+        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
+        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
+        "longText": true,
+      }
     }
   };
-}
-
-function resetNonPremiumPanel() {
-  const endOfIntroPricingElem = document.querySelector(".end-of-intro-pricing");
-  const nonPremiumPanel = document.querySelector(".content-wrapper");
-  const panelStatus = document.querySelector(".panel-status");
-
-  endOfIntroPricingElem.classList.add("is-hidden");
-  nonPremiumPanel.classList.remove("is-hidden");
-  panelStatus.classList.remove("is-hidden");
-}
-
-// End of intro pricing banner
-function showCountdownTimer(introPricingOfferEndDate) {
-
-  const remainingTimeInMs =  setRemainingTimeParts();
-
-  if (remainingTimeInMs <= 0) {
-    resetNonPremiumPanel();
-   }
-
-  setRemainingTimeParts();
-
-  const timeInterval = setInterval(() => {
-  // When timer runs out, set it back to default non premium view
-  const remainingTimeInMs =  setRemainingTimeParts();
-
-   if (remainingTimeInMs <= 0) {
-    clearInterval(timeInterval);
-   }
-   }, 1000);
-
-   function getRemainingTimeParts(remainingMilliseconds) {
-    const remainingDays = Math.floor(
-      remainingMilliseconds / (1000 * 60 * 60 * 24)
-    );
-    const remainingHours = Math.floor(
-      (remainingMilliseconds - remainingDays * (1000 * 60 * 60 * 24)) /
-        (1000 * 60 * 60)
-    );
-    const remainingMinutes = Math.floor(
-      (remainingMilliseconds -
-        remainingDays * (1000 * 60 * 60 * 24) -
-        remainingHours * (1000 * 60 * 60)) /
-        (1000 * 60)
-    );
-    const remainingSeconds = Math.floor(
-      (remainingMilliseconds -
-        remainingDays * (1000 * 60 * 60 * 24) -
-        remainingHours * (1000 * 60 * 60) -
-        remainingMinutes * (1000 * 60)) /
-        1000
-    );
-  
-    return {
-      remainingDays,
-      remainingHours,
-      remainingMinutes,
-      remainingSeconds,
-    }
-  }
-
-    function setRemainingTimeParts() {
-      const countdownTimer = document.querySelector(".countdown-timer");
-      const currentTime = new Date();
-      const remainingTimeInMs = introPricingOfferEndDate.getTime() - currentTime;
-
-      const countdownDays = getRemainingTimeParts(remainingTimeInMs).remainingDays;
-      const countdownHours = getRemainingTimeParts(remainingTimeInMs).remainingHours;
-      const countdownMinutes = getRemainingTimeParts(remainingTimeInMs).remainingMinutes;
-      const countdownSeconds = getRemainingTimeParts(remainingTimeInMs).remainingSeconds;
-
-      countdownTimer.querySelector(".countdown-data-days").textContent = countdownDays;
-      countdownTimer.querySelector(".countdown-data-hours").textContent = countdownHours;
-      countdownTimer.querySelector(".countdown-data-minutes").textContent = countdownMinutes;
-      countdownTimer.querySelector(".countdown-data-seconds").textContent = countdownSeconds;
-
-      return remainingTimeInMs;
-  }
 }
 
 function showSignUpPanel() {
@@ -242,25 +223,12 @@ const serverStoragePanel = {
   },
 };
 
-async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
+async function choosePanel(panelId, premium, premiumSubdomainSet){
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  
-  // Turned off label sync prompt for premium release
-  // const shouldShowServerStoragePromptPanel = await serverStoragePanel.isRelevant();
-  // if (shouldShowServerStoragePromptPanel) {
-  //   serverStoragePanel.init(premium);
-  // } else 
-  if (premium) {
-    const endOfIntroPricing = document.querySelector(".end-of-intro-pricing");
-    endOfIntroPricing.classList.add("is-hidden");
 
+  if (premium) {
     document.getElementsByClassName("content-wrapper")[0].remove();
     premiumPanelWrapper.classList.remove("is-hidden");
-    premiumPanelWrapper
-      .querySelectorAll(".is-hidden")
-      .forEach((premiumFeature) =>
-        premiumFeature.classList.remove("is-hidden")
-      );
     //Toggle register domain or education module
     checkUserSubdomain(premiumSubdomainSet);
     return "premiumPanel";
@@ -269,7 +237,8 @@ async function choosePanel(numRemaining, panelId, premium, premiumSubdomainSet){
     if (premiumWrapper.length) {
       premiumWrapper[0].remove();
     }
-    return numRemaining === 0 ? "maxAliasesPanel" : `panel${panelId}`;
+
+    return `panel${panelId}`;
   }
 }
 
@@ -286,6 +255,7 @@ function checkUserSubdomain(premiumSubdomainSet){
   }
 }
 
+
 async function showRelayPanel(tipPanelToShow) {
   const onboardingPanelWrapper = document.querySelector("onboarding-panel");
   const tipImageEl = onboardingPanelWrapper.querySelector("img");
@@ -294,21 +264,34 @@ async function showRelayPanel(tipPanelToShow) {
   const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
   const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
   const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
-  const panelPagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
-  const onboardingPanelStrings = getOnboardingPanels();
-  const educationalStrings = getEducationalStrings();
+  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
+  const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
+  let premiumPanelStrings = getEducationalStrings();
+  let onboardingPanelStrings = await getOnboardingPanels();
 
-  document.querySelectorAll(".total-panels").forEach(panel => {
-    panel.textContent = 2;
-  });
+  // const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+  
+  const phoneMaskingAvailable =    await checkWaffleFlag("phones") && isPhoneAvailableInCountry;
+  // TODO: Enable this when bundle pricing has been confirmed
+  // const bundleAvailable =    await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
+
+  if (
+    phoneMaskingAvailable 
+    // && bundleAvailable
+  ) {
+    promoElements.forEach(i => {
+      i.classList.remove("is-hidden");
+    });
+    onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
+    onboardingPanelStrings = await getPromoPanels();
+    premiumPanelStrings = await getPromoPanels();
+  }
 
   if (!browser.menus) {
     // Remove sign back in for browsers that don't support menus API (Chrome)
-    delete onboardingPanelStrings.panel2;
-    panelPagination.classList.add("is-hidden");
-    // document.querySelectorAll(".total-panels").forEach(panel => {
-    //   panel.textContent = 1;
-    // });
+    delete onboardingPanelStrings.announcements.panel3;
+    delete premiumPanelStrings.announcements.panel4;
   }
 
   //Premium Panel
@@ -338,7 +321,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if premium features are available
   const premiumCountryAvailability = (await browser.storage.local.get("premiumCountries"))?.premiumCountries?.PREMIUM_PLANS;
- 
+
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
   
@@ -346,87 +329,35 @@ async function showRelayPanel(tipPanelToShow) {
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
   //Educational Panel
-  const educationalModule = premiumPanelWrapper.querySelector(".educational-component");
   const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const attachmentSizeLimitHeadline = premiumPanelWrapper.querySelector(".education-headline");
-  const attachmentSizeLimitBody = premiumPanelWrapper.querySelector(".education-body");
+  const educationHeadlineEl = premiumPanelWrapper.querySelector(".education-headline");
+  const educationBodyEl = premiumPanelWrapper.querySelector(".education-body");
   const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
-  const panelPremiumPagination = educationalModule.querySelector(".onboarding-pagination");
+  const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
 
-  //Load first announcement item
-  const educationStringsSelection = educationalStrings["educationalCriticalEmails"];
-  const educationalComponentStrings = educationStringsSelection;
-  attachmentSizeLimitHeadline.textContent = educationalComponentStrings.headline;
-  attachmentSizeLimitBody.textContent = educationalComponentStrings.description;
-  educationalImgEl.src = educationalComponentStrings.img;
-  currentEducationalPanel.textContent = `${tipPanelToShow}`;
-  educationalModule.setAttribute("id", "educationalCriticalEmails");
-  
-  if (!browser.menus) {
-    panelPremiumPagination.classList.add("hidden");
-  }
-
-  const updateEducationPanel = async (announcementIndex) => {
-    currentEducationalPanel.textContent = [`${tipPanelToShow}`];
-    if (announcementIndex === 1) {
-      switchEducationPanel("educationalCriticalEmails");
-      // educationalModule.classList.remove("is-last-panel");
-
-      if (!browser.menus) {
-        // Override class for Chrome browsers to not display sign-back in
-        educationalModule.classList.add("is-last-panel");
-      }
-    }
-
-    if (announcementIndex === 2) {
-      switchEducationPanel("educationalSignBackIn");
-
-    }
-
-    // if (announcementIndex === 3) {
-    //   switchEducationPanel("educationalSignBackIn");
-    // }
-  }
-
-  function switchEducationPanel(announcementType) {
-    const updateEducationPanel = educationalStrings[announcementType];
-    attachmentSizeLimitHeadline.textContent = updateEducationPanel.headline;
-    attachmentSizeLimitBody.textContent = updateEducationPanel.description;
-    educationalImgEl.src = updateEducationPanel.img;
-    educationalModule.setAttribute("id", announcementType);
-  }
-
-  const updatePanel = async (numRemaining, panelId) => {
-    const panelToShow = await choosePanel(numRemaining, panelId, premium, premiumSubdomainSet);
-    onboardingPanelWrapper.classList = [panelToShow];
-
-    
-    // Override class for Chrome browsers to not display sign-back in
-    if (!browser.menus && (panelId === 2)){
-      onboardingPanelWrapper.classList.add("is-last-panel")
-    }
-    
-    const panelStrings = onboardingPanelStrings[`${panelToShow}`];
-
+  const updatePremiumPanel = async (panelId) => {
+    const panelToShow =  `panel${panelId}`;
+    premiumPanelWrapper.setAttribute("id", panelToShow);
+    const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
     }
-
-    tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
-    tipHeadlineEl.textContent = panelStrings.tipHeadline;
-    tipBodyEl.textContent = panelStrings.tipBody;
-    currentPanel.textContent = `${panelId}`;
-    upgradeButtonEl.textContent = panelStrings.upgradeButton;
-    upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
-
-    registerDomainImgEl.src = panelStrings.registerDomainImg;
-
-    //If Premium features are not available, do not show upgrade CTA on the panel
-    if (premiumCountryAvailability?.premium_available_in_country === true) {
-      const premiumCTA = document.querySelector(".premium-cta");
-      premiumCTA.classList.remove("is-hidden");
+    educationBodyEl.classList.remove("small-font-size");
+    if (panelStrings.longText) {
+      educationBodyEl.classList.add("small-font-size");
     }
+
+    const totalPanels = Object.keys(premiumPanelStrings.announcements).length;
+    setPagination(panelId, totalPanels);
+
+    educationHeadlineEl.textContent = panelStrings.tipHeadline;
+    educationBodyEl.textContent = panelStrings.tipBody;
+    educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
+    educationalCtaEl.textContent = panelStrings.tipCta;
+    currentEducationalPanel.textContent = `${tipPanelToShow}`;
+
+    registerDomainImgEl.src = `/images/panel-images/email-domain-illustration.svg`;
 
     // Remove panel status if user has unlimited aliases, so no negative alias left count
     if (premium) {
@@ -437,16 +368,71 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  // Set End Date here
-  const introPricingEndDateISO = (await browser.storage.local.get("introPricingEndDate"))?.introPricingEndDate.INTRO_PRICING_END;
-  const introPricingOfferEndDate = new Date(introPricingEndDateISO);
-  
-  // Display End of Intro Pricing
-  if (premiumCountryAvailability?.premium_available_in_country === true && introPricingEndDateISO) {
-    showCountdownTimer(introPricingOfferEndDate);
-  }
-  else {
-    resetNonPremiumPanel();
+  const updatePanel = async (numRemaining, panelId) => {
+    // TODO: Add " && bundleAvailable " when bundle pricing has been confirmed
+    const bundlePhoneMaskingAvailable = phoneMaskingAvailable;
+    
+    const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
+    onboardingPanelWrapper.classList = [panelToShow];
+    
+    const totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
+    let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
+
+    setPagination(panelId, totalPanels);
+
+    // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
+    // Otherwise, show Phone masking and Bundle promo
+    if (!premium && numRemaining === 0 && !bundlePhoneMaskingAvailable) {
+      panelStrings = onboardingPanelStrings["maxAliasesPanel"];
+      onboardingPanelWrapper.classList = "maxAliasesPanel";
+
+      if (premiumCountryAvailability?.premium_available_in_country === true) {
+        const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
+        upgradeButton.classList.remove("is-hidden");
+      }
+    }
+    if (!panelStrings) {
+      // Exit early if on a non-onboarding
+      return;
+    }
+
+    tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
+    tipHeadlineEl.textContent = panelStrings.tipHeadline;
+    tipBodyEl.textContent = panelStrings.tipBody;
+    tipCtaEl.textContent = panelStrings.tipCta;
+    currentPanel.textContent = `${panelId}`;
+    upgradeButtonEl.textContent = panelStrings.upgradeButton;
+    upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
+
+    //If Premium features are not available, do not show upgrade CTA on the panel
+    if (premiumCountryAvailability?.premium_available_in_country === true) {
+      const premiumCTA = document.querySelector(".premium-cta");
+      premiumCTA.classList.remove("is-hidden");
+    }
+    
+    return;
+  };
+
+  const setPagination = (activePanel, totalPanels) => {
+    const pagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
+    const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
+    const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
+    const totalPanelsEl = document.querySelector(".total-panels");
+    // Number of panels available for free users
+    totalPanelsEl.textContent = totalPanels;
+    prevButton.classList.remove("is-invisible");
+    nextButton.classList.remove("is-invisible");
+    // If user is at the start of the carousel, hide next button
+    if (activePanel === 1) {
+      prevButton.classList.add("is-invisible");
+    }
+    // If user is at the end of the carousel, hide next button
+    if (activePanel === totalPanels) {
+      nextButton.classList.add("is-invisible");
+    }
+    if (totalPanels === 1) {
+      pagination.classList.add("is-hidden");
+    }
   }
 
   //Nonpremium panel status 
@@ -458,6 +444,7 @@ async function showRelayPanel(tipPanelToShow) {
   getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
 
   document.body.classList.add("relay-panel");
+  updatePremiumPanel(tipPanelToShow);
   updatePanel(numRemaining, tipPanelToShow);
 
   document.querySelectorAll(".panel-nav").forEach(navBtn => {
@@ -470,13 +457,13 @@ async function showRelayPanel(tipPanelToShow) {
     });
   });
 
-  document.querySelectorAll(".js-panel-nav").forEach(navBtn => {
+  document.querySelectorAll(".premium-panel-nav").forEach(navBtn => {
     navBtn.addEventListener("click", () => {
       sendRelayEvent("Panel", "click", "panel-navigation-arrow");
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      updateEducationPanel(tipPanelToShow+=nextPanel);
+      return updatePremiumPanel(tipPanelToShow+=nextPanel);
     });
   });
 
@@ -492,12 +479,6 @@ async function showRelayPanel(tipPanelToShow) {
   relayPanel.classList.remove("hidden");
 
   if (numRemaining === 0) {
-    
-    if (premiumCountryAvailability?.premium_available_in_country === true) {
-      const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-      upgradeButton.classList.remove("is-hidden");
-    }
-
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
   return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
@@ -548,10 +529,6 @@ async function enableSettingsPanel() {
     const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
-
-
-  
-
 }
 
 
@@ -649,6 +626,12 @@ async function popup() {
   document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
     registerDomainLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=register-email-domain#mpp-choose-subdomain`;
   });
+
+  // Add backlink to pricing section from promo CTAs
+  const promoCTAEl = document.querySelectorAll(".js-promo-link");
+  promoCTAEl.forEach(i => {
+    i.href = `${relaySiteOrigin}/premium#pricing`;
+  })
 
 }
 
