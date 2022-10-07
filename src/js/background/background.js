@@ -361,11 +361,6 @@ async function displayBrowserActionBadge() {
 browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   let response;
   const currentPage = await getCurrentPage();
-  let url = false;
-
-  if (currentPage.url) {
-    url = new URL(currentPage.url);
-  }
 
   switch (m.method) {
     case "displayBrowserActionBadge":
@@ -393,7 +388,8 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       response = await getCurrentPage();
       break;
     case "getCurrentPageHostname":
-      if (url) { response = url.hostname }
+      // Only capture the page hostanme if the active tab is an non-internal (about:) page.
+      if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
