@@ -141,17 +141,17 @@ to each release, under the release "Assets" section.
 
 #### Publish to AMO
 
-1. `npm run config:prod`
-2. `npm run-script build`
+1. After pushing the new version to GitHub, open the "continuous prerelease to GitHub" run for that tag: https://github.com/mozilla/fx-private-relay-add-on/actions/workflows/sign-and-release-to-github.yml
+2. Under "Artifacts", download `fx-private-relay-extension.zip`
 3. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
 
 **Note: Be sure the *"Where to Host Version"* is set to _"On this site"._**
 
 #### Publish to Chrome 
 
-1. `npm run config:prod`
-2. `npm run package:chrome`
-3. [Upload the `.zip` to Chrome](https://developer.chrome.com/docs/webstore/publish//)
+1. After pushing the new version to GitHub, open the "continuous prerelease to GitHub" run for that tag: https://github.com/mozilla/fx-private-relay-add-on/actions/workflows/sign-and-release-to-github.yml
+2. Under "Artifacts", download `fx-private-relay-extension.zip`
+3. [Upload the `.zip` to Chrome](https://developer.chrome.com/docs/webstore/publish/)
 
 **Note: Be sure the publisher is set to *Mozilla Corportation*.**
 
