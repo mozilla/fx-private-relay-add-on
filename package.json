@@ -22,6 +22,7 @@
     "package:chrome": "zip -r web-ext-artifacts/chrome_relay-${npm_package_version}.zip ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
+    "remove-locales-github": "rm -rf src/_locales/.github",
     "web-ext-run": "rm -rf src/_locales/.github && web-ext run -s src/",
     "web-ext-run:firefox": "npm run web-ext-run -- --target firefox-desktop",
     "web-ext-run:android": "npm run web-ext-run -- --target firefox-android --adb-device $npm_config_device --firefox-apk org.mozilla.fenix",
