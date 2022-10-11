@@ -6,6 +6,13 @@ browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
 
 browser.runtime.onInstalled.addListener(async (details) => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
+
+  if (details.reason == "update") {
+    // Force storeRuntimeData update
+    await storeRuntimeData({forceUpdate: true});
+  }
+  
+  
   if (firstRunShown || details.reason !== "install") {
     return;
   }
@@ -87,7 +94,7 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   return await response.json();
 }
 
-async function storeRuntimeData() {
+async function storeRuntimeData(opts={forceUpdate: false}) {  
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
   const existingPremiumAvailability = (await browser.storage.local.get("premiumCountries")).premiumCountries;
@@ -99,7 +106,8 @@ async function storeRuntimeData() {
   if (typeof existingPremiumAvailability === "object" && 
       typeof existingIntroPricingEndDate === "object" && 
       existingPremiumAvailability.fetchedAt > checkingRemainingDays &&
-      existingIntroPricingEndDate.fetchedAt > checkingRemainingDays
+      existingIntroPricingEndDate.fetchedAt > checkingRemainingDays &&
+      !opts.forceUpdate
       ) 
       {
     return;
