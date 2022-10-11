@@ -66,6 +66,10 @@ jobs:
       - name: "Lint"
         run: npm run lint
 
+        # The l10n submodule .github folder breaks web-ext linting so remove it
+      - name: "Remove locales .github folder"
+        run: npm run remove-locales-github
+
       - name: "Configure add-on for the stage site"
         run: npm run config:stage
         if: github.ref_type == 'branch'
