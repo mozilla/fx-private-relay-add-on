@@ -530,7 +530,7 @@ async function enableSettingsPanel() {
   }
 }
 
-async function enableReportIssuePanel() {
+function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
   const submissionSuccessContinue = document.querySelector(".report-continue");
@@ -549,32 +549,29 @@ async function enableReportIssuePanel() {
   showReportInputOtherTextField();
   showSuccessReportSubmission();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
-
-  console.log(reportForm);
-
-=======
-  const reportForm = document.querySelector(".report-issue-content");
->>>>>>> b0f8727 (test mock data on console)
-=======
-  const reportForm = document.querySelector('.report-issue-content > input[type="checkbox"');
-
-  console.log(reportForm);
-  
->>>>>>> 9cf7225 (Check JSON format for results)
+  const reportForm = document.querySelector('.report-issue-content');
   reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
-function handleReportIssueFormSubmission(event) {
-  event.preventDefault();
+async function handleReportIssueFormSubmission(event) {
   const data = new FormData(event.target);
   const formJSON = Object.fromEntries(data.entries());
-  console.log(JSON.stringify(formJSON, null, 2));
+  // console.log(JSON.stringify(formJSON, null, 2));
+
+  await browser.runtime.sendMessage({
+    method: "postReportWebcompatIssue",
+    description: formJSON,
+    // issue_on_domain: formJSON.issue_on_domain, 
+    // email_mask_not_accepted: formJSON.email_mask_not_accepted, 
+    // email_not_received: formJSON.email_not_received, 
+    // other_issue: formJSON.other_issue,
+  });
+
+  event.preventDefault();
+
 }
 
-async function showSuccessReportSubmission() {
+function showSuccessReportSubmission() {
   const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
   const reportSuccess = document.querySelector(".report-success");
   const reportContent = document.querySelector(".report-issue-content");
@@ -594,7 +591,7 @@ async function reportURL() {
   inputFieldUrl.value = url.hostname;
 }
 
-async function showReportInputOtherTextField() {
+ function showReportInputOtherTextField() {
   const otherCheckbox = document.querySelector('input[name="issue-case-other"');
   const otherTextField = document.querySelector('input[name="issue-case-other-details"');
   otherCheckbox.addEventListener("click", () => {
