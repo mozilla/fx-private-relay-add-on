@@ -347,9 +347,7 @@ async function showRelayPanel(tipPanelToShow) {
     if (panelStrings.longText) {
       educationBodyEl.classList.add("small-font-size");
     }
-
-    const totalPanels = Object.keys(premiumPanelStrings.announcements).length;
-    setPagination(panelId, totalPanels);
+    setPagination(panelId);
 
     educationHeadlineEl.textContent = panelStrings.tipHeadline;
     educationBodyEl.textContent = panelStrings.tipBody;
@@ -375,10 +373,9 @@ async function showRelayPanel(tipPanelToShow) {
     const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
     
-    const totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
     let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
 
-    setPagination(panelId, totalPanels);
+    setPagination(panelId);
 
     // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
     // Otherwise, show Phone masking and Bundle promo
@@ -413,12 +410,16 @@ async function showRelayPanel(tipPanelToShow) {
     return;
   };
 
-  const setPagination = (activePanel, totalPanels) => {
+  const setPagination = (activePanel) => {
     const pagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
     const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
     const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
     const totalPanelsEl = document.querySelector(".total-panels");
     // Number of panels available for free users
+    let totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
+    if (premium) {
+      totalPanels = Object.keys(premiumPanelStrings.announcements).length;
+    }
     totalPanelsEl.textContent = totalPanels;
     prevButton.classList.remove("is-invisible");
     nextButton.classList.remove("is-invisible");
@@ -442,8 +443,8 @@ async function showRelayPanel(tipPanelToShow) {
   remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2_mask", [numRemaining, maxNumAliases]);
   const getUnlimitedAliases = document.querySelector(".premium-cta");
   getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
-
   document.body.classList.add("relay-panel");
+
   updatePremiumPanel(tipPanelToShow);
   updatePanel(numRemaining, tipPanelToShow);
 
