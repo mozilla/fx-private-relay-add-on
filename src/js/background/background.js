@@ -7,7 +7,7 @@ browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
 browser.runtime.onInstalled.addListener(async (details) => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
 
-  if (details.reason == "update") {
+  if (details.reason == "update" || details.reason == "install") {
     // Force storeRuntimeData update
     await storeRuntimeData({forceUpdate: true});
   }
@@ -61,6 +61,31 @@ async function getAliasesFromServer(method = "GET", opts=null) {
   return masks;
 }
 
+async function fetchApiRequest(url, method = "GET", body = null, opts=null) {
+      const { csrfCookieValue } = browser.storage.local.get("csrfCookieValue");
+      const headers = new Headers();
+
+
+      headers.set("X-CSRFToken", csrfCookieValue);
+      headers.set("Content-Type", "application/json");
+      headers.set("Accept", "application/json");
+
+      if (opts && opts.auth) {
+        const apiToken = await browser.storage.local.get("apiToken");
+        headers.set("Authorization", `Token ${apiToken.apiToken}`);
+      }
+
+      const response = await fetch(url, {
+        mode: "same-origin",
+        method,
+        headers: headers,
+        body,
+      });
+
+      const answer = await response.json();
+      return answer;
+    }
+
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
@@ -94,7 +119,7 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   return await response.json();
 }
 
-async function storeRuntimeData(opts={forceUpdate: false}) {  
+async function storeRuntimeData(opts={forceUpdate: false}) {
   const existingPremiumAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans;
   // If we already fetched Premium availability in the past seven days,
   // don't fetch it again.
@@ -349,73 +374,107 @@ async function displayBrowserActionBadge() {
   }
 
   if (!browserActionBadgesClicked && (serverStoragePrompt !== true || privacyNoticeUpdatePromptShown !== true)) {
-    browser.browserAction.setBadgeBackgroundColor({
+    browser.action.setBadgeBackgroundColor({
       color: "#00D900",
     });
-    browser.browserAction.setBadgeText({ text: "!" });
+    browser.action.setBadgeText({ text: "!" });
   }
 }
 
-browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   let response;
-  const currentPage = await getCurrentPage();
 
-  switch (m.method) {
+  switch (message.method) {
     case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
+      displayBrowserActionBadge().then(() => {
+        sendResponse();
+      });
       break;
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
       break;
     case "fillInputWithAlias":
-      browser.tabs.sendMessage(sender.tab.id, m.message);
+      browser.tabs.sendMessage(sender.tab.id, message.message);
       break;
     case "updateIframeHeight":
-      browser.tabs.sendMessage(sender.tab.id, m);
+      browser.tabs.sendMessage(sender.tab.id, message);
       break;
     case "getServerStoragePref":
-      response = await getServerStoragePref();
-      break;
+      getServerStoragePref().then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "getAliasesFromServer":
-      response = await getAliasesFromServer("GET", m.options);
-      break;
+      getAliasesFromServer("GET", message.options).then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "patchMaskInfo":
-      await patchMaskInfo("PATCH", m.id, m.data, m.options);
+      patchMaskInfo("PATCH", message.id, message.data, message.options).then(() => {
+        sendResponse();
+      });
       break;
+    case "fetchApiRequest": 
+      fetchApiRequest(message.url).then(response => {
+        sendResponse({ response });
+      });
+      return true;
     case "getCurrentPage":
-      response = await getCurrentPage();
-      break;
+      getCurrentPage().then(() => {
+        sendResponse();
+      });
+      return true
     case "getCurrentPageHostname":
+      // FIXME: Set correct .then/promise logic here
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
-      if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
+      // getCurrentPage().then((currentPage) => {
+      //   if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
+      //   sendResponse({ response });
+      // });
+      
       break;
     case "makeRelayAddress":
-      response = await makeRelayAddress(m.description);
-      break;
+      makeRelayAddress(message.description).then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "openRelayHomepage":
       browser.tabs.create({
         url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
       });
       break;
     case "rebuildContextMenuUpgrade":
-      await relayContextMenus.init();
-      break;
+      relayContextMenus.init().then(() => {
+        sendResponse();
+      });
+      return true
     case "refreshAccountPages":
-      await refreshAccountPages();
-      break;
+      refreshAccountPages.init().then(() => {
+        sendResponse();
+      });
+      return true
     case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
+      sendMetricsEvent(message.eventData).then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "updateAddOnAuthStatus":
-      await updateAddOnAuthStatus(m.status);
-      break;
+      updateAddOnAuthStatus(message.status).then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
+      browser.storage.local.set({ showInputIcons: message.iconPref });
       break;
+    case "storeRuntimeData":
+      storeRuntimeData({forceUpdate: message.forceUpdate}).then(() => {
+        sendResponse();
+      });
+      return true;
   }
-  return response;
-});
 
+  return;
+});
 
 (async () => {
   await displayBrowserActionBadge();

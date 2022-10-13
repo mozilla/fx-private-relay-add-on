@@ -40,6 +40,15 @@
     run();
   }
 
+  async function fetchRequestFromBackground(url) {
+    const { response } = await browser.runtime.sendMessage({
+      method: "fetchApiRequest",
+      url: url
+    });
+
+    return response;
+  }
+  
   async function run() {
     // Get the api token from the account profile page
     const profileMainElement = document.querySelector("#profile-main");
@@ -53,10 +62,9 @@
     const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
     const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
 
-    async function apiRequest(url, method = "GET", body = null, opts=null) {
+    const cookieString =
+      typeof document.cookie === "string" ? document.cookie : "";
 
-      const cookieString =
-        typeof document.cookie === "string" ? document.cookie : "";
       const cookieStringArray = cookieString
         .split(";")
         .map((individualCookieString) => individualCookieString.split("="))
@@ -69,36 +77,11 @@
         ([cookieKey, _cookieValue]) => cookieKey === "csrftoken"
       );
 
-      browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
+    await browser.storage.local.set({csrfCookieValue: csrfCookieValue});
 
+    const serverProfileData = await fetchRequestFromBackground(apiProfileURL);
 
-      const headers = new Headers();
-
-
-      headers.set("X-CSRFToken", csrfCookieValue);
-      headers.set("Content-Type", "application/json");
-      headers.set("Accept", "application/json");
-
-      if (opts && opts.auth) {
-        const apiToken = await browser.storage.local.get("apiToken");
-        headers.set("Authorization", `Token ${apiToken.apiToken}`);
-      }
-
-
-      const response = await fetch(url, {
-        mode: "same-origin",
-        method,
-        headers: headers,
-        body,
-      });
-
-      const answer = await response.json();
-      return answer;
-    }
-
-    const serverProfileData = await apiRequest(apiProfileURL);
-
-    browser.storage.local.set({
+    await browser.storage.local.set({
       profileID: parseInt(serverProfileData[0].id, 10),
       server_storage: serverProfileData[0].server_storage,
       has_phone: serverProfileData[0].has_phone,
@@ -114,9 +97,9 @@
      */
     async function refreshLocalLabelCache(options = {}) {
       /** @type {RandomMask[]} */
-      const relayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      const relayAddresses = await fetchRequestFromBackground(relayApiUrlRelayAddresses);
       const domainAddresses = options.fetchCustomMasks
-        ? await apiRequest(relayApiUrlDomainAddresses)
+        ? await fetchRequestFromBackground(relayApiUrlDomainAddresses)
         : [];
       await browser.storage.local.set({
         relayAddresses:
@@ -165,7 +148,7 @@
     const isPremiumUser = document.querySelector(
         "firefox-private-relay-addon-data"
       ).dataset.hasPremium === "true";
-    browser.storage.local.set({ premium: isPremiumUser });
+    await browser.storage.local.set({ premium: isPremiumUser });
 
     // Get FXA Stuff
     const fxaSubscriptionsUrl = document.querySelector(
@@ -187,7 +170,7 @@
       "firefox-private-relay-addon-data"
     ).dataset.premiumSubdomainSet;
 
-    browser.storage.local.set({
+    await browser.storage.local.set({
       fxaSubscriptionsUrl,
       aliasesUsedVal,
       emailsForwardedVal,
@@ -227,14 +210,14 @@
 
         if (body.description.length > 0 || body.generated_for.length > 0 || body.used_on.length > 0) {
           const endpoint = alias.mask_type === "custom" ? relayApiUrlDomainAddresses : relayApiUrlRelayAddresses;
-          await apiRequest(`${endpoint}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
+          await fetchRequestFromBackground(`${endpoint}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
         }
       }
     }
 
     // Loop through the temp array that is about to be synced with the server dataset and
     // be sure it matches the local storage metadata dataset
-    function getAliasesWithUpdatedMetadata(updatedAliases, prevAliases) {
+    async function getAliasesWithUpdatedMetadata(updatedAliases, prevAliases) {
       return prevAliases.map(prevAlias => {
         const updatedAlias = updatedAliases.find(otherAlias => otherAlias.id === prevAlias.id) ?? { description: "", generated_for: "", used_on: ""};
         return {
@@ -249,9 +232,9 @@
     if (siteStorageEnabled) {
       // Sync alias data from server page.
       // If local storage items exist AND have label metadata stored, sync it to the server.
-      const serverRelayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      const serverRelayAddresses = await fetchRequestFromBackground(relayApiUrlRelayAddresses);
       const serverDomainAddresses = isPremiumUser
-        ? await apiRequest(relayApiUrlDomainAddresses)
+        ? await fetchRequestFromBackground(relayApiUrlDomainAddresses)
         : [];
 
       // let usage: This data may be overwritten when merging the local storage dataset with the server set.
@@ -269,13 +252,13 @@
         !aliasesHaveStoredMetadata(localCopyOfServerMasks) // Make sure there is no meta data in the server dataset
       ) {
         await sendMetaDataToServer(localMasks);
-        localCopyOfServerMasks = getAliasesWithUpdatedMetadata(
+        localCopyOfServerMasks = await getAliasesWithUpdatedMetadata(
           localCopyOfServerMasks,
           localMasks
         );
       }
 
-      browser.storage.local.set({ relayAddresses: localCopyOfServerMasks });
+      await browser.storage.local.set({ relayAddresses: localCopyOfServerMasks });
     } else {
       const { relayAddresses: existingLocalStorageRelayAddresses } = await browser.storage.local.get(
         "relayAddresses"

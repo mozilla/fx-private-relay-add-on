@@ -1,72 +1,81 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Firefox Relay",
   "version": "2.5.6",
 
   "description": "__MSG_extensionDescription_mask__",
-
   "default_locale": "en",
-
   "icons": {
     "16": "icons/icon_16.png",
     "48": "icons/icon_48.png",
     "96": "icons/icon_96.png"
   },
-
   "browser_specific_settings": {
-      "gecko": {
-          "id": "private-relay@firefox.com",
-          "strict_min_version": "79.0"
-      }
+    "gecko": {
+      "id": "private-relay@firefox.com",
+      "strict_min_version": "79.0"
+    }
   },
-
   "background": {
-      "scripts": ["js/libs/browser-polyfill.min.js", "js/background/background.js", "js/background/context-menu.js"]
+    "service_worker": "js/background/background.js"
   },
-
-  "browser_action": {
-      "browser_style": true,
-      "default_icon": {
-          "32": "icons/icon_32.png"
-      },
-      "default_popup": "popup.html"
+  "action": {
+    "browser_style": true,
+    "default_icon": {
+      "32": "icons/icon_32.png"
+    },
+    "default_popup": "popup.html"
   },
-
   "content_scripts": [
     {
       "matches": [
         "http://127.0.0.1/"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/track_logout.js"]
+      "js": [
+        "js/libs/browser-polyfill.min.js",
+        "js/relay.firefox.com/track_logout.js"
+      ]
     },
     {
       "matches": [
         "http://127.0.0.1/**"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/inject_addon_data.js"]
+      "js": [
+        "js/libs/browser-polyfill.min.js",
+        "js/relay.firefox.com/inject_addon_data.js"
+      ]
     },
     {
       "matches": [
         "http://127.0.0.1/**"
       ],
-      "css": ["css/relay-website.css"],
+      "css": [
+        "css/relay-website.css"
+      ],
       "run_at": "document_start"
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/profile/**"
+        "http://127.0.0.1/accounts/profile/**"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/get_profile_data.js"]
+      "js": [
+        "js/libs/browser-polyfill.min.js",
+        "js/relay.firefox.com/get_profile_data.js"
+      ],
+      "run_at": "document_end"
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/settings/**"
+        "http://127.0.0.1/accounts/settings/**"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/settings_refresh.js"]
+      "js": [
+        "js/libs/browser-polyfill.min.js",
+        "js/relay.firefox.com/settings_refresh.js"
+      ]
     },
     {
       "matches": [
-          "<all_urls>"
+        "<all_urls>"
       ],
       "js": [
         "js/libs/browser-polyfill.min.js",
@@ -77,25 +86,33 @@
         "js/other-websites/fill_relay_address.js",
         "js/shared/metrics.js"
       ],
-      "css": ["css/relay.css"],
+      "css": [
+        "css/relay.css"
+      ],
       "all_frames": true
     }
   ],
-
-  "permissions": [
-      "<all_urls>",
-      "storage",
-      "contextMenus",
-      "menus"
+  "host_permissions": [
+    "http://127.0.0.1:8000/**"
   ],
-
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "menus"
+  ],
   "web_accessible_resources": [
-    "images/*.svg",
-    "icons/*.svg",
-    "icons/*.png",
-    "fonts/Inter/*.woff2",
-    "fonts/Metropolis/*.woff2",
-    "*.html"
+    {
+      "resources": [
+        "images/*.svg",
+        "icons/*.svg",
+        "icons/*.png",
+        "fonts/Inter/*.woff2",
+        "fonts/Metropolis/*.woff2",
+        "*.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ]
-
 }

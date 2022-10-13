@@ -204,7 +204,6 @@ const serverStoragePanel = {
       );
 
       serverStoragePanel.event.dontShowPanelAgain();
-
       browser.tabs.create({
         url: `${relaySiteOrigin}/accounts/profile/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=allow-labels-sync#sync-labels`,
         active: true,
@@ -266,6 +265,14 @@ async function showRelayPanel(tipPanelToShow) {
   let onboardingPanelStrings = await getOnboardingPanels();
 
   const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  // const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+
+  await browser.runtime.sendMessage({
+    method: "storeRuntimeData",
+    forceUpdate: true
+  });
+  
+
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
 
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
@@ -550,7 +557,6 @@ async function enableSettingsPanel() {
 
   if (currentBrowser === "Chrome") {
     const supportLink = document.getElementById("popupSettingsLeaveFeedbackLink");
-    const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
     supportLink.href = chromeSupportLink;
   }
 }
@@ -594,8 +600,8 @@ async function clearBrowserActionBadge() {
   // Dismiss the browserActionBadge only when it exists
   if (browserActionBadgesClicked === false) {
     browser.storage.local.set({ browserActionBadgesClicked: true });
-    browser.browserAction.setBadgeBackgroundColor({ color: null });
-    browser.browserAction.setBadgeText({ text: "" });
+    browser.action.setBadgeBackgroundColor({ color: null });
+    browser.action.setBadgeText({ text: "" });
   }
 }
 
