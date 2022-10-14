@@ -272,15 +272,15 @@ async function showRelayPanel(tipPanelToShow) {
   // const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
   
-  const showPhoneMaskingPromo =    await checkWaffleFlag("phones") && isPhoneAvailableInCountry;
-  // TODO: Enable this when bundle pricing has been confirmed
-  // const bundleAvailable =    await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
-  
   // If user has a phone plan, don't show the phone masking promo
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
   
+  const showPhoneMaskingPromo =    await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  // TODO: Enable this when bundle pricing has been confirmed
+  // const bundleAvailable =    await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
+  
   if (
-    showPhoneMaskingPromo && !hasPhone
+    showPhoneMaskingPromo
     // && bundleAvailable
   ) {
     promoElements.forEach(i => {
