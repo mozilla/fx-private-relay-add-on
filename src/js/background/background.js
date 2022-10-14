@@ -100,14 +100,6 @@ async function postReportWebcompatIssue(description) {
     return;
   }
   const headers = await createNewHeadersObject({auth: true});
-  
-  // Change 'on' input to 'true'
-  for (let [key, value] of Object.entries(description)) {
-    if (value === "on" && key !== "other_issue") {
-      value = true;
-    }
-  };
-
   const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
 
   let apiBody = {

@@ -554,22 +554,22 @@ function enableReportIssuePanel() {
 async function handleReportIssueFormSubmission(event) {
   event.preventDefault();
   const data = new FormData(event.target);
-  const formJSON = Object.fromEntries(data.entries());
+  const reportData = Object.fromEntries(data.entries());
   
-  Object.keys(formJSON).forEach(function(value) {
+  Object.keys(reportData).forEach(function(value) {
     // Switch "on" to true
-    if (formJSON[value] === "on") {
-      formJSON[value] = true;
+    if (reportData[value] === "on") {
+      reportData[value] = true;
     }
     // Remove from report if empty string
-    if (formJSON[value] === "") {
-      delete formJSON[value];
+    if (reportData[value] === "") {
+      delete reportData[value];
     }
   });
 
   await browser.runtime.sendMessage({
     method: "postReportWebcompatIssue",
-    description: formJSON
+    description: reportData
   });
 }
 
