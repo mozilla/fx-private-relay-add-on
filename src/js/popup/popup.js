@@ -572,42 +572,42 @@ function enableReportIssuePanel() {
       }
     });
   });
-
+  const reportForm = document.querySelector('.report-issue-content');
+  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
-
-  const reportForm = document.querySelector('.report-issue-content');
-  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
 async function handleReportIssueFormSubmission(event) {
+  event.preventDefault();
   const data = new FormData(event.target);
   const formJSON = Object.fromEntries(data.entries());
-  // console.log(JSON.stringify(formJSON, null, 2));
+  
+  Object.keys(formJSON).forEach(function(value) {
+    // Switch "on" to true
+    if (formJSON[value] === "on") {
+      formJSON[value] = true;
+    }
+    // Remove from report if empty string
+    if (formJSON[value] === "") {
+      delete formJSON[value];
+    }
+  });
 
   await browser.runtime.sendMessage({
     method: "postReportWebcompatIssue",
-    description: formJSON,
-    // issue_on_domain: formJSON.issue_on_domain, 
-    // email_mask_not_accepted: formJSON.email_mask_not_accepted, 
-    // email_not_received: formJSON.email_not_received, 
-    // other_issue: formJSON.other_issue,
+    description: formJSON
   });
-
-  event.preventDefault();
-
 }
 
 function showSuccessReportSubmission() {
   const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
   const reportSuccess = document.querySelector(".report-success");
   const reportContent = document.querySelector(".report-issue-content");
-
   reportIssueSubmitBtn.addEventListener("click", () => {
     reportSuccess.classList.remove("is-hidden");
     reportContent.classList.add("is-hidden");
-
   });
 }
 
@@ -616,25 +616,19 @@ async function reportURL() {
   const currentPage = await getCurrentPage();
   const url = new URL(currentPage.url);
   const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-  inputFieldUrl.value = url.hostname;
+  inputFieldUrl.value = url.origin;
 }
 
  function showReportInputOtherTextField() {
   const otherCheckbox = document.querySelector('input[name="issue-case-other"');
-  const otherTextField = document.querySelector('input[name="issue-case-other-details"');
+  const otherTextField = document.querySelector('input[name="other_issue"');
   otherCheckbox.addEventListener("click", () => {
     otherTextField.classList.toggle("is-hidden");
   })
 
   // Add placeholder to report input on 'Other' selection
-  const inputFieldOtherDetails = document.querySelector('input[name="issue-case-other-details"]');
-
-  // Clear placeholder on click
-  inputFieldOtherDetails.addEventListener("click", () => {
-    if (inputFieldOtherDetails.value === browser.i18n.getMessage("popupReportIssueCaseOtherDetails")) {
-      inputFieldOtherDetails.value = "";
-    }
-  })
+  const inputFieldOtherDetails = document.querySelector('input[name="other_issue"]');
+  inputFieldOtherDetails.placeholder = browser.i18n.getMessage("popupReportIssueCaseOtherDetails");
 }
 
 async function getCurrentPage() {

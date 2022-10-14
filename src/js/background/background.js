@@ -99,10 +99,16 @@ async function postReportWebcompatIssue(description) {
   if (!relayApiSource) {
     return;
   }
-
   const headers = await createNewHeadersObject({auth: true});
+  
+  // Change 'on' input to 'true'
+  for (let [key, value] of Object.entries(description)) {
+    if (value === "on" && key !== "other_issue") {
+      value = true;
+    }
+  };
 
-  const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue/`;
+  const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
 
   let apiBody = {
     issue_on_domain: "",
@@ -112,12 +118,6 @@ async function postReportWebcompatIssue(description) {
     other_issue: "",
   };
 
-  // apiBody.issue_on_domain = issue_on_domain;
-  // apiBody.email_mask_not_accepted = email_mask_not_accepted;
-  // apiBody.add_on_visual_issue = add_on_visual_issue;
-  // apiBody.email_not_received = email_not_received;
-  // apiBody.other_issue = other_issue;
-  
   apiBody.issue_on_domain = description.issue_on_domain;
   apiBody.email_mask_not_accepted = description.email_mask_not_accepted;
   apiBody.add_on_visual_issue = description.add_on_visual_issue;
@@ -132,9 +132,6 @@ async function postReportWebcompatIssue(description) {
   });
 
   let newRelayAddressJson = await newRelayAddressResponse.json();
-
-  console.log(newRelayAddressJson);
-
   return newRelayAddressJson;
 
 }
@@ -439,7 +436,6 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "postReportWebcompatIssue":
       response = await postReportWebcompatIssue(m.description);
-      console.log(response);
       break;
     case "openRelayHomepage":
       browser.tabs.create({
