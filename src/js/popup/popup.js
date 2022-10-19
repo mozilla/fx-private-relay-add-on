@@ -530,7 +530,7 @@ async function enableSettingsPanel() {
   }
 }
 
-function enableReportIssuePanel() {
+async function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
   const submissionSuccessContinue = document.querySelector(".report-continue");
@@ -544,18 +544,18 @@ function enableReportIssuePanel() {
       }
     });
   });
-  const reportForm = document.querySelector('.report-issue-content');
-  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
+  const reportForm = document.querySelector(".report-issue-content");
   reportURL();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
+  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
 }
 
 async function handleReportIssueFormSubmission(event) {
   event.preventDefault();
   const data = new FormData(event.target);
   const reportData = Object.fromEntries(data.entries());
-  
+
   Object.keys(reportData).forEach(function(value) {
     // Switch "on" to true
     if (reportData[value] === "on") {
@@ -583,12 +583,29 @@ function showSuccessReportSubmission() {
   });
 }
 
+function isValidURL(string) {
+  const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+  return (res !== null)
+};
+
 async function reportURL() {
   // Add Site URL placeholder
-  const currentPage = await getCurrentPage();
-  const url = new URL(currentPage.url);
+  const currentPage = (await getCurrentPage()).url;
+  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
   const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-  inputFieldUrl.value = url.origin;
+  
+  inputFieldUrl.addEventListener('input', () => {
+    if (isValidURL(inputFieldUrl.value)) {
+      reportIssueSubmitBtn.disabled = false;
+    }
+    reportIssueSubmitBtn.disabled = true;
+  });
+
+  if (currentPage) {
+    const url = new URL(currentPage);
+    // returns a http:// or https:// value
+    inputFieldUrl.value = url.origin;
+  };
 }
 
  function showReportInputOtherTextField() {
