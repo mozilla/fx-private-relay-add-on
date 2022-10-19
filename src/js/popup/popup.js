@@ -565,7 +565,7 @@ async function handleReportIssueFormSubmission(event) {
       delete reportData[value];
     }
   });
-  // Clean URL data to add "http://" before it if the url doesn't contain a protocol
+  // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
   if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
     reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
   }
@@ -586,9 +586,12 @@ function showSuccessReportSubmission() {
 }
 
 function isValidURL(string) {
-  const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+  // Disabled es-lint in the following line to accept regex
+  /* eslint-disable-next-line */
+  var expression = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
+  const res = string.match(expression);
   return (res !== null)
-};
+}
 
 async function setURLwithIssue() {
   // Add Site URL placeholder
@@ -612,7 +615,7 @@ async function setURLwithIssue() {
     // returns a http:// or https:// value
     inputFieldUrl.value = url.origin;
     reportIssueSubmitBtn.disabled = false;
-  };
+  }
 }
 
  function showReportInputOtherTextField() {
