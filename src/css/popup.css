@@ -103,6 +103,10 @@ settings, report-issue, report-issue-success {
   padding: 4px;
 }
 
+.report-section input[type=submit]:disabled{
+  background: var(--colorInformationalDisabled);
+}
+
 .report-success {
   padding-top: 24px;
   display: flex;
@@ -120,7 +124,6 @@ settings, report-issue, report-issue-success {
   cursor: pointer;
   color: var(--relayBlue3);
 }
-
 
 .setting {
   padding: 12px 0;
