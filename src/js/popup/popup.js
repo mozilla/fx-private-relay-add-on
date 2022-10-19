@@ -562,7 +562,6 @@ async function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
   const submissionSuccessContinue = document.querySelector(".report-continue");
-
   [reportIssueToggle, reportIssueSettingsReturn, submissionSuccessContinue].forEach(e => {
     e.addEventListener("click", () => {
       document.body.classList.toggle("show-report-issue");
@@ -573,7 +572,7 @@ async function enableReportIssuePanel() {
     });
   });
   const reportForm = document.querySelector(".report-issue-content");
-  reportURL();
+  setURLwithIssue();
   showReportInputOtherTextField();
   showSuccessReportSubmission();
   reportForm.addEventListener('submit', handleReportIssueFormSubmission);
@@ -594,7 +593,10 @@ async function handleReportIssueFormSubmission(event) {
       delete reportData[value];
     }
   });
-
+  // Clean URL data to add "http://" before it if the url doesn't contain a protocol
+  if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
+    reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
+  }
   await browser.runtime.sendMessage({
     method: "postReportWebcompatIssue",
     description: reportData
@@ -616,29 +618,34 @@ function isValidURL(string) {
   return (res !== null)
 };
 
-async function reportURL() {
+async function setURLwithIssue() {
   // Add Site URL placeholder
   const currentPage = (await getCurrentPage()).url;
   const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
   const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-  
+  reportIssueSubmitBtn.disabled = true;
+
+  // Allow for custom URL inputs
   inputFieldUrl.addEventListener('input', () => {
+    reportIssueSubmitBtn.disabled = true;
+    // Ensure that the custom input is valid
     if (isValidURL(inputFieldUrl.value)) {
       reportIssueSubmitBtn.disabled = false;
     }
-    reportIssueSubmitBtn.disabled = true;
   });
 
+  // Check that the host site has a valid URL
   if (currentPage) {
     const url = new URL(currentPage);
     // returns a http:// or https:// value
     inputFieldUrl.value = url.origin;
+    reportIssueSubmitBtn.disabled = false;
   };
 }
 
  function showReportInputOtherTextField() {
-  const otherCheckbox = document.querySelector('input[name="issue-case-other"');
-  const otherTextField = document.querySelector('input[name="other_issue"');
+  const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
+  const otherTextField = document.querySelector('input[name="other_issue"]');
   otherCheckbox.addEventListener("click", () => {
     otherTextField.classList.toggle("is-hidden");
   })
