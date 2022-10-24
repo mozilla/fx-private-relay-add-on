@@ -585,12 +585,8 @@ function showSuccessReportSubmission() {
   });
 }
 
-function isValidURL(string) {
-  // Disabled es-lint in the following line to accept regex
-  /* eslint-disable-next-line */
-  var expression = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
-  const res = string.match(expression);
-  return (res !== null)
+function isSortaAURL(str) {
+  return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
 }
 
 async function setURLwithIssue() {
@@ -603,8 +599,8 @@ async function setURLwithIssue() {
   // Allow for custom URL inputs
   inputFieldUrl.addEventListener('input', () => {
     reportIssueSubmitBtn.disabled = true;
-    // Ensure that the custom input is valid
-    if (isValidURL(inputFieldUrl.value)) {
+    // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
+    if (isSortaAURL(inputFieldUrl.value)) {
       reportIssueSubmitBtn.disabled = false;
     }
   });
