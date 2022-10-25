@@ -272,17 +272,19 @@ async function showRelayPanel(tipPanelToShow) {
   const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
 
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-  const showPhoneMaskingPromo = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-  const showBundlePromo = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
+  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
   
   if (
-    showPhoneMaskingPromo || showBundlePromo
+    isPhoneMaskingAvailable || isBundleAvailable
   ) {
     promoElements.forEach(i => {
       i.classList.remove("is-hidden");
     });
     onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
+    
+    // If phone masking / bundle is available, switch panels to promo panel set to advertise phone masking/bundle plans
     onboardingPanelStrings = await getPromoPanels();
     premiumPanelStrings = await getPromoPanels();
   }
@@ -349,12 +351,12 @@ async function showRelayPanel(tipPanelToShow) {
     }
 
     // If bundle is unavailable but phone masking is, only show the phone masking promo
-    if (!showBundlePromo && showPhoneMaskingPromo) {
+    if (!isBundleAvailable && isPhoneMaskingAvailable) {
       delete premiumPanelStrings.announcements.panel2;
     }
 
     // If phone masking is unavailable but bundle is, only show bundle promo
-    if (!showPhoneMaskingPromo && showBundlePromo) {
+    if (!isPhoneMaskingAvailable && isBundleAvailable) {
       // Force panel to start at panel2, which is the bundle promo
       panelStrings = premiumPanelStrings.announcements.panel2;
       delete premiumPanelStrings.announcements.panel1;
@@ -386,12 +388,12 @@ async function showRelayPanel(tipPanelToShow) {
     let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
 
     // If bundle is unavailable but phone masking is, only show the phone masking promo
-    if (!showBundlePromo && showPhoneMaskingPromo) {
+    if (!isBundleAvailable && isPhoneMaskingAvailable) {
       delete onboardingPanelStrings.announcements.panel2;
     }
 
     // If phone masking is unavailable but bundle is, only show bundle promo
-    if (!showPhoneMaskingPromo && showBundlePromo) {
+    if (!isPhoneMaskingAvailable && isBundleAvailable) {
       // Force panel to start at panel2, which is the bundle promo
       panelStrings = onboardingPanelStrings.announcements.panel2;
       delete onboardingPanelStrings.announcements.panel1;
@@ -401,7 +403,7 @@ async function showRelayPanel(tipPanelToShow) {
 
     // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
     // Otherwise, show Phone masking and Bundle promo
-    if (!premium && numRemaining === 0 && !(showPhoneMaskingPromo || showBundlePromo)) {
+    if (!premium && numRemaining === 0 && !(isPhoneMaskingAvailable || isBundleAvailable)) {
       panelStrings = onboardingPanelStrings["maxAliasesPanel"];
       onboardingPanelWrapper.classList = "maxAliasesPanel";
 
