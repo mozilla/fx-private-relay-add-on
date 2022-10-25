@@ -9,9 +9,8 @@ async function checkWaffleFlag(flag) {
   return false;
 }
 
-
 async function getPromoPanels() {
-  const savings = "40%"; // For "Save 50%!" in the Bundle promo body
+  const savings = "40%"; // For "Save 40%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
   const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
@@ -272,7 +271,9 @@ async function showRelayPanel(tipPanelToShow) {
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
   const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
 
+  // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
   const showPhoneMaskingPromo = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
   const showBundlePromo = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
   
   if (
@@ -347,12 +348,14 @@ async function showRelayPanel(tipPanelToShow) {
       educationBodyEl.classList.add("small-font-size");
     }
 
+    // If bundle is unavailable but phone masking is, only show the phone masking promo
     if (!showBundlePromo && showPhoneMaskingPromo) {
-      panelStrings = premiumPanelStrings.announcements.panel1;
       delete premiumPanelStrings.announcements.panel2;
     }
 
+    // If phone masking is unavailable but bundle is, only show bundle promo
     if (!showPhoneMaskingPromo && showBundlePromo) {
+      // Force panel to start at panel2, which is the bundle promo
       panelStrings = premiumPanelStrings.announcements.panel2;
       delete premiumPanelStrings.announcements.panel1;
     }
@@ -382,12 +385,14 @@ async function showRelayPanel(tipPanelToShow) {
 
     let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
 
+    // If bundle is unavailable but phone masking is, only show the phone masking promo
     if (!showBundlePromo && showPhoneMaskingPromo) {
-      panelStrings = onboardingPanelStrings.announcements.panel1;
       delete onboardingPanelStrings.announcements.panel2;
     }
 
+    // If phone masking is unavailable but bundle is, only show bundle promo
     if (!showPhoneMaskingPromo && showBundlePromo) {
+      // Force panel to start at panel2, which is the bundle promo
       panelStrings = onboardingPanelStrings.announcements.panel2;
       delete onboardingPanelStrings.announcements.panel1;
     }
