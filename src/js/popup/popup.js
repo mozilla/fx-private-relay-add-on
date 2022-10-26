@@ -7,20 +7,18 @@ async function checkWaffleFlag(flag) {
     }
   }
   return false;
- }
+}
 
- 
- async function getPromoPanels() {
-  // TODO: Enable this when bundle pricing has been confirmed
-  // const savings = "22%"; // For "Save 50%!" in the Bundle promo body
-  // const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-  // const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-  // const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
-  // const userLocale = navigator.language;
-  // const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
-  //   style: "currency",
-  //   currency: getBundleCurrency,
-  // }).format(getBundlePrice);
+async function getPromoPanels() {
+  const savings = "40%"; // For "Save 40%!" in the Bundle promo body
+  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+  const userLocale = navigator.language;
+  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+    style: "currency",
+    currency: getBundleCurrency,
+  }).format(getBundlePrice);
 
   return {
     "announcements": {
@@ -33,15 +31,13 @@ async function checkWaffleFlag(flag) {
         "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
         "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
       },
-      // TODO: Enable this when bundle pricing has been confirmed
-      // Bundle Announcement
-      //  "panel2": {
-      //   "imgSrc": "announcements/panel-bundle-announcement.svg",
-      //   "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
-      //   "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-      //   "tipBody": browser.i18n.getMessage("popupBundlePromoBodyFreePlan", [formattedBundlePrice, savings]),
-      //   "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
-      // },
+      "panel2": {
+        "imgSrc": "announcements/panel-bundle-announcement.svg",
+        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
+        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+        "tipBody": browser.i18n.getMessage("popupBundlePromoBody_3", formattedBundlePrice),
+        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+      },
     },
     "premiumPanel": {
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
@@ -49,9 +45,9 @@ async function checkWaffleFlag(flag) {
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
   }
- }
+}
 
- async function getOnboardingPanels() {
+async function getOnboardingPanels() {
   return {
     "announcements": {
       "panel1": {
@@ -169,11 +165,11 @@ const serverStoragePanel = {
     });
 
     serverStoragePanelWrapper.classList.remove("is-hidden");
-    
+
     serverStoragePanelWrapper
       .querySelectorAll(".is-hidden")
       .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
-    
+
     const serverStoragePanelButtonDismiss =
       serverStoragePanelWrapper.querySelector(".js-button-dismiss");
 
@@ -185,7 +181,7 @@ const serverStoragePanel = {
       serverStoragePanel.event.dismiss,
       false
     );
-    
+
     serverStoragePanelButtonAllow.addEventListener(
       "click",
       serverStoragePanel.event.allow,
@@ -199,7 +195,7 @@ const serverStoragePanel = {
       serverStoragePanel.hide();
       showRelayPanel(1);
     },
-    
+
     allow: async (e) => {
       e.preventDefault();
 
@@ -208,7 +204,7 @@ const serverStoragePanel = {
       );
 
       serverStoragePanel.event.dontShowPanelAgain();
-      
+
       browser.tabs.create({
         url: `${relaySiteOrigin}/accounts/profile/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=allow-labels-sync#sync-labels`,
         active: true,
@@ -217,13 +213,13 @@ const serverStoragePanel = {
       window.close();
     },
 
-    dontShowPanelAgain: ()=> {
+    dontShowPanelAgain: () => {
       browser.storage.local.set({ serverStoragePrompt: true });
     }
   },
 };
 
-async function choosePanel(panelId, premium, premiumSubdomainSet){
+async function choosePanel(panelId, premium, premiumSubdomainSet) {
   const premiumPanelWrapper = document.querySelector(".premium-wrapper");
 
   if (premium) {
@@ -242,7 +238,7 @@ async function choosePanel(panelId, premium, premiumSubdomainSet){
   }
 }
 
-function checkUserSubdomain(premiumSubdomainSet){
+function checkUserSubdomain(premiumSubdomainSet) {
   const educationalComponent = document.querySelector(".educational-component");
   const registerDomainComponent = document.querySelector(".register-domain-component");
 
@@ -269,24 +265,26 @@ async function showRelayPanel(tipPanelToShow) {
   let premiumPanelStrings = getEducationalStrings();
   let onboardingPanelStrings = await getOnboardingPanels();
 
-  // const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
-  
-  // If user has a phone plan, don't show the phone masking promo
+
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
-  
-  const showPhoneMaskingPromo =    await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
-  // TODO: Enable this when bundle pricing has been confirmed
-  // const bundleAvailable =    await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
+  const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
+
+  // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
+  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
+  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
   
   if (
-    showPhoneMaskingPromo
-    // && bundleAvailable
+    isPhoneMaskingAvailable || isBundleAvailable
   ) {
     promoElements.forEach(i => {
       i.classList.remove("is-hidden");
     });
     onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
+    
+    // If phone masking / bundle is available, switch panels to promo panel set to advertise phone masking/bundle plans
     onboardingPanelStrings = await getPromoPanels();
     premiumPanelStrings = await getPromoPanels();
   }
@@ -327,7 +325,7 @@ async function showRelayPanel(tipPanelToShow) {
 
   //Check if user is premium
   const { premium } = await browser.storage.local.get("premium");
-  
+
   //Check if user has a subdomain set
   const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
 
@@ -339,9 +337,10 @@ async function showRelayPanel(tipPanelToShow) {
   const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
 
   const updatePremiumPanel = async (panelId) => {
-    const panelToShow =  `panel${panelId}`;
+    const panelToShow = `panel${panelId}`;
     premiumPanelWrapper.setAttribute("id", panelToShow);
-    const panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
+    let panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
+    
     if (!panelStrings) {
       // Exit early if on a non-onboarding
       return;
@@ -350,6 +349,19 @@ async function showRelayPanel(tipPanelToShow) {
     if (panelStrings.longText) {
       educationBodyEl.classList.add("small-font-size");
     }
+
+    // If bundle is unavailable but phone masking is, only show the phone masking promo
+    if (!isBundleAvailable && isPhoneMaskingAvailable) {
+      delete premiumPanelStrings.announcements.panel2;
+    }
+
+    // If phone masking is unavailable but bundle is, only show bundle promo
+    if (!isPhoneMaskingAvailable && isBundleAvailable) {
+      // Force panel to start at panel2, which is the bundle promo
+      panelStrings = premiumPanelStrings.announcements.panel2;
+      delete premiumPanelStrings.announcements.panel1;
+    }
+
     setPagination(panelId);
 
     educationHeadlineEl.textContent = panelStrings.tipHeadline;
@@ -370,19 +382,28 @@ async function showRelayPanel(tipPanelToShow) {
   };
 
   const updatePanel = async (numRemaining, panelId) => {
-    // TODO: Add " && bundleAvailable " when bundle pricing has been confirmed
-    const bundlePhoneMaskingAvailable = showPhoneMaskingPromo;
-    
     const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
     onboardingPanelWrapper.classList = [panelToShow];
-    
+
     let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
+
+    // If bundle is unavailable but phone masking is, only show the phone masking promo
+    if (!isBundleAvailable && isPhoneMaskingAvailable) {
+      delete onboardingPanelStrings.announcements.panel2;
+    }
+
+    // If phone masking is unavailable but bundle is, only show bundle promo
+    if (!isPhoneMaskingAvailable && isBundleAvailable) {
+      // Force panel to start at panel2, which is the bundle promo
+      panelStrings = onboardingPanelStrings.announcements.panel2;
+      delete onboardingPanelStrings.announcements.panel1;
+    }
 
     setPagination(panelId);
 
     // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
     // Otherwise, show Phone masking and Bundle promo
-    if (!premium && numRemaining === 0 && !bundlePhoneMaskingAvailable) {
+    if (!premium && numRemaining === 0 && !(isPhoneMaskingAvailable || isBundleAvailable)) {
       panelStrings = onboardingPanelStrings["maxAliasesPanel"];
       onboardingPanelWrapper.classList = "maxAliasesPanel";
 
@@ -409,7 +430,7 @@ async function showRelayPanel(tipPanelToShow) {
       const premiumCTA = document.querySelector(".premium-cta");
       premiumCTA.classList.remove("is-hidden");
     }
-    
+
     return;
   };
 
@@ -456,7 +477,7 @@ async function showRelayPanel(tipPanelToShow) {
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      return updatePanel(numRemaining, tipPanelToShow+=nextPanel);
+      return updatePanel(numRemaining, tipPanelToShow += nextPanel);
     });
   });
 
@@ -466,7 +487,7 @@ async function showRelayPanel(tipPanelToShow) {
       // pointer events are disabled in popup CSS for the "previous" button on panel 1
       // and the "next" button on panel 3
       const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      return updatePremiumPanel(tipPanelToShow+=nextPanel);
+      return updatePremiumPanel(tipPanelToShow += nextPanel);
     });
   });
 
@@ -484,7 +505,7 @@ async function showRelayPanel(tipPanelToShow) {
   if (numRemaining === 0) {
     return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
   }
-  return sendRelayEvent("Panel","viewed-panel", "authenticated-user-panel");
+  return sendRelayEvent("Panel", "viewed-panel", "authenticated-user-panel");
 }
 
 
@@ -513,7 +534,7 @@ async function getBrowser() {
 
 async function enableSettingsPanel() {
 
-  
+
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -553,7 +574,7 @@ async function enableInputIconDisabling() {
   const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
   stylePrefToggle(userIconChoice);
 
-  inputIconVisibilityToggle.addEventListener("click", async() => {
+  inputIconVisibilityToggle.addEventListener("click", async () => {
     const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
     await browser.runtime.sendMessage({
       method: "updateInputIconPref",
@@ -610,7 +631,7 @@ async function popup() {
       window.close();
     });
   });
-  
+
   const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
 
 
