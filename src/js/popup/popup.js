@@ -85,22 +85,22 @@ function getEducationalStrings() {
   return {
     "announcements": {
       "panel1": {
-        "imgSrcPremium": "/educational-matrix/educationalImg1.png",
+        "imgSrcPremium": "educational-matrix/educationalImg1.png",
         "tipHeadline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
         "tipBody": browser.i18n.getMessage("popupEducationalComponent1Body"),
       },
       "panel2": {
-        "imgSrcPremium": "/educational-matrix/educationalImg-attachment-limit.svg",
+        "imgSrcPremium": "educational-matrix/educationalImg-attachment-limit.svg",
         "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
         "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
       },
       "panel3": {
-        "imgSrcPremium": "/educational-matrix/educationalImg-block-emails.svg",
+        "imgSrcPremium": "educational-matrix/educationalImg-block-emails.svg",
         "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
         "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
       },
       "panel4": {
-        "imgSrcPremium": "/educational-matrix/educationalImg-sign-back-in.svg",
+        "imgSrcPremium": "educational-matrix/educationalImg-sign-back-in.svg",
         "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
         "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
         "longText": true,
