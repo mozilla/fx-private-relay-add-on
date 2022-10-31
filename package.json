@@ -6,7 +6,7 @@
   "dependencies": {},
   "devDependencies": {
     "eslint": "^8.13.0",
-    "web-ext": "^7.1.0"
+    "web-ext": "^7.2.0"
   },
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
