@@ -25,6 +25,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
+
 async function fetchApiRequest(url, fetchMethod = "GET", body = null, opts=null) {
   const headers = new Headers();
 
@@ -426,7 +427,7 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
         m.url, 
         m.fetchMethod,
         m.body,
-        m.otps
+        m.opts
       );
       break;
     case "fillInputWithAlias":
