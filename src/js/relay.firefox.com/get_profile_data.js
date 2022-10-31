@@ -73,7 +73,7 @@
 
     
     const serverProfileData = await browser.runtime.sendMessage({
-      method: "fetchApiRequest",
+      method: "fetchRequestFromBackground",
       url: apiProfileURL
     });
 
@@ -95,12 +95,12 @@
       
       /** @type {RandomMask[]} */
       const relayAddresses = await browser.runtime.sendMessage({
-        method: "fetchApiRequest",
+        method: "fetchRequestFromBackground",
         url: relayApiUrlRelayAddresses
       });
       const domainAddresses = options.fetchCustomMasks
         ? await browser.runtime.sendMessage({
-          method: "fetchApiRequest",
+          method: "fetchRequestFromBackground",
           url: relayApiUrlDomainAddresses
         })
         : [];
@@ -214,7 +214,7 @@
         if (body.description.length > 0 || body.generated_for.length > 0 || body.used_on.length > 0) {
           const endpoint = alias.mask_type === "custom" ? relayApiUrlDomainAddresses : relayApiUrlRelayAddresses;
           await browser.runtime.sendMessage({
-            method: "fetchApiRequest",
+            method: "fetchRequestFromBackground",
             url: `${endpoint}${alias.id}/`,
             fetchMethod: "PATCH",
             body: JSON.stringify(body),
@@ -243,13 +243,13 @@
       // If local storage items exist AND have label metadata stored, sync it to the server.
       
       const serverRelayAddresses = await browser.runtime.sendMessage({
-        method: "fetchApiRequest",
+        method: "fetchRequestFromBackground",
         url: relayApiUrlRelayAddresses
       });
       
       const serverDomainAddresses = isPremiumUser
         ? await browser.runtime.sendMessage({
-          method: "fetchApiRequest",
+          method: "fetchRequestFromBackground",
           url: relayApiUrlDomainAddresses
         })
         : [];
