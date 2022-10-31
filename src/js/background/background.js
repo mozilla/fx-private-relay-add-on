@@ -396,6 +396,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       break;
     case "getCurrentPageHostname":
+      // FIXME: Make synchronous/async friendly
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
       // if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
       break;
