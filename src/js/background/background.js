@@ -25,6 +25,31 @@ browser.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
+async function fetchApiRequest(url, fetchMethod = "GET", body = null, opts=null) {
+  const headers = new Headers();
+
+  const { csrfCookieValue } = await browser.storage.local.get("csrfCookieValue");
+  
+  headers.set("X-CSRFToken", csrfCookieValue);
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+
+  if (opts && opts.auth) {
+    const apiToken = await browser.storage.local.get("apiToken");
+    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  }
+
+  const response = await fetch(url, {
+    mode: "same-origin",
+    method: fetchMethod,
+    headers: headers,
+    body,
+  });
+
+  const answer = await response.json();
+  return answer;
+}
+
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function getAliasesFromServer(method = "GET", opts=null) {
@@ -395,6 +420,14 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+      break;
+    case "fetchApiRequest": 
+      response = await fetchApiRequest(
+        m.url, 
+        m.fetchMethod,
+        m.body,
+        m.otps
+      );
       break;
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);
