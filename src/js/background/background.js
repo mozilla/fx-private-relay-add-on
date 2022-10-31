@@ -26,7 +26,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
 });
 
 
-async function fetchApiRequest(url, fetchMethod = "GET", body = null, opts=null) {
+async function fetchRequestFromBackground(url, fetchMethod = "GET", body = null, opts=null) {
   const headers = new Headers();
 
   const { csrfCookieValue } = await browser.storage.local.get("csrfCookieValue");
@@ -422,8 +422,8 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
       break;
-    case "fetchApiRequest": 
-      response = await fetchApiRequest(
+    case "fetchRequestFromBackground": 
+      response = await fetchRequestFromBackground(
         m.url, 
         m.fetchMethod,
         m.body,
