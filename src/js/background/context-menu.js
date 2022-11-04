@@ -30,6 +30,13 @@ const staticMenuData = {
     visible: true,
     contexts: ["all"],
   },
+  insertPhoneMask: {
+    id: "fx-private-relay-insert-phone-mask",
+    title: browser.i18n.getMessage("pageInputIconInsertPhoneMask"),
+    enabled: true,
+    visible: true,
+    contexts: ["all"],
+  },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
     title: browser.i18n.getMessage("pageInputIconGetUnlimitedAliases_mask"),
@@ -163,6 +170,11 @@ const relayContextMenus = {
           aliases
         );
       }
+    }
+
+    const phoneMask = await relayContextMenus.utils.getPhoneMask();
+    if (phoneMask) {
+      await relayContextMenus.menus.create(staticMenuData.insertPhoneMask);
     }
 
     // Create "Manage all aliases" link
@@ -374,6 +386,16 @@ const relayContextMenus = {
       );
       return relayAddresses;
     },
+    getPhoneMask: async () => {
+      // Note: This function only returns the mask saved in local storage.
+      //       That means that it will be out of date if this recently changed.
+      //       However, blocking the expansion of the context menu while waiting
+      //       for a GET request is not a great experience.
+      const { relayNumbers } = await browser.storage.local.get(
+        "relayNumbers"
+      );
+      return relayNumbers?.[0] ?? null;
+    },
     checkIfAnyMasksWereGeneratedOrUsedOnCurrentWebsite: async (website) => {
       const relayAddresses = await relayContextMenus.utils.getAliases();
 
@@ -519,6 +541,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
   );
   const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
   const urlManageAliases = `${relaySiteOrigin}/accounts/profile/`;
+  const phoneMask = await relayContextMenus.utils.getPhoneMask();
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
@@ -546,6 +569,26 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         label: "context-menu-relay-manage-aliases",
       });
       await browser.tabs.create({ url: urlManageAliases });
+      break;
+    case staticMenuData.insertPhoneMask.id:
+      sendMetricsEvent({
+        category: "Extension: Context Menu",
+        action: "click",
+        label: "context-menu-insert-phone-mask",
+      });
+      if (phoneMask) {
+        browser.tabs.sendMessage(
+          tab.id,
+          {
+            type: "fillTargetWithRelayNumber",
+            targetElementId: info.targetElementId,
+            relayNumber: phoneMask,
+          },
+          {
+            frameId: info.frameId,
+          }
+        );
+      }
       break;
   }
 
