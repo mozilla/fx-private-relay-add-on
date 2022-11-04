@@ -20,6 +20,24 @@ function fillInputWithAlias(emailInput, relayAlias) {
 
 }
 
+function fillInputWithRelayNumber(emailInput, relayNumber) {
+
+  // BUG: Duplicate fillInputWithAlias calls without proper input content
+  // The relayNumber/emailInput arguments check below is a work-around to let the duplicate call(s) fail silently.
+  // To debug, check all instances where fillInputWithRelayNumber() is being called and isolate it.
+  if (!emailInput || !relayNumber) {
+    return false;
+  }
+
+  // Set the value of the target field to the mask number
+  const normalisedNumber = relayNumber.number.startsWith("+1") ? relayNumber.number.substr(2) : relayNumber.number;
+  emailInput.value = normalisedNumber;
+
+
+  emailInput.dispatchEvent(new Event('input', {bubbles:true}));
+
+}
+
 
 // COMPATIBILITY NOTE: browser.menus.getTargetElement is not available so 
 // we have to listen for any contextmenu click to determe the target element.
@@ -39,6 +57,12 @@ browser.runtime.onMessage.addListener((message, _sender, _response) => {
     // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
     const emailInput = browser.menus ? browser.menus.getTargetElement(message.targetElementId): clickedEl;
     fillInputWithAlias(emailInput, message.relayAddress);
+  }
+  if (message.type === "fillTargetWithRelayNumber") {
+
+    // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
+    const emailInput = browser.menus ? browser.menus.getTargetElement(message.targetElementId): clickedEl;
+    fillInputWithRelayNumber(emailInput, message.relayNumber);
   }
 });
 
