@@ -52,6 +52,7 @@
     const apiProfileURL = `${relayApiSource}/profiles/`;
     const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
     const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
+    const relayApiUrlRelayNumbers = `${relayApiSource}/relaynumber/`;
 
     async function apiRequest(url, method = "GET", body = null, opts=null) {
 
@@ -106,6 +107,13 @@
     });
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
+
+    const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+    if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
+      browser.storage.local.set({
+        relayNumbers: relayNumbers,
+      });
+    }
 
     /**
      * Fetch the current list of random masks from the server, while preserving local labels if present
