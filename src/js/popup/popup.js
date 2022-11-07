@@ -582,6 +582,7 @@ async function handleReportIssueFormSubmission(event) {
   event.preventDefault();
   const data = new FormData(event.target);
   const reportData = Object.fromEntries(data.entries());
+  reportData.user_agent = await getBrowser();
 
   Object.keys(reportData).forEach(function(value) {
     // Switch "on" to true

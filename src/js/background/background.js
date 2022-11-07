@@ -122,6 +122,7 @@ async function postReportWebcompatIssue(description) {
     add_on_visual_issue: description.add_on_visual_issue,
     email_not_received: description.email_not_received,
     other_issue: description.other_issue,
+    user_agent: description.user_agent
   };
 
   const newReportedIssueResponse = await fetch(reportWebCompatResponse, {
