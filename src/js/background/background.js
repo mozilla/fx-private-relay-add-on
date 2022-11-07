@@ -102,20 +102,6 @@ async function postReportWebcompatIssue(description) {
   const headers = await createNewHeadersObject({auth: true});
   const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
 
-  // let apiBody = {
-  //   issue_on_domain: "",
-  //   email_mask_not_accepted: "",
-  //   add_on_visual_issue: "",
-  //   email_not_received: "",
-  //   other_issue: "",
-  // };
-
-  // apiBody.issue_on_domain = description.issue_on_domain;
-  // apiBody.email_mask_not_accepted = description.email_mask_not_accepted;
-  // apiBody.add_on_visual_issue = description.add_on_visual_issue;
-  // apiBody.email_not_received = description.email_not_received;
-  // apiBody.other_issue = description.other_issue;
-
   const apiBody = {
     issue_on_domain: description.issue_on_domain,
     email_mask_not_accepted: description.email_mask_not_accepted,

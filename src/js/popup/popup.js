@@ -533,11 +533,6 @@ async function getBrowser() {
 }
 
 async function enableSettingsPanel() {
-
-<<<<<<< HEAD
-
-=======
->>>>>>> 9e2a42c (DNM: Add Report Issue Panel)
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
