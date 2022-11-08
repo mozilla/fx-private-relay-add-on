@@ -356,64 +356,85 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
-  let response;
-  const currentPage = await getCurrentPage();
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // let response;
+  // const currentPage = await getCurrentPage();
 
-  switch (m.method) {
+  switch (message.method) {
     case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
+      displayBrowserActionBadge().then(() => {
+        sendResponse();
+      });
       break;
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
       break;
     case "fillInputWithAlias":
-      browser.tabs.sendMessage(sender.tab.id, m.message);
+      browser.tabs.sendMessage(sender.tab.id, message.message);
       break;
     case "updateIframeHeight":
       browser.tabs.sendMessage(sender.tab.id, m);
       break;
     case "getServerStoragePref":
-      response = await getServerStoragePref();
-      break;
+      getServerStoragePref().then(response => {
+        sendResponse({ response });
+      });
+      return true
     case "getAliasesFromServer":
-      response = await getAliasesFromServer("GET", m.options);
+      getAliasesFromServer("GET", message.options).then(() => {
+        sendResponse();
+      });
       break;
     case "patchMaskInfo":
-      await patchMaskInfo("PATCH", m.id, m.data, m.options);
+      patchMaskInfo("PATCH", message.id, message.data, message.options).then(() => {
+        sendResponse();
+      });
       break;
     case "getCurrentPage":
-      response = await getCurrentPage();
+      getCurrentPage().then(() => {
+        sendResponse();
+      });
       break;
     case "getCurrentPageHostname":
+      // FIXME: Make synchronous/async friendly
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
-      if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
+      // if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
       break;
     case "makeRelayAddress":
-      response = await makeRelayAddress(m.description);
-      break;
+      makeRelayAddress(message.description).then(response => {
+        sendResponse({ response });
+      });
+      return true;
     case "openRelayHomepage":
       browser.tabs.create({
         url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
       });
       break;
     case "rebuildContextMenuUpgrade":
-      await relayContextMenus.init();
+      relayContextMenus.init().then(() => {
+        sendResponse();
+      });
       break;
     case "refreshAccountPages":
-      await refreshAccountPages();
+      refreshAccountPages().then(() => {
+        sendResponse();
+      });
       break;
     case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
+      sendMetricsEvent(message.eventData).then(response => {
+        sendResponse({ response });
+      });
+      return true;
     case "updateAddOnAuthStatus":
-      await updateAddOnAuthStatus(m.status);
-      break;
+      updateAddOnAuthStatus(message.status).then(response => {
+        sendResponse({ response });
+      });
+      return true;
     case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
+      browser.storage.local.set({ showInputIcons: message.iconPref });
       break;
   }
-  return response;
+  return;
 });
 
 
