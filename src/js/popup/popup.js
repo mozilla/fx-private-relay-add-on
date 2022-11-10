@@ -553,7 +553,7 @@ async function enableSettingsPanel() {
   }
 }
 
-async function enableReportIssuePanel() {
+function enableReportIssuePanel() {
   const reportIssueToggle = document.querySelector(".settings-report-issue");
   const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
   const submissionSuccessContinue = document.querySelector(".report-continue");
