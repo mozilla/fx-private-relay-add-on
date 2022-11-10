@@ -16,30 +16,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="fx-relay-panel fx-relay">
-  <panel-content>
-    <fx-relay-logo-wrapper>
-      <fx-relay-logomark></fx-relay-logomark>
-      <fx-relay-logotype></fx-relay-logotype>
-      <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
-        data-i18n-message-id="popupSettingsTitle"></button>
-    </fx-relay-logo-wrapper>
-
-    <head>
-      <meta http-equiv="content-type" content="text/html; charset=utf-8">
-      <title>Firefox Relay</title>
-      <link rel="stylesheet" href="/css/global.css">
-      <link rel="stylesheet" href="/css/relay.css">
-      <link rel="stylesheet" href="/css/popup.css">
-      <script src="/js/libs/browser-polyfill.min.js"></script>
-      <script src="/js/shared/i18n.js"></script>
-      <script src="/js/shared/data-opt-out-toggle.js"></script>
-      <script src="js/shared/utils.js"></script>
-      <script src="js/popup/popup.js"></script>
-      <script src="js/shared/metrics.js"></script>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-
     <body class="fx-relay-panel fx-relay">
       <panel-content>
         <fx-relay-logo-wrapper>
@@ -134,26 +110,19 @@
                 </li>
               </ul>
             </div>
-            <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit"
-              onClick="checkform()" data-i18n-message-id="popupSettingsSubmitReport"></input>
+            <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
           </form>
 
           <!-- Report Submission Success Panel -->
           <div class="report-success is-hidden">
             <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
-            <!-- TODO: Localize these strings -->
             <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
-            <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody">Thank you for helping us improve
-              Firefox Relay!</p>
+            <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
             <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
-              data-event-action="click">Continue</a>
+              data-event-action="click"></a>
             </li>
-
           </div>
-
-          <!-- Submit Report btn -->
         </report-issue>
-
 
         <sign-up-panel class="sign-up-panel hidden">
           <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
