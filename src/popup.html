@@ -1,271 +1,268 @@
 <!DOCTYPE html>
 <html id="1">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Firefox Relay</title>
+    <link rel="stylesheet" href="css/relay.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/global.css">
+    <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/shared/i18n.js"></script>
+    <script src="/js/shared/data-opt-out-toggle.js"></script>
+    <script src="js/shared/utils.js"></script>
+    <script src="js/popup/popup.js"></script>
+    <script src="js/shared/metrics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="fx-relay-panel fx-relay">
+    <panel-content>
+      <fx-relay-logo-wrapper>
+        <fx-relay-logomark></fx-relay-logomark>
+        <fx-relay-logotype></fx-relay-logotype>
+        <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
+          data-i18n-message-id="popupSettingsTitle"></button>
+      </fx-relay-logo-wrapper>
 
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>Firefox Relay</title>
-  <link rel="stylesheet" href="css/relay.css">
-  <link rel="stylesheet" href="css/popup.css">
-  <link rel="stylesheet" href="css/global.css">
-  <script src="/js/libs/browser-polyfill.min.js"></script>
-  <script src="/js/shared/i18n.js"></script>
-  <script src="/js/shared/data-opt-out-toggle.js"></script>
-  <script src="js/shared/utils.js"></script>
-  <script src="js/popup/popup.js"></script>
-  <script src="js/shared/metrics.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+      <settings>
+        <div class="settings-header">
+          <button class="close-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
+            data-i18n-message-id="popupSettingsReturn"></button>
+          <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsTitle"></h1>
+        </div>
+        <ul class="settings-list">
+          <!-- Settings Toggle -->
+          <li class="setting">
+            <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
+            <button title="" data-icon-visibility-option="disable-input-icon"
+              class="toggle-icon-in-page-visibility fx-relay-toggle"></button>
+          </li>
+          <li class="setting">
+            <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
+            <button title="" class="data-collection fx-relay-toggle"></button>
+          </li>
+          <!-- Settings Redirect -->
+          <li class="setting flex-col">
+            <a id="popupSettingsLeaveFeedbackLink"
+              href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup"
+              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
+              data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+            <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
+              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
+              data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+            <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
+              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
+              data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+            <!-- Report Issue Panel Prompt -->
+            <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
+              data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
+          </li>
+        </ul>
+      </settings>
 
-    <body class="fx-relay-panel fx-relay">
-      <panel-content>
-        <fx-relay-logo-wrapper>
-          <fx-relay-logomark></fx-relay-logomark>
-          <fx-relay-logotype></fx-relay-logotype>
-          <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
-            data-i18n-message-id="popupSettingsTitle"></button>
-        </fx-relay-logo-wrapper>
-
-        <settings>
-          <div class="settings-header">
-            <button class="close-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
-              data-i18n-message-id="popupSettingsReturn"></button>
-            <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsTitle"></h1>
+      <!-- Report Issue Panel -->
+      <report-issue>
+        <div class="settings-header">
+          <button class="close-settings settings-report-issue-return i18n-attribute" data-i18n-attribute="title"
+            data-i18n-message-id="popupSettingsReturn"></button>
+          <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
+        </div>
+        <form class="report-issue-content">
+          <!-- Report URL -->
+          <div class="report-section">
+            <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
+              data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
+            <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
           </div>
-          <ul class="settings-list">
-            <!-- Settings Toggle -->
-            <li class="setting">
-              <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
-              <button title="" data-icon-visibility-option="disable-input-icon"
-                class="toggle-icon-in-page-visibility fx-relay-toggle"></button>
-            </li>
-            <li class="setting">
-              <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
-              <button title="" class="data-collection fx-relay-toggle"></button>
-            </li>
-            <!-- Settings Redirect -->
-            <li class="setting flex-col">
-              <a id="popupSettingsLeaveFeedbackLink"
-                href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-                class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-                data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
-              <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-                class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-                data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
-              <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-                class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-                data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
-              <!-- Report Issue Panel Prompt -->
-              <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
-                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
-            </li>
-          </ul>
-        </settings>
-
-        <!-- Report Issue Panel -->
-        <report-issue>
-          <div class="settings-header">
-            <button class="close-settings settings-report-issue-return i18n-attribute" data-i18n-attribute="title"
-              data-i18n-message-id="popupSettingsReturn"></button>
-            <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
+          <div class="report-section">
+            <!-- Select issue checkboxes -->
+            <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+            <ul>
+              <li>
+                <!-- Case One -->
+                <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
+                <label class="i18n-content" for="email_mask_not_accepted"
+                  data-i18n-message-id="popupReportIssueCaseOne"></label>
+              </li>
+              <li>
+                <!-- Case Two -->
+                <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
+                <label class="i18n-content" for="add_on_visual_issue"
+                  data-i18n-message-id="popupReportIssueCaseTwo"></label>
+              </li>
+              <li>
+                <!-- Case Three -->
+                <input type="checkbox" id="email_not_received" name="email_not_received" />
+                <label class="i18n-content" for="email_not_received"
+                  data-i18n-message-id="popupReportIssueCaseThree"></label>
+              </li>
+              <li>
+                <!-- Case Four -->
+                <input type="checkbox" id="issue-case-other" name="issue-case-other" />
+                <label class="i18n-content" for="issue-case-other"
+                  data-i18n-message-id="popupReportIssueCaseOther"></label>
+              </li>
+              <li>
+                <!-- 'Other' option input field -->
+                <input class="report-other-field is-hidden" type="text" name="other_issue"
+                  id="other_issue" name="other_issue" />
+              </li>
+            </ul>
           </div>
-          <form class="report-issue-content">
-            <!-- Report URL -->
-            <div class="report-section">
-              <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
-                data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
-              <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
+          <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
+        </form>
+
+        <!-- Report Submission Success Panel -->
+        <div class="report-success is-hidden">
+          <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
+          <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
+          <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
+          <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
+            data-event-action="click"></a>
+          </li>
+        </div>
+      </report-issue>
+
+      <sign-up-panel class="sign-up-panel hidden">
+        <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
+        <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
+        <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content"
+          data-event-action="click" data-event-label="panel-continue-btn"
+          data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
+      </sign-up-panel>
+
+      <main-panel class="signed-in-panel hidden">
+        <span class="panel-status">
+          <p class="aliases-remaining remaining-plural"></p>
+          <a class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden"
+            data-event-action="click" data-i18n-message-id="popupGetUnlimitedAliases_mask">
+          </a>
+        </span>
+        <onboarding-panel>
+          <!--Non Premium Panel-->
+          <div class="content-wrapper">
+            <div class="img-wrapper">
+              <img class="onboarding-img">
             </div>
-            <div class="report-section">
-              <!-- Select issue checkboxes -->
-              <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+            <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
+            <h1 class="onboarding-h1"></h1>
+            <p class="onboarding-p"></p>
+            <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden"
+            data-event-action="click"></a>
+            <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link"
+              data-event-action="click">
+              <img class="upgrade-banner-icon">
+              <p class="upgrade-banner"></p>
+            </a>
+            <div class="onboarding-pagination">
+              <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
+              <span class="panel-num">
+                <span class="current-panel"></span>/
+                  <span class="total-panels"></span>
+              </span>
+              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label"
+                data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+            </div>
+          </div>
+          <!-- Premium Panel-->
+          <div class="premium-wrapper is-hidden">
+            <!-- Dashboard Statistics-->
+            <div class="dashboard-stats-list">
               <ul>
-                <li>
-                  <!-- Case One -->
-                  <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
-                  <label class="i18n-content" for="email_mask_not_accepted"
-                    data-i18n-message-id="popupReportIssueCaseOne"></label>
+                <li class="dashboard-info">
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
+                  <div class="dashboard-stats aliases-used"></div>
                 </li>
-                <li>
-                  <!-- Case Two -->
-                  <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
-                  <label class="i18n-content" for="add_on_visual_issue"
-                    data-i18n-message-id="popupReportIssueCaseTwo"></label>
+                <li class="dashboard-info">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked"></div>
                 </li>
-                <li>
-                  <!-- Case Three -->
-                  <input type="checkbox" id="email_not_received" name="email_not_received" />
-                  <label class="i18n-content" for="email_not_received"
-                    data-i18n-message-id="popupReportIssueCaseThree"></label>
+                <li class="dashboard-info">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded"></div>
                 </li>
-                <li>
-                  <!-- Case Four -->
-                  <input type="checkbox" id="issue-case-other" name="issue-case-other" />
-                  <label class="i18n-content" for="issue-case-other"
-                    data-i18n-message-id="popupReportIssueCaseOther"></label>
-                </li>
-                <li>
-                  <!-- 'Other' option input field -->
-                  <input class="report-other-field is-hidden" type="text" name="other_issue"
-                    id="other_issue" name="other_issue" />
+                <li class="dashboard-info">
+                  <span class="email-trackers-removed-text i18n-content"
+                    data-i18n-message-id="popupEmailTrackersRemoved"></span>
+                  <div class="dashboard-stats email-trackers-removed"></div>
                 </li>
               </ul>
             </div>
-            <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
-          </form>
-
-          <!-- Report Submission Success Panel -->
-          <div class="report-success is-hidden">
-            <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
-            <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
-            <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
-            <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
-              data-event-action="click"></a>
-            </li>
-          </div>
-        </report-issue>
-
-        <sign-up-panel class="sign-up-panel hidden">
-          <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
-          <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-          <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content"
-            data-event-action="click" data-event-label="panel-continue-btn"
-            data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
-        </sign-up-panel>
-
-        <main-panel class="signed-in-panel hidden">
-          <span class="panel-status">
-            <p class="aliases-remaining remaining-plural"></p>
-            <a class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden"
-              data-event-action="click" data-i18n-message-id="popupGetUnlimitedAliases_mask">
-            </a>
-          </span>
-          <onboarding-panel>
-            <!--Non Premium Panel-->
-            <div class="content-wrapper">
+            <!-- Register Domain Component -->
+            <div class="register-domain-component">
               <div class="img-wrapper">
-                <img class="onboarding-img">
+                <img class="email-domain-illustration">
               </div>
-              <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
-              <h1 class="onboarding-h1"></h1>
-              <p class="onboarding-p"></p>
-              <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden"
-              data-event-action="click"></a>
-              <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link"
-                data-event-action="click">
-                <img class="upgrade-banner-icon">
-                <p class="upgrade-banner"></p>
-              </a>
+              <p class="register-domain-headline i18n-content"
+                data-i18n-message-id="popupRegisterDomainHeadline_mask"></p>
+              <a class="register-domain-cta i18n-content button sign-in-btn blue-primary-btn close-popup-after-click"
+                data-event-action="click" data-i18n-message-id="popupRegisterDomainButton_mask"></a>
+            </div>
+            <!-- Educational Matrix Module Dashboard-->
+            <div class="educational-component">
+              <div class="education-img-wrapper">
+                <img class="education-img">
+              </div>
+              <div class="education-description">
+                <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
+                <h1 class="education-headline"></h1>
+                <p class="education-body"></p>
+                <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden"
+                  data-event-action="click"></a>
+              </div>
+
               <div class="onboarding-pagination">
-                <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
-                <span class="panel-num">
+                <button class="premium-panel-nav previous-panel i18n-attribute" data-direction="-1"
+                  data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious"
+                  aria-label=""></button>
+                <span class="js-panel-num">
                   <span class="current-panel"></span>/
-                    <span class="total-panels"></span>
+                  <span class="total-panels"></span>
                 </span>
-                <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label"
-                  data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+                <button class="premium-panel-nav next-panel i18n-attribute" data-direction="1"
+                  data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext"
+                  aria-label=""></button>
               </div>
-            </div>
-            <!-- Premium Panel-->
-            <div class="premium-wrapper is-hidden">
-              <!-- Dashboard Statistics-->
-              <div class="dashboard-stats-list">
-                <ul>
-                  <li class="dashboard-info">
-                    <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
-                    <div class="dashboard-stats aliases-used"></div>
-                  </li>
-                  <li class="dashboard-info">
-                    <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
-                    <div class="dashboard-stats emails-blocked"></div>
-                  </li>
-                  <li class="dashboard-info">
-                    <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
-                    <div class="dashboard-stats emails-forwarded"></div>
-                  </li>
-                  <li class="dashboard-info">
-                    <span class="email-trackers-removed-text i18n-content"
-                      data-i18n-message-id="popupEmailTrackersRemoved"></span>
-                    <div class="dashboard-stats email-trackers-removed"></div>
-                  </li>
-                </ul>
-              </div>
-              <!-- Register Domain Component -->
-              <div class="register-domain-component">
-                <div class="img-wrapper">
-                  <img class="email-domain-illustration">
-                </div>
-                <p class="register-domain-headline i18n-content"
-                  data-i18n-message-id="popupRegisterDomainHeadline_mask"></p>
-                <a class="register-domain-cta i18n-content button sign-in-btn blue-primary-btn close-popup-after-click"
-                  data-event-action="click" data-i18n-message-id="popupRegisterDomainButton_mask"></a>
-              </div>
-              <!-- Educational Matrix Module Dashboard-->
-              <div class="educational-component">
-                <div class="education-img-wrapper">
-                  <img class="education-img">
-                </div>
-                <div class="education-description">
-                  <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
-                  <h1 class="education-headline"></h1>
-                  <p class="education-body"></p>
-                  <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden"
-                    data-event-action="click"></a>
-                </div>
 
-                <div class="onboarding-pagination">
-                  <button class="premium-panel-nav previous-panel i18n-attribute" data-direction="-1"
-                    data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious"
-                    aria-label=""></button>
-                  <span class="js-panel-num">
-                    <span class="current-panel"></span>/
-                    <span class="total-panels"></span>
-                  </span>
-                  <button class="premium-panel-nav next-panel i18n-attribute" data-direction="1"
-                    data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext"
-                    aria-label=""></button>
-                </div>
-
+            </div>
+          </div>
+          </div>
+          <!-- Server Storage Opt-in -->
+          <div class="js-server-storage-wrapper newsflash-wrapper is-hidden has-approval-button">
+            <div class="newsflash-description">
+              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
+              <p class="newsflash-body i18n-content" data-i18n-message-id="popupDataCollectionBody_mask"></p>
+              <a class="newsflash-learn-more i18n-content"
+                href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button"
+                data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
+              <div class="newsflash-buttons">
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
+                  data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
+                <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content"
+                  data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
               </div>
             </div>
-            </div>
-            <!-- Server Storage Opt-in -->
-            <div class="js-server-storage-wrapper newsflash-wrapper is-hidden has-approval-button">
-              <div class="newsflash-description">
-                <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
-                <p class="newsflash-body i18n-content" data-i18n-message-id="popupDataCollectionBody_mask"></p>
-                <a class="newsflash-learn-more i18n-content"
-                  href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button"
-                  data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
-                <div class="newsflash-buttons">
-                  <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
-                    data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
-                  <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content"
-                    data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
-                </div>
+          </div>
+          <!-- Privacy Policy update notification -->
+          <div class="js-privacy-policy-update-wrapper newsflash-wrapper is-hidden">
+            <div class="newsflash-description">
+              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline">
+              </h1>
+              <p class="newsflash-body i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateBody"></p>
+              <a class="newsflash-learn-more i18n-content"
+                href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification"
+                data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
+              <div class="newsflash-buttons">
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
+                  data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
               </div>
             </div>
-            <!-- Privacy Policy update notification -->
-            <div class="js-privacy-policy-update-wrapper newsflash-wrapper is-hidden">
-              <div class="newsflash-description">
-                <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline">
-                </h1>
-                <p class="newsflash-body i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateBody"></p>
-                <a class="newsflash-learn-more i18n-content"
-                  href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification"
-                  data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
-                <div class="newsflash-buttons">
-                  <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
-                    data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
-                </div>
-              </div>
-            </div>
-          </onboarding-panel>
-          <footer>
-            <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click"
-              data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases_mask"></a>
-          </footer>
-        </main-panel>
-      </panel-content>
-    </body>
-
+          </div>
+        </onboarding-panel>
+        <footer>
+          <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click"
+            data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases_mask"></a>
+        </footer>
+      </main-panel>
+    </panel-content>
+  </body>
 </html>
