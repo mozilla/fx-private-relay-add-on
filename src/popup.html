@@ -19,22 +19,19 @@
       <fx-relay-logo-wrapper>
         <fx-relay-logomark></fx-relay-logomark>
         <fx-relay-logotype></fx-relay-logotype>
-        <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
-          data-i18n-message-id="popupSettingsTitle"></button>
+        <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title" data-i18n-message-id="popupSettingsTitle"></button>
       </fx-relay-logo-wrapper>
 
       <settings>
         <div class="settings-header">
-          <button class="close-settings settings-toggle i18n-attribute" data-i18n-attribute="title"
-            data-i18n-message-id="popupSettingsReturn"></button>
+          <button class="close-settings settings-toggle i18n-attribute" data-i18n-attribute="title" data-i18n-message-id="popupSettingsReturn"></button>
           <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsTitle"></h1>
         </div>
         <ul class="settings-list">
           <!-- Settings Toggle -->
           <li class="setting">
             <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
-            <button title="" data-icon-visibility-option="disable-input-icon"
-              class="toggle-icon-in-page-visibility fx-relay-toggle"></button>
+            <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-toggle"></button>
           </li>
           <li class="setting">
             <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
@@ -42,16 +39,9 @@
           </li>
           <!-- Settings Redirect -->
           <li class="setting flex-col">
-            <a id="popupSettingsLeaveFeedbackLink"
-              href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-              data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
-            <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-              data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
-            <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup"
-              class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click"
-              data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+            <a id="popupSettingsLeaveFeedbackLink" href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+            <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+            <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
             <!-- Report Issue Panel Prompt -->
             <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
               data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
@@ -133,8 +123,10 @@
       <main-panel class="signed-in-panel hidden">
         <span class="panel-status">
           <p class="aliases-remaining remaining-plural"></p>
-          <a class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden"
-            data-event-action="click" data-i18n-message-id="popupGetUnlimitedAliases_mask">
+          <a 
+            class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden"
+            data-event-action="click" 
+            data-i18n-message-id="popupGetUnlimitedAliases_mask">
           </a>
         </span>
         <onboarding-panel>
@@ -146,10 +138,8 @@
             <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
             <h1 class="onboarding-h1"></h1>
             <p class="onboarding-p"></p>
-            <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden"
-            data-event-action="click"></a>
-            <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link"
-              data-event-action="click">
+            <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden" data-event-action="click"></a>
+            <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link" data-event-action="click">
               <img class="upgrade-banner-icon">
               <p class="upgrade-banner"></p>
             </a>
@@ -159,8 +149,7 @@
                 <span class="current-panel"></span>/
                   <span class="total-panels"></span>
               </span>
-              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label"
-                data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
             </div>
           </div>
           <!-- Premium Panel-->
@@ -218,9 +207,7 @@
                   <span class="current-panel"></span>/
                   <span class="total-panels"></span>
                 </span>
-                <button class="premium-panel-nav next-panel i18n-attribute" data-direction="1"
-                  data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext"
-                  aria-label=""></button>
+                <button class="premium-panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
               </div>
             </div>
           </div>
@@ -229,36 +216,27 @@
             <div class="newsflash-description">
               <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
               <p class="newsflash-body i18n-content" data-i18n-message-id="popupDataCollectionBody_mask"></p>
-              <a class="newsflash-learn-more i18n-content"
-                href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button"
-                data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
+              <a class="newsflash-learn-more i18n-content" href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button" data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
               <div class="newsflash-buttons">
-                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
-                  data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
-                <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content"
-                  data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
+                <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content" data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
               </div>
             </div>
           </div>
           <!-- Privacy Policy update notification -->
           <div class="js-privacy-policy-update-wrapper newsflash-wrapper is-hidden">
             <div class="newsflash-description">
-              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline">
-              </h1>
+              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline"></h1>
               <p class="newsflash-body i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateBody"></p>
-              <a class="newsflash-learn-more i18n-content"
-                href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification"
-                data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
+              <a class="newsflash-learn-more i18n-content" href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification" data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
               <div class="newsflash-buttons">
-                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content"
-                  data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
+                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
               </div>
             </div>
           </div>
         </onboarding-panel>
         <footer>
-          <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click"
-            data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases_mask"></a>
+          <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click" data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases_mask"></a>
         </footer>
       </main-panel>
     </panel-content>
