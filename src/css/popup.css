@@ -47,7 +47,7 @@ p {
   text-align: center;
 }
 
-settings {
+settings, report-issue, report-issue-success {
   background-color: rgba(255, 255, 255, 1);
   position: absolute;
   top: 0;
@@ -58,6 +58,71 @@ settings {
   z-index: 2;
   transform: translateX(360px);
   transition: all 0.5s ease;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 0 24px;
+}
+
+.report-issue-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  border: 0 none;
+}
+
+.report-section {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.report-label::after {
+  content: ":";
+}
+
+.report-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.report-section li {
+  display: flex;
+  align-items:flex-start;
+  margin-bottom: 8px;
+}
+
+.report-section input[type=checkbox]{
+  margin-right: 8px;
+}
+
+.report-section input[type=text]{
+  width: 100%;
+  padding: 4px;
+}
+
+.report-section input[type=submit]:disabled{
+  background: var(--colorInformationalDisabled);
+}
+
+.report-success {
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.report-success h1 {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.report-continue {
+  cursor: pointer;
+  color: var(--relayBlue3);
 }
 
 .setting {
@@ -73,11 +138,7 @@ settings {
 
 .setting-label {
   display: inline-block;
-  font-size: 13px;
   color: var(--relayInk70);
-  line-height: 1.4;
-  padding-left: 24px;
-  padding-right: 24px;
 }
 
 a.setting-label {
@@ -98,6 +159,7 @@ a.setting-label:active {
 
 .settings-list {
   padding: 0;
+  margin: 0;
   list-style-type: none;
   margin: 0;
 }
@@ -140,6 +202,19 @@ fx-relay-logo-wrapper {
   transition: all 0.3s ease;
 }
 
+.show-report-issue report-issue {
+  visibility: visible;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+.show-report-issue fx-relay-logo-wrapper,
+.show-report-issue settings {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
 fx-relay-logo-wrapper,
 .signed-in-panel {
   opacity: 1;
@@ -165,19 +240,23 @@ fx-relay-logo-wrapper,
   right: 24px;
 }
 
-.settings-toggle:hover {
+.settings-report-issue {
+  cursor: pointer;
+}
+
+.settings-toggle:hover, .settings-report-issue-return:hover {
   opacity: .8;
 }
 
-.settings-toggle:focus {
+.settings-toggle:focus, .settings-report-issue-return:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
-.settings-toggle:active {
+.settings-toggle:active, .settings-report-issue-return:active {
   opacity: 1;
 }
 
-.settings-toggle {
+.settings-toggle, .settings-report-issue-return  {
   border-radius: 50%;
   background-repeat: no-repeat;
   background-size: 18px;
@@ -237,6 +316,7 @@ panel-content {
   font-family: var(--relayMetropolis);
   font-weight: 800;
   font-size: 15px;
+  border: 0 none;
   text-decoration: none;
   color: rgba(255, 255, 255, 1);
   min-width: 200px;
@@ -652,19 +732,18 @@ onboarding-panel p, .education-body {
   transition: opacity 0.2s ease;
 }
 
-
-.settings-toggle:hover::after,
+.settings-toggle:hover::after, .settings-report-issue-return:hover::after,
 .panel-nav:hover::after, .premium-panel-nav:hover::after {
   opacity: .8;
   transition: opacity 0.2s ease;
 }
 
-.settings-toggle:focus,
-.panel-nav:focus, .premium-panel-nav:focus {
+.settings-toggle:focus, .settings-report-issue-return:focus,
+.panel-nav:focus, .js-panel-nav:focus {
   box-shadow: var(--relayButtonFocus);
 }
 
-.settings-toggle:active::after,
+.settings-toggle:active::after, .settings-report-issue-return:active::after,
 .panel-nav:active::after, .premium-panel-nav:active::after {
   opacity: 1;
   transition: opacity 0.2s ease;

@@ -94,6 +94,35 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   return await response.json();
 }
 
+async function postReportWebcompatIssue(description) {
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  if (!relayApiSource) {
+    return;
+  }
+  const headers = await createNewHeadersObject({auth: true});
+  const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
+
+  const apiBody = {
+    issue_on_domain: description.issue_on_domain,
+    email_mask_not_accepted: description.email_mask_not_accepted,
+    add_on_visual_issue: description.add_on_visual_issue,
+    email_not_received: description.email_not_received,
+    other_issue: description.other_issue,
+    user_agent: description.user_agent
+  };
+
+  const newReportedIssueResponse = await fetch(reportWebCompatResponse, {
+    mode: "same-origin",
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(apiBody),
+  });
+
+  let newReportedIssueForm = await newReportedIssueResponse.json();
+  return newReportedIssueForm;
+
+}
+
 async function storeRuntimeData(opts={forceUpdate: false}) {  
   const existingPremiumAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans;
   // If we already fetched Premium availability in the past seven days,
@@ -391,6 +420,9 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
+      break;
+    case "postReportWebcompatIssue":
+      response = await postReportWebcompatIssue(m.description);
       break;
     case "openRelayHomepage":
       browser.tabs.create({

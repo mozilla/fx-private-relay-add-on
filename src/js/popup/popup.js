@@ -533,8 +533,6 @@ async function getBrowser() {
 }
 
 async function enableSettingsPanel() {
-
-
   const settingsToggles = document.querySelectorAll(".settings-toggle");
   settingsToggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -555,6 +553,110 @@ async function enableSettingsPanel() {
   }
 }
 
+function enableReportIssuePanel() {
+  const reportIssueToggle = document.querySelector(".settings-report-issue");
+  const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
+  const submissionSuccessContinue = document.querySelector(".report-continue");
+  [reportIssueToggle, reportIssueSettingsReturn, submissionSuccessContinue].forEach(e => {
+    e.addEventListener("click", () => {
+      document.body.classList.toggle("show-report-issue");
+      const eventLabel = document.body.classList.contains("show-report-issue") ? "opened-report-issue" : "closed-report-issue";
+      if (document.body.classList.contains("show-report-issue")) {
+        sendRelayEvent("Panel", "click", eventLabel);
+      }
+    });
+  });
+  const reportForm = document.querySelector(".report-issue-content");
+  setURLwithIssue();
+  showReportInputOtherTextField();
+  showSuccessReportSubmission();
+  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
+}
+
+async function handleReportIssueFormSubmission(event) {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const reportData = Object.fromEntries(data.entries());
+  reportData.user_agent = await getBrowser();
+
+  Object.keys(reportData).forEach(function(value) {
+    // Switch "on" to true
+    if (reportData[value] === "on") {
+      reportData[value] = true;
+    }
+    // Remove from report if empty string
+    if (reportData[value] === "") {
+      delete reportData[value];
+    }
+  });
+  // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
+  if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
+    reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
+  }
+  await browser.runtime.sendMessage({
+    method: "postReportWebcompatIssue",
+    description: reportData
+  });
+}
+
+function showSuccessReportSubmission() {
+  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+  const reportSuccess = document.querySelector(".report-success");
+  const reportContent = document.querySelector(".report-issue-content");
+  reportIssueSubmitBtn.addEventListener("click", () => {
+    reportSuccess.classList.remove("is-hidden");
+    reportContent.classList.add("is-hidden");
+  });
+}
+
+function isSortaAURL(str) {
+  return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
+}
+
+async function setURLwithIssue() {
+  // Add Site URL placeholder
+  const currentPage = (await getCurrentPage()).url;
+  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+  const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
+  reportIssueSubmitBtn.disabled = true;
+
+  // Allow for custom URL inputs
+  inputFieldUrl.addEventListener('input', () => {
+    reportIssueSubmitBtn.disabled = true;
+    // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
+    if (isSortaAURL(inputFieldUrl.value)) {
+      reportIssueSubmitBtn.disabled = false;
+    }
+  });
+
+  // Check that the host site has a valid URL
+  if (currentPage) {
+    const url = new URL(currentPage);
+    // returns a http:// or https:// value
+    inputFieldUrl.value = url.origin;
+    reportIssueSubmitBtn.disabled = false;
+  }
+}
+
+ function showReportInputOtherTextField() {
+  const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
+  const otherTextField = document.querySelector('input[name="other_issue"]');
+  otherCheckbox.addEventListener("click", () => {
+    otherTextField.classList.toggle("is-hidden");
+  })
+
+  // Add placeholder to report input on 'Other' selection
+  const inputFieldOtherDetails = document.querySelector('input[name="other_issue"]');
+  inputFieldOtherDetails.placeholder = browser.i18n.getMessage("popupReportIssueCaseOtherDetails");
+}
+
+async function getCurrentPage() {
+  const [currentTab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  return currentTab;
+}
 
 async function enableInputIconDisabling() {
   const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
@@ -617,7 +719,10 @@ async function popup() {
     showRelayPanel(1);
   }
 
+
   await enableSettingsPanel();
+  await enableReportIssuePanel();
+
   enableDataOptOut();
   enableInputIconDisabling();
 

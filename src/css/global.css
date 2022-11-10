@@ -45,6 +45,7 @@
   --colorInformationalActive: #054096;
   --colorInformationalHover: #bcd0ec;
   --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
+  --colorInformationalDisabled: #C9D9F3;
 
   /* Nebula Colors: Button: Error */
   --colorError: #FF4F5E;
@@ -131,6 +132,11 @@
   background-color: var(--colorInformational);
   color: var(--colorWhite);
   font-weight: 600;
+}
+
+.fx-relay-c-button.t-primary:disabled {
+  background-color: var(--colorInformationalDisabled);
+  cursor: not-allowed;
 }
 
 .fx-relay-c-button.t-primary:hover {
