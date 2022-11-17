@@ -94,6 +94,72 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
   return await response.json();
 }
 
+async function makePhoneCall(link) {
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  
+  if (!relayApiSource) {
+    return;
+  }
+
+  function formatPhoneNumber(link) {
+    // phoneNumber should be tel:+12345678900 tel:123456789 or 1234567890 or +12345678900
+    let phoneNumber = link;
+
+    // Check if string starts with "tel:" chars
+    if (!phoneNumber.startsWith("tel:")) {
+      let appendPlusOne = false;
+      
+      if (phoneNumber.startsWith("+1")) { appendPlusOne = true }
+      
+      phoneNumber = link.replace(/\D/g,'');
+
+      if (appendPlusOne) {
+        phoneNumber = `+` + phoneNumber;
+      }
+      
+    } else {
+      // Remove the "tel:" chars
+      phoneNumber = link.substring(4);
+    }
+
+    // phoneNumber is "+12345678900"
+    if (phoneNumber.startsWith("+1") && phoneNumber.length === 12) {
+      return phoneNumber;
+    }
+
+    // phoneNumber is "123456789"
+    if (phoneNumber.length === 10) {
+      phoneNumber = `+1` + phoneNumber;
+      return phoneNumber
+    }
+    
+    return false;
+  }
+
+  const phoneNumber = formatPhoneNumber(link);
+
+  if (!phoneNumber) {
+    throw new Error(`This phone number is incorrect.`)
+  }
+  
+  const headers = await createNewHeadersObject({auth: true});
+  const reportWebCompatResponse = `${relayApiSource}/call`;
+
+  const apiBody = {
+    to: phoneNumber
+  };
+
+  await fetch(reportWebCompatResponse, {
+    mode: "same-origin",
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(apiBody),
+  });
+
+  return;
+
+}
+
 async function postReportWebcompatIssue(description) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
   

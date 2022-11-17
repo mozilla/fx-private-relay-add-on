@@ -1,4 +1,4 @@
-/* global patchMaskInfo getBrowser */
+/* global patchMaskInfo getBrowser makePhoneCall */
 
 // The static data used to create different context menu items.
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
@@ -36,6 +36,13 @@ const staticMenuData = {
     enabled: true,
     visible: true,
     contexts: ["editable"],
+  },
+  makePhoneCall: {
+    id: "fx-private-relay-call-via-relay",
+    title: "Start Relay masked call",
+    enabled: true,
+    visible: true,
+    contexts: ["link", "selection"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
@@ -175,6 +182,7 @@ const relayContextMenus = {
     const phoneMask = await relayContextMenus.utils.getPhoneMask();
     if (phoneMask) {
       await relayContextMenus.menus.create(staticMenuData.insertPhoneMask);
+      await relayContextMenus.menus.create(staticMenuData.makePhoneCall);
     }
 
     // Create "Manage all aliases" link
@@ -598,6 +606,33 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
           }
         );
       }
+      break;
+    case "fx-private-relay-call-via-relay":
+      // TODO: Add metrics event
+      // sendMetricsEvent({
+      //   category: "Extension: Context Menu",
+      //   action: "click",
+      //   label: "context-menu-insert-phone-mask",
+      // });
+      // 
+      
+      if (phoneMask) {
+
+        let phoneNumberToCall;
+
+        // Set to selection Text if available but DEFAULT to linkUrl is available
+        if (info.selectionText) {
+          phoneNumberToCall = info.selectionText
+        } 
+        
+        // Set to linkUrl if available and OVERWRITE previous entry
+        if (info.linkUrl) {
+          phoneNumberToCall = info.linkUrl
+        }
+        
+        await makePhoneCall(phoneNumberToCall);
+      }
+
       break;
   }
 
