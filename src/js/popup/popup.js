@@ -38,6 +38,12 @@ async function getPromoPanels() {
         "tipBody": browser.i18n.getMessage("popupBundlePromoBody_3", formattedBundlePrice),
         "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
       },
+      "panel3": {
+        "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+        "imgSrcPremium": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+        "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+        "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody")
+      },
     },
     "premiumPanel": {
       "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
@@ -67,8 +73,8 @@ async function getOnboardingPanels() {
       },
       "panel4": {
         "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
-        "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline_mask"),
-        "tipBody": browser.i18n.getMessage("popupPasswordManagerRelaySubHeadline_mask"),
+        "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+        "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody"),
       },
     },
     "maxAliasesPanel": {
