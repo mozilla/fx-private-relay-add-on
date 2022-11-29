@@ -9,6 +9,7 @@ async function checkWaffleFlag(flag) {
   return false;
 }
 
+// Announcements
 async function getPromoPanels() {
   const savings = "40%"; // For "Save 40%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
@@ -19,8 +20,10 @@ async function getPromoPanels() {
     style: "currency",
     currency: getBundleCurrency,
   }).format(getBundlePrice);
+  // Conditions for showing the Firefox password manager announcement
+  const isFirefoxIntegration = await checkWaffleFlag("firefox_integration");
 
-  return {
+  const panels = {
     "announcements": {
       // Phone Masking Announcement
       "panel1": {
@@ -45,10 +48,24 @@ async function getPromoPanels() {
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
   }
+
+  if (isFirefoxIntegration) {
+    panels.announcements["panel3"] = {
+      "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "imgSrcPremium": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+      "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody")
+    }
+  }
+
+  return panels;
 }
 
 async function getOnboardingPanels() {
-  return {
+  // Conditions for showing the Firefox password manager announcement
+  const isFirefoxIntegration = await checkWaffleFlag("firefox_integration");
+
+  const panels = {
     "announcements": {
       "panel1": {
         "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
@@ -79,6 +96,16 @@ async function getOnboardingPanels() {
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
   };
+
+  if (isFirefoxIntegration) {
+    panels.announcements["panel4"] = {
+      "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+      "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody"),
+    }
+  }
+
+  return panels
 }
 
 function getEducationalStrings() {
