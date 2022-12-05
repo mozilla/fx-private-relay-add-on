@@ -45,9 +45,6 @@ async function fetchRequestFromBackground({url = null, fetchMethod = "GET", body
   
   const headers = new Headers();
 
-  const { csrfCookieValue } = await browser.storage.local.get("csrfCookieValue");
-  
-  headers.set("X-CSRFToken", csrfCookieValue);
   headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json");
 
