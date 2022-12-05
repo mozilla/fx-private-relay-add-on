@@ -89,7 +89,13 @@
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
-    const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+    const relayNumbers = await await browser.runtime.sendMessage({
+      method: "fetchRequestFromBackground",
+      fetchRequest: {
+        url: relayApiUrlRelayNumbers
+      }
+    });
+
     if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
       browser.storage.local.set({
         relayNumbers: relayNumbers,
