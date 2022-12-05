@@ -25,8 +25,24 @@ browser.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
-
-async function fetchRequestFromBackground(url, fetchMethod = "GET", body = null, opts=null) {
+/**
+ * Function that makes any API/fetch request on behalf of a content script
+ * 
+ * @async
+ * @function fetchRequestFromBackground
+ * @param  {string} url=null - URL of API route
+ * @param  {string} fetchMethod="GET" - fetch method type 
+ * @param  {object} body=null - Overwrite if the request type (PATCH, POST) is method that needs to send data to the server
+ * @param  {object} opts=null} Option to add users apiToken for protected API calls 
+ * @return {string} JSON formatted response from the API
+ */
+async function fetchRequestFromBackground({url = null, fetchMethod = "GET", body = null, opts=null} = {}) {
+  // URL is the only "required" argument to make a fetch. 
+  // Default
+  if (url == null) {
+    return false;
+  }
+  
   const headers = new Headers();
 
   const { csrfCookieValue } = await browser.storage.local.get("csrfCookieValue");
@@ -424,10 +440,7 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "fetchRequestFromBackground": 
       response = await fetchRequestFromBackground(
-        m.url, 
-        m.fetchMethod,
-        m.body,
-        m.opts
+        m.fetchRequest
       );
       break;
     case "fillInputWithAlias":

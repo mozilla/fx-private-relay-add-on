@@ -75,7 +75,9 @@
     
     const serverProfileData = await browser.runtime.sendMessage({
       method: "fetchRequestFromBackground",
-      url: apiProfileURL
+      fetchRequest: {
+        url: apiProfileURL
+      }
     });
 
     browser.storage.local.set({
@@ -104,12 +106,16 @@
       /** @type {RandomMask[]} */
       const relayAddresses = await browser.runtime.sendMessage({
         method: "fetchRequestFromBackground",
-        url: relayApiUrlRelayAddresses
+        fetchRequest: {
+          url: relayApiUrlRelayAddresses
+        }
       });
       const domainAddresses = options.fetchCustomMasks
         ? await browser.runtime.sendMessage({
           method: "fetchRequestFromBackground",
-          url: relayApiUrlDomainAddresses
+          fetchRequest: {
+            url: relayApiUrlDomainAddresses
+          }
         })
         : [];
       await browser.storage.local.set({
@@ -223,10 +229,12 @@
           const endpoint = alias.mask_type === "custom" ? relayApiUrlDomainAddresses : relayApiUrlRelayAddresses;
           await browser.runtime.sendMessage({
             method: "fetchRequestFromBackground",
-            url: `${endpoint}${alias.id}/`,
-            fetchMethod: "PATCH",
-            body: JSON.stringify(body),
-            opts: {auth: true}
+            fetchRequest: {
+              url: `${endpoint}${alias.id}/`,
+              fetchMethod: "PATCH",
+              body: JSON.stringify(body),
+              opts: {auth: true}
+            }
           });
         }
       }
@@ -252,13 +260,17 @@
       
       const serverRelayAddresses = await browser.runtime.sendMessage({
         method: "fetchRequestFromBackground",
-        url: relayApiUrlRelayAddresses
+        fetchRequest: {
+          url: relayApiUrlRelayAddresses
+        }
       });
       
       const serverDomainAddresses = isPremiumUser
         ? await browser.runtime.sendMessage({
           method: "fetchRequestFromBackground",
-          url: relayApiUrlDomainAddresses
+          fetchRequest: {
+            url: relayApiUrlDomainAddresses
+          }
         })
         : [];
 
