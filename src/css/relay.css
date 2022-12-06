@@ -1,5 +1,6 @@
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
+.fx-relay-modal-iframe,
 .fx-relay-menu-iframe,
 .fx-relay-menu,
 .fx-relay-panel,
@@ -38,6 +39,20 @@
 .fx-relay-menu ::-moz-focus-inner,
 .fx-relay-icon ::-moz-focus-inner {
   border: 0;
+}
+
+.fx-relay-modal-iframe {
+  /* width: auto; */
+  top: 0;
+  right: 0;
+  position: absolute;
+  margin: 20px;
+  border-radius: 4px;
+  /* background: var(--relayGrey10); */
+  /* background-color: var(--relayGrey10); */
+  border: 0;
+  box-shadow: 3px 3px 3px 3px #00000017;
+  animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
 .fx-relay-menu-iframe iframe { 
@@ -80,7 +95,7 @@
   right: 9px;
 }
 
-.fx-relay-menu-wrapper {
+.fx-relay-menu-wrapper, .fx-relay-modal-wrapper {
   position: fixed;
   height: 100%;
   top: 0;

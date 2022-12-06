@@ -11,12 +11,10 @@ function closeRelayInPageMenu() {
 }
 
 function closeRelayInPageModal() {
-  const relayIconBtn = document.querySelector(".fx-relay-modal-open");
-  relayIconBtn?.classList.remove("fx-relay-modal-open");
-  const openMenuEl = document.querySelector(".fx-relay-modal-wrapper");
-  openMenuEl?.remove();
-  window.removeEventListener("resize", positionRelayMenu);
-  window.removeEventListener("scroll", positionRelayMenu);
+  const openMenuEl = document.querySelector(".fx-relay-modal-iframe");
+  openMenuEl.remove();
+  // window.removeEventListener("resize", positionRelayMenu);
+  // window.removeEventListener("scroll", positionRelayMenu);
   return;
 }
 
@@ -30,6 +28,17 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
   relayInPageMenuIframe.ariaHidden = "false"
   relayInPageMenuIframe.focus();
+  return;
+}
+
+function addRelayModalToPage(relayInPageModal) {
+  // relayModalWrapper.appendChild(relayInPageModal);
+  document.body.appendChild(relayInPageModal);
+
+  const relayInPageModalIframe = document.querySelector(".fx-relay-modal-iframe iframe");
+  relayInPageModalIframe.ariaHidden = "false"
+  relayInPageModalIframe.focus();
+
   return;
 }
 
@@ -103,7 +112,6 @@ function buildInpageIframe(opts) {
   iframe.tabIndex = 0;
   iframe.ariaHidden = "false";
   
-
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
     iframe.height = 200;
@@ -225,31 +233,23 @@ async function addRelayIconToInput(emailInput) {
   };
 
 
+
   emailInput.addEventListener("click", async (e) => {
     if (!e.isTrusted) {
       // The click was not user generated so ignore
       return false;
     }
-
     console.log("clicked email inout");
 
-    const relayInPageModal = buildInPageModalIframe();
-    const relayModalWrapper = createElementWithClassList(
-      "div",
-      "fx-relay-modal-wrapper"
-    );
-    // Close menu if the user clicks outside of the menu
-    relayModalWrapper.addEventListener("click", closeRelayInPageModal);
-
-    // emailInput.classList.toggle("fx-relay-modal-open");
-    // if (!relayIconBtn.classList.contains("fx-relay-modal-open")) {
-    //   return closeRelayInPageModal();
-    // }
-    
-    addRelayMenuToPage(relayModalWrapper, relayInPageModal);
+    const relayModal = document.querySelector(".fx-relay-modal-iframe");
+    if (!relayModal) {
+      const relayInPageModal = buildInPageModalIframe();
+      addRelayModalToPage(relayInPageModal);
+      emailInput.classList.toggle("fx-relay-modal-open");
+    }
     return;
-
   });
+
 
   relayIconBtn.addEventListener("click", async (e) => {
     if (!e.isTrusted) {
@@ -319,6 +319,10 @@ browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
   if (m.message === "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
   }  
+  // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
+  if (m.message === "iframeCloseRelayInPageModal") {
+    return closeRelayInPageModal();
+} 
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
   if (m.method == "updateIframeHeight") {

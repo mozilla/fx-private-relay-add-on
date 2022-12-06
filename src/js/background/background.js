@@ -396,6 +396,9 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
       break;
+    case "iframeCloseRelayInPageModal":
+      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageModal"});
+      break;
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);
       break;

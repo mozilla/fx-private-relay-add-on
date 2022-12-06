@@ -1,0 +1,43 @@
+.fx-relay-menu-body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--colorWhite);
+  box-sizing: border-box;
+  font-size: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--fontStackBase);
+  font-size: 16px;
+  -moz-osx-font-smoothing: grayscale;
+}
+ 
+
+.fx-relay-modal-body.is-premium.is-loading {
+  background-color: var(--colorWhite);
+}
+
+.fx-relay-modL-body.is-premium {
+  background-color: var(--colorGrey05);
+}
+
+.is-premium .fx-relay-modal-header {
+  border: none;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  border-radius: var(--borderRadiusSm);
+  background-color: var(--colorWhite);
+}
+
+.is-premium .fx-relay-modal-header-logo-bar {
+  position: relative;
+  /* The z-index is necessary here to have the box-shadow above the rest of the content */
+  z-index: 1;
+}
+
+.fx-relay-modal-body *,
+.fx-relay-modal-body *:before,
+.fx-relay-modal-body *:after {
+  box-sizing: inherit;
+}
