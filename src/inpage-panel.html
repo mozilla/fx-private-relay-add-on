@@ -9,7 +9,7 @@
     <script src="/js/shared/utils.js"></script>
     <script src="/js/shared/metrics.js"></script>
     <script src="/js/other-websites/inpage_menu.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body
     id="fxRelayMenuBody"
@@ -29,17 +29,22 @@
             src="/images/logo-text-fx-relay.svg"
           />
         </h1>
-        <a
-          class="fx-relay-menu-dashboard-link"        
-          href="https://relay.firefox.com"
-        >
+        <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
           <span class="fx-relay-menu-dashboard-link-tooltip"></span>
           <img src="/icons/nebula-external-link-blue.svg" alt="" />
         </a>
       </div>
       <div class="fx-relay-menu-filter-active-site">
-        <button class="fx-relay-menu-filter-active-site-button is-active" data-mask-list=".fx-relay-menu-masks-list-this-website" data-string-id="labelFromThisWebsite"></button>
-        <button class="fx-relay-menu-filter-active-site-button" data-mask-list=".fx-relay-menu-masks-list-all-masks"  data-string-id="labelAllEmailMasks"></button>
+        <button
+          class="fx-relay-menu-filter-active-site-button is-active"
+          data-mask-list=".fx-relay-menu-masks-list-this-website"
+          data-string-id="labelFromThisWebsite"
+        ></button>
+        <button
+          class="fx-relay-menu-filter-active-site-button"
+          data-mask-list=".fx-relay-menu-masks-list-all-masks"
+          data-string-id="labelAllEmailMasks"
+        ></button>
       </div>
     </header>
     <main class="fx-relay-menu">
@@ -56,24 +61,29 @@
       <section class="fx-relay-menu-content fx-content-signed-out is-hidden">
         <p class="fx-relay-menu-sign-up-message"></p>
         <a
-          
           class="fx-relay-c-button t-primary fx-relay-menu-sign-up-btn"
-          href="https://relay.firefox.com"
+          href="http://127.0.0.1"
         ></a>
       </section>
 
       <!-- Logged In / Free Tier -->
-      <section class="fx-relay-menu-content fx-content-signed-in-free is-hidden">
+      <section
+        class="fx-relay-menu-content fx-content-signed-in-free is-hidden"
+      >
         <p class="fx-relay-menu-remaining-aliases"></p>
         <button
-          
           class="fx-relay-c-button t-primary fx-relay-menu-generate-alias-btn"
         ></button>
 
         <div class="fx-relay-menu-masks-lists">
           <!-- Reused Alias Menu -->
-          <div class="fx-relay-menu-masks-list t-website fx-relay-menu-masks-free-this-website">
-            <span data-string-id="pageInputIconPreviouslyUsedMask" class="fx-relay-menu-masks-list-label"></span>
+          <div
+            class="fx-relay-menu-masks-list t-website fx-relay-menu-masks-free-this-website"
+          >
+            <span
+              data-string-id="pageInputIconPreviouslyUsedMask"
+              class="fx-relay-menu-masks-list-label"
+            ></span>
             <ul class="is-loading">
               <li class="fx-relay-menu-masks-list-loading">
                 <img
@@ -87,7 +97,6 @@
 
           <div class="fx-relay-menu-masks-list fx-relay-menu-masks-free-other">
             <span
-            
               data-string-id="pageInputIconAdditionalEmailMasks"
               class="fx-relay-menu-masks-list-label"
             ></span>
@@ -104,15 +113,15 @@
         </div>
 
         <a
-          
-          
           class="fx-relay-c-button t-secondary fx-relay-menu-get-unlimited-aliases"
-          href="https://relay.firefox.com/premium"
+          href="http://127.0.0.1/premium"
         ></a>
       </section>
 
       <!-- Logged In / Premium Tier -->
-      <section class="fx-relay-menu-content fx-content-signed-in-premium is-hidden">
+      <section
+        class="fx-relay-menu-content fx-content-signed-in-premium is-hidden"
+      >
         <div class="fx-relay-menu-masks-search">
           <form class="fx-relay-menu-masks-search-form">
             <input
@@ -127,7 +136,9 @@
               </div>
             </div>
           </form>
-          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-this-website is-loading">
+          <div
+            class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-this-website is-loading"
+          >
             <ul class="">
               <li class="fx-relay-menu-masks-list-loading">
                 <img
@@ -138,7 +149,9 @@
               </li>
             </ul>
           </div>
-          <div class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-all-masks is-loading">
+          <div
+            class="fx-relay-menu-masks-list t-search fx-relay-menu-masks-list-all-masks is-loading"
+          >
             <ul class="">
               <li class="fx-relay-menu-masks-list-loading">
                 <img
@@ -153,7 +166,6 @@
 
         <div class="fx-relay-menu-content-footer">
           <button
-            
             class="fx-relay-c-button t-primary fx-relay-menu-generate-alias-btn"
           ></button>
         </div>
