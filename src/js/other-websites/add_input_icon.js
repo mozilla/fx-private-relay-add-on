@@ -104,6 +104,30 @@ function buildInpageIframe(opts) {
   return div;
 }
 
+function buildInPageModalIframe(opts) {
+  const div = createElementWithClassList(
+    "div",
+    "fx-relay-modal-iframe"
+  );
+  const iframe = document.createElement("iframe");
+  iframe.src = browser.runtime.getURL("inpage-panel.html");
+  iframe.width = 300;
+  // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
+  iframe.height = 300;
+  iframe.title = "This is a modal";
+  iframe.tabIndex = 0;
+  iframe.ariaHidden = "false";
+
+  // if (!opts.isSignedIn) {
+  //   // If the user is not signed in, the content is shorter. Build the iframe accordingly.
+  //   iframe.height = 200;
+  // }
+
+  div.appendChild(iframe);
+  
+  return div;
+}
+
 function addPaddingRight(element, paddingInPixels) {
   const computedElementStyles = getComputedStyle(element);
   const existingPaddingRight =
@@ -206,9 +230,16 @@ async function addRelayIconToInput(emailInput) {
     const signedInUser = await isUserSignedIn();
 
     const relayInPageMenu = buildInpageIframe({isSignedIn: signedInUser});
+    const relayInPageModal = buildInPageModalIframe({isSignedIn: signedInUser});
+
     const relayMenuWrapper = createElementWithClassList(
       "div",
       "fx-relay-menu-wrapper"
+    );
+
+    const relayModalWrapper = createElementWithClassList(
+      "div",
+      "fx-relay-modal-wrapper"
     );
 
     // Close menu if the user clicks outside of the menu
@@ -223,12 +254,14 @@ async function addRelayIconToInput(emailInput) {
 
     if (!signedInUser) {
       addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
+      addRelayMenuToPage(relayModalWrapper, relayInPageModal);
       sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
       return;
     }
 
     sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
     addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
+    addRelayMenuToPage(relayModalWrapper, relayInPageModal);
 
   });
 
