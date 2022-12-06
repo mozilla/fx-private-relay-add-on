@@ -10,6 +10,16 @@ function closeRelayInPageMenu() {
   return;
 }
 
+function closeRelayInPageModal() {
+  const relayIconBtn = document.querySelector(".fx-relay-modal-open");
+  relayIconBtn?.classList.remove("fx-relay-modal-open");
+  const openMenuEl = document.querySelector(".fx-relay-modal-wrapper");
+  openMenuEl?.remove();
+  window.removeEventListener("resize", positionRelayMenu);
+  window.removeEventListener("scroll", positionRelayMenu);
+  return;
+}
+
 function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
@@ -104,13 +114,13 @@ function buildInpageIframe(opts) {
   return div;
 }
 
-function buildInPageModalIframe(opts) {
+function buildInPageModalIframe() {
   const div = createElementWithClassList(
     "div",
     "fx-relay-modal-iframe"
   );
   const iframe = document.createElement("iframe");
-  iframe.src = browser.runtime.getURL("inpage-panel.html");
+  iframe.src = browser.runtime.getURL("inpage-modal.html");
   iframe.width = 300;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
   iframe.height = 300;
@@ -214,6 +224,33 @@ async function addRelayIconToInput(emailInput) {
     sendRelayEvent("In-page", evtAction, evtLabel);
   };
 
+
+  emailInput.addEventListener("click", async (e) => {
+    if (!e.isTrusted) {
+      // The click was not user generated so ignore
+      return false;
+    }
+
+    console.log("clicked email inout");
+
+    const relayInPageModal = buildInPageModalIframe();
+    const relayModalWrapper = createElementWithClassList(
+      "div",
+      "fx-relay-modal-wrapper"
+    );
+    // Close menu if the user clicks outside of the menu
+    relayModalWrapper.addEventListener("click", closeRelayInPageModal);
+
+    // emailInput.classList.toggle("fx-relay-modal-open");
+    // if (!relayIconBtn.classList.contains("fx-relay-modal-open")) {
+    //   return closeRelayInPageModal();
+    // }
+    
+    addRelayMenuToPage(relayModalWrapper, relayInPageModal);
+    return;
+
+  });
+
   relayIconBtn.addEventListener("click", async (e) => {
     if (!e.isTrusted) {
       // The click was not user generated so ignore
@@ -228,18 +265,10 @@ async function addRelayIconToInput(emailInput) {
     window.addEventListener("scroll", positionRelayMenu);
 
     const signedInUser = await isUserSignedIn();
-
     const relayInPageMenu = buildInpageIframe({isSignedIn: signedInUser});
-    const relayInPageModal = buildInPageModalIframe({isSignedIn: signedInUser});
-
     const relayMenuWrapper = createElementWithClassList(
       "div",
       "fx-relay-menu-wrapper"
-    );
-
-    const relayModalWrapper = createElementWithClassList(
-      "div",
-      "fx-relay-modal-wrapper"
     );
 
     // Close menu if the user clicks outside of the menu
@@ -254,14 +283,12 @@ async function addRelayIconToInput(emailInput) {
 
     if (!signedInUser) {
       addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
-      addRelayMenuToPage(relayModalWrapper, relayInPageModal);
       sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
       return;
     }
 
     sendInPageEvent("viewed-menu", "authenticated-user-input-menu");
     addRelayMenuToPage(relayMenuWrapper, relayInPageMenu, relayIconBtn);
-    addRelayMenuToPage(relayModalWrapper, relayInPageModal);
 
   });
 
