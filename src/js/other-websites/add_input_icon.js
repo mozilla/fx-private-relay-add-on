@@ -129,7 +129,7 @@ function buildInPageModalIframe() {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-modal.html");
-  iframe.width = 300;
+  iframe.width = 450;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
   iframe.height = 300;
   iframe.title = "This is a modal";

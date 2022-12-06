@@ -36,23 +36,10 @@
 }
 
 .fx-relay-menu-iframe ::-moz-focus-inner,
+.fx-relay-modal-iframe ::-moz-focus-inner,
 .fx-relay-menu ::-moz-focus-inner,
 .fx-relay-icon ::-moz-focus-inner {
   border: 0;
-}
-
-.fx-relay-modal-iframe {
-  /* width: auto; */
-  top: 0;
-  right: 0;
-  position: absolute;
-  margin: 20px;
-  border-radius: 4px;
-  /* background: var(--relayGrey10); */
-  /* background-color: var(--relayGrey10); */
-  border: 0;
-  box-shadow: 3px 3px 3px 3px #00000017;
-  animation: fxRelayFadeIn 0.2s ease forwards;
 }
 
 .fx-relay-menu-iframe iframe { 
@@ -95,7 +82,7 @@
   right: 9px;
 }
 
-.fx-relay-menu-wrapper, .fx-relay-modal-wrapper {
+.fx-relay-menu-wrapper {
   position: fixed;
   height: 100%;
   top: 0;
@@ -106,6 +93,22 @@
   z-index: 9999999999999999999999;
   background-color: rgba(0, 0, 0, 0.1);
   animation: fxRelayFadeIn 0.2s ease forwards;
+}
+
+.fx-relay-modal-iframe {
+  top: 0;
+  right: 0;
+  position: fixed;
+  margin: 20px;
+  z-index: 9999999999999999999999;
+  animation: fxRelayFadeIn 0.5s ease-in-out;
+  box-shadow: 0 5px 12px 0 rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.fx-relay-modal-iframe iframe{
+  border-width: 0;
+
 }
 
 fx-relay-logotype {

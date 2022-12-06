@@ -1,4 +1,4 @@
-.fx-relay-menu-body {
+.fx-relay-modal-body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -10,30 +10,59 @@
   flex-direction: column;
   height: 100%;
   font-family: var(--fontStackBase);
-  font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
 }
- 
 
-.fx-relay-modal-body.is-premium.is-loading {
-  background-color: var(--colorWhite);
+.container {
+  margin: 8px;
 }
 
-.fx-relay-modL-body.is-premium {
-  background-color: var(--colorGrey05);
+.flexbox {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
 }
 
-.is-premium .fx-relay-modal-header {
-  border: none;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
-  border-radius: var(--borderRadiusSm);
-  background-color: var(--colorWhite);
+.description {
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
 }
 
-.is-premium .fx-relay-modal-header-logo-bar {
-  position: relative;
-  /* The z-index is necessary here to have the box-shadow above the rest of the content */
-  z-index: 1;
+.description > * {
+  margin: 0;
+  line-height: 120%;
+}
+
+.headline {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.body {
+  font-size: 14px;
+
+}
+
+.recommended {
+  align-self: start;
+  background: #9059FF;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.70em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 5px;
+  line-height: 100%;
+  align-self: left;
+  border-radius: 3px;
+}
+.maxxuardo {
+  width: 120px;
+  padding-right: 8px;
+  border-right: 1px solid #eee;
 }
 
 .fx-relay-modal-body *,
