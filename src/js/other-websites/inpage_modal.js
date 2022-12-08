@@ -32,23 +32,14 @@ function getModalStrings() {
   }
 }
 
-// const randomIteration = function (item) {
-  
-// };
-
-// console.log(Object.values(getModalStrings()));
-
 const iterationArray = Object.values(getModalStrings());
 const getRandomIterationFromArray = iterationArray[Math.floor(Math.random()*iterationArray.length)];
-
-console.log(getRandomIterationFromArray);
 
 const modalHeadlineElem = document.querySelector(".fx-relay-modal .headline");
 const modalBodyElem = document.querySelector(".fx-relay-modal .body");
 
 modalHeadlineElem.textContent = getRandomIterationFromArray.headline;
 modalBodyElem.textContent = getRandomIterationFromArray.body;
-
 
 const closeBtn = document.querySelector(".js-close-modal");
 
@@ -71,6 +62,33 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 const generateAliasBtn = document.querySelector(".js-fx-relay-generate-mask");
 // console.log(generateAliasBtn);
 
+
+// const currentPageURL = async () => {
+//   return await browser.runtime.sendMessage({
+//     method: "getCurrentPageURL",
+//   });
+// }
+
+async function currentPageURL() {
+ const current = await browser.runtime.sendMessage({
+    method: "getCurrentPageURL",
+  });
+  return current;
+}
+
+async function currentURL() {
+  const current = await currentPageURL(); 
+
+  if (current.includes("signin") || current.includes("login")) {
+    console.log("this is a sign in process");
+  }
+  else {
+    console.log("this is NOT a sign in process");
+  }
+}
+
+currentURL();
+
 // Handle "Generate New Alias" clicks
 generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   sendInPageEvent("click", "input-modal-reuse-previous-alias");
@@ -83,6 +101,11 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   const currentPageHostName = await browser.runtime.sendMessage({
     method: "getCurrentPageHostname",
   });
+
+  const currentPageHostNameURL = await browser.runtime.sendMessage({
+    method: "getCurrentPageURL",
+  });
+
 
   // Attempt to create a new alias
   const newRelayAddressResponse = await browser.runtime.sendMessage({

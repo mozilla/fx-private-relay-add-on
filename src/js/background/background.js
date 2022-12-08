@@ -421,6 +421,10 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
       if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
       break;
+    case "getCurrentPageURL":
+      // Only capture the page hostanme if the active tab is an non-internal (about:) page.
+      if (currentPage.url) { response = (new URL(currentPage.url)).href }
+      break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
       break;
