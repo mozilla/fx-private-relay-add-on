@@ -32,7 +32,6 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
 }
 
 function addRelayModalToPage(relayInPageModal) {
-  // relayModalWrapper.appendChild(relayInPageModal);
   document.body.appendChild(relayInPageModal);
 
   const relayInPageModalIframe = document.querySelector(".fx-relay-modal-iframe iframe");
@@ -129,9 +128,9 @@ function buildInPageModalIframe() {
   );
   const iframe = document.createElement("iframe");
   iframe.src = browser.runtime.getURL("inpage-modal.html");
-  iframe.width = 450;
+  iframe.width = 500;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
-  iframe.height = 300;
+  iframe.height = 210;
   iframe.title = "This is a modal";
   iframe.tabIndex = 0;
   iframe.ariaHidden = "false";
@@ -239,7 +238,7 @@ async function addRelayIconToInput(emailInput) {
       // The click was not user generated so ignore
       return false;
     }
-    console.log("clicked email inout");
+    lastClickedEmailInput = emailInput;
 
     const relayModal = document.querySelector(".fx-relay-modal-iframe");
     if (!relayModal) {
@@ -310,6 +309,7 @@ function updateIframeHeight(height) {
 browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
   if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
+    console.log(lastClickedEmailInput);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
     relayIconBtn?.classList.add("user-generated-relay");
     return closeRelayInPageMenu();

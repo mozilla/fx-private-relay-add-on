@@ -24,26 +24,56 @@
 }
 
 .description {
-  padding: 8px;
+  padding: 6px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-direction: column;
 }
 
 .description > * {
   margin: 0;
   line-height: 120%;
+  font-size: 13px;
+
 }
 
 .headline {
+  padding-top: 6px;
   font-size: 18px;
   font-weight: 600;
   margin: 0;
 }
 
-.body {
-  font-size: 14px;
+.footer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
 
+.footer > * {
+  font-size: 14px;
+}
+
+.masks-left {
+  padding-top: 6px;
+  font-weight: 600;
+}
+
+.get-unlimited {
+  background: transparent;
+}
+
+.top-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  color: gray;
+  margin: 0;
 }
 
 .recommended {
@@ -51,13 +81,13 @@
   background: #9059FF;
   color: white;
   text-transform: uppercase;
-  font-size: 0.70em;
+  font-size: 0.75em;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 5px;
+  letter-spacing: 0.03em;
+  padding: 6px 8px;
   line-height: 100%;
   align-self: left;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 .maxxuardo {
   width: 120px;

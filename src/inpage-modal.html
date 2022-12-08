@@ -8,7 +8,6 @@
     <script src="/js/libs/browser-polyfill.min.js"></script>
     <script src="/js/shared/utils.js"></script>
     <script src="/js/shared/metrics.js"></script>
-    <script src="/js/other-websites/inpage_modal.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body class="fx-relay-modal-body fx-relay is-premium is-loading">
@@ -16,7 +15,12 @@
       <div class="flexbox">
         <img class="maxxuardo" src="/images/maxxuardo.svg" alt="" />
         <div class="description">
-          <div class="recommended">Recommended for this site</div>
+          <div class="top-row">
+            <div class="recommended">Recommended for this site</div>
+            <button class="js-close-modal close t-basic get-unlimited">
+              X
+            </button>
+          </div>
           <p class="headline">
             Are you sure you want to share your real email?
           </p>
@@ -24,8 +28,21 @@
             Use your email mask to protect your real identity and control how
             this company can contact you.
           </p>
+          <p class="masks-left">You have 3 masks left.</p>
+          <div class="footer">
+            <button
+              class="js-fx-relay-generate-mask fx-relay-c-button t-primary"
+            >
+              Generate new mask
+            </button>
+
+            <button class="fx-relay-c-button t-secondary t-basic get-unlimited">
+              Get unlimited masks
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <script src="/js/other-websites/inpage_modal.js"></script>
   </body>
 </html>
