@@ -6,6 +6,50 @@ async function iframeCloseRelayInPageModal() {
   }
 
 
+function getModalStrings() {
+
+  return {
+    "iteration_one": {
+      "headline": "Are you sure you want to share your real email?",
+      "body": "Use your email mask to protect your real identity and control how this company can contact you",
+    },
+    "iteration_two": {
+      "headline": "Now’s the perfect time to protect your real email",
+      "body": "Use your email mask to protect your real identity and control how this site can contact you.",
+    },
+    "iteration_three": {
+      "headline": "Protect your real email address",
+      "body": "Use your email mask to protect your real identity and control how this site can contact you.",
+    },
+    "iteration_four": {
+      "headline": "Don’t share your email with this site",
+      "body": "Use your email masks to protect your real identity and control how this site can contact you.",
+    },
+    "iteration_five": {
+      "headline": "Don’t share your email – use a mask instead",
+      "body": "Protect your real identity and control how this site can contact you in the future.",
+    },
+  }
+}
+
+// const randomIteration = function (item) {
+  
+// };
+
+// console.log(Object.values(getModalStrings()));
+
+const iterationArray = Object.values(getModalStrings());
+const getRandomIterationFromArray = iterationArray[Math.floor(Math.random()*iterationArray.length)];
+
+console.log(getRandomIterationFromArray);
+
+const modalHeadlineElem = document.querySelector(".fx-relay-modal .headline");
+const modalBodyElem = document.querySelector(".fx-relay-modal .body");
+
+modalHeadlineElem.textContent = getRandomIterationFromArray.headline;
+modalBodyElem.textContent = getRandomIterationFromArray.body;
+
+
 const closeBtn = document.querySelector(".js-close-modal");
 
 async function handleKeydownEvents(e) {
@@ -55,7 +99,7 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   //   );
   // }
 
-  const fillinput = await browser.runtime.sendMessage({
+  await browser.runtime.sendMessage({
     method: "fillInputWithAlias",
     message: {
       filter: "fillInputWithAlias",
