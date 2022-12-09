@@ -39,7 +39,7 @@
 
 .headline {
   padding-top: 6px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
 }
@@ -89,10 +89,18 @@
   align-self: left;
   border-radius: 4px;
 }
-.maxxuardo {
-  width: 120px;
+
+.maxxuardo-wrapper {
   padding-right: 8px;
+  display: flex;
   border-right: 1px solid #eee;
+}
+
+.maxxuardo {
+  align-self: center;
+  width: 120px;
+  height: 120px;
+  
 }
 
 .fx-relay-modal-body *,
