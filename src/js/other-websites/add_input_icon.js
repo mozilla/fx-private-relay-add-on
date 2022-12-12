@@ -130,48 +130,23 @@ function buildInPageModalIframe() {
   iframe.src = browser.runtime.getURL("inpage-modal.html");
   iframe.width = 500;
   // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
-  // iframe.height = 210;
+  iframe.height = 190;
   iframe.title = "This is a modal";
   iframe.tabIndex = 0;
-  iframe.classList.add("gh-fit");
+  iframe.style.overflow = "hidden";
   iframe.ariaHidden = "false";
-  console.log(iframe);
 
   // if (!opts.isSignedIn) {
   //   // If the user is not signed in, the content is shorter. Build the iframe accordingly.
   //   iframe.height = 200;
   // }
-  iframe.addEventListener("load", requestAnimationFrame.bind(this, fit))
+  // iframe.addEventListener("load", requestAnimationFrame.bind(this, fit))
 
   div.appendChild(iframe);
   
   return div;
 }
 
-function fit() {
-  var iframes = document.querySelectorAll("iframe.gh-fit")
-
-  for(var id = 0; id < iframes.length; id++) {
-      var win = iframes[id].contentWindow
-      var doc = win.document
-      var html = doc.documentElement
-      var body = doc.body
-      var ifrm = iframes[id] // or win.frameElement
-
-      if(body) {
-          body.style.overflowX = "scroll" // scrollbar-jitter fix
-          body.style.overflowY = "hidden"
-      }
-      if(html) {
-          // html.style.overflowX = "scroll" // scrollbar-jitter fix
-          html.style.overflowY = "hidden"
-          var style = win.getComputedStyle(html)
-          ifrm.height = parseInt(style.getPropertyValue("height"))
-      }
-  }
-
-  requestAnimationFrame(fit)
-}
 
 
 function addPaddingRight(element, paddingInPixels) {
@@ -261,24 +236,41 @@ async function addRelayIconToInput(emailInput) {
   };
 
 
+  // emailInput.addEventListener("click", async (e) => {
+  //   if (!e.isTrusted) {
+  //     // The click was not user generated so ignore
+  //     return false;
+  //   }
+  //   lastClickedEmailInput = emailInput;
 
-  emailInput.addEventListener("click", async (e) => {
-    if (!e.isTrusted) {
-      // The click was not user generated so ignore
-      return false;
+  //   const relayModal = document.querySelector(".fx-relay-modal-iframe");
+
+  //   if (!relayModal) {
+  //     const relayInPageModal = buildInPageModalIframe();
+  //     addRelayModalToPage(relayInPageModal);
+  //     emailInput.classList.toggle("fx-relay-modal-open");
+  //   }
+  //   return;
+  // });
+
+  emailInput.addEventListener("input", async (e) => {
+    const emailInputValue = emailInput.value;
+    const characterAfterEmailSymbol = emailInputValue.split("@")[1];
+
+    if (emailInputValue.includes("@gmail") || emailInputValue.includes("@yahoo") || emailInputValue.includes("@hotmail")) {
+      
+      lastClickedEmailInput = emailInput;
+
+      const relayModal = document.querySelector(".fx-relay-modal-iframe");
+  
+      if (!relayModal) {
+        const relayInPageModal = buildInPageModalIframe();
+        addRelayModalToPage(relayInPageModal);
+        emailInput.classList.toggle("fx-relay-modal-open");
+      }
+      return;
     }
-    lastClickedEmailInput = emailInput;
-
-    const relayModal = document.querySelector(".fx-relay-modal-iframe");
-
-    if (!relayModal) {
-      const relayInPageModal = buildInPageModalIframe();
-      addRelayModalToPage(relayInPageModal);
-      emailInput.classList.toggle("fx-relay-modal-open");
-    }
-    return;
   });
-
 
   relayIconBtn.addEventListener("click", async (e) => {
     if (!e.isTrusted) {
