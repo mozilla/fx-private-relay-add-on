@@ -74,6 +74,12 @@
 .close {
   color: gray;
   margin: 0;
+  width: auto;
+  align-self: flex-start;
+}
+
+.close:hover {
+  opacity: 0.5;
 }
 
 .recommended {
