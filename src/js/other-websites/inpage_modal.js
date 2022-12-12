@@ -60,14 +60,7 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 };
 
 const generateAliasBtn = document.querySelector(".js-fx-relay-generate-mask");
-// console.log(generateAliasBtn);
 
-
-// const currentPageURL = async () => {
-//   return await browser.runtime.sendMessage({
-//     method: "getCurrentPageURL",
-//   });
-// }
 
 async function currentPageURL() {
  const current = await browser.runtime.sendMessage({
@@ -88,6 +81,67 @@ async function currentURL() {
 }
 
 currentURL();
+
+async function getRemainingMasks() {
+  const masks = await getMasks();
+  const { maxNumAliases }  = await browser.storage.local.get(
+    "maxNumAliases"
+  );
+  const numAliasesRemaining = maxNumAliases - masks.length;
+  return numAliasesRemaining;
+}
+
+const masksLeftElem = document.querySelector(".masks-left");
+
+const showMasksLeft = async () => {
+  masksLeftElem.textContent = await getRemainingMasks();
+}
+
+showMasksLeft();
+
+async function getCachedServerStoragePref() {
+  const serverStoragePref = await browser.storage.local.get("server_storage");
+  const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
+    serverStoragePref,
+    "server_storage"
+  );
+
+  if (!serverStoragePrefInLocalStorage) {
+    // There is no reference to the users storage preference saved. Fetch it from the server.
+    return await browser.runtime.sendMessage({
+      method: "getServerStoragePref",
+    });
+  } else {
+    // If the stored pref exists, return value
+    return serverStoragePref.server_storage;
+  }
+}
+
+async function getMasks(options = { fetchCustomMasks: false }) {
+  const serverStoragePref = await getCachedServerStoragePref();
+
+  if (serverStoragePref) {
+    try {
+      return await browser.runtime.sendMessage({
+        method: "getAliasesFromServer",
+        options,
+      });
+    } catch (error) {
+      console.warn(`getAliasesFromServer Error: ${error}`);
+
+      // API Error — Fallback to local storage
+      const { relayAddresses } = await browser.storage.local.get(
+        "relayAddresses"
+      );
+
+      return relayAddresses;
+    }
+  }
+
+  const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+  return relayAddresses;
+}
+
 
 // Handle "Generate New Alias" clicks
 generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
