@@ -5,7 +5,6 @@ async function iframeCloseRelayInPageModal() {
     await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageModal" });
   }
 
-
 function getModalStrings() {
 
   return {
@@ -61,22 +60,49 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 
 const generateAliasBtn = document.querySelector(".js-fx-relay-generate-mask");
  
-async function getRemainingMasks() {
+async function getRemainingMasks(value) {
   const masks = await getMasks();
+  let upgradeNeeded = false;
   const { maxNumAliases }  = await browser.storage.local.get(
     "maxNumAliases"
   );
   const numAliasesRemaining = maxNumAliases - masks.length;
-  return numAliasesRemaining;
-}
+  
+  if (numAliasesRemaining === 0) {
+    upgradeNeeded = true;
+  }
 
+  if (value === "num-remaining") {
+    return numAliasesRemaining;
+  }
+  if (value === "check-upgrade") {
+    return upgradeNeeded;
+  }
+}
 const masksLeftElem = document.querySelector(".masks-left");
 
 const showMasksLeft = async () => {
-  masksLeftElem.textContent = await getRemainingMasks();
+  masksLeftElem.textContent = await getRemainingMasks("num-remaining");
+}
+
+async function switchToUpgradeFooter(){
+  const generateMaskModalFooter = document.querySelector(".js-generate-mask-modal-footer");
+  const upgradeModalFooter = document.querySelector(".js-upgrade-modal-footer");
+
+  if (await getRemainingMasks("check-upgrade")) {
+    upgradeModalFooter.classList.remove("hidden");
+    generateMaskModalFooter.classList.add("hidden");
+  }
 }
 
 showMasksLeft();
+switchToUpgradeFooter();
+
+const generateMaskModalFooter = document.querySelector(".js-generate-mask-modal-footer");
+const upgradeModalFooter = document.querySelector(".js-upgrade-modal-footer");
+
+// const masksremaning = await getRemainingMasks();
+// console.log(masksremaning);
 
 async function getCachedServerStoragePref() {
   const serverStoragePref = await browser.storage.local.get("server_storage");
@@ -126,7 +152,6 @@ async function getMasks(options = { fetchCustomMasks: false }) {
 generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   sendInPageEvent("click", "input-modal-reuse-previous-alias");
   preventDefaultBehavior(generateClickEvt);
-  console.log("clicked generate btn");
 
   // generateAliasBtn.classList.add("is-loading");
 
@@ -134,11 +159,6 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   const currentPageHostName = await browser.runtime.sendMessage({
     method: "getCurrentPageHostname",
   });
-
-  const currentPageHostNameURL = await browser.runtime.sendMessage({
-    method: "getCurrentPageURL",
-  });
-
 
   // Attempt to create a new alias
   const newRelayAddressResponse = await browser.runtime.sendMessage({
@@ -162,5 +182,8 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
       newRelayAddressResponse,
     },
   });
+
+  await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageModal" });
+
 
 });

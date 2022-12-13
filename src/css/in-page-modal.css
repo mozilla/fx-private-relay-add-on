@@ -12,13 +12,6 @@
   font-family: var(--fontStackBase);
   -moz-osx-font-smoothing: grayscale;
 }
-
-.fx-relay-hidden {
-  display: none;
-  visibility: hidden;
-  opacity: 0;
-}
-
 .container {
   margin: 8px;
 }
@@ -70,6 +63,12 @@
   background: transparent;
 }
 
+.fx-relay-manage-masks {
+  background: transparent;
+  width: auto;
+  flex-shrink: 0;
+}
+
 .top-row {
   display: flex;
   flex-direction: row;
@@ -112,7 +111,27 @@
   align-self: center;
   width: 120px;
   height: 120px;
-  
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.fx-relay-logo {
+  width: 20px;
+}
+
+.get-unlimited-mask-btn {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  background-color: #3D04AD;
+  color: var(--colorWhite);
+  font-weight: 600;
+  justify-content: start;
+  width: auto;
 }
 
 .fx-relay-modal-body *,

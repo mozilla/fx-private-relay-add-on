@@ -30,15 +30,35 @@
           <p class="masks-left-row">
             Masks remaining: <span class="masks-left"></span>
           </p>
-          <div class="footer">
+          <!-- With aliases left -->
+          <div class="js-generate-mask-modal-footer footer">
             <button
               class="js-fx-relay-generate-mask fx-relay-c-button t-primary"
             >
               Generate new mask
             </button>
-
             <button class="fx-relay-c-button t-secondary t-basic get-unlimited">
               Get unlimited masks
+            </button>
+          </div>
+
+          <!-- Without aliases left -->
+          <div class="js-upgrade-modal-footer footer hidden">
+            <button
+              class="get-unlimited-mask-btn js-fx-relay-get-unlimited-mask fx-relay-c-button"
+            >
+              <img
+                class="fx-relay-logo"
+                src="/images/logo-image-fx-relay.svg"
+                alt=""
+              />
+              <span>Get unlimited masks</span>
+            </button>
+
+            <button
+              class="fx-relay-c-button t-secondary t-basic fx-relay-manage-masks"
+            >
+              Manage all masks
             </button>
           </div>
         </div>

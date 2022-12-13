@@ -10,8 +10,9 @@ function closeRelayInPageMenu() {
   return;
 }
 
+const openMenuEl = document.querySelector(".fx-relay-modal-iframe iframe");
+
 function closeRelayInPageModal() {
-  const openMenuEl = document.querySelector(".fx-relay-modal-iframe");
   openMenuEl.remove();
   // window.removeEventListener("resize", positionRelayMenu);
   // window.removeEventListener("scroll", positionRelayMenu);
@@ -149,7 +150,6 @@ function buildInPageModalIframe() {
 }
 
 
-
 function addPaddingRight(element, paddingInPixels) {
   const computedElementStyles = getComputedStyle(element);
   const existingPaddingRight =
@@ -174,7 +174,6 @@ function addPaddingRight(element, paddingInPixels) {
     element.style.width = newWidth.toString() + "px";
   }
 }
-
 
 let lastClickedEmailInput;
 
@@ -246,22 +245,25 @@ async function addRelayIconToInput(emailInput) {
      return current;
    }
    
-   async function isASignInFlow() {
+   const signUpTerms = ["signup", "sign-up", "register"];
+
+   async function isASignUpFlow() {
      const current = await currentPageURL(); 
-   
-     if (current.includes("signin") || current.includes("login") || current.includes("register")) {
-       return true;
-     }
-    return false;
+     let signUpFlowBool = false;
+
+     signUpTerms.forEach((e) => {
+      if (current.includes(e)) {
+        signUpFlowBool = true;
+      }
+     });
+
+    return signUpFlowBool;
    }
 
-  const getCurrentUserFlow = await isASignInFlow();
-
-  if (await getCurrentUserFlow) {
+  if (await isASignUpFlow()) {
     lastClickedEmailInput = emailInput;
 
     if (!relayModal) {
-      console.log("building");
       const relayInPageModal = buildInPageModalIframe();
       addRelayModalToPage(relayInPageModal);
       emailInput.classList.toggle("fx-relay-modal-open"); 
@@ -272,7 +274,6 @@ async function addRelayIconToInput(emailInput) {
   emailInput.addEventListener("input", async (e) => {
     const emailInputValue = emailInput.value;
     const relayModal = document.querySelector(".fx-relay-modal-iframe");
-
 
     if (emailInputValue.includes("@gmail") || emailInputValue.includes("@yahoo") || emailInputValue.includes("@hotmail")) {
       
@@ -351,7 +352,7 @@ browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
       return closeRelayInPageMenu();
   }  
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if (m.message === "iframeCloseRelayInPageModal") {
+  if ((m.message === "iframeCloseRelayInPageModal") && openMenuEl) {
     return closeRelayInPageModal();
 } 
 
