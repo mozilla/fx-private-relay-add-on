@@ -275,3 +275,9 @@ button.fx-relay-button {
     opacity: 1;
   }
 }
+
+.fx-relay-hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}

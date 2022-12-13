@@ -13,6 +13,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.fx-relay-hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
 .container {
   margin: 8px;
 }

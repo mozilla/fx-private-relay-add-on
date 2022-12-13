@@ -60,28 +60,7 @@ const sendInPageEvent = (evtAction, evtLabel) => {
 };
 
 const generateAliasBtn = document.querySelector(".js-fx-relay-generate-mask");
-
-
-async function currentPageURL() {
- const current = await browser.runtime.sendMessage({
-    method: "getCurrentPageURL",
-  });
-  return current;
-}
-
-async function currentURL() {
-  const current = await currentPageURL(); 
-
-  if (current.includes("signin") || current.includes("login")) {
-    console.log("this is a sign in process");
-  }
-  else {
-    console.log("this is NOT a sign in process");
-  }
-}
-
-currentURL();
-
+ 
 async function getRemainingMasks() {
   const masks = await getMasks();
   const { maxNumAliases }  = await browser.storage.local.get(

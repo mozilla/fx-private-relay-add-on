@@ -290,3 +290,8 @@
   color: var(--colorGrey40);
 }
 
+.fx-relay-hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
