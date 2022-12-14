@@ -50,7 +50,12 @@ async function handleKeydownEvents(e) {
   }
 }
 
-closeBtn.addEventListener("click", iframeCloseRelayInPageModal);
+closeBtn.addEventListener("click", async () => {
+  await iframeCloseRelayInPageModal();
+  
+
+});
+
 // Set Listeners
 document.addEventListener("keydown", handleKeydownEvents);
 
@@ -95,8 +100,33 @@ async function switchToUpgradeFooter(){
   }
 }
 
+async function addLinks() {
+  const { relaySiteOrigin } = await browser.storage.local.get(
+    "relaySiteOrigin"
+  );
+  const premiumCountryAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS
+
+  const getUnlimitedMasksLink = document.querySelector(".js-get-unlimited-masks");
+  const manageMasksLink = document.querySelector(".js-manage-masks");
+
+  const unlimitedHref =
+  premiumCountryAvailability?.available_in_country
+    ? `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=get-premium-link`
+    : `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=join-waitlist-link`;
+
+  console.log(unlimitedHref);
+  console.log(getUnlimitedMasksLink);
+
+  manageMasksLink.href = `${relaySiteOrigin}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=manage-all-addresses`;
+  manageMasksLink.target = "_blank";
+  getUnlimitedMasksLink.href = unlimitedHref;
+  getUnlimitedMasksLink.target = "_blank";
+
+}
+
 showMasksLeft();
 switchToUpgradeFooter();
+addLinks();
 
 const generateMaskModalFooter = document.querySelector(".js-generate-mask-modal-footer");
 const upgradeModalFooter = document.querySelector(".js-upgrade-modal-footer");
@@ -153,7 +183,7 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   sendInPageEvent("click", "input-modal-reuse-previous-alias");
   preventDefaultBehavior(generateClickEvt);
 
-  // generateAliasBtn.classList.add("is-loading");
+  generateAliasBtn.classList.add("is-loading");
 
   // Request the active tab from the background script and parse the `document.location.hostname`
   const currentPageHostName = await browser.runtime.sendMessage({
@@ -184,6 +214,7 @@ generateAliasBtn.addEventListener("click", async (generateClickEvt) => {
   });
 
   await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageModal" });
-
+  await iframeCloseRelayInPageModal();
 
 });
+

@@ -10,12 +10,12 @@ function closeRelayInPageMenu() {
   return;
 }
 
-const openMenuEl = document.querySelector(".fx-relay-modal-iframe iframe");
-
 function closeRelayInPageModal() {
+  const openMenuEl = document.querySelector(".fx-relay-modal-iframe");
   openMenuEl.remove();
-  // window.removeEventListener("resize", positionRelayMenu);
-  // window.removeEventListener("scroll", positionRelayMenu);
+
+  const relayInPageModal = buildInPageModalIframe();
+  addRelayModalToPage(relayInPageModal);
   return;
 }
 
@@ -352,7 +352,7 @@ browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
       return closeRelayInPageMenu();
   }  
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
-  if ((m.message === "iframeCloseRelayInPageModal") && openMenuEl) {
+  if ((m.message === "iframeCloseRelayInPageModal")) {
     return closeRelayInPageModal();
 } 
 
