@@ -65,6 +65,11 @@ async function getOnboardingPanels() {
         "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
         "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
       },
+      "panel4": {
+        "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+        "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline_mask"),
+        "tipBody": browser.i18n.getMessage("popupPasswordManagerRelaySubHeadline_mask"),
+      },
     },
     "maxAliasesPanel": {
       "imgSrc": "high-five.svg",
