@@ -852,27 +852,13 @@ const buildContent = {
           ".fx-relay-menu-masks-search-input"
         );
 
-        const searchFilterTotal = document.querySelector(
-          ".js-filter-masks-total"
-        );
-
-        const searchFilterVisible = document.querySelector(
-          ".js-filter-masks-visible"
-        );
-
-        const maskSearchResults = document.querySelectorAll(
-          ".fx-relay-menu-masks-list.is-visible ul li"
-        );
-
-        searchFilterTotal.textContent = maskSearchResults.length;
-        searchFilterVisible.textContent = maskSearchResults.length;
-
         // Resize iframe
         await browser.runtime.sendMessage({
           method: "updateIframeHeight",
           height: document.getElementById("fxRelayMenuBody").scrollHeight,
         });
 
+        applySearchFilter(filterSearchInput.value);
         filterSearchInput.focus();
       },
       init: async () => {
