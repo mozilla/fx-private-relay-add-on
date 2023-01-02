@@ -1,4 +1,5 @@
 
+// eslint-disable-next-line no-unused-vars
 async function checkWaffleFlag(flag) {
   const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
   for (let i of waffleFlagArray) {
@@ -272,9 +273,9 @@ async function showRelayPanel(tipPanelToShow) {
   const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
 
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
+  const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
   
   if (
     isPhoneMaskingAvailable || isBundleAvailable
