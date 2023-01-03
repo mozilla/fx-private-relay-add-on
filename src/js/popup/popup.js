@@ -464,10 +464,18 @@ async function showRelayPanel(tipPanelToShow) {
   const { relayAddresses, maxNumAliases } = await getRemainingAliases();
   const numRemaining = maxNumAliases - relayAddresses.length;
   const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2_mask", [numRemaining, maxNumAliases]);
   const getUnlimitedAliases = document.querySelector(".premium-cta");
   getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
   document.body.classList.add("relay-panel");
+  
+  // Prevent negative masks from showing, default to 0 if all free masks have been used up
+  // TODO: Create re-usable data fetching and caching method for data syncing
+  let numRemainingNonNegative = numRemaining;
+  if (numRemaining <= 0) {
+    numRemainingNonNegative = 0;
+  }
+  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2_mask", [numRemainingNonNegative, maxNumAliases]);
+  
   updatePremiumPanel(tipPanelToShow);
   updatePanel(numRemaining, tipPanelToShow);
 
