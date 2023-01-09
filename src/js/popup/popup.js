@@ -53,7 +53,7 @@ async function getPromoPanels() {
     panels.announcements["panel3"] = panels.announcements["panel1"]
     panels.announcements["panel1"] = {
       "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
-      "imgSrcPremium": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "imgSrcPremium": "announcements/panel-announcement-password-manager-relay-square-illustration.svg",
       "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
       "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody")
     }
