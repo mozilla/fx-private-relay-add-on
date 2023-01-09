@@ -297,13 +297,10 @@ async function showRelayPanel(tipPanelToShow) {
   const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
 
-  const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
-  const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
-
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry && !hasPhone;
+  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry;
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry && !hasVpn;
+  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
   
   if (
     isPhoneMaskingAvailable || isBundleAvailable
