@@ -21,7 +21,12 @@
   },
 
   "background": {
-      "scripts": ["js/libs/browser-polyfill.min.js", "js/background/background.js", "js/background/context-menu.js"]
+      "scripts": [
+        "js/libs/browser-polyfill.min.js",
+        "js/shared/utils.js",
+        "js/background/background.js",
+        "js/background/context-menu.js"
+      ]
   },
 
   "browser_action": {
