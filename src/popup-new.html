@@ -23,27 +23,28 @@
             </h1>
             <nav class="fx-relay-menu-header-navigation">
               <!-- Dashboard -->
-              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+              <a class="fx-relay-menu-dashboard-link js-external-link" href="http://127.0.0.1">
                 <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
                 <img src="/icons/nebula-link-blue.svg" alt="" />
               </a>
               
               <!-- Settings -->
-              <a id="settings" class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+              <!-- QUESTION: Should this be a button? -->
+              <a data-panel-id="settings" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
                 <!-- TODO: Add i18n String (popupSettingsTitle)  -->
                 <span class="fx-relay-menu-dashboard-link-tooltip">Settings</span>
                 <img src="/icons/nebula-gear-blue.svg" alt="" />
               </a>
               
               <!-- Stats -->
-              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+              <a data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
                 <!-- TODO: Add i18n String (???)  -->
                 <span class="fx-relay-menu-dashboard-link-tooltip">Stats</span>
                 <img src="/icons/nebula-stats-blue.svg" alt="" />
               </a>
 
               <!-- News -->
-              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+              <a data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
                 <!-- TODO: Add i18n String (???)  -->
                 <span class="fx-relay-menu-dashboard-link-tooltip">News</span>
                 <img src="/icons/nebula-gift-blue.svg" alt="" />
@@ -53,11 +54,33 @@
     </header>
 
     <content>
-        <sign-up-panel class="sign-up-panel hidden">
+        <!-- Panel: Sign Up -->
+        <sign-up-panel data-panel-id="sign-up" class="sign-up-panel panel is-hidden" id="sign-up-panel">
             <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
             <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
             <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
         </sign-up-panel>
+
+        <!-- Panel: Masks (Default once logged in) -->
+        <masks-panel data-panel-id="masks" class="panel" id="masks-panel">
+          MASKS_PANEL
+        </masks-panel>
+        
+        <!-- Panel: Settings -->
+        <settings-panel data-panel-id="settings" class="is-hidden panel" id="settings-panel">
+          settings panel
+        </settings-panel>
+
+        <!-- Panel: Stats -->
+        <stats-panel data-panel-id="stats" class="is-hidden panel" id="stats-panel">
+          stats panel
+        </stats-panel>
+
+        <!-- Panel: News -->
+        <news-panel data-panel-id="news" class="is-hidden panel" id="news-panel">
+          news panel
+        </news-panel>
+        
     </content>
 
   </body>
