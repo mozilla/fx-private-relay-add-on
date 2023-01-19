@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html id="1">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Firefox Relay</title>
+    <!-- <link rel="stylesheet" href="css/relay.css"> -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/popup-new.css">
+    <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/shared/i18n.js"></script>
+    <script src="/js/shared/data-opt-out-toggle.js"></script>
+    <script src="js/shared/utils.js"></script>
+    <script src="js/popup/popup-new.js"></script>
+    <script src="js/shared/metrics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="fx-relay-panel fx-relay">
+    <header class="fx-relay-menu-header">
+        <div class="fx-relay-menu-header-logo-bar">
+            <h1 class="fx-relay-menu-logo">
+              <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="" />
+              <img class="fx-relay-menu-logo-text" alt="Firefox Relay" src="/images/logo-text-fx-relay.svg" />
+            </h1>
+            <nav class="fx-relay-menu-header-navigation">
+              <!-- Dashboard -->
+              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
+                <img src="/icons/nebula-link-blue.svg" alt="" />
+              </a>
+              
+              <!-- Settings -->
+              <a id="settings" class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
+                <img src="/icons/nebula-gear-blue.svg" alt="" />
+              </a>
+              
+              <!-- Stats -->
+              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
+                <img src="/icons/nebula-stats-blue.svg" alt="" />
+              </a>
+
+              <!-- News -->
+              <a class="fx-relay-menu-dashboard-link" href="http://127.0.0.1">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
+                <img src="/icons/nebula-gift-blue.svg" alt="" />
+              </a>
+            </nav>
+        </div>
+    </header>
+
+    <content>
+        <sign-up-panel class="sign-up-panel hidden">
+            <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
+            <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
+            <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
+        </sign-up-panel>
+    </content>
+
+  </body>
+</html>

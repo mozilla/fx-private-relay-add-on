@@ -1,0 +1,132 @@
+/* Global Panel Styles */
+
+.fx-relay-panel {
+  --panelWidth: 360px;
+  /* Any changes to --panelHeight should be reflected in the screen media query */
+  --panelHeight: 500px;
+  background-color: var(--colorWhite);
+  min-width: var(--panelWidth);
+  min-height: var(--panelHeight);
+  color: var(--relayInk70);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  font-family: var(--fontStackBase);
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
+  box-sizing: inherit;
+}
+
+/* Header */
+
+.fx-relay-menu-header {
+  border: 0;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  /* Bottom corners only */
+  border-radius: 0 0 var(--borderRadiusSm) var(--borderRadiusSm);
+  background-color: var(--colorWhite);
+}
+
+.fx-relay-menu-header-logo-bar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacingSm);
+}
+
+.fx-relay-menu-logo {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--spacingSm);
+}
+
+.fx-relay-menu-logo-image-fx-relay {
+  width: 26px;
+}
+
+.fx-relay-menu-logo-text {
+  width: 104px;
+  /* Optical offset to center "Firefox Relay" text in logo */
+  margin-top: 2px;
+}
+
+.fx-relay-menu-header-navigation {
+  display: flex;
+  gap: var(--spacingXs);
+}
+
+.fx-relay-menu-dashboard-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+/* Default icon width */
+.fx-relay-menu-dashboard-link img {
+  width: 14px;
+  filter: grayscale(1);
+}
+
+.fx-relay-menu-dashboard-link:hover img {
+  filter: grayscale(0);
+}
+
+.fx-relay-menu-dashboard-link#settings img {
+  width: 16px;
+}
+
+.fx-relay-menu-dashboard-link:hover,
+.fx-relay-menu-dashboard-link:focus {
+  background-color: var(--colorGrey10);
+  border-radius: 100%;
+}
+
+.fx-relay-menu-dashboard-link .fx-relay-menu-dashboard-link-tooltip {
+  display: none;
+  color: var(--colorWhite);
+  background-color: var(--colorGrey40);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingXs) var(--spacingSm);
+  position: absolute;
+  top: calc(100% + var(--spacingXs));
+  right: 0;
+}
+
+.fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
+.fx-relay-menu-dashboard-link:focus .fx-relay-menu-dashboard-link-tooltip,
+.fx-relay-menu-dashboard-link:focus-visible .fx-relay-menu-dashboard-link-tooltip {
+  display: block;
+  margin: 0 var(--spacingXs);
+}
+
+/* Sign Up/In Panel */
+sign-up-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  position: relative;
+}
+
+sign-up-panel::after {
+  height: 3px;
+  background: var(--relayFxGradient);
+  content: "";
+  position: absolute;
+  lefT: 0;
+  right: 0;
+  top: -1px;
+  background-size: 120%;
+}
