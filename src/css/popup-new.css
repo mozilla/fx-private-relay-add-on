@@ -22,6 +22,11 @@
   box-sizing: inherit;
 }
 
+/* Utilities  */
+.fx-relay-panel .is-hidden {
+  display: none;
+}
+
 /* Header */
 
 .fx-relay-menu-header {
@@ -75,6 +80,7 @@
 
 /* Default icon width */
 .fx-relay-menu-dashboard-link img {
+  pointer-events: none;
   width: 14px;
   filter: grayscale(1);
 }
@@ -83,7 +89,7 @@
   filter: grayscale(0);
 }
 
-.fx-relay-menu-dashboard-link#settings img {
+.fx-relay-menu-dashboard-link[data-panel-id="settings"] img {
   width: 16px;
 }
 
