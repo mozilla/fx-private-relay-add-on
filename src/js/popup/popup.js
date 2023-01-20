@@ -10,6 +10,7 @@ async function checkWaffleFlag(flag) {
   return false;
 }
 
+// Announcements
 async function getPromoPanels() {
   const savings = "40%"; // For "Save 40%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
@@ -20,8 +21,10 @@ async function getPromoPanels() {
     style: "currency",
     currency: getBundleCurrency,
   }).format(getBundlePrice);
+  // Conditions for showing the Firefox password manager announcement
+  const isFirefoxIntegration = await checkWaffleFlag("firefox_integration");
 
-  return {
+  const panels = {
     "announcements": {
       // Phone Masking Announcement
       "panel1": {
@@ -46,10 +49,25 @@ async function getPromoPanels() {
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
   }
+
+  if (isFirefoxIntegration) {
+    panels.announcements["panel3"] = panels.announcements["panel1"]
+    panels.announcements["panel1"] = {
+      "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "imgSrcPremium": "announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+      "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+      "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody")
+    }
+  }
+
+  return panels;
 }
 
 async function getOnboardingPanels() {
-  return {
+  // Conditions for showing the Firefox password manager announcement
+  const isFirefoxIntegration = await checkWaffleFlag("firefox_integration");
+
+  const panels = {
     "announcements": {
       "panel1": {
         "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
@@ -80,6 +98,17 @@ async function getOnboardingPanels() {
       "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
     }
   };
+
+  if (isFirefoxIntegration) {
+    panels.announcements["panel4"] = panels.announcements["panel1"]
+    panels.announcements["panel1"] = {
+      "imgSrc": "announcements/panel-announcement-password-manager-relay-illustration.svg",
+      "tipHeadline": browser.i18n.getMessage("popupPasswordManagerRelayHeadline"),
+      "tipBody": browser.i18n.getMessage("popupPasswordManagerRelayBody"),
+    }
+  }
+
+  return panels
 }
 
 function getEducationalStrings() {
@@ -269,13 +298,10 @@ async function showRelayPanel(tipPanelToShow) {
   const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
   const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
 
-  const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
-  const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
-
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-  const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+  const isPhoneMaskingAvailable = await checkWaffleFlag("phones") && isPhoneAvailableInCountry;
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-  const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
+  const isBundleAvailable = await checkWaffleFlag("bundle") && isBundleAvailableInCountry;
   
   if (
     isPhoneMaskingAvailable || isBundleAvailable
