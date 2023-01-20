@@ -13,7 +13,7 @@
     <script src="js/shared/metrics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body class="fx-relay-panel fx-relay">
+  <body class="fx-relay-panel-wrapper fx-relay">
     <header class="fx-relay-menu-header">
         <div class="fx-relay-menu-header-logo-bar">
             <h1 class="fx-relay-menu-logo">
@@ -54,30 +54,56 @@
 
     <content>
         <!-- Panel: Sign Up -->
-        <sign-up-panel data-panel-id="sign-up" class="sign-up-panel panel is-hidden" id="sign-up-panel">
+        <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
             <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
             <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
             <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
         </sign-up-panel>
 
         <!-- Panel: Masks (Default once logged in) -->
-        <masks-panel data-panel-id="masks" class="panel" id="masks-panel">
+        <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
           MASKS_PANEL
+          
         </masks-panel>
         
         <!-- Panel: Settings -->
-        <settings-panel data-panel-id="settings" class="is-hidden panel" id="settings-panel">
-          settings panel
+        <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">Settings</h2>
+          </header>
         </settings-panel>
 
         <!-- Panel: Stats -->
-        <stats-panel data-panel-id="stats" class="is-hidden panel" id="stats-panel">
-          stats panel
+        <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">Stats</h2>
+          </header>
         </stats-panel>
 
         <!-- Panel: News -->
-        <news-panel data-panel-id="news" class="is-hidden panel" id="news-panel">
-          news panel
+        <news-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">What’s new in Relay</h2>
+          </header>
+          
         </news-panel>
         
     </content>

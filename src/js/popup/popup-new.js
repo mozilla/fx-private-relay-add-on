@@ -4,10 +4,22 @@
     "relaySiteOrigin"
   );
 
+  const state = {
+    currentPanel: null
+  }
+
   const popup = {
     events: {
+      backClick: (e) => {
+        e.preventDefault();
+        const backTarget = e.target.dataset.backTarget;
+        document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        popup.panel.update(backTarget);
+      },
       navigationClick: (e) => {
         e.preventDefault();
+        document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        e.target.classList.add("is-active");
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
       },
@@ -15,11 +27,16 @@
     init: async () => {
       // Set Navigation Listeners
       const navigationButtons = document.querySelectorAll(".js-internal-link");
-
       navigationButtons.forEach((button) => {
         button.addEventListener("click", popup.events.navigationClick, false);
       });
 
+      // Set Back Button Listeners
+      const backButtons = document.querySelectorAll(".fx-relay-panel-header-btn-back");
+      backButtons.forEach((button)=> {
+        button.addEventListener("click", popup.events.backClick, false);
+      });
+      
       // Check if user is signed in to show default/sign-in panel
       if (await popup.utilities.isUserSignedIn()) {
         popup.panel.update("masks");
@@ -34,7 +51,7 @@
     },
     panel: {
       update: (panelId) => {
-        const panels = document.querySelectorAll(".panel");
+        const panels = document.querySelectorAll(".fx-relay-panel");
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
 
@@ -43,10 +60,13 @@
             popup.panel.init(panelId);
           }
         });
+
+        state.currentPanel = panelId;
       },
       init: (panelId) => {
-        const panel = document.getElementById(`${panelId}-panel`);
+        const panel = document.getElementById(`${panelId}-panel`);        
         console.log(panel);
+        // console.log(state.currentPanel);
       },
     },
     utilities: {
@@ -94,6 +114,6 @@
     },
   };
 
-  await popup.init();
+  popup.init();
   
 })();

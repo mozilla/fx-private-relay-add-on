@@ -1,6 +1,6 @@
 /* Global Panel Styles */
 
-.fx-relay-panel {
+.fx-relay-panel-wrapper {
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 500px;
@@ -18,12 +18,12 @@
   margin: 0;
 }
 
-.fx-relay-panel *, .fx-relay-panel *:before, .fx-relay-panel *:after {
+.fx-relay-panel-wrapper *, .fx-relay-panel-wrapper *:before, .fx-relay-panel-wrapper *:after {
   box-sizing: inherit;
 }
 
 /* Utilities  */
-.fx-relay-panel .is-hidden {
+.fx-relay-panel-wrapper .is-hidden {
   display: none;
 }
 
@@ -85,6 +85,7 @@
   filter: grayscale(1);
 }
 
+.fx-relay-menu-dashboard-link.is-active img,
 .fx-relay-menu-dashboard-link:hover img {
   filter: grayscale(0);
 }
@@ -93,12 +94,14 @@
   width: 16px;
 }
 
+.fx-relay-menu-dashboard-link.is-active,
 .fx-relay-menu-dashboard-link:hover,
 .fx-relay-menu-dashboard-link:focus {
   background-color: var(--colorGrey10);
   border-radius: 100%;
 }
 
+.fx-relay-menu-dashboard-link.is-active .fx-relay-menu-dashboard-link-tooltip,
 .fx-relay-menu-dashboard-link .fx-relay-menu-dashboard-link-tooltip {
   display: none;
   color: var(--colorWhite);
@@ -115,6 +118,46 @@
 .fx-relay-menu-dashboard-link:focus-visible .fx-relay-menu-dashboard-link-tooltip {
   display: block;
   margin: 0 var(--spacingXs);
+}
+
+/* Panel Header */
+
+.fx-relay-panel-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.fx-relay-panel-header-btn-back {
+  position: absolute;
+  left: var(--spacingSm);
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  margin: 0;
+  padding: var(--spacingXs);
+  cursor: pointer;
+}
+
+.fx-relay-panel-header-btn-back:focus,
+.fx-relay-panel-header-btn-back:hover {
+  background-color: var(--colorGrey10);
+  border-radius: 100%;
+}
+
+.fx-relay-panel-header-btn-back img {
+  display: block;
+  width: 100%;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.fx-relay-panel-header-title {
+  font-size: 16px;
+  font-family: var(--relayMetropolis);
+  font-weight: 500;
 }
 
 /* Sign Up/In Panel */
@@ -136,3 +179,4 @@ sign-up-panel::after {
   top: -1px;
   background-size: 120%;
 }
+
