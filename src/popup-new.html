@@ -22,7 +22,7 @@
             </h1>
             <nav class="fx-relay-menu-header-navigation">
               <!-- Dashboard -->
-              <a class="fx-relay-menu-dashboard-link js-external-link" href="http://127.0.0.1">
+              <a class="fx-relay-menu-dashboard-link js-external-link" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
                 <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
                 <img src="/icons/nebula-link-purple.svg" alt="" />
               </a>
@@ -36,14 +36,14 @@
               </a>
               
               <!-- Stats -->
-              <a data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
+              <a data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
                 <!-- TODO: Add i18n String (???)  -->
                 <span class="fx-relay-menu-dashboard-link-tooltip">Stats</span>
                 <img src="/icons/nebula-stats-purple.svg" alt="" />
               </a>
 
               <!-- News -->
-              <a data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
+              <a data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
                 <!-- TODO: Add i18n String (???)  -->
                 <span class="fx-relay-menu-dashboard-link-tooltip">News</span>
                 <img src="/icons/nebula-gift-purple.svg" alt="" />
@@ -57,7 +57,7 @@
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel panel is-hidden" id="sign-up-panel">
             <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
             <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-            <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
+            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
         </sign-up-panel>
 
         <!-- Panel: Masks (Default once logged in) -->
