@@ -1,44 +1,79 @@
-const popup = {
-  events: {
-    navigationClick: (e) => {
-      e.preventDefault();
-      const panelId = e.target.dataset.panelId;
-      popup.events.updatePanel(panelId);
-    },
-    updatePanel: (panelId) => {
-      const panels = document.querySelectorAll(".panel");
-      panels.forEach((panel) => {
-        panel.classList.add("is-hidden");
+(async () => {
+  // Global Data
+  const { relaySiteOrigin } = await browser.storage.local.get(
+    "relaySiteOrigin"
+  );
 
-        if (panel.dataset.panelId === panelId) {
-          panel.classList.remove("is-hidden");
-          // TODO: initPanel(panelId);
-        }
+  const popup = {
+    events: {
+      navigationClick: (e) => {
+        e.preventDefault();
+        const panelId = e.target.dataset.panelId;
+        popup.panel.update(panelId);
+      },
+    },
+    init: async () => {
+      // Set Navigation Listeners
+      const navigationButtons = document.querySelectorAll(".js-internal-link");
+
+      navigationButtons.forEach((button) => {
+        button.addEventListener("click", popup.events.navigationClick, false);
       });
+
+      // Check if user is signed in to show default/sign-in panel
+      if (await popup.utilities.isUserSignedIn()) {
+        popup.panel.update("masks");
+        popup.utilities.unhideNavigationItemsOnceLoggedIn();
+      } else {
+        popup.panel.update("sign-up");
+      }
+
+      // Set External Event Listerners
+      await popup.utilities.setExternalEventListeners();
+
+      //   document.querySelectorAll(".login-link").forEach(loginLink => {
+      //   loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
+      // });
+
+      // document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
+      //   dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
+      // });
+
+      // document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
+      //   premiumLink.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=popup&utm_content=get-premium-link`;
+      // });
+
+      // document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
+      //   registerDomainLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=register-email-domain#mpp-choose-subdomain`;
+      // });
     },
-  },
-  init: async () => {
-    // Set Navigation Listeners
-    const navigationButtons = document.querySelectorAll(".js-internal-link");
+    panel: {
+      update: (panelId) => {
+        const panels = document.querySelectorAll(".panel");
+        panels.forEach((panel) => {
+          panel.classList.add("is-hidden");
 
-    navigationButtons.forEach((button) => {
-      button.addEventListener("click", popup.events.navigationClick, false);
-    });
-
-    // Check if user is signed in to show default/sign-in panel
-    if (await popup.utilities.isUserSignedIn()) {
-      popup.events.updatePanel("masks");
-    } else {
-       popup.events.updatePanel("sign-up"); 
-    }
-  },
-  utilities: {
-    isUserSignedIn: async ()=> {
+          if (panel.dataset.panelId === panelId) {
+            panel.classList.remove("is-hidden");
+            popup.panel.init(panelId);
+          }
+        });
+      },
+      init: (panelId) => {
+        const panel = document.getElementById(`${panelId}-panel`);
+        console.log(panel);
+      },
+    },
+    utilities: {
+      isUserSignedIn: async () => {
         const userApiToken = await browser.storage.local.get("apiToken");
-        const signedInUser = (Object.prototype.hasOwnProperty.call(userApiToken, "apiToken"));
-        return (signedInUser);
-    },
-    clearBrowserActionBadge: async() => {
+        const signedInUser = Object.prototype.hasOwnProperty.call(
+          userApiToken,
+          "apiToken"
+        );
+        return signedInUser;
+      },
+      clearBrowserActionBadge: async () => {
         const { browserActionBadgesClicked } = await browser.storage.local.get(
           "browserActionBadgesClicked"
         );
@@ -49,12 +84,31 @@ const popup = {
           browser.browserAction.setBadgeBackgroundColor({ color: null });
           browser.browserAction.setBadgeText({ text: "" });
         }
-    }
-  },
-};
+      },
+      setExternalEventListeners: async () => {
+        const externalLinks = document.querySelectorAll(".js-external-link");
+                
+        externalLinks.forEach(link => {
+          link.href = `${relaySiteOrigin}/${link.dataset.href}`;
 
-document.onreadystatechange = () => {
-  if (document.readyState === "interactive") {
-    popup.init();
-  }
-};
+          link.addEventListener("click", async (e) => {
+            e.preventDefault();
+            if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
+              sendRelayEvent("Panel", e.target.dataset.eventAction, e.target.dataset.eventLabel);
+            }
+            await browser.tabs.create({ url: link.href });
+            window.close();
+          });
+        });
+      },
+      unhideNavigationItemsOnceLoggedIn: ()=> {
+        document.querySelectorAll(".fx-relay-menu-dashboard-link.is-hidden").forEach(link => {
+          link.classList.remove("is-hidden");
+        })
+      }
+    },
+  };
+
+  await popup.init();
+  
+})();
