@@ -4,7 +4,7 @@
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 500px;
-  background-color: var(--colorWhite);
+  background-color: var(--colorGrey05);
   min-width: var(--panelWidth);
   min-height: var(--panelHeight);
   color: var(--relayInk70);
@@ -25,6 +25,12 @@
 /* Utilities  */
 .fx-relay-panel-wrapper .is-hidden {
   display: none;
+}
+
+/* Main Content */
+
+.fx-relay-panel-content {
+  padding: var(--spacingMd);
 }
 
 /* Header */
@@ -180,3 +186,92 @@ sign-up-panel::after {
   background-size: 120%;
 }
 
+/* Settings */
+
+.fx-relay-settings-toggles {
+  padding: var(--spacingMd);
+  background-color: var(--colorWhite);
+  border-radius: var(--borderRadiusSm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMd);
+}
+
+.fx-relay-settings-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid red;
+}
+
+.fx-relay-settings-toggle-wrapper-spacer {
+  height: 1px;
+  background-color: var(--colorGrey10);
+}
+
+.fx-relay-settings-toggle {
+  display: block;
+  height: 16px;
+  width: 28px;
+  min-width: 28px;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 1.5em;
+  outline: none;
+  background-color: var(--colorGreen50);
+  background-size: 20px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.fx-relay-settings-toggle:checked:hover {
+  background-color: var(--colorGreen60);
+}
+
+.fx-relay-settings-toggle:checked:focus {
+  box-shadow: var(--colorGreen20);
+}
+
+.fx-relay-settings-toggle:checked:active {
+  background-color: var(--colorGreen70);
+}
+
+.fx-relay-settings-toggle::after {
+  content: "";
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 1);
+  position: absolute;
+  top: 0px;
+  bottom: 0;
+  margin: auto;
+  right: 4px;
+  transition: all 0.2s ease;
+}
+
+.data-disabled::after,
+.input-icons-disabled::after {
+  left: 4px;
+  right: 18px;
+  transition: all 0.2s ease;
+}
+
+.data-disabled:hover,
+.data-disabled:focus,
+.input-icons-disabled:hover,
+.input-icons-disabled:focus {
+  background-color: var(--colorGrey40);
+}
+
+.data-disabled:active,
+.input-icons-disabled:active {
+  background-color: var(--colorGrey50);
+}
+
+.data-disabled,
+.input-icons-disabled {
+  background-color: var(--colorGrey30);
+}

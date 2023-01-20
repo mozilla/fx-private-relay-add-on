@@ -1,3 +1,5 @@
+/* global areInputIconsEnabled */
+
 (async () => {
   // Global Data
   const { relaySiteOrigin } = await browser.storage.local.get(
@@ -51,6 +53,7 @@
     },
     panel: {
       update: (panelId) => {
+        
         const panels = document.querySelectorAll(".fx-relay-panel");
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
@@ -64,9 +67,15 @@
         state.currentPanel = panelId;
       },
       init: (panelId) => {
-        const panel = document.getElementById(`${panelId}-panel`);        
-        console.log(panel);
-        // console.log(state.currentPanel);
+        // const panel = document.getElementById(`${panelId}-panel`);        
+        switch (panelId) {
+          case "settings":
+            popup.utilities.enableInputIconDisabling();
+            break;
+
+          default:
+            break;
+        }
       },
     },
     utilities: {
@@ -89,6 +98,33 @@
           browser.browserAction.setBadgeBackgroundColor({ color: null });
           browser.browserAction.setBadgeText({ text: "" });
         }
+      },
+      enableInputIconDisabling: async () => {
+        const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
+
+        const stylePrefToggle = (inputsEnabled) => {
+          if (inputsEnabled === "show-input-icons") {
+            inputIconVisibilityToggle.dataset.iconVisibilityOption = "disable-input-icon";
+            inputIconVisibilityToggle.classList.remove("input-icons-disabled");
+            return;
+          }
+          inputIconVisibilityToggle.dataset.iconVisibilityOption = "enable-input-icon";
+          inputIconVisibilityToggle.classList.add("input-icons-disabled");
+        };
+
+        const iconsAreEnabled = await areInputIconsEnabled();
+        const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
+        stylePrefToggle(userIconChoice);
+
+        inputIconVisibilityToggle.addEventListener("click", async () => {
+          const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
+          await browser.runtime.sendMessage({
+            method: "updateInputIconPref",
+            iconPref: userIconPreference,
+          });
+          sendRelayEvent("Panel", "click", userIconPreference);
+          return stylePrefToggle(userIconPreference);
+        });        
       },
       setExternalEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
