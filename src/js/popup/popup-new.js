@@ -90,6 +90,11 @@
             }, false)
             
             break;
+          case "stats":
+            sendRelayEvent("Panel", "click", "opened-stats");
+            popup.panel.stats.init();
+            break;
+
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
@@ -97,6 +102,27 @@
 
           default:
             break;
+        }
+      },
+      stats: {
+        init: async ()=> {
+            //Get profile data from site
+            const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+            const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+            const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+            const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
+
+            const statSet = document.querySelector(".dashboard-stats-list");
+            
+            const aliasesUsedValEl = statSet.querySelector(".aliases-used");
+            const emailsBlockedValEl = statSet.querySelector(".emails-blocked");
+            const emailsForwardedValEl = statSet.querySelector(".emails-forwarded");
+            const emailTrackersRemovedValEl = statSet.querySelector(".email-trackers-removed");
+
+            aliasesUsedValEl.textContent = aliasesUsedVal;
+            emailsBlockedValEl.textContent = emailsBlockedVal;
+            emailsForwardedValEl.textContent = emailsForwardedVal;
+            emailTrackersRemovedValEl.textContent = emailTrackersRemovedVal;
         }
       },
       webcompat: {
