@@ -42,3 +42,14 @@ function preventDefaultBehavior(clickEvt) {
   clickEvt.preventDefault();
   return;
 }
+
+// eslint-disable-next-line no-unused-vars
+async function checkWaffleFlag(flag) {
+  const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
+  for (let i of waffleFlagArray) {
+    if (i[0] === flag && i[1] === true) {
+      return true;
+    }
+  }
+  return false;
+}
