@@ -13,6 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
   font-family: var(--fontStackBase);
+  font-size: 16px;
   position: relative;
   padding: 0;
   margin: 0;
@@ -187,6 +188,9 @@ sign-up-panel::after {
 }
 
 /* Settings */
+#settings-panel {
+  font-size: 12px;
+}
 
 .fx-relay-settings-toggles {
   padding: var(--spacingMd);
@@ -294,4 +298,93 @@ sign-up-panel::after {
 .fx-relay-settings-link:focus {
   background-color: var(--colorViolet05);
   border-radius: var(--borderRadiusSm);
+}
+
+/* Report Panel */
+
+.report-issue-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMd);
+  padding: var(--spacingMd);
+  border: 0 none;
+  font-size: 14px;
+}
+
+.report-section {
+  margin-bottom: var(--spacingMd);
+  display: flex;
+  gap: var(--spacingMd);
+  flex-direction: column;
+}
+
+.report-label::after {
+  content: ":";
+}
+
+.report-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.report-section li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: var(--spacingMd);
+}
+
+.report-section input[type=checkbox]{
+  margin: 0;
+  margin-top: 2px; /* Custom Alignment Issue with Checkbox and Label */
+  margin-right: var(--spacingMd);
+  color: var(--colorGrey50);
+}
+
+.report-section input[type=checkbox]:checked + label {
+  color: var(--colorInformational);
+}
+
+.report-section input[type=text]{
+  width: 100%;
+  padding: var(--spacingSm) var(--spacing2xl) var(--spacingSm) var(--spacingMd);
+  border-radius: var(--borderRadiusSm);
+  background-color: var(--colorWhite);
+  border: 2px solid transparent;
+  outline: 1px solid var(--colorGrey30);
+}
+
+.report-section input[type=text]:focus{
+  outline: 4px solid var(--colorInformationalFocus);
+  border: 2px solid var(--colorInformational);
+}
+
+.report-issue-content input[type=submit]:disabled{
+  background: var(--colorInformationalDisabled);
+}
+
+.report-success {
+  padding: var(--spacingMd);
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 16px;
+}
+
+.report-image-success {
+  max-width: 200px;
+}
+
+.report-success h1 {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.report-continue {
+  margin-top: var(--spacingLg);
+  cursor: pointer;
+  color: var(--colorInformational);
 }

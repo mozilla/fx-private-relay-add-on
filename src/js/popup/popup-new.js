@@ -1,4 +1,4 @@
-/* global */
+/* global getBrowser */
 
 (async () => {
   // Global Data
@@ -21,6 +21,11 @@
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
         }
 
+        // Custom rule to send "Closed Report Issue" event
+        if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
+          sendRelayEvent("Panel", "click", "closed-report-issue");
+        }
+ 
         popup.panel.update(backTarget);
       },
       navigationClick: (e) => {
@@ -85,21 +90,108 @@
             }, false)
             
             break;
+          case "webcompat":
+            sendRelayEvent("Panel", "click", "opened-report-issue");
+            popup.panel.webcompat.init();
+            break;
 
           default:
             break;
         }
       },
+      webcompat: {
+        init: () => {
+          popup.panel.webcompat.setURLwithIssue();
+          popup.panel.webcompat.showReportInputOtherTextField();
+          popup.panel.webcompat.showSuccessReportSubmission();
+
+          const reportForm = document.querySelector(".report-issue-content");
+          reportForm.addEventListener("submit", async (event) => {
+            await popup.panel.webcompat.handleReportIssueFormSubmission(event);
+          });
+
+          const reportContinueButton = document.querySelector(".report-continue");
+          reportContinueButton.addEventListener("click", popup.events.backClick, false);
+
+        },
+        setURLwithIssue: async () => {
+          // Add Site URL placeholder
+          const currentPage = (await popup.utilities.getCurrentPage()).url;
+          const reportIssueSubmitBtn = document.querySelector(
+            ".report-issue-submit-btn"
+          );
+          const inputFieldUrl = document.querySelector(
+            'input[name="issue_on_domain"]'
+          );
+          reportIssueSubmitBtn.disabled = true;
+
+          // Allow for custom URL inputs
+          inputFieldUrl.addEventListener("input", () => {
+            reportIssueSubmitBtn.disabled = true;
+            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
+            if (popup.utilities.isSortaAURL(inputFieldUrl.value)) {
+              reportIssueSubmitBtn.disabled = false;
+            }
+          });
+
+          // Check that the host site has a valid URL
+          if (currentPage) {
+            const url = new URL(currentPage);
+            // returns a http:// or https:// value
+            inputFieldUrl.value = url.origin;
+            reportIssueSubmitBtn.disabled = false;
+          }
+        },
+        showReportInputOtherTextField: () => {
+          const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
+          const otherTextField = document.querySelector('input[name="other_issue"]');
+          otherCheckbox.addEventListener("click", () => {
+            otherTextField.classList.toggle("is-hidden");
+          })
+
+          // Add placeholder to report input on 'Other' selection
+          const inputFieldOtherDetails = document.querySelector('input[name="other_issue"]');
+          inputFieldOtherDetails.placeholder = browser.i18n.getMessage("popupReportIssueCaseOtherDetails");
+        },
+        showSuccessReportSubmission: () => {
+          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+          const reportSuccess = document.querySelector(".report-success");
+          const reportContent = document.querySelector(".report-issue-content");
+          reportIssueSubmitBtn.addEventListener("click", () => {
+            reportSuccess.classList.remove("is-hidden");
+            reportContent.classList.add("is-hidden");
+          });
+        },
+        handleReportIssueFormSubmission: async (event) => {
+          event.preventDefault();
+          const data = new FormData(event.target);
+          const reportData = Object.fromEntries(data.entries());
+          reportData.user_agent = await getBrowser();
+
+          Object.keys(reportData).forEach(function(value) {
+            // Switch "on" to true
+            if (reportData[value] === "on") {
+              reportData[value] = true;
+            }
+            // Remove from report if empty string
+            if (reportData[value] === "") {
+              delete reportData[value];
+            }
+          });
+
+          // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
+          if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
+            reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
+          }
+          
+          await browser.runtime.sendMessage({
+            method: "postReportWebcompatIssue",
+            description: reportData
+          });
+        },
+      },
     },
     utilities: {
-      isUserSignedIn: async () => {
-        const userApiToken = await browser.storage.local.get("apiToken");
-        const signedInUser = Object.prototype.hasOwnProperty.call(
-          userApiToken,
-          "apiToken"
-        );
-        return signedInUser;
-      },
       clearBrowserActionBadge: async () => {
         const { browserActionBadgesClicked } = await browser.storage.local.get(
           "browserActionBadgesClicked"
@@ -137,7 +229,25 @@
           });
           sendRelayEvent("Panel", "click", userIconPreference);
           return stylePrefToggle(userIconPreference);
-        });        
+        });
+      },
+      isSortaAURL: (str) => {
+        return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
+      },
+      isUserSignedIn: async () => {
+        const userApiToken = await browser.storage.local.get("apiToken");
+        const signedInUser = Object.prototype.hasOwnProperty.call(
+          userApiToken,
+          "apiToken"
+        );
+        return signedInUser;
+      },
+      getCurrentPage: async () => {
+        const [currentTab] = await browser.tabs.query({
+          active: true,
+          currentWindow: true,
+        });
+        return currentTab;
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
