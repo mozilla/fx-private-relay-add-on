@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html id="1">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Firefox Relay</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/popup-new.css">
+    <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/shared/i18n.js"></script>
+    <script src="/js/shared/data-opt-out-toggle.js"></script>
+    <script src="js/shared/utils.js"></script>
+    <script src="js/popup/popup-new.js"></script>
+    <script src="js/shared/metrics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="fx-relay-panel-wrapper fx-relay">
+    <header class="fx-relay-menu-header">
+        <div class="fx-relay-menu-header-logo-bar">
+            <h1 class="fx-relay-menu-logo">
+              <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="" />
+              <img class="fx-relay-menu-logo-text" alt="Firefox Relay" src="/images/logo-text-fx-relay.svg" />
+            </h1>
+            <nav class="fx-relay-menu-header-navigation">
+              <!-- Dashboard -->
+              <a class="fx-relay-menu-dashboard-link js-external-link" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
+                <img src="/icons/nebula-link-purple.svg" alt="" />
+              </a>
+              
+              <!-- Settings -->
+              <!-- QUESTION: Should this be a button? -->
+              <a data-panel-id="settings" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
+                <!-- TODO: Add i18n String (popupSettingsTitle)  -->
+                <span class="fx-relay-menu-dashboard-link-tooltip">Settings</span>
+                <img src="/icons/nebula-gear-purple.svg" alt="" />
+              </a>
+              
+              <!-- Stats -->
+              <a data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <!-- TODO: Add i18n String (???)  -->
+                <span class="fx-relay-menu-dashboard-link-tooltip">Stats</span>
+                <img src="/icons/nebula-stats-purple.svg" alt="" />
+              </a>
+
+              <!-- News -->
+              <a data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <!-- TODO: Add i18n String (???)  -->
+                <span class="fx-relay-menu-dashboard-link-tooltip">News</span>
+                <img src="/icons/nebula-gift-purple.svg" alt="" />
+              </a>
+            </nav>
+        </div>
+    </header>
+
+    <content>
+        <!-- Panel: Sign Up -->
+        <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
+            <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
+            <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
+            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+        </sign-up-panel>
+
+        <!-- Panel: Masks (Default once logged in) -->
+        <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
+          MASKS_PANEL
+          
+        </masks-panel>
+        
+        <!-- Panel: Settings -->
+        <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">Settings</h2>
+          </header>
+        </settings-panel>
+
+        <!-- Panel: Stats -->
+        <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">Stats</h2>
+          </header>
+        </stats-panel>
+
+        <!-- Panel: News -->
+        <news-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">What’s new in Relay</h2>
+          </header>
+          
+        </news-panel>
+        
+    </content>
+
+  </body>
+</html>
