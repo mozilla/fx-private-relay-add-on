@@ -53,7 +53,7 @@
       }
 
       // Set External Event Listerners
-      await popup.utilities.setExternalEventListeners();
+      await popup.utilities.setExternalLinkEventListeners();
       
     },
     panel: {
@@ -76,13 +76,13 @@
         switch (panelId) {
           case "settings":
             popup.utilities.enableInputIconDisabling();
+            // Function is imported from data-opt-out-toggle.js
+            enableDataOptOut(); 
 
             document.getElementById("popupSettingsReportIssue").addEventListener("click", (e)=>{
               e.preventDefault();
-              console.log("popupSettingsReportIssue");
               popup.panel.update("webcompat");
             }, false)
-            
             
             break;
 
@@ -139,11 +139,18 @@
           return stylePrefToggle(userIconPreference);
         });        
       },
-      setExternalEventListeners: async () => {
+      setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
                 
         externalLinks.forEach(link => {
-          link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          // Because we dynamically set the Relay origin URL (local/dev/stage/prod), 
+          // we have to catch Relay-specific links and prepend the correct Relay website URL
+          if (link.dataset.relayInternal === "true") {
+            link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          } else {
+            link.href = `${link.dataset.href}`;
+          }
+          
 
           link.addEventListener("click", async (e) => {
             e.preventDefault();

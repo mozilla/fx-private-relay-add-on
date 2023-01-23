@@ -22,7 +22,7 @@
             </h1>
             <nav class="fx-relay-menu-header-navigation">
               <!-- Dashboard -->
-              <a class="fx-relay-menu-dashboard-link js-external-link" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
+              <a class="fx-relay-menu-dashboard-link js-external-link" data-relay-internal="true" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
                 <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
                 <img src="/icons/nebula-link-purple.svg" alt="" />
               </a>
@@ -57,7 +57,7 @@
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
             <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
             <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-relay-internal="true" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
         </sign-up-panel>
 
         <!-- Panel: Masks (Default once logged in) -->
@@ -88,16 +88,16 @@
               <div class="fx-relay-settings-toggle-wrapper-spacer"></div>
               <div class="fx-relay-settings-toggle-wrapper">
                 <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
-                <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-settings-toggle"></button>
+                <button title="" data-icon-visibility-option="disable-input-icon" class="data-collection fx-relay-settings-toggle"></button>
               </div>
             </div> 
             <div class="fx-relay-settings-links">
               <!-- Leave Feedback -->
-              <a id="popupSettingsLeaveFeedbackLink" href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+              <a id="popupSettingsLeaveFeedbackLink" href="" data-href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
               <!-- Privacy -->
-              <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+              <a data-href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup#relay" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
               <!-- Terms of Service -->
-              <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+              <a data-href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
               <!-- Report Issue Panel Prompt -->
               <a id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
                 data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
