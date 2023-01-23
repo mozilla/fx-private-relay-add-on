@@ -91,9 +91,35 @@
                 <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-settings-toggle"></button>
               </div>
             </div> 
+            <div class="fx-relay-settings-links">
+              <!-- Leave Feedback -->
+              <a id="popupSettingsLeaveFeedbackLink" href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+              <!-- Privacy -->
+              <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+              <!-- Terms of Service -->
+              <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+              <!-- Report Issue Panel Prompt -->
+              <a id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
+                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
+            </div>
           </div>
-
         </settings-panel>
+
+        <!-- Panel: Report Issue -->
+        <webcompat-panel data-panel-id="webcompat" class="is-hidden fx-relay-panel" id="webcompat-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-back-target="settings" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h2>
+          </header>
+          
+          
+
+        </webcompat-panel>
 
         <!-- Panel: Stats -->
         <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">

@@ -1,4 +1,4 @@
-/* global areInputIconsEnabled */
+/* global */
 
 (async () => {
   // Global Data
@@ -15,7 +15,13 @@
       backClick: (e) => {
         e.preventDefault();
         const backTarget = e.target.dataset.backTarget;
-        document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        
+        // BUG/FIX/TODO: Refactor logic / add extra data attr to check if parent panel
+        // (Is item at root or child of a panel)
+        if (backTarget === "masks") {
+          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        }
+
         popup.panel.update(backTarget);
       },
       navigationClick: (e) => {
@@ -71,6 +77,14 @@
         switch (panelId) {
           case "settings":
             popup.utilities.enableInputIconDisabling();
+
+            document.getElementById("popupSettingsReportIssue").addEventListener("click", (e)=>{
+              e.preventDefault();
+              console.log("popupSettingsReportIssue");
+              popup.panel.update("webcompat");
+            }, false)
+            
+            
             break;
 
           default:
