@@ -15,10 +15,9 @@
       backClick: (e) => {
         e.preventDefault();
         const backTarget = e.target.dataset.backTarget;
+        const backNavLevel = e.target.dataset.navLevel;
         
-        // BUG/FIX/TODO: Refactor logic / add extra data attr to check if parent panel
-        // (Is item at root or child of a panel)
-        if (backTarget === "masks") {
+        if (backNavLevel === "root") {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
         }
 
