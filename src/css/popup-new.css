@@ -396,6 +396,7 @@ sign-up-panel::after {
   padding: var(--spacingXs) var(--spacingLg);
   font-size: 14px;
   background: var(--colorWhite);
+  margin-bottom: var(--spacingMd);
 }
 
 .dashboard-stats-list ul {
