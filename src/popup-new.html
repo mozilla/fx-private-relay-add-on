@@ -108,14 +108,70 @@
         <webcompat-panel data-panel-id="webcompat" class="is-hidden fx-relay-panel" id="webcompat-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-            <button data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
+            <button data-nav-id="webcompat" data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
               <img src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h2>
+
           </header>
-          
+          <div class="fx-relay-panel-content">
+             <!-- Report Submission Form -->
+            <form class="report-issue-content">
+              <div class="report-section">
+                <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
+                  data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
+                <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
+              </div>
+              <div class="report-section">
+                <!-- Select issue checkboxes -->
+                <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+                <ul>
+                  <li>
+                    <!-- Case: Email not accepted -->
+                    <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
+                    <label class="i18n-content" for="email_mask_not_accepted"
+                      data-i18n-message-id="popupReportIssueCaseOne"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Add on visual issue -->
+                    <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
+                    <label class="i18n-content" for="add_on_visual_issue"
+                      data-i18n-message-id="popupReportIssueCaseTwo"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Email not received -->
+                    <input type="checkbox" id="email_not_received" name="email_not_received" />
+                    <label class="i18n-content" for="email_not_received"
+                      data-i18n-message-id="popupReportIssueCaseThree"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Other -->
+                    <input type="checkbox" id="issue-case-other" name="issue-case-other" />
+                    <label class="i18n-content" for="issue-case-other"
+                      data-i18n-message-id="popupReportIssueCaseOther"></label>
+                  </li>
+                  <li>
+                    <!-- 'Other' option input field -->
+                    <input class="report-other-field is-hidden" type="text"
+                      id="other_issue" name="other_issue" />
+                  </li>
+                </ul>
+              </div>
+              <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
+            </form>
+
+            <!-- Report Submission Success -->
+            <div class="report-success is-hidden">
+              <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
+              <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
+              <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
+              <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
+                data-event-action="click" data-nav-id="webcompat" data-nav-level="child" data-back-target="settings"></a>
+              </li>
+            </div>
+          </div>
           
 
         </webcompat-panel>
