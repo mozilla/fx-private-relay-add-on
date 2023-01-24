@@ -219,12 +219,6 @@
                   <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
                   <div class="dashboard-stats emails-forwarded">0</div>
                 </li>
-                <!-- <li class="dashboard-info-spacer"></li>
-                <li class="dashboard-info dashboard-info-trackers-removed">
-                  <span class="email-trackers-removed-text i18n-content"
-                    data-i18n-message-id="popupEmailTrackersRemoved"></span>
-                  <div class="dashboard-stats email-trackers-removed">0</div>
-                </li> -->
               </ul>
             </div>
           </div>
@@ -243,7 +237,30 @@
             <h2 class="fx-relay-panel-header-title">What’s new in Relay</h2>
           </header>
           
+          <!-- News List -->
+          <div class="fx-relay-panel-content">
+            <ul class="fx-relay-news"></ul>
+          </div>
+          
         </news-panel>
+
+        <!-- Panel: News Item -->
+        <newsStory-panel data-panel-id="newsStory" class="is-hidden fx-relay-panel" id="newsStory-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+             <button data-nav-id="newsStory" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title">What’s new in Relay</h2>
+          </header>
+          
+          <div class="fx-relay-panel-content">
+            <article class="fx-relay-news-story"></article>
+          </div>
+          
+        </newsStory-panel>
         
     </content>
 

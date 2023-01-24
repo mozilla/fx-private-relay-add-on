@@ -1,4 +1,4 @@
-/* global getBrowser */
+/* global getBrowser checkWaffleFlag */
 
 (async () => {
   // Global Data
@@ -7,8 +7,50 @@
   );
 
   const state = {
-    currentPanel: null
-  }
+    currentPanel: null,
+  };
+
+  // audience can be premium, free, phones, all
+  // Optional data: waffle, fullCta*
+  const newsContent = [
+    {
+      id: "premium-announcement-phone-masking",
+      locale: "us",
+      audience: "premium",
+      headlineString: "popupPhoneMaskingPromoHeadline",
+      bodyString: "popupPhoneMaskingPromoBody",
+      teaserImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+      fullImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaEventAction: "click",
+      fullCtaEventLabel: "panel-manage-btn",
+      fullCtaHref: "http://127.0.0.1:8000/premium/#pricing",
+    },
+    {
+      id: "phones",
+      waffle: "phones",
+      headlineString: "popupPhoneMaskingPromoHeadline",
+      bodyString: "popupPhoneMaskingPromoBody",
+      teaserImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+      fullImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaHref: "http://127.0.0.1:8000/premium/#pricing",
+    },
+    {
+      id: "asdfasdfasdf",
+      waffle: "phones",
+      headlineString: "popupPhoneMaskingPromoHeadline",
+      bodyString: "popupPhoneMaskingPromoBody",
+      teaserImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+      fullImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+    },
+  ];
 
   const popup = {
     events: {
@@ -16,21 +58,37 @@
         e.preventDefault();
         const backTarget = e.target.dataset.backTarget;
         const backNavLevel = e.target.dataset.navLevel;
-        
+
         if (backNavLevel === "root") {
-          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document
+            .querySelector(".js-internal-link.is-active")
+            ?.classList.remove("is-active");
         }
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
- 
+
         popup.panel.update(backTarget);
+      },
+      externalClick: async (e) => {
+        e.preventDefault();
+        if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
+          sendRelayEvent(
+            "Panel",
+            e.target.dataset.eventAction,
+            e.target.dataset.eventLabel
+          );
+        }
+        await browser.tabs.create({ url: e.target.href });
+        window.close();
       },
       navigationClick: (e) => {
         e.preventDefault();
-        document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        document
+          .querySelector(".js-internal-link.is-active")
+          ?.classList.remove("is-active");
         e.target.classList.add("is-active");
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
@@ -44,11 +102,13 @@
       });
 
       // Set Back Button Listeners
-      const backButtons = document.querySelectorAll(".fx-relay-panel-header-btn-back");
-      backButtons.forEach((button)=> {
+      const backButtons = document.querySelectorAll(
+        ".fx-relay-panel-header-btn-back"
+      );
+      backButtons.forEach((button) => {
         button.addEventListener("click", popup.events.backClick, false);
       });
-      
+
       // Check if user is signed in to show default/sign-in panel
       if (await popup.utilities.isUserSignedIn()) {
         popup.panel.update("masks");
@@ -59,36 +119,47 @@
 
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
-      
     },
     panel: {
-      update: (panelId) => {
-        
+      update: (panelId, data) => {
         const panels = document.querySelectorAll(".fx-relay-panel");
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
 
           if (panel.dataset.panelId === panelId) {
             panel.classList.remove("is-hidden");
-            popup.panel.init(panelId);
+            popup.panel.init(panelId, data);
           }
         });
 
         state.currentPanel = panelId;
       },
-      init: (panelId) => {
-        // const panel = document.getElementById(`${panelId}-panel`);        
+      init: (panelId, data) => {
         switch (panelId) {
+          case "news":
+            sendRelayEvent("Panel", "click", "opened-news");
+            popup.panel.news.init();
+            break;
+          case "newsStory":
+            sendRelayEvent("Panel", "click", "opened-news-item");
+            popup.panel.news.storyPanel.update(data.newsItemId);
+            break;
           case "settings":
             popup.utilities.enableInputIconDisabling();
             // Function is imported from data-opt-out-toggle.js
-            enableDataOptOut(); 
+            enableDataOptOut();
 
-            document.getElementById("popupSettingsReportIssue").addEventListener("click", (e)=>{
-              e.preventDefault();
-              popup.panel.update("webcompat");
-            }, false)
-            
+            document
+              .getElementById("popupSettingsReportIssue")
+              .addEventListener(
+                "click",
+                (e) => {
+                  e.preventDefault();
+                  popup.panel.update("webcompat");
+                },
+                false
+              );
+
             break;
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
@@ -104,79 +175,223 @@
             break;
         }
       },
-      stats: {
-        init: async ()=> {
-            // Get Global Mask Stats data 
-            const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
-            const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
-            const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+      news: {
+        init: async () => {
 
-            const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
+          const newsList = document.querySelector(".fx-relay-news");
+
+          // If there's no news items, go build them
+          if ( !newsList.hasChildNodes() ) {
+            newsContent.forEach(async (newsItem) => {
+              // Check for any catches to not display the item
+              if (
+                // Waffle
+                newsItem.waffle && (await checkWaffleFlag(newsItem.waffle)) === false
+                // TODO: Add locale filtering
+                // TODO: Add free/premium filtering
+              ) {
+                return;
+              }
+
+              // Build and attach news item
+              const liFxRelayNewsItem = document.createElement("li");
+              liFxRelayNewsItem.classList.add("fx-relay-news-item");
+
+              const button = document.createElement("button");
+              button.classList.add("fx-relay-news-item-button");
+              button.setAttribute("data-news-item-id", newsItem.id);
+              liFxRelayNewsItem.appendChild(button);
+
+              const divTeaserImage = document.createElement("div");
+              divTeaserImage.classList.add("fx-relay-news-item-image");
+
+              const imgTeaserImage = document.createElement("img");
+              imgTeaserImage.src = newsItem.teaserImg;
+              divTeaserImage.appendChild(imgTeaserImage);
+              button.appendChild(divTeaserImage);
+
+              const divTeaserCopy = document.createElement("div");
+              divTeaserCopy.classList.add("fx-relay-news-item-content");
+
+              const h3TeaserTitle = document.createElement("h3");
+              h3TeaserTitle.classList.add("fx-relay-news-item-hero");
+              h3TeaserTitle.textContent = browser.i18n.getMessage(
+                newsItem.headlineString
+              );
+
+              const divTeaserBody = document.createElement("div");
+              divTeaserBody.classList.add("fx-relay-news-item-body");
+              divTeaserBody.textContent = browser.i18n.getMessage(
+                newsItem.bodyString
+              );
+
+              divTeaserCopy.appendChild(h3TeaserTitle);
+              divTeaserCopy.appendChild(divTeaserBody);
+              button.appendChild(divTeaserCopy);
+
+              newsList.appendChild(liFxRelayNewsItem);
+
+              button.addEventListener(
+                "click",
+                popup.panel.news.storyPanel.show,
+                false
+              );
+            });
+          }
+        },
+        storyPanel: {
+          show: (event) => {
+            popup.panel.update("newsStory", {
+              newsItemId: event.target.dataset.newsItemId,
+            });
+          },
+          update: (newsItemId) => {
+            // Get content for news detail view
+            const storyData = newsContent.filter((story) => { return story.id == newsItemId });
+            const newsItemContent = storyData[0];
             
-            const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
-            const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
-            const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
+            const newsStoryDetail = document.querySelector(".fx-relay-news-story");
+            
+            // Reset news detail item
+            newsStoryDetail.textContent = "";
 
-            globalAliasesUsedValEl.textContent = aliasesUsedVal;
-            globalEmailsBlockedValEl.textContent = emailsBlockedVal;
-            globalEmailsForwardedValEl.textContent = emailsForwardedVal;
+             // Populate HTML
+            const newsStoryHeroImage = document.createElement("img");
+            newsStoryHeroImage.src = newsItemContent.fullImg;
+            newsStoryDetail.appendChild(newsStoryHeroImage);
+            
+            const newsStoryHeroTitle = document.createElement("h3");
+            newsStoryHeroTitle.textContent = browser.i18n.getMessage(newsItemContent.headlineString);
+            newsStoryDetail.appendChild(newsStoryHeroTitle);
+            
+            const newsStoryHeroBody = document.createElement("div");
+            newsStoryHeroBody.textContent = browser.i18n.getMessage(newsItemContent.bodyString);
+            newsStoryDetail.appendChild(newsStoryHeroBody);
 
-            // Check if any data applies to the current site
-            const currentPageHostName = await browser.runtime.sendMessage({
-              method: "getCurrentPageHostname",
+            // If the section has a CTA, add it.
+            if (newsItemContent.fullCta) {
+              const newsStoryHeroCTA = document.createElement("a");
+              newsStoryHeroCTA.classList.add("fx-relay-news-story-link");
+              newsStoryHeroCTA.href = newsItemContent.fullCtaHref;
+
+              // Set GA data if applicable
+              if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
+                newsStoryHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
+                newsStoryHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
+              }
+
+              newsStoryHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
+              newsStoryHeroCTA.addEventListener("click", popup.events.externalClick, false);
+              newsStoryDetail.appendChild(newsStoryHeroCTA);
+            }
+          },
+        },
+      },
+      stats: {
+        init: async () => {
+          // Get Global Mask Stats data
+          const { aliasesUsedVal } = await browser.storage.local.get(
+            "aliasesUsedVal"
+          );
+          const { emailsForwardedVal } = await browser.storage.local.get(
+            "emailsForwardedVal"
+          );
+          const { emailsBlockedVal } = await browser.storage.local.get(
+            "emailsBlockedVal"
+          );
+
+          const globalStatSet = document.querySelector(
+            ".dashboard-stats-list.global-stats"
+          );
+
+          const globalAliasesUsedValEl =
+            globalStatSet.querySelector(".aliases-used");
+          const globalEmailsBlockedValEl =
+            globalStatSet.querySelector(".emails-blocked");
+          const globalEmailsForwardedValEl =
+            globalStatSet.querySelector(".emails-forwarded");
+
+          globalAliasesUsedValEl.textContent = aliasesUsedVal;
+          globalEmailsBlockedValEl.textContent = emailsBlockedVal;
+          globalEmailsForwardedValEl.textContent = emailsForwardedVal;
+
+          // Check if any data applies to the current site
+          const currentPageHostName = await browser.runtime.sendMessage({
+            method: "getCurrentPageHostname",
+          });
+
+          // Check if user is premium (and then check if they have a domain set)
+          // This is needed in order to query both random and custom masks
+          const { premium } = await browser.storage.local.get("premium");
+          let getMasksOptions = { fetchCustomMasks: false };
+
+          if (premium) {
+            // Check if user may have custom domain masks
+            const { premiumSubdomainSet } = await browser.storage.local.get(
+              "premiumSubdomainSet"
+            );
+
+            // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+            getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+          }
+
+          const masks = await popup.utilities.getMasks(getMasksOptions);
+
+          const currentWebsiteStateSet = document.querySelector(
+            ".dashboard-stats-list.current-website-stats"
+          );
+
+          if (
+            popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(
+              masks,
+              currentPageHostName
+            )
+          ) {
+            // Some masks are used on the current site. Time to calculate!
+            const filteredMasks = masks.filter(
+              (mask) =>
+                mask.generated_for === currentPageHostName ||
+                popup.utilities.hasMaskBeenUsedOnCurrentSite(
+                  mask,
+                  currentPageHostName
+                )
+            );
+
+            let currentWebsiteForwardedVal = 0;
+            let currentWebsiteBlockedVal = 0;
+
+            filteredMasks.forEach((mask) => {
+              currentWebsiteForwardedVal += mask.num_forwarded;
+              currentWebsiteBlockedVal += mask.num_blocked;
             });
 
-            // Check if user is premium (and then check if they have a domain set)
-            // This is needed in order to query both random and custom masks
-            const { premium } = await browser.storage.local.get("premium");
-            let getMasksOptions = {fetchCustomMasks: false};
-            
-            if (premium) {
-              // Check if user may have custom domain masks
-              const { premiumSubdomainSet } = await browser.storage.local.get(
-                "premiumSubdomainSet"
+            const currentWebsiteAliasesUsedValEl =
+              currentWebsiteStateSet.querySelector(".aliases-used");
+            currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
+
+            const currentWebsiteEmailsForwardedValEl =
+              currentWebsiteStateSet.querySelector(".emails-forwarded");
+            currentWebsiteEmailsForwardedValEl.textContent =
+              currentWebsiteForwardedVal;
+
+            const currentWebsiteEmailsBlockedValEl =
+              currentWebsiteStateSet.querySelector(".emails-blocked");
+            currentWebsiteEmailsBlockedValEl.textContent =
+              currentWebsiteBlockedVal;
+
+            const currentWebsiteEmailsBlocked =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-blocked"
               );
-
-              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
-              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
-              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
-            }
-            
-            const masks = await popup.utilities.getMasks(getMasksOptions);
-            
-            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats")
-
-            if (popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) {
-              // Some masks are used on the current site. Time to calculate!
-              const filteredMasks = masks.filter(
-                (mask) =>
-                  mask.generated_for === currentPageHostName ||
-                  popup.utilities.hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+            const currentWebsiteEmailsForwarded =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-forwarded"
               );
-
-              let currentWebsiteForwardedVal = 0;
-              let currentWebsiteBlockedVal = 0;
-
-              filteredMasks.forEach(mask => {
-                currentWebsiteForwardedVal += mask.num_forwarded;
-                currentWebsiteBlockedVal += mask.num_blocked;
-              });
-
-              const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
-              currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
-
-              const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
-              currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
-                            
-              const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
-              currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal
-
-              const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
-              const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
-              currentWebsiteEmailsBlocked.classList.remove("is-hidden");
-              currentWebsiteEmailsForwarded.classList.remove("is-hidden");              
-            }
-        }
+            currentWebsiteEmailsBlocked.classList.remove("is-hidden");
+            currentWebsiteEmailsForwarded.classList.remove("is-hidden");
+          }
+        },
       },
       webcompat: {
         init: () => {
@@ -189,9 +404,13 @@
             await popup.panel.webcompat.handleReportIssueFormSubmission(event);
           });
 
-          const reportContinueButton = document.querySelector(".report-continue");
-          reportContinueButton.addEventListener("click", popup.events.backClick, false);
-
+          const reportContinueButton =
+            document.querySelector(".report-continue");
+          reportContinueButton.addEventListener(
+            "click",
+            popup.events.backClick,
+            false
+          );
         },
         setURLwithIssue: async () => {
           // Add Site URL placeholder
@@ -222,18 +441,28 @@
           }
         },
         showReportInputOtherTextField: () => {
-          const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
-          const otherTextField = document.querySelector('input[name="other_issue"]');
+          const otherCheckbox = document.querySelector(
+            'input[name="issue-case-other"]'
+          );
+          const otherTextField = document.querySelector(
+            'input[name="other_issue"]'
+          );
           otherCheckbox.addEventListener("click", () => {
             otherTextField.classList.toggle("is-hidden");
-          })
+          });
 
           // Add placeholder to report input on 'Other' selection
-          const inputFieldOtherDetails = document.querySelector('input[name="other_issue"]');
-          inputFieldOtherDetails.placeholder = browser.i18n.getMessage("popupReportIssueCaseOtherDetails");
+          const inputFieldOtherDetails = document.querySelector(
+            'input[name="other_issue"]'
+          );
+          inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
+            "popupReportIssueCaseOtherDetails"
+          );
         },
         showSuccessReportSubmission: () => {
-          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+          const reportIssueSubmitBtn = document.querySelector(
+            ".report-issue-submit-btn"
+          );
           const reportSuccess = document.querySelector(".report-success");
           const reportContent = document.querySelector(".report-issue-content");
           reportIssueSubmitBtn.addEventListener("click", () => {
@@ -247,7 +476,7 @@
           const reportData = Object.fromEntries(data.entries());
           reportData.user_agent = await getBrowser();
 
-          Object.keys(reportData).forEach(function(value) {
+          Object.keys(reportData).forEach(function (value) {
             // Switch "on" to true
             if (reportData[value] === "on") {
               reportData[value] = true;
@@ -259,13 +488,18 @@
           });
 
           // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
-          if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
+          if (
+            !(
+              reportData.issue_on_domain.startsWith("http://") ||
+              reportData.issue_on_domain.startsWith("https://")
+            )
+          ) {
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
-          
+
           await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
-            description: reportData
+            description: reportData,
           });
         },
       },
@@ -289,24 +523,34 @@
         }
       },
       enableInputIconDisabling: async () => {
-        const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
+        const inputIconVisibilityToggle = document.querySelector(
+          ".toggle-icon-in-page-visibility"
+        );
 
         const stylePrefToggle = (inputsEnabled) => {
           if (inputsEnabled === "show-input-icons") {
-            inputIconVisibilityToggle.dataset.iconVisibilityOption = "disable-input-icon";
+            inputIconVisibilityToggle.dataset.iconVisibilityOption =
+              "disable-input-icon";
             inputIconVisibilityToggle.classList.remove("input-icons-disabled");
             return;
           }
-          inputIconVisibilityToggle.dataset.iconVisibilityOption = "enable-input-icon";
+          inputIconVisibilityToggle.dataset.iconVisibilityOption =
+            "enable-input-icon";
           inputIconVisibilityToggle.classList.add("input-icons-disabled");
         };
 
         const iconsAreEnabled = await areInputIconsEnabled();
-        const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
+        const userIconChoice = iconsAreEnabled
+          ? "show-input-icons"
+          : "hide-input-icons";
         stylePrefToggle(userIconChoice);
 
         inputIconVisibilityToggle.addEventListener("click", async () => {
-          const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
+          const userIconPreference =
+            inputIconVisibilityToggle.dataset.iconVisibilityOption ===
+            "disable-input-icon"
+              ? "hide-input-icons"
+              : "show-input-icons";
           await browser.runtime.sendMessage({
             method: "updateInputIconPref",
             iconPref: userIconPreference,
@@ -347,11 +591,14 @@
         return signedInUser;
       },
       getCachedServerStoragePref: async () => {
-        const serverStoragePref = await browser.storage.local.get("server_storage");
-        const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
-          serverStoragePref,
+        const serverStoragePref = await browser.storage.local.get(
           "server_storage"
         );
+        const serverStoragePrefInLocalStorage =
+          Object.prototype.hasOwnProperty.call(
+            serverStoragePref,
+            "server_storage"
+          );
 
         if (!serverStoragePrefInLocalStorage) {
           // There is no reference to the users storage preference saved. Fetch it from the server.
@@ -371,7 +618,8 @@
         return currentTab;
       },
       getMasks: async (options = { fetchCustomMasks: false }) => {
-        const serverStoragePref = await popup.utilities.getCachedServerStoragePref();
+        const serverStoragePref =
+          await popup.utilities.getCachedServerStoragePref();
 
         if (serverStoragePref) {
           try {
@@ -393,35 +641,28 @@
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
-                
-        externalLinks.forEach(link => {
-          // Because we dynamically set the Relay origin URL (local/dev/stage/prod), 
+
+        externalLinks.forEach((link) => {
+          // Because we dynamically set the Relay origin URL (local/dev/stage/prod),
           // we have to catch Relay-specific links and prepend the correct Relay website URL
           if (link.dataset.relayInternal === "true") {
             link.href = `${relaySiteOrigin}/${link.dataset.href}`;
           } else {
             link.href = `${link.dataset.href}`;
           }
-          
 
-          link.addEventListener("click", async (e) => {
-            e.preventDefault();
-            if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
-              sendRelayEvent("Panel", e.target.dataset.eventAction, e.target.dataset.eventLabel);
-            }
-            await browser.tabs.create({ url: link.href });
-            window.close();
-          });
+          link.addEventListener("click", popup.events.externalClick, false);
         });
       },
-      unhideNavigationItemsOnceLoggedIn: ()=> {
-        document.querySelectorAll(".fx-relay-menu-dashboard-link.is-hidden").forEach(link => {
-          link.classList.remove("is-hidden");
-        })
-      }
+      unhideNavigationItemsOnceLoggedIn: () => {
+        document
+          .querySelectorAll(".fx-relay-menu-dashboard-link.is-hidden")
+          .forEach((link) => {
+            link.classList.remove("is-hidden");
+          });
+      },
     },
   };
 
   popup.init();
-  
 })();
