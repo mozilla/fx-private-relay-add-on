@@ -388,3 +388,71 @@ sign-up-panel::after {
   cursor: pointer;
   color: var(--colorInformational);
 }
+
+/* Stats */
+.dashboard-stats-list {
+  width: 100%;
+  border-radius: var(--borderRadiusSm);
+  padding: 0 var(--spacingLg);
+  font-size: 14px;
+  background: var(--colorWhite);
+  margin-bottom: var(--spacingMd);
+}
+
+.dashboard-stats-list ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-stats-list li:first-child {
+  font-weight: 600;
+  color: var(--colorBlack)
+}
+
+.dashboard-stats-list li:not(:first-child){
+  padding-left: var(--spacingLg);
+  color: var(--colorGrey50)
+}
+
+.dashboard-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: var(--spacingMd) 0;
+}
+
+.dashboard-info + .dashboard-info {
+  border-top: 1px solid var(--colorGrey10);
+}
+
+.dashboard-info::before {
+  content: "";
+  /* Custom size/positioning for icon on the stat row  */
+  width: 20px; 
+  height: 20px;
+  margin-left: -25px; 
+  position: absolute;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0);
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-info-emails-blocked::before {
+  background-image: url("/icons/blocked-icon.svg");
+}
+
+.dashboard-info-emails-forwarded::before {
+  background-image: url("/icons/forward-icon.svg");
+}
+
+.dashboard-info-trackers-removed::before {
+  background-image: url("/icons/email-trackers-icon.svg");
+}
+
+.dashboard-stats {
+  right: 0;
+  display: flex;
+  align-items: right;
+}
