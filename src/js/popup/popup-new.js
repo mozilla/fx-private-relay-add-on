@@ -122,12 +122,28 @@
             globalEmailsForwardedValEl.textContent = emailsForwardedVal;
 
             // Check if any data applies to the current site
-            
             const currentPageHostName = await browser.runtime.sendMessage({
               method: "getCurrentPageHostname",
             });
 
-            const masks = await popup.utilities.getMasks();
+            // Check if user is premium (and then check if they have a domain set)
+            // This is needed in order to query both random and custom masks
+            const { premium } = await browser.storage.local.get("premium");
+            let getMasksOptions = {fetchCustomMasks: false};
+            
+            if (premium) {
+              // Check if user may have custom domain masks
+              const { premiumSubdomainSet } = await browser.storage.local.get(
+                "premiumSubdomainSet"
+              );
+
+              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+            }
+            
+            const masks = await popup.utilities.getMasks(getMasksOptions);
+            
             const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats")
 
             if (popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) {
@@ -159,10 +175,7 @@
               const currenWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
               currenWebsiteEmailsBlocked.classList.remove("is-hidden");
               currenWebsiteEmailsForwarded.classList.remove("is-hidden");              
-              
             }
-
-            
         }
       },
       webcompat: {
