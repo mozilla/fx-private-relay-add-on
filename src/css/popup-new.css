@@ -393,7 +393,7 @@ sign-up-panel::after {
 .dashboard-stats-list {
   width: 100%;
   border-radius: var(--borderRadiusSm);
-  padding: var(--spacingXs) var(--spacingLg);
+  padding: 0 var(--spacingLg);
   font-size: 14px;
   background: var(--colorWhite);
   margin-bottom: var(--spacingMd);
@@ -404,17 +404,12 @@ sign-up-panel::after {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacingMd);
 }
 
 .dashboard-stats-list li {
   /* border: 1px solid red; */
 }
 
-.dashboard-info-spacer {
-  background-color: var(--colorGrey10);
-  height: 1px;
-}
 
 .dashboard-stats-list li:first-child {
   font-weight: 600;
@@ -430,6 +425,12 @@ sign-up-panel::after {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: var(--spacingMd) 0;
+  /* outline: 1px solid red; */
+}
+
+.dashboard-info + .dashboard-info {
+  border-top: 1px solid var(--colorGrey10);
 }
 
 .dashboard-info::before {

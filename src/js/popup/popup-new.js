@@ -106,23 +106,63 @@
       },
       stats: {
         init: async ()=> {
-            //Get profile data from site
+            // Get Global Mask Stats data 
             const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
             const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
             const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-            const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
 
-            const statSet = document.querySelector(".dashboard-stats-list");
+            const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
             
-            const aliasesUsedValEl = statSet.querySelector(".aliases-used");
-            const emailsBlockedValEl = statSet.querySelector(".emails-blocked");
-            const emailsForwardedValEl = statSet.querySelector(".emails-forwarded");
-            const emailTrackersRemovedValEl = statSet.querySelector(".email-trackers-removed");
+            const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
+            const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
+            const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
 
-            aliasesUsedValEl.textContent = aliasesUsedVal;
-            emailsBlockedValEl.textContent = emailsBlockedVal;
-            emailsForwardedValEl.textContent = emailsForwardedVal;
-            emailTrackersRemovedValEl.textContent = emailTrackersRemovedVal;
+            globalAliasesUsedValEl.textContent = aliasesUsedVal;
+            globalEmailsBlockedValEl.textContent = emailsBlockedVal;
+            globalEmailsForwardedValEl.textContent = emailsForwardedVal;
+
+            // Check if any data applies to the current site
+            
+            const currentPageHostName = await browser.runtime.sendMessage({
+              method: "getCurrentPageHostname",
+            });
+
+            const masks = await popup.utilities.getMasks();
+            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats")
+
+            if (popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) {
+              // Some masks are used on the current site. Time to calculate!
+              const filteredMasks = masks.filter(
+                (mask) =>
+                  mask.generated_for === currentPageHostName ||
+                  popup.utilities.hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+              );
+
+              let currenWebsiteForwardedVal = 0;
+              let currenWebsiteBlockedVal = 0;
+
+              filteredMasks.forEach(mask => {
+                currenWebsiteForwardedVal += mask.num_forwarded;
+                currenWebsiteBlockedVal += mask.num_blocked;
+              });
+
+              const currenWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
+              currenWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
+
+              const currenWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
+              currenWebsiteEmailsForwardedValEl.textContent = currenWebsiteForwardedVal;
+                            
+              const currenWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
+              currenWebsiteEmailsBlockedValEl.textContent = currenWebsiteBlockedVal
+
+              const currenWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
+              const currenWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
+              currenWebsiteEmailsBlocked.classList.remove("is-hidden");
+              currenWebsiteEmailsForwarded.classList.remove("is-hidden");              
+              
+            }
+
+            
         }
       },
       webcompat: {
@@ -218,6 +258,11 @@
       },
     },
     utilities: {
+      checkIfAnyMasksWereGeneratedOnCurrentWebsite: (masks, domain) => {
+        return masks.some((mask) => {
+          return domain === mask.generated_for;
+        });
+      },
       clearBrowserActionBadge: async () => {
         const { browserActionBadgesClicked } = await browser.storage.local.get(
           "browserActionBadgesClicked"
@@ -257,6 +302,26 @@
           return stylePrefToggle(userIconPreference);
         });
       },
+      hasMaskBeenUsedOnCurrentSite: (mask, domain) => {
+        const domainList = mask.used_on;
+
+        // Short circuit out if there's no used_on entry
+        if (
+          domainList === null ||
+          domainList === "" ||
+          domainList === undefined
+        ) {
+          return false;
+        }
+
+        // Domain already exists in used_on field. Just return the list!
+        if (domainList.split(",").includes(domain)) {
+          return true;
+        }
+
+        // No match found!
+        return false;
+      },
       isSortaAURL: (str) => {
         return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
       },
@@ -268,12 +333,50 @@
         );
         return signedInUser;
       },
+      getCachedServerStoragePref: async () => {
+        const serverStoragePref = await browser.storage.local.get("server_storage");
+        const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
+          serverStoragePref,
+          "server_storage"
+        );
+
+        if (!serverStoragePrefInLocalStorage) {
+          // There is no reference to the users storage preference saved. Fetch it from the server.
+          return await browser.runtime.sendMessage({
+            method: "getServerStoragePref",
+          });
+        } else {
+          // If the stored pref exists, return value
+          return serverStoragePref.server_storage;
+        }
+      },
       getCurrentPage: async () => {
         const [currentTab] = await browser.tabs.query({
           active: true,
           currentWindow: true,
         });
         return currentTab;
+      },
+      getMasks: async (options = { fetchCustomMasks: false }) => {
+        const serverStoragePref = await popup.utilities.getCachedServerStoragePref();
+
+        if (serverStoragePref) {
+          try {
+            return await browser.runtime.sendMessage({
+              method: "getAliasesFromServer",
+              options,
+            });
+          } catch (error) {
+            console.warn(`getAliasesFromServer Error: ${error}`);
+
+            // API Error — Fallback to local storage
+            const { relayAddresses } = await browser.storage.local.get(
+              "relayAddresses"
+            );
+
+            return relayAddresses;
+          }
+        }
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
