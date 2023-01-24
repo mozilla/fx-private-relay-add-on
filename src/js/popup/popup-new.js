@@ -90,6 +90,11 @@
             }, false)
             
             break;
+          case "stats":
+            sendRelayEvent("Panel", "click", "opened-stats");
+            popup.panel.stats.init();
+            break;
+
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
@@ -97,6 +102,80 @@
 
           default:
             break;
+        }
+      },
+      stats: {
+        init: async ()=> {
+            // Get Global Mask Stats data 
+            const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
+            const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
+            const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
+
+            const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
+            
+            const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
+            const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
+            const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
+
+            globalAliasesUsedValEl.textContent = aliasesUsedVal;
+            globalEmailsBlockedValEl.textContent = emailsBlockedVal;
+            globalEmailsForwardedValEl.textContent = emailsForwardedVal;
+
+            // Check if any data applies to the current site
+            const currentPageHostName = await browser.runtime.sendMessage({
+              method: "getCurrentPageHostname",
+            });
+
+            // Check if user is premium (and then check if they have a domain set)
+            // This is needed in order to query both random and custom masks
+            const { premium } = await browser.storage.local.get("premium");
+            let getMasksOptions = {fetchCustomMasks: false};
+            
+            if (premium) {
+              // Check if user may have custom domain masks
+              const { premiumSubdomainSet } = await browser.storage.local.get(
+                "premiumSubdomainSet"
+              );
+
+              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+            }
+            
+            const masks = await popup.utilities.getMasks(getMasksOptions);
+            
+            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats")
+
+            if (popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks, currentPageHostName)) {
+              // Some masks are used on the current site. Time to calculate!
+              const filteredMasks = masks.filter(
+                (mask) =>
+                  mask.generated_for === currentPageHostName ||
+                  popup.utilities.hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
+              );
+
+              let currentWebsiteForwardedVal = 0;
+              let currentWebsiteBlockedVal = 0;
+
+              filteredMasks.forEach(mask => {
+                currentWebsiteForwardedVal += mask.num_forwarded;
+                currentWebsiteBlockedVal += mask.num_blocked;
+              });
+
+              const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
+              currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
+
+              const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
+              currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
+                            
+              const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
+              currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal
+
+              const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
+              const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
+              currentWebsiteEmailsBlocked.classList.remove("is-hidden");
+              currentWebsiteEmailsForwarded.classList.remove("is-hidden");              
+            }
         }
       },
       webcompat: {
@@ -192,6 +271,11 @@
       },
     },
     utilities: {
+      checkIfAnyMasksWereGeneratedOnCurrentWebsite: (masks, domain) => {
+        return masks.some((mask) => {
+          return domain === mask.generated_for;
+        });
+      },
       clearBrowserActionBadge: async () => {
         const { browserActionBadgesClicked } = await browser.storage.local.get(
           "browserActionBadgesClicked"
@@ -231,6 +315,26 @@
           return stylePrefToggle(userIconPreference);
         });
       },
+      hasMaskBeenUsedOnCurrentSite: (mask, domain) => {
+        const domainList = mask.used_on;
+
+        // Short circuit out if there's no used_on entry
+        if (
+          domainList === null ||
+          domainList === "" ||
+          domainList === undefined
+        ) {
+          return false;
+        }
+
+        // Domain already exists in used_on field. Just return the list!
+        if (domainList.split(",").includes(domain)) {
+          return true;
+        }
+
+        // No match found!
+        return false;
+      },
       isSortaAURL: (str) => {
         return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
       },
@@ -242,12 +346,50 @@
         );
         return signedInUser;
       },
+      getCachedServerStoragePref: async () => {
+        const serverStoragePref = await browser.storage.local.get("server_storage");
+        const serverStoragePrefInLocalStorage = Object.prototype.hasOwnProperty.call(
+          serverStoragePref,
+          "server_storage"
+        );
+
+        if (!serverStoragePrefInLocalStorage) {
+          // There is no reference to the users storage preference saved. Fetch it from the server.
+          return await browser.runtime.sendMessage({
+            method: "getServerStoragePref",
+          });
+        } else {
+          // If the stored pref exists, return value
+          return serverStoragePref.server_storage;
+        }
+      },
       getCurrentPage: async () => {
         const [currentTab] = await browser.tabs.query({
           active: true,
           currentWindow: true,
         });
         return currentTab;
+      },
+      getMasks: async (options = { fetchCustomMasks: false }) => {
+        const serverStoragePref = await popup.utilities.getCachedServerStoragePref();
+
+        if (serverStoragePref) {
+          try {
+            return await browser.runtime.sendMessage({
+              method: "getAliasesFromServer",
+              options,
+            });
+          } catch (error) {
+            console.warn(`getAliasesFromServer Error: ${error}`);
+
+            // API Error — Fallback to local storage
+            const { relayAddresses } = await browser.storage.local.get(
+              "relayAddresses"
+            );
+
+            return relayAddresses;
+          }
+        }
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
