@@ -65,6 +65,18 @@
   --colorBlue10: #80ebff;
   --colorBlue05: #aaf2ff;
 
+  /* Nebula Colors: Green */
+  --colorGreen90: #00736c;
+  --colorGreen80: #00a49a;
+  --colorGreen70: #1cc4a0;
+  --colorGreen60: #3ad4b3;
+  --colorGreen50: #3fe1b0;
+  --colorGreen40: #54ffbd;
+  --colorGreen30: #88ffd1;
+  --colorGreen20: #b3ffe3;
+  --colorGreen10: #d1ffee;
+  --colorGreen05: #e3fff3;
+
   /* Nebula Colors: Grays */
   --colorBlack: #000000;
   --colorGrey60: #0c0c0d;

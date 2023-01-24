@@ -13,7 +13,12 @@
       backClick: (e) => {
         e.preventDefault();
         const backTarget = e.target.dataset.backTarget;
-        document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        const backNavLevel = e.target.dataset.navLevel;
+        
+        if (backNavLevel === "root") {
+          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+        }
+
         popup.panel.update(backTarget);
       },
       navigationClick: (e) => {
@@ -46,11 +51,12 @@
       }
 
       // Set External Event Listerners
-      await popup.utilities.setExternalEventListeners();
+      await popup.utilities.setExternalLinkEventListeners();
       
     },
     panel: {
       update: (panelId) => {
+        
         const panels = document.querySelectorAll(".fx-relay-panel");
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
@@ -64,9 +70,23 @@
         state.currentPanel = panelId;
       },
       init: (panelId) => {
-        const panel = document.getElementById(`${panelId}-panel`);        
-        console.log(panel);
-        // console.log(state.currentPanel);
+        // const panel = document.getElementById(`${panelId}-panel`);        
+        switch (panelId) {
+          case "settings":
+            popup.utilities.enableInputIconDisabling();
+            // Function is imported from data-opt-out-toggle.js
+            enableDataOptOut(); 
+
+            document.getElementById("popupSettingsReportIssue").addEventListener("click", (e)=>{
+              e.preventDefault();
+              popup.panel.update("webcompat");
+            }, false)
+            
+            break;
+
+          default:
+            break;
+        }
       },
     },
     utilities: {
@@ -90,11 +110,45 @@
           browser.browserAction.setBadgeText({ text: "" });
         }
       },
-      setExternalEventListeners: async () => {
+      enableInputIconDisabling: async () => {
+        const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
+
+        const stylePrefToggle = (inputsEnabled) => {
+          if (inputsEnabled === "show-input-icons") {
+            inputIconVisibilityToggle.dataset.iconVisibilityOption = "disable-input-icon";
+            inputIconVisibilityToggle.classList.remove("input-icons-disabled");
+            return;
+          }
+          inputIconVisibilityToggle.dataset.iconVisibilityOption = "enable-input-icon";
+          inputIconVisibilityToggle.classList.add("input-icons-disabled");
+        };
+
+        const iconsAreEnabled = await areInputIconsEnabled();
+        const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
+        stylePrefToggle(userIconChoice);
+
+        inputIconVisibilityToggle.addEventListener("click", async () => {
+          const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
+          await browser.runtime.sendMessage({
+            method: "updateInputIconPref",
+            iconPref: userIconPreference,
+          });
+          sendRelayEvent("Panel", "click", userIconPreference);
+          return stylePrefToggle(userIconPreference);
+        });        
+      },
+      setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
                 
         externalLinks.forEach(link => {
-          link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          // Because we dynamically set the Relay origin URL (local/dev/stage/prod), 
+          // we have to catch Relay-specific links and prepend the correct Relay website URL
+          if (link.dataset.relayInternal === "true") {
+            link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          } else {
+            link.href = `${link.dataset.href}`;
+          }
+          
 
           link.addEventListener("click", async (e) => {
             e.preventDefault();
