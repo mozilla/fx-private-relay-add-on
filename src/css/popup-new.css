@@ -406,11 +406,6 @@ sign-up-panel::after {
   flex-direction: column;
 }
 
-.dashboard-stats-list li {
-  /* border: 1px solid red; */
-}
-
-
 .dashboard-stats-list li:first-child {
   font-weight: 600;
   color: var(--colorBlack)
@@ -426,7 +421,6 @@ sign-up-panel::after {
   flex-direction: row;
   justify-content: space-between;
   padding: var(--spacingMd) 0;
-  /* outline: 1px solid red; */
 }
 
 .dashboard-info + .dashboard-info {
@@ -435,9 +429,10 @@ sign-up-panel::after {
 
 .dashboard-info::before {
   content: "";
+  /* Custom size/positioning for icon on the stat row  */
   width: 20px; 
   height: 20px;
-  margin-left: -25px;
+  margin-left: -25px; 
   position: absolute;
   background-repeat: no-repeat;
   background-color: rgba(0, 0, 0, 0);
