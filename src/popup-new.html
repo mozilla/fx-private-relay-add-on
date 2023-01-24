@@ -189,10 +189,10 @@
           </header>
 
           <div class="fx-relay-panel-content">
-            <div class="dashboard-stats-list">
+            <div class="dashboard-stats-list global-stats">
               <ul>
                 <li class="dashboard-info">
-                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupTotalMasksUsed"></span>
                   <div class="dashboard-stats aliases-used"></div>
                 </li>
                 <li class="dashboard-info-spacer"></li>
@@ -205,12 +205,36 @@
                   <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
                   <div class="dashboard-stats emails-forwarded"></div>
                 </li>
-                <li class="dashboard-info-spacer"></li>
+                <!-- <li class="dashboard-info-spacer"></li>
                 <li class="dashboard-info dashboard-info-trackers-removed">
                   <span class="email-trackers-removed-text i18n-content"
                     data-i18n-message-id="popupEmailTrackersRemoved"></span>
                   <div class="dashboard-stats email-trackers-removed"></div>
+                </li> -->
+              </ul>
+            </div>
+            <div class="dashboard-stats-list current-website-stats">
+              <ul>
+                <li class="dashboard-info">
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupMasksUsedInThisWebsite"></span>
+                  <div class="dashboard-stats aliases-used">0</div>
                 </li>
+                <li class="dashboard-info-spacer"></li>
+                <li class="dashboard-info dashboard-info-emails-blocked">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked">0</div>
+                </li>
+                <li class="dashboard-info-spacer"></li>
+                <li class="dashboard-info dashboard-info-emails-forwarded">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded">0</div>
+                </li>
+                <!-- <li class="dashboard-info-spacer"></li>
+                <li class="dashboard-info dashboard-info-trackers-removed">
+                  <span class="email-trackers-removed-text i18n-content"
+                    data-i18n-message-id="popupEmailTrackersRemoved"></span>
+                  <div class="dashboard-stats email-trackers-removed">0</div>
+                </li> -->
               </ul>
             </div>
           </div>
