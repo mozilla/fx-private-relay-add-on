@@ -154,27 +154,27 @@
                   popup.utilities.hasMaskBeenUsedOnCurrentSite(mask, currentPageHostName)
               );
 
-              let currenWebsiteForwardedVal = 0;
-              let currenWebsiteBlockedVal = 0;
+              let currentWebsiteForwardedVal = 0;
+              let currentWebsiteBlockedVal = 0;
 
               filteredMasks.forEach(mask => {
-                currenWebsiteForwardedVal += mask.num_forwarded;
-                currenWebsiteBlockedVal += mask.num_blocked;
+                currentWebsiteForwardedVal += mask.num_forwarded;
+                currentWebsiteBlockedVal += mask.num_blocked;
               });
 
-              const currenWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
-              currenWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
+              const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
+              currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
 
-              const currenWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
-              currenWebsiteEmailsForwardedValEl.textContent = currenWebsiteForwardedVal;
+              const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
+              currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
                             
-              const currenWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
-              currenWebsiteEmailsBlockedValEl.textContent = currenWebsiteBlockedVal
+              const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
+              currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal
 
-              const currenWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
-              const currenWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
-              currenWebsiteEmailsBlocked.classList.remove("is-hidden");
-              currenWebsiteEmailsForwarded.classList.remove("is-hidden");              
+              const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
+              const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
+              currentWebsiteEmailsBlocked.classList.remove("is-hidden");
+              currentWebsiteEmailsForwarded.classList.remove("is-hidden");              
             }
         }
       },
