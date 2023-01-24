@@ -22,7 +22,7 @@
             </h1>
             <nav class="fx-relay-menu-header-navigation">
               <!-- Dashboard -->
-              <a class="fx-relay-menu-dashboard-link js-external-link" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
+              <a class="fx-relay-menu-dashboard-link js-external-link" data-relay-internal="true" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
                 <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="labelManage"></span>
                 <img src="/icons/nebula-link-purple.svg" alt="" />
               </a>
@@ -57,7 +57,7 @@
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
             <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
             <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-relay-internal="true" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
         </sign-up-panel>
 
         <!-- Panel: Masks (Default once logged in) -->
@@ -70,20 +70,61 @@
         <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
               <img src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title">Settings</h2>
           </header>
+
+          <!-- Settings Content -->
+          <div class="fx-relay-panel-content">
+            <div class="fx-relay-settings-toggles">
+              <div class="fx-relay-settings-toggle-wrapper">
+                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
+                <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-settings-toggle"></button>
+              </div>
+              <div class="fx-relay-settings-toggle-wrapper">
+                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
+                <button title="" data-icon-visibility-option="disable-input-icon" class="data-collection fx-relay-settings-toggle"></button>
+              </div>
+            </div> 
+            <div class="fx-relay-settings-links">
+              <!-- Leave Feedback -->
+              <a id="popupSettingsLeaveFeedbackLink" href="" data-href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+              <!-- Privacy -->
+              <a data-href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup#relay" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+              <!-- Terms of Service -->
+              <a data-href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+              <!-- Report Issue Panel Prompt -->
+              <a id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
+                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
+            </div>
+          </div>
         </settings-panel>
+
+        <!-- Panel: Report Issue -->
+        <webcompat-panel data-panel-id="webcompat" class="is-hidden fx-relay-panel" id="webcompat-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h2>
+          </header>
+          
+          
+
+        </webcompat-panel>
 
         <!-- Panel: Stats -->
         <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
               <img src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
@@ -96,7 +137,7 @@
         <news-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-            <button data-back-target="masks" class="fx-relay-panel-header-btn-back">
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
               <img src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
