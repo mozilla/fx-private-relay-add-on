@@ -189,12 +189,11 @@ sign-up-panel::after {
 /* Settings */
 
 .fx-relay-settings-toggles {
-  padding: var(--spacingMd);
+  padding: 0 var(--spacingMd);
   background-color: var(--colorWhite);
   border-radius: var(--borderRadiusSm);
   display: flex;
   flex-direction: column;
-  gap: var(--spacingMd);
 }
 
 .fx-relay-settings-toggle-wrapper {
@@ -202,11 +201,12 @@ sign-up-panel::after {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  padding: var(--spacingMd) 0;
 }
 
-.fx-relay-settings-toggle-wrapper-spacer {
-  height: 1px;
-  background-color: var(--colorGrey10);
+.fx-relay-settings-toggle-wrapper +
+.fx-relay-settings-toggle-wrapper {
+  border-top: 1px solid var(--colorGrey10);
 }
 
 .fx-relay-settings-toggle {
