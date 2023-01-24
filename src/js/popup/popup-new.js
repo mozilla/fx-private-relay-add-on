@@ -1,5 +1,3 @@
-/* global */
-
 (async () => {
   // Global Data
   const { relaySiteOrigin } = await browser.storage.local.get(
