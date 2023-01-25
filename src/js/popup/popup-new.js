@@ -14,19 +14,16 @@
   // Optional data: waffle, fullCta*
   const newsContent = [
     {
-      id: "premium-announcement-phone-masking",
+      id: "firefox-integration",
+      waffle: "firefox_integration",
       locale: "us",
       audience: "premium",
-      headlineString: "popupPhoneMaskingPromoHeadline",
-      bodyString: "popupPhoneMaskingPromoBody",
+      headlineString: "popupPasswordManagerRelayHeadline",
+      bodyString: "popupPasswordManagerRelayBody",
       teaserImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
       fullImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
-      fullCta: "popupPhoneMaskingPromoCTA",
-      fullCtaEventAction: "click",
-      fullCtaEventLabel: "panel-manage-btn",
-      fullCtaHref: "http://127.0.0.1:8000/premium/#pricing",
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
     },
     {
       id: "phones",

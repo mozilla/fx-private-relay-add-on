@@ -491,11 +491,20 @@ sign-up-panel::after {
 
 .fx-relay-news-item-image {
   pointer-events: none;
+  max-width: var(--layoutMd);
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.fx-relay-news-item-image img {
+  display: block;
+  width: 100%;
 }
 
 .fx-relay-news-item-content {
   text-align: left;
   pointer-events: none;
+  width: 100%;
 }
 
 .fx-relay-news-item-hero {
