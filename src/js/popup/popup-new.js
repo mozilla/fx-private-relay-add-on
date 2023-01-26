@@ -22,22 +22,21 @@
     currency: getBundleCurrency,
   }).format(getBundlePrice);
   
-  // "panel1": {
-  //   "imgSrc": "announcements/panel-phone-masking-announcement.svg",
-  //   "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
-  //   "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
-  //   "longText": true,
-  //   "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
-  //   "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
-  // },
-  // "panel2": {
-  //   "imgSrc": "announcements/panel-bundle-announcement.svg",
-  //   "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
-  //   "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-  //   "tipBody": browser.i18n.getMessage("popupBundlePromoBody_3", formattedBundlePrice),
-  //   "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
-  // },
-  
+  const isBundleAvailableInCountry = (
+    await browser.storage.local.get("bundlePlans")
+  ).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isPhoneAvailableInCountry = (
+    await browser.storage.local.get("phonePlans")
+  ).phonePlans.PHONE_PLANS.available_in_country;
+
+  const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
+  const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
+
+  // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
+  const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+  // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
+  const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
+ 
   // FIXME: The order is not being set correctly
   const newsContent = [
     {
@@ -54,6 +53,7 @@
     },
     {
       id: "mozilla-vpn-bundle",
+      logicCheck: isBundleAvailable,
       headlineString: "popupBundlePromoHeadline_2",
       headlineStringArgs: savings,
       bodyString: "popupBundlePromoBody_3",
@@ -71,6 +71,7 @@
     },
     {
       id: "phones",
+      logicCheck: isPhoneMaskingAvailable,
       headlineString: "popupPhoneMaskingPromoHeadline",
       bodyString: "popupPhoneMaskingPromoBody",
       teaserImg:
@@ -218,12 +219,16 @@
           if ( !newsList.hasChildNodes() ) {
             newsContent.forEach(async (newsItem) => {
               // Check for any catches to not display the item
+              const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
+              
               if (
-                // Waffle
-                newsItem.waffle &&
-                (await checkWaffleFlag(newsItem.waffle)) === false
-                // TODO: Add locale filtering
-                // TODO: Add free/premium filtering
+                // Check for waffle (Waffle must return false to catch)
+                (
+                  newsItem.waffle &&
+                  !(await checkWaffleFlag(newsItem.waffle)))
+                ||
+                // logicCheck Function (Must return false to catch)
+                (hasLogicCheck && !newsItem.logicCheck)
               ) {
                 return;
               }
