@@ -40,17 +40,22 @@
   // FIXME: The order is not being set correctly
   const newsContent = [
     {
-      id: "firefox-integration",
-      waffle: "firefox_integration",
-      locale: "us",
-      audience: "premium",
-      headlineString: "popupPasswordManagerRelayHeadline",
-      bodyString: "popupPasswordManagerRelayBody",
+      id: "phones",
+      logicCheck: isPhoneMaskingAvailable,
+      headlineString: "popupPhoneMaskingPromoHeadline",
+      bodyString: "popupPhoneMaskingPromoBody",
       teaserImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
       fullImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaRelayURL: true,
+      fullCtaHref:
+        "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+      fullCtaEventLabel: "panel-news-phone-masking-cta",
+      fullCtaEventAction: "click",
     },
+
     {
       id: "mozilla-vpn-bundle",
       logicCheck: isBundleAvailable,
@@ -70,20 +75,16 @@
       fullCtaEventAction: "click",
     },
     {
-      id: "phones",
-      logicCheck: isPhoneMaskingAvailable,
-      headlineString: "popupPhoneMaskingPromoHeadline",
-      bodyString: "popupPhoneMaskingPromoBody",
+      id: "firefox-integration",
+      waffle: "firefox_integration",
+      locale: "us",
+      audience: "premium",
+      headlineString: "popupPasswordManagerRelayHeadline",
+      bodyString: "popupPasswordManagerRelayBody",
       teaserImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
       fullImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
-      fullCta: "popupPhoneMaskingPromoCTA",
-      fullCtaRelayURL: true,
-      fullCtaHref:
-        "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
-      fullCtaEventLabel: "panel-news-phone-masking-cta",
-      fullCtaEventAction: "click",
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
     },
   ];
 

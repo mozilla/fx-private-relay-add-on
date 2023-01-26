@@ -53,6 +53,12 @@
   --colorErrorHover: #E22850;
   --colorErrorFocus: #FFBDC5 ;
 
+  /* Nebula Colors: Button: Warning */
+  --colorWarning: #ffa436;
+  --colorWarningActive: #c45a27;
+  --colorWarningHover: #e27f2e;
+  --colorWarningFocus: #ffd5b2;
+
   /* Nebula Colors: Blues */
   --colorBlue90: #09204d;
   --colorBlue80: #073072;

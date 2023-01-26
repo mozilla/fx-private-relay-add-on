@@ -79,10 +79,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   font-size: 14px;
   position: relative;
   width: 32px;
   height: 32px;
+}
+
+.fx-relay-menu-dashboard-link .news-count {
+  position: absolute;
+  right: calc(var(--spacingXs) * -1);
+  top: calc(var(--spacingXs) * -1);
+  border-radius: 100%;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--colorWarning);
 }
 
 /* Default icon width */
