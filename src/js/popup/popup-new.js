@@ -12,6 +12,33 @@
 
   // audience can be premium, free, phones, all
   // Optional data: waffle, fullCta*
+  const savings = "40%"; // For "Save 40%!" in the Bundle promo body
+  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+  const userLocale = navigator.language;
+  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+    style: "currency",
+    currency: getBundleCurrency,
+  }).format(getBundlePrice);
+  
+  // "panel1": {
+  //   "imgSrc": "announcements/panel-phone-masking-announcement.svg",
+  //   "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
+  //   "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
+  //   "longText": true,
+  //   "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
+  //   "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
+  // },
+  // "panel2": {
+  //   "imgSrc": "announcements/panel-bundle-announcement.svg",
+  //   "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
+  //   "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
+  //   "tipBody": browser.i18n.getMessage("popupBundlePromoBody_3", formattedBundlePrice),
+  //   "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
+  // },
+  
+  // FIXME: The order is not being set correctly
   const newsContent = [
     {
       id: "firefox-integration",
@@ -26,8 +53,24 @@
         "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
     },
     {
+      id: "mozilla-vpn-bundle",
+      headlineString: "popupBundlePromoHeadline_2",
+      headlineStringArgs: savings,
+      bodyString: "popupBundlePromoBody_3",
+      bodyStringArgs: formattedBundlePrice,
+      teaserImg:
+        "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
+      fullImg:
+        "/images/panel-images/announcements/panel-bundle-announcement.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaRelayURL: true,
+      fullCtaHref:
+        "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+      fullCtaEventLabel: "panel-news-bundle-cta",
+      fullCtaEventAction: "click",
+    },
+    {
       id: "phones",
-      waffle: "phones",
       headlineString: "popupPhoneMaskingPromoHeadline",
       bodyString: "popupPhoneMaskingPromoBody",
       teaserImg:
@@ -35,17 +78,11 @@
       fullImg:
         "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
       fullCta: "popupPhoneMaskingPromoCTA",
-      fullCtaHref: "http://127.0.0.1:8000/premium/#pricing",
-    },
-    {
-      id: "asdfasdfasdf",
-      waffle: "phones",
-      headlineString: "popupPhoneMaskingPromoHeadline",
-      bodyString: "popupPhoneMaskingPromoBody",
-      teaserImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
-      fullImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+      fullCtaRelayURL: true,
+      fullCtaHref:
+        "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+      fullCtaEventLabel: "panel-news-phone-masking-cta",
+      fullCtaEventAction: "click",
     },
   ];
 
@@ -183,7 +220,8 @@
               // Check for any catches to not display the item
               if (
                 // Waffle
-                newsItem.waffle && (await checkWaffleFlag(newsItem.waffle)) === false
+                newsItem.waffle &&
+                (await checkWaffleFlag(newsItem.waffle)) === false
                 // TODO: Add locale filtering
                 // TODO: Add free/premium filtering
               ) {
@@ -212,15 +250,25 @@
 
               const h3TeaserTitle = document.createElement("h3");
               h3TeaserTitle.classList.add("fx-relay-news-item-hero");
-              h3TeaserTitle.textContent = browser.i18n.getMessage(
-                newsItem.headlineString
-              );
+              // Pass i18n Args if applicable
+              const h3TeaserTitleTextContent = newsItem.headlineStringArgs
+                ? browser.i18n.getMessage(
+                    newsItem.headlineString,
+                    newsItem.headlineStringArgs
+                  )
+                : browser.i18n.getMessage(newsItem.headlineString);
+              h3TeaserTitle.textContent = h3TeaserTitleTextContent;
 
               const divTeaserBody = document.createElement("div");
               divTeaserBody.classList.add("fx-relay-news-item-body");
-              divTeaserBody.textContent = browser.i18n.getMessage(
-                newsItem.bodyString
-              );
+              // Pass i18n Args if applicable
+              const divTeaserBodyTextContent = newsItem.bodyStringArgs
+                ? browser.i18n.getMessage(
+                    newsItem.bodyString,
+                    newsItem.bodyStringArgs
+                  )
+                : browser.i18n.getMessage(newsItem.bodyString);
+              divTeaserBody.textContent = divTeaserBodyTextContent;
 
               divTeaserCopy.appendChild(h3TeaserTitle);
               divTeaserCopy.appendChild(divTeaserBody);
@@ -258,19 +306,38 @@
             newsStoryDetail.appendChild(newsStoryHeroImage);
             
             const newsStoryHeroTitle = document.createElement("h3");
-            newsStoryHeroTitle.textContent = browser.i18n.getMessage(newsItemContent.headlineString);
+            const newsStoryHeroTitleTextContent = newsItemContent.headlineStringArgs
+              ? browser.i18n.getMessage(
+                  newsItemContent.headlineString,
+                  newsItemContent.headlineStringArgs
+                )
+              : browser.i18n.getMessage(newsItemContent.headlineString);
+            newsStoryHeroTitle.textContent = newsStoryHeroTitleTextContent;
             newsStoryDetail.appendChild(newsStoryHeroTitle);
             
             const newsStoryHeroBody = document.createElement("div");
-            newsStoryHeroBody.textContent = browser.i18n.getMessage(newsItemContent.bodyString);
+            // Pass i18n Args if applicable
+            const newsStoryHeroBodyTextContent = newsItemContent.bodyStringArgs
+              ? browser.i18n.getMessage(
+                  newsItemContent.bodyString,
+                  newsItemContent.bodyStringArgs
+                )
+              : browser.i18n.getMessage(newsItemContent.bodyString);
+            newsStoryHeroBody.textContent = newsStoryHeroBodyTextContent;
             newsStoryDetail.appendChild(newsStoryHeroBody);
 
             // If the section has a CTA, add it.
             if (newsItemContent.fullCta) {
               const newsStoryHeroCTA = document.createElement("a");
               newsStoryHeroCTA.classList.add("fx-relay-news-story-link");
-              newsStoryHeroCTA.href = newsItemContent.fullCtaHref;
 
+              // If the URL points towards Relay, choose the correct server
+              if (newsItemContent.fullCtaRelayURL) {
+                newsStoryHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
+              } else {
+                newsStoryHeroCTA.href = `${newsItemContent.fullCtaHref}`;
+              }
+              
               // Set GA data if applicable
               if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
                 newsStoryHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
@@ -643,6 +710,7 @@
           // Because we dynamically set the Relay origin URL (local/dev/stage/prod),
           // we have to catch Relay-specific links and prepend the correct Relay website URL
           if (link.dataset.relayInternal === "true") {
+            // TODO: Remove "/" from here. It'll be error prone
             link.href = `${relaySiteOrigin}/${link.dataset.href}`;
           } else {
             link.href = `${link.dataset.href}`;

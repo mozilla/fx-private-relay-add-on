@@ -43,7 +43,7 @@
   /* Primary Nebula Colors */
   --colorInformational: #0060df;
   --colorInformationalActive: #054096;
-  --colorInformationalHover: #bcd0ec;
+  --colorInformationalHover: #0250bb;
   --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
   --colorInformationalDisabled: #C9D9F3;
 

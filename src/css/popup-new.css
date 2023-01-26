@@ -523,3 +523,18 @@ sign-up-panel::after {
   overflow: hidden;
 }
 
+.fx-relay-news-story-link {
+  margin-top: var(--spacingMd);
+  color: var(--colorInformational);
+  display: block;
+  text-decoration: none;
+}
+
+.fx-relay-news-story-link:focus {
+  color: var(--colorInformationalFocus);
+}
+
+.fx-relay-news-story-link:hover {
+  color: var(--colorInformationalActive);
+}
+
