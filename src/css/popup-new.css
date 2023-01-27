@@ -100,6 +100,10 @@
   background-color: var(--colorWarning);
 }
 
+.news-count.is-hidden {
+  display: none;
+}
+
 /* Default icon width */
 .fx-relay-menu-dashboard-link img {
   pointer-events: none;

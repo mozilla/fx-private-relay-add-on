@@ -8,6 +8,7 @@
 
   const state = {
     currentPanel: null,
+    newsItemsCount: 0
   };
 
   // audience can be premium, free, phones, all
@@ -88,6 +89,9 @@
     },
   ];
 
+  // Update news item count
+  state.newsItemsCount = newsContent.length;
+  
   const popup = {
     events: {
       backClick: (e) => {
@@ -155,6 +159,9 @@
 
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
+
+      // Set Notification Bug for Unread News Items
+      popup.panel.news.utilities.initNewsItemCountNotification();
     },
     panel: {
       update: (panelId, data) => {
@@ -175,6 +182,9 @@
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
+
+            popup.panel.news.utilities.updateNewsItemCountNotification(true);
+
             break;
           case "newsStory":
             sendRelayEvent("Panel", "click", "opened-news-item");
@@ -355,6 +365,75 @@
               newsStoryDetail.appendChild(newsStoryHeroCTA);
             }
           },
+        },
+        utilities: {
+          initNewsItemCountNotification: async () => {
+            
+            const localStorage = await browser.storage.local.get();
+
+            const unreadNewsItemsCountExists =
+              Object.prototype.hasOwnProperty.call(
+                localStorage,
+                "unreadNewsItemsCount"
+              );
+              
+            const readNewsItemsCountExists =
+              Object.prototype.hasOwnProperty.call(
+                localStorage,
+                "readNewsItemCount"
+              );
+
+            // First-run user: No unread data present
+            if (!unreadNewsItemsCountExists && !readNewsItemsCountExists) {
+              await browser.storage.local.set({
+                unreadNewsItemsCount: state.newsItemsCount,
+                readNewsItemCount: 0,
+              });
+            }
+
+            // FIXME: The total news item count may differ than what is displayed to the user
+            // Example: Three items total but user doesn't have waffle for one news item. 
+            // Regardless - update the unreadNews count to match whatever is in state
+            await browser.storage.local.set({
+              unreadNewsItemsCount: state.newsItemsCount,
+            });
+
+            const { readNewsItemCount } = await browser.storage.local.get(
+              "readNewsItemCount"
+            );
+
+            const { unreadNewsItemsCount } = await browser.storage.local.get(
+              "unreadNewsItemsCount"
+            );
+
+            // Set unread count
+            const newsItemCountNotification = document.querySelector(
+              ".fx-relay-menu-dashboard-link[data-panel-id='news'] .news-count"
+            );
+            
+            const unreadCount = unreadNewsItemsCount - readNewsItemCount;
+
+            // Show count is it exists
+            if (unreadCount > 0) {
+              newsItemCountNotification.textContent = unreadCount.toString();
+              newsItemCountNotification.classList.remove("is-hidden");
+            }
+            
+          },
+          updateNewsItemCountNotification: async (markAllUnread = false) => {
+            if (markAllUnread) {
+              await browser.storage.local.set({
+                readNewsItemCount: state.newsItemsCount,
+              });
+
+              const newsItemCountNotification = document.querySelector(
+                ".fx-relay-menu-dashboard-link[data-panel-id='news'] .news-count"
+              );
+
+              newsItemCountNotification.classList.add("is-hidden");
+
+            }
+          }
         },
       },
       stats: {
