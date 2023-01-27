@@ -54,6 +54,7 @@ if (!browser.menus) {
 }
 
 browser.runtime.onMessage.addListener((message, _sender, _response) => {
+  // These messages are sent by the context menu, not the in-page popup:
   if (message.type === "fillTargetWithRelayAddress") {    
 
     // COMPATIBILITY NOTE: getTargetElement() not available on Chrome contextMenus API
