@@ -89,23 +89,25 @@ const email_detector_ruleset = ruleset([
     [["email", -3.907843589782715]]
 );
 
-// It looks like ESLint doesn't recognise generator functions as global,
-// so we ignore this rule here.
-// Also, this function is defined as global in the ESLint config _because_ it is created here,
+/**
+ * @param {Document | HTMLElement} domRoot
+ * @returns HTMLInputElement[]
+ */
+// This function is defined as global in the ESLint config _because_ it is created here,
 // so it's not actually a redeclaration.
-// eslint-disable-next-line no-unused-vars, no-redeclare
-function *detectEmailInputs(domRoot) {
-    // First return <input type='email'>
-    const typeEmailInputs = Array.from(domRoot.querySelectorAll("input[type='email']"));
-    for (const input of typeEmailInputs) {
-        yield input;
-    }
+// eslint-disable-next-line no-redeclare, no-unused-vars
+function findEmailInputs(domRoot) {
+  // First return <input type='email'>
+  const typeEmailInputs = Array.from(
+    domRoot.querySelectorAll("input[type='email']")
+  );
 
-    // Then run ruleset and return detected fields
-    const detectedInputs = email_detector_ruleset.against(domRoot).get("email");
-    for (const input of detectedInputs) {
-        if (input.scoreFor("email") > 0.5) {
-            yield input.element;
-        }
-    }
+  // Then run ruleset and return detected fields
+  const detectedInputs = email_detector_ruleset
+    .against(domRoot)
+    .get("email")
+    .filter((node) => node.scoreFor("email") > 0.5)
+    .map((node) => node.element);
+
+  return typeEmailInputs.concat(detectedInputs);
 }
