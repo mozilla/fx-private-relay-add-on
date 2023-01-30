@@ -341,8 +341,20 @@
 
               const maskListItemCopyButton = document.createElement("button");
               maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
-              maskListItemCopyButton.addEventListener("click", ()=> {
-                // TODO: Add Copy Function
+              maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
+
+              const maskListItemCopyButtonSuccessMessage = document.createElement("span");
+              maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
+              maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
+              maskListItemAddressActions.appendChild(maskListItemCopyButtonSuccessMessage);
+              
+              maskListItemCopyButton.addEventListener("click", (e)=> {
+                e.preventDefault();
+                navigator.clipboard.writeText(e.target.dataset.maskAddress);
+                maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
+                setTimeout(() => {
+                  maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
+                }, 1000);
               }, false);
               maskListItemAddressActions.appendChild(maskListItemCopyButton);
 
