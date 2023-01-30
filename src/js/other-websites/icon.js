@@ -175,8 +175,6 @@ function openMenu(target) {
   underlay.style.position = "fixed";
   underlay.style.inset = "0";
   underlay.style.zIndex = "99999999";
-  underlay.style.overflow = "scroll";
-  underlay.style.overscrollBehavior = "contain";
   underlay.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
   const existingIframe = underlay.querySelector("iframe");
   const iframe = existingIframe ?? document.createElement("iframe");
@@ -189,6 +187,10 @@ function openMenu(target) {
     positionIframe(iframe, target);
   };
   window.addEventListener("resize", onResizeWindow);
+  const onScroll = () => {
+    positionIframe(iframe, target);
+  };
+  window.addEventListener("scroll", onScroll);
 
   /**
    * @param {unknown} message 
@@ -262,9 +264,9 @@ function openMenu(target) {
   browser.runtime.onMessage.addListener(onCloseMenuMessage)
 
   const closeMenu = () => {
-    document.body.style.overflow = "revert";
     document.body.removeEventListener("keydown", onKeydown);
     window.removeEventListener("resize", onResizeWindow);
+    window.removeEventListener("scroll", onScroll);
     browser.runtime.onMessage.removeListener(onInsertMask);
     browser.runtime.onMessage.removeListener(onUpdateIframeHeight);
     browser.runtime.onMessage.removeListener(onCloseMenuMessage);
@@ -281,7 +283,6 @@ function openMenu(target) {
   if (!existingUnderlay) {
     document.body.appendChild(underlay);
   }
-  document.body.style.overflow = "hidden";
   iframe.contentWindow?.focus();
 }
 
