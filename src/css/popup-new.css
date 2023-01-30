@@ -7,6 +7,7 @@
   background-color: var(--colorGrey05);
   min-width: var(--panelWidth);
   min-height: var(--panelHeight);
+  max-width: var(--panelWidth);
   color: var(--relayInk70);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
@@ -42,6 +43,9 @@
   /* Bottom corners only */
   border-radius: 0 0 var(--borderRadiusSm) var(--borderRadiusSm);
   background-color: var(--colorWhite);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .fx-relay-menu-header-logo-bar {
@@ -137,6 +141,7 @@
   position: absolute;
   top: calc(100% + var(--spacingXs));
   right: 0;
+  white-space: nowrap;
 }
 
 .fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
@@ -557,3 +562,148 @@ sign-up-panel::after {
   color: var(--colorInformationalActive);
 }
 
+/* Masks Panel */
+
+.fx-relay-masks-available-count {
+  color: var(--colorGrey40);
+  font-size: 14px;
+}
+
+.fx-relay-masks-limit-upgrade {
+  background-color: var(--colorErrorHover);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingSm);
+  color: var(--colorWhite);
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  gap: var(--spacingSm);
+}
+
+.fx-relay-masks-limit-upgrade span + span {
+    font-weight: 600;
+  text-decoration: underline;
+
+}
+
+.fx-relay-masks-limit-upgrade .fx-relay-masks-available-count-upgrade {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.fx-relay-no-masks-created {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--layoutXl);
+}
+
+.fx-relay-no-masks-created img {
+  max-width: var(--contentXs);
+  margin-bottom: var(--spacingMd);
+}
+
+.fx-relay-no-masks-created h2 {
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 var(--spacingMd);
+}
+
+.fx-relay-no-masks-created p {
+  font-size: 14px;
+  max-width: var(--contentXs);
+  padding: 0;
+  margin: 0 0 var(--spacingLg);
+}
+
+.fx-relay-generate-mask-buttons {
+  border-top: 1px solid var(--colorGrey10);
+  position: fixed;
+  /* position: absolute; */
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  padding: var(--spacingMd);
+  background-color: var(--colorGrey05);
+}
+
+/* Mask List/Item */
+
+.fx-relay-mask-list {
+  list-style: none;
+  margin: var(--spacingMd) 0 0;
+  padding: 0 0 var(--layoutLg);
+}
+
+.fx-relay-mask-item {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingSm);
+}
+
+.fx-relay-mask-item:focus,
+.fx-relay-mask-item:hover {
+  background-color: var(--colorPurple05);
+}
+
+.fx-relay-mask-item-label {
+  font-size: 12px;
+  color: var(--colorGrey40);
+  overflow: hidden;
+  display: block;
+  line-height: 1;
+}
+
+.fx-relay-mask-item-address-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingMd);
+}
+
+.fx-relay-mask-item-address {
+  user-select: all;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--colorGrey50);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fx-relay-mask-item-address::selection {
+  background: var(--colorPurple10);
+}
+
+.fx-relay-mask-item-address-actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--spacingSm);
+}
+
+.fx-relay-mask-item-address-actions > button {
+  appearance: none;
+  border: 0;
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: grayscale(1);
+  cursor: pointer;
+}
+
+.fx-relay-mask-item-address-actions > button:hover {
+  background-color: white;
+  filter: grayscale(0);
+}
+
+.fx-relay-mask-item-address-copy {
+  background-image: url(/icons/nebula-copy-text.svg);
+}
+
+.fx-relay-mask-item-address-toggle {
+  background-image: url(/icons/nebula-arrow-up-down.svg);
+}
