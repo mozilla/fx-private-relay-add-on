@@ -686,6 +686,7 @@ sign-up-panel::after {
   margin-left: auto;
   display: flex;
   gap: var(--spacingSm);
+  position: relative;
 }
 
 .fx-relay-mask-item-address-actions > button {
@@ -707,6 +708,34 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address-copy {
   background-image: url(/icons/nebula-copy-text.svg);
+}
+
+.fx-relay-mask-item-address-copy-success {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s;
+  background-color: var(--colorGreen50);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingXs) var(--spacingSm);
+  font-size: 13px;
+  font-weight: 500;
+  /* 
+  By allowing this to overlap other elements,
+  we don't need to reserve empty space for it.  
+  Otherwise, this empty space would push the
+  .expand-toggle out of the card on small screens:
+  */
+  position: absolute;
+  right: calc(100% + var(--spacingSm));
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fx-relay-mask-item-address-copy-success.is-shown {
+  pointer-events: auto;
+  opacity: 1;
+  /* Don't fade in when appearing: */
+  transition: opacity 0s;
 }
 
 .fx-relay-mask-item-address-toggle {
