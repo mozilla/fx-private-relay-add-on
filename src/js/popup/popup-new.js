@@ -169,6 +169,10 @@
 
         event.target.classList.remove("is-loading");
 
+        // Hide onboarding panel
+        const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+        noMasksCreatedPanel.classList.add("is-hidden");
+
         await popup.panel.masks.utilities.buildMasksList();
 
         const { premium } = await browser.storage.local.get("premium");
@@ -200,6 +204,7 @@
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
       } else {
         popup.panel.update("sign-up");
+        document.body.classList.remove("is-loading");
       }
 
       // Set External Event Listerners
@@ -294,6 +299,9 @@
           // Build initial list
           popup.panel.masks.utilities.buildMasksList();
 
+          // Remove loading state
+          document.body.classList.remove("is-loading");
+
         },
         utilities: {
           buildMasksList: async () => {
@@ -315,7 +323,6 @@
               if (mask.generated_for !== "") {
                 maskListItem.setAttribute("data-mask-generated", mask.generated_for);
               }
-              
               
               maskListItem.classList.add("fx-relay-mask-item");
 
