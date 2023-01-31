@@ -35,6 +35,12 @@
   padding: var(--spacingMd);
 }
 
+/* Magic Number: Custom max-height for masks panel */
+#masks-panel .fx-relay-panel-content {
+  max-height: 384px;
+  overflow: auto;
+}
+
 /* Header */
 
 .fx-relay-menu-header {
@@ -626,7 +632,7 @@ sign-up-panel::after {
 .fx-relay-mask-list {
   list-style: none;
   margin: 0;
-  padding: 0 0 var(--layoutLg);
+  padding: 0;
 }
 
 .fx-relay-mask-item {
