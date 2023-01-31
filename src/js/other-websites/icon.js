@@ -213,6 +213,7 @@ function openMenu(target) {
       typeof message?.height !== "undefined"
     ) {
       iframe.style.height = `${message.height}px`;
+      positionIframe(iframe, target);
     }
   };
   browser.runtime.onMessage.addListener(onUpdateIframeHeight);
@@ -296,6 +297,34 @@ function positionIframe(iframe, target) {
     // right-hand side of the input, to keep it close to the button:
     iframe.style.left = "";
     iframe.style.right = `calc(100vw - ${elementBounds.right}px)`;
+  }
+
+  const iframeHeight = Number.parseInt(
+    getComputedStyle(iframe).height.replace("px", ""),
+    10
+  );
+  if (Number.isNaN(iframeHeight)) {
+    iframe.style.top = `${elementBounds.bottom}px`;
+  } else {
+    const elementBounds = target.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    const iframeSrc = new URL(iframe.getAttribute("src"));
+    if (
+      viewportHeight - elementBounds.bottom < iframeHeight &&
+      elementBounds.top > iframeHeight
+    ) {
+      // Position the menu at the top of the input element it there is room there,
+      // and no room below it:
+      iframeSrc.hash = "#position=top";
+      iframe.setAttribute("src", iframeSrc.href);
+      iframe.style.top = "unset";
+      iframe.style.bottom = `${viewportHeight - elementBounds.top}px`;
+    } else {
+      iframeSrc.hash = "#position=bottom";
+      iframe.setAttribute("src", iframeSrc.href);
+      iframe.style.top = `${elementBounds.bottom}px`;
+      iframe.style.bottom = "unset";
+    }
   }
 }
 
