@@ -13,7 +13,7 @@
     <script src="js/shared/metrics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body class="fx-relay-panel-wrapper fx-relay">
+  <body class="fx-relay-panel-wrapper fx-relay is-loading">
     <header class="fx-relay-menu-header">
         <div class="fx-relay-menu-header-logo-bar">
             <h1 class="fx-relay-menu-logo">
@@ -53,6 +53,17 @@
         </div>
     </header>
 
+    <!-- Loading Bar -->
+    <div class="fx-relay-menu-loading-bar">
+      <div class="fx-relay-menu-loading-bar-wrapper">
+        <div class="fx-relay-menu-loading-bar-border">
+          <div class="fx-relay-menu-loading-bar-whitespace">
+            <div class="fx-relay-menu-loading-bar-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <content>
         <!-- Panel: Sign Up -->
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
