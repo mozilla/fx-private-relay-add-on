@@ -286,9 +286,13 @@
           }
           
           const { premium } = await browser.storage.local.get("premium");
+          const maskPanel = document.getElementById("masks-panel");
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
+            maskPanel.setAttribute("data-account-level", "free");
+          } else {
+            maskPanel.setAttribute("data-account-level", "premium");
           }
 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
@@ -305,14 +309,32 @@
         },
         utilities: {
           buildMasksList: async () => {
-            const masks = await popup.utilities.getMasks();
+            let getMasksOptions = { fetchCustomMasks: false };
+            const { premium } = await browser.storage.local.get("premium");
+
+            if (premium) {
+              // Check if user may have custom domain masks
+              const { premiumSubdomainSet } = await browser.storage.local.get(
+                "premiumSubdomainSet"
+              );
+
+              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+
+
+              // Show Generate Button
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.classList.remove("is-hidden");              
+            }
+            
+            const masks = await popup.utilities.getMasks(getMasksOptions);
             
             const maskList = document.querySelector(".fx-relay-mask-list");
             // Reset mask list
             maskList.textContent = "";
 
             masks.forEach(mask => {
-              
               const maskListItem = document.createElement("li");
               maskListItem.setAttribute("data-mask-address", mask.full_address);
               
@@ -395,11 +417,11 @@
             const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
             const numRemaining = maxNumAliases - masks.length;
             const masksAvailable = document.querySelector(".fx-relay-masks-available-count");
-            const masksAvailableUpgrade = document.querySelector(".fx-relay-masks-available-count-upgrade");
+            const masksLimitReached = document.querySelector(".fx-relay-masks-limit-upgrade-string");
             const limitReachedToast = document.querySelector(".fx-relay-masks-limit-upgrade");
 
             masksAvailable.textContent = browser.i18n.getMessage("popupFreeMasksAvailable", [numRemaining, maxNumAliases]);
-            masksAvailableUpgrade.textContent = browser.i18n.getMessage("popupFreeMasksAvailable", [numRemaining, maxNumAliases]);
+            masksLimitReached.textContent = browser.i18n.getMessage("popupFreeMasksLimitReached", [maxNumAliases]);
 
             const generateRandomMask = document.querySelector(".js-generate-random-mask");
             
@@ -413,12 +435,16 @@
               limitReachedToast.classList.remove("is-hidden");
               masksAvailable.classList.add("is-hidden");
               
+              // Hide Generate Button
+              generateRandomMask.classList.add("is-hidden");
+
+              // Show Upgrade Button
               const getUnlimitedMasksBtn = document.querySelector(".fx-relay-mask-upgrade-button");
               getUnlimitedMasksBtn.classList.remove("is-hidden");
-              generateRandomMask.classList.add("is-hidden");
             } else {
+              
+              // Show Masks Count/Generate Button
               masksAvailable.classList.remove("is-hidden");
-              limitReachedToast.classList.add("is-hidden");
               generateRandomMask.classList.remove("is-hidden");
             }
           

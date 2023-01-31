@@ -572,6 +572,8 @@ sign-up-panel::after {
 .fx-relay-masks-available-count {
   color: var(--colorGrey40);
   font-size: 14px;
+  display: inline-block;
+  margin-bottom: var(--spacingSm);
 }
 
 .fx-relay-masks-limit-upgrade {
@@ -583,17 +585,7 @@ sign-up-panel::after {
   display: flex;
   justify-content: center;
   gap: var(--spacingSm);
-}
-
-.fx-relay-masks-limit-upgrade span + span {
-    font-weight: 600;
-  text-decoration: underline;
-
-}
-
-.fx-relay-masks-limit-upgrade .fx-relay-masks-available-count-upgrade {
-  font-weight: 400;
-  text-decoration: none;
+  margin-bottom: var(--spacingSm);
 }
 
 .fx-relay-no-masks-created {
@@ -638,7 +630,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-list {
   list-style: none;
-  margin: var(--spacingMd) 0 0;
+  margin: 0;
   padding: 0 0 var(--layoutLg);
 }
 
