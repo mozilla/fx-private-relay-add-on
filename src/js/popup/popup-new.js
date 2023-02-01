@@ -173,7 +173,7 @@
         const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
         noMasksCreatedPanel.classList.add("is-hidden");
 
-        await popup.panel.masks.utilities.buildMasksList();
+        await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
 
         const { premium } = await browser.storage.local.get("premium");
         
@@ -296,7 +296,7 @@
           }
 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
-          generateRandomMask.addEventListener("click", async (e) => {
+          generateRandomMask.addEventListener("click", (e) => {
               popup.events.generateMask(e, "random");
             }, false);
 
@@ -308,7 +308,7 @@
 
         },
         utilities: {
-          buildMasksList: async () => {
+          buildMasksList: async (opts = null) => {
             let getMasksOptions = { fetchCustomMasks: false };
             const { premium } = await browser.storage.local.get("premium");
 
@@ -321,7 +321,6 @@
               // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
               const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
               getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
-
 
               // Show Generate Button
               const generateRandomMask = document.querySelector(".js-generate-random-mask");
@@ -347,6 +346,12 @@
               }
               
               maskListItem.classList.add("fx-relay-mask-item");
+
+              const maskListItemNewMaskCreatedLabel = document.createElement("span");
+              maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
+              maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
+              maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
+
 
               const maskListItemLabel = document.createElement("span");
               maskListItemLabel.classList.add("fx-relay-mask-item-label");
@@ -402,6 +407,17 @@
               maskListItem.appendChild(maskListItemAddressBar);
               maskList.appendChild(maskListItem);
             });
+
+            // Display "Mask created" temporary label when a new mask is created in the panel
+            if (opts && opts.newMaskCreated && maskList.firstElementChild) {
+              maskList.firstElementChild.classList.add("is-new-mask");
+
+              setTimeout(() => {
+                maskList.firstElementChild.classList.remove("is-new-mask");
+              }, 1000);
+            }
+
+
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();
