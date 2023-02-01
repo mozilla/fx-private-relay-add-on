@@ -557,3 +557,8 @@ sign-up-panel::after {
   color: var(--colorInformationalActive);
 }
 
+.fx-relay-news-story img {
+  display: block;
+  width: 100%;
+}
+
