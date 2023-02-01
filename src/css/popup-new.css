@@ -79,10 +79,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   font-size: 14px;
   position: relative;
   width: 32px;
   height: 32px;
+}
+
+.fx-relay-menu-dashboard-link .news-count {
+  position: absolute;
+  right: calc(var(--spacingXs) * -1);
+  top: calc(var(--spacingXs) * -1);
+  border-radius: 100%;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--colorWarning);
+}
+
+.news-count.is-hidden {
+  display: none;
 }
 
 /* Default icon width */
@@ -456,3 +475,90 @@ sign-up-panel::after {
   display: flex;
   align-items: right;
 }
+
+/* News */
+
+.fx-relay-news {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingXs);
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  align-items: flex-start;
+  justify-content: left;
+}
+
+.fx-relay-news-item button {
+  appearance: none;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  background-color: var(--colorWhite);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingMd);
+  cursor: pointer;
+  display: flex;
+  gap: var(--spacingMd);
+}
+
+.fx-relay-news-item button:focus,
+.fx-relay-news-item button:hover {
+  background-color: var(--colorPurple05)
+}
+
+.fx-relay-news-item-image {
+  pointer-events: none;
+  max-width: var(--layoutMd);
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.fx-relay-news-item-image img {
+  display: block;
+  width: 100%;
+}
+
+.fx-relay-news-item-content {
+  text-align: left;
+  pointer-events: none;
+  width: 100%;
+}
+
+.fx-relay-news-item-hero {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 var(--spacingXs);
+  line-height: 20px;
+}
+
+.fx-relay-news-item-body {
+  font-size: 14px;
+  line-height: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fx-relay-news-story-link {
+  margin-top: var(--spacingMd);
+  color: var(--colorInformational);
+  display: block;
+  text-decoration: none;
+}
+
+.fx-relay-news-story-link:focus {
+  color: var(--colorInformationalFocus);
+}
+
+.fx-relay-news-story-link:hover {
+  color: var(--colorInformationalActive);
+}
+
+.fx-relay-news-story img {
+  display: block;
+  width: 100%;
+}
+
