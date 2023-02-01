@@ -43,7 +43,7 @@
   /* Primary Nebula Colors */
   --colorInformational: #0060df;
   --colorInformationalActive: #054096;
-  --colorInformationalHover: #bcd0ec;
+  --colorInformationalHover: #0250bb;
   --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
   --colorInformationalDisabled: #C9D9F3;
 
@@ -52,6 +52,12 @@
   --colorErrorActive: #C50042;
   --colorErrorHover: #E22850;
   --colorErrorFocus: #FFBDC5 ;
+
+  /* Nebula Colors: Button: Warning */
+  --colorWarning: #ffa436;
+  --colorWarningActive: #c45a27;
+  --colorWarningHover: #e27f2e;
+  --colorWarningFocus: #ffd5b2;
 
   /* Nebula Colors: Blues */
   --colorBlue90: #09204d;
@@ -98,6 +104,18 @@
   --colorViolet20: #f68fff;
   --colorViolet10: #f6b8ff;
   --colorViolet05: #f7e2ff;
+
+  /* Nebula Colors: Purple */
+  --colorPurple90: #321c64;
+  --colorPurple80: #45278d;
+  --colorPurple70: #592acb;
+  --colorPurple60: #7542e5;
+  --colorPurple50: #9059ff;
+  --colorPurple40: #ab71ff;
+  --colorPurple30: #c689ff;
+  --colorPurple20: #cb9eff;
+  --colorPurple10: #d9bfff;
+  --colorPurple05: #e7dfff;
 
   /* Nebula Colors: Whites */
   --colorWhite: #ffffff;
