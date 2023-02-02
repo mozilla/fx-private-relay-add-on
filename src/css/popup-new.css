@@ -35,6 +35,7 @@
   padding: var(--spacingMd);
 }
 
+/* FIXME: Refactor to account for height dynamically */
 /* Magic Number: Custom max-height for masks panel */
 #masks-panel .fx-relay-panel-content {
   max-height: 384px;
@@ -51,7 +52,6 @@
   background-color: var(--colorWhite);
   position: sticky;
   top: 0;
-  z-index: 20;
 }
 
 .fx-relay-menu-header-logo-bar {
