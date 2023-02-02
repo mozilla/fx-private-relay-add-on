@@ -266,16 +266,6 @@ function openMenu(target) {
     document.body.appendChild(underlay);
   }
   iframe.contentWindow?.focus();
-  browser.storage.local.get("apiToken").then(userApiToken => {
-    const isSignedIn = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
-    sendRelayEvent(
-      "In-page",
-      "viewed-menu",
-      isSignedIn
-        ?  "authenticated-user-input-menu"
-        : "unauthenticated-user-input-menu"
-    );
-  });
 }
 
 /**
