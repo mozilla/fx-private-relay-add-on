@@ -44,6 +44,10 @@ async function run() {
  * @returns void
  */
 function wireUpInputs(emailInputs) {
+  if (emailInputs.length === 0) {
+    return;
+  }
+
   for (const input of emailInputs) {
     const computedStyles = getComputedStyle(input);
     // Chrome updates `computedStyles` as soon as we write to input.style,
@@ -98,8 +102,9 @@ function wireUpInputs(emailInputs) {
       openMenu(input);
     });
     input.insertAdjacentElement("afterend", invisibleFocusableButton);
-    sendRelayEvent("In-page", "input-icon-injected", "input-icon");
   }
+
+  sendRelayEvent("In-page", "input-icon-injected", "input-icon");
 }
 
 /**
