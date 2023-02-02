@@ -133,6 +133,55 @@
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
       },
+      generateMask: async (event, type = "random") => {
+        
+        // Types: "random", "custom"
+        sendRelayEvent("Panel", "click", `popup-generate-${type}-mask`);
+        preventDefaultBehavior(event);
+
+        event.target.classList.add("is-loading");
+
+        // Request the active tab from the background script and parse the `document.location.hostname`
+        const currentPageHostName = await browser.runtime.sendMessage({
+          method: "getCurrentPageHostname",
+        });
+
+        const newRelayAddressResponseArgs = {
+          method: "makeRelayAddress"
+        }
+
+        // If active tab is a non-internal browser page, add a label to the creation request
+        if (currentPageHostName !== null) {
+          newRelayAddressResponseArgs.description = currentPageHostName;
+        }
+
+        // Attempt to create a new alias
+        const newRelayAddressResponse = await browser.runtime.sendMessage(newRelayAddressResponseArgs);
+
+        // Catch edge cases where the "Generate New Alias" button is still enabled,
+        // but the user has already reached the max number of aliases.
+        if (newRelayAddressResponse.status === 402) {
+          event.target.classList.remove("is-loading");
+          throw new Error(
+            browser.i18n.getMessage("pageInputIconMaxAliasesError_mask")
+          );
+        }
+
+        event.target.classList.remove("is-loading");
+
+        // Hide onboarding panel
+        const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+        noMasksCreatedPanel.classList.add("is-hidden");
+
+        await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
+
+        const { premium } = await browser.storage.local.get("premium");
+        
+        if (!premium) {
+          await popup.panel.masks.utilities.setRemainingMaskCount();
+        }
+
+      }
     },
     init: async () => {
       // Set Navigation Listeners
@@ -155,6 +204,7 @@
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
       } else {
         popup.panel.update("sign-up");
+        document.body.classList.remove("is-loading");
       }
 
       // Set External Event Listerners
@@ -179,6 +229,9 @@
       },
       init: (panelId, data) => {
         switch (panelId) {
+          case "masks": 
+            popup.panel.masks.init();
+            break;
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
@@ -220,6 +273,201 @@
           default:
             break;
         }
+      },
+      masks: {
+        init: async () => {
+          
+          const masks = await popup.utilities.getMasks();
+          
+          // If no masks are created, 
+          if (masks.length === 0) {
+            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+            noMasksCreatedPanel.classList.remove("is-hidden");
+          }
+          
+          const { premium } = await browser.storage.local.get("premium");
+          const maskPanel = document.getElementById("masks-panel");
+          
+          if (!premium) {
+            await popup.panel.masks.utilities.setRemainingMaskCount();
+            maskPanel.setAttribute("data-account-level", "free");
+          } else {
+            maskPanel.setAttribute("data-account-level", "premium");
+          }
+
+          const generateRandomMask = document.querySelector(".js-generate-random-mask");
+          generateRandomMask.addEventListener("click", (e) => {
+              popup.events.generateMask(e, "random");
+            }, false);
+
+          // Build initial list
+          popup.panel.masks.utilities.buildMasksList();
+
+          // Remove loading state
+          document.body.classList.remove("is-loading");
+
+        },
+        utilities: {
+          buildMasksList: async (opts = null) => {
+            let getMasksOptions = { fetchCustomMasks: false };
+            const { premium } = await browser.storage.local.get("premium");
+
+            if (premium) {
+              // Check if user may have custom domain masks
+              const { premiumSubdomainSet } = await browser.storage.local.get(
+                "premiumSubdomainSet"
+              );
+
+              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+
+              // Show Generate Button
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.classList.remove("is-hidden");              
+            }
+            
+            const masks = await popup.utilities.getMasks(getMasksOptions);
+            
+            const maskList = document.querySelector(".fx-relay-mask-list");
+            // Reset mask list
+            maskList.textContent = "";
+
+            masks.forEach(mask => {
+              const maskListItem = document.createElement("li");
+              maskListItem.setAttribute("data-mask-address", mask.full_address);
+              
+              if (mask.used_on !== "") {
+                maskListItem.setAttribute("data-mask-used-on", mask.used_on);
+              }
+
+              if (mask.generated_for !== "") {
+                maskListItem.setAttribute("data-mask-generated", mask.generated_for);
+              }
+              
+              maskListItem.classList.add("fx-relay-mask-item");
+
+              const maskListItemNewMaskCreatedLabel = document.createElement("span");
+              maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
+              maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
+              maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
+
+
+              const maskListItemLabel = document.createElement("span");
+              maskListItemLabel.classList.add("fx-relay-mask-item-label");
+              maskListItemLabel.textContent = mask.description;
+              
+              // Append Label if it exists
+              if (mask.description !== "") {
+                maskListItem.appendChild(maskListItemLabel);
+              }
+              
+              const maskListItemAddressBar = document.createElement("div");
+              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+
+              const maskListItemAddress = document.createElement("div");
+              maskListItemAddress.classList.add("fx-relay-mask-item-address");
+              maskListItemAddress.textContent = mask.full_address;
+              maskListItemAddressBar.appendChild(maskListItemAddress);
+
+              const maskListItemAddressActions = document.createElement("div");
+              maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
+
+              const maskListItemCopyButton = document.createElement("button");
+              maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
+              maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
+
+              const maskListItemCopyButtonSuccessMessage = document.createElement("span");
+              maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
+              maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
+              maskListItemAddressActions.appendChild(maskListItemCopyButtonSuccessMessage);
+              
+              maskListItemCopyButton.addEventListener("click", (e)=> {
+                e.preventDefault();
+                navigator.clipboard.writeText(e.target.dataset.maskAddress);
+                maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
+                setTimeout(() => {
+                  maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
+                }, 1000);
+              }, false);
+              maskListItemAddressActions.appendChild(maskListItemCopyButton);
+
+              const maskListItemToggleButton = document.createElement("button");
+              maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
+              maskListItemToggleButton.addEventListener("click", ()=> {
+                // TODO: Add Toggle Function
+              }, false);
+              maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
+              maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
+              maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
+
+              maskListItemAddressActions.appendChild(maskListItemToggleButton);
+
+              maskListItemAddressBar.appendChild(maskListItemAddressActions);
+              maskListItem.appendChild(maskListItemAddressBar);
+              maskList.appendChild(maskListItem);
+            });
+
+            // Display "Mask created" temporary label when a new mask is created in the panel
+            if (opts && opts.newMaskCreated && maskList.firstElementChild) {
+              maskList.firstElementChild.classList.add("is-new-mask");
+
+              setTimeout(() => {
+                maskList.firstElementChild.classList.remove("is-new-mask");
+              }, 1000);
+            }
+
+
+          },
+          getRemainingAliases: async () => {
+            const masks = await popup.utilities.getMasks();
+            const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+            return { masks, maxNumAliases };
+          },
+          getRemainingMaskCount: async () => {
+            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const numRemaining = maxNumAliases - masks.length;
+            return numRemaining;
+          },
+          setRemainingMaskCount: async () => {
+            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const numRemaining = maxNumAliases - masks.length;
+            const masksAvailable = document.querySelector(".fx-relay-masks-available-count");
+            const masksLimitReached = document.querySelector(".fx-relay-masks-limit-upgrade-string");
+            const limitReachedToast = document.querySelector(".fx-relay-masks-limit-upgrade");
+
+            masksAvailable.textContent = browser.i18n.getMessage("popupFreeMasksAvailable", [numRemaining, maxNumAliases]);
+            masksLimitReached.textContent = browser.i18n.getMessage("popupFreeMasksLimitReached", [maxNumAliases]);
+
+            const generateRandomMask = document.querySelector(".js-generate-random-mask");
+            
+            if (masks.length === 0) {
+              generateRandomMask.classList.remove("is-hidden");
+              return;
+            }
+            
+            if (numRemaining === 0) {
+              // No masks remaining
+              limitReachedToast.classList.remove("is-hidden");
+              masksAvailable.classList.add("is-hidden");
+              
+              // Hide Generate Button
+              generateRandomMask.classList.add("is-hidden");
+
+              // Show Upgrade Button
+              const getUnlimitedMasksBtn = document.querySelector(".fx-relay-mask-upgrade-button");
+              getUnlimitedMasksBtn.classList.remove("is-hidden");
+            } else {
+              
+              // Show Masks Count/Generate Button
+              masksAvailable.classList.remove("is-hidden");
+              generateRandomMask.classList.remove("is-hidden");
+            }
+          
+            
+            
+          }
+        },
       },
       news: {
         init: async () => {
