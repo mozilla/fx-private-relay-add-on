@@ -113,7 +113,15 @@ function wireUpInputs(emailInputs) {
  */
 function getPaddingRight(element) {
   const elementStyles = getComputedStyle(element);
-  return Number.parseInt(elementStyles.paddingRight.replace("px", ""), 10);
+  // padding-right is usually the "computed value", i.e. an absolute value, so
+  // unless the website we inject to specified a value like `mm`, this will
+  // generally be in pixels. In the rare cases where no absolute value could be
+  // calculated, or the absolute value is not in pixels, we just assume no
+  // additional right padding is applied by the injected website.
+  // See https://developer.mozilla.org/en-US/docs/Web/CSS/resolved_value,
+  // https://drafts.csswg.org/cssom/#resolved-values
+  const paddingRight = Number.parseInt(elementStyles.paddingRight.replace("px", ""), 10);
+  return Number.isNaN(paddingRight) ? 0 : paddingRight;
 }
 
 /**
