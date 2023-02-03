@@ -2,6 +2,7 @@
 run();
 
 const RELAY_INPAGE_MENU_WIDTH = 320;
+const RELAY_ICON_WIDTH = 25;
 
 async function run() {
   // Don't run on Firefox accounts; creating a Relay mask there can result in
@@ -60,7 +61,7 @@ function wireUpInputs(emailInputs) {
       backgroundOrigin: computedStyles.backgroundOrigin,
     };
     const iconUrl = browser.runtime.getURL("/images/logo-image-fx-relay.svg");
-    input.style.backgroundSize = existingStyles.backgroundSize + `, 25px`;
+    input.style.backgroundSize = existingStyles.backgroundSize + `, ${RELAY_ICON_WIDTH}px`;
     input.style.backgroundImage =
       existingStyles.backgroundImage + `, url(${iconUrl})`;
     input.style.backgroundRepeat =
@@ -133,7 +134,10 @@ function intersectsRelayIcon(
   element,
   coords
 ) {
-  return element.clientWidth - coords.x <= 25 + 2 * getPaddingRight(element);
+  // The icon itself is 25 pixels wide, so any point inside that range, as well
+  // as within the range of the padding around it, is considered to be "on" the
+  // icon:
+  return element.clientWidth - coords.x <= RELAY_ICON_WIDTH + 2 * getPaddingRight(element);
 }
 
 /**
@@ -366,7 +370,9 @@ function setHoverStyles(element) {
   const hoverBackgroundStyle =
     elementStyles.backgroundImage +
     `, linear-gradient(to left, #f68fff ${
-      getPaddingRight(element) * 2 + 25
+      // The icon itself is 25 pixels wide, so we want the gradient to be behind
+      // it and the padding surrounding it on hover:
+      getPaddingRight(element) * 2 + RELAY_ICON_WIDTH
     }px, transparent 1px, transparent)`;
   // The `!important` is to override the inline styles we set in `run()`:
   const emailInputHoverStyles = `
@@ -415,7 +421,9 @@ function setFocusStyles(element) {
     backgroundPosition: computedStyles.backgroundPosition,
     backgroundRepeat: computedStyles.backgroundRepeat,
   };
-  const underlineWidth = getPaddingRight(element) * 2 + 25;
+  // The icon itself is 25 pixels wide, and we want the underline to span that
+  // and the horizontal padding:
+  const underlineWidth = getPaddingRight(element) * 2 + RELAY_ICON_WIDTH;
   const emailInputHoverStyles = `
     .relay-email-input-with-button-focused {
       background-image: ${
