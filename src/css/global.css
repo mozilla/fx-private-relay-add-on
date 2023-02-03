@@ -15,6 +15,7 @@
   --layoutLg: 64px;
   --layoutXl: 96px;
   --layout2xl: 192px;
+  --layout3xl: 256px;
 
   /* Border Radius */
   --borderRadiusXs: 2px;
@@ -23,6 +24,7 @@
   --borderRadiusLg: 16px;
 
   /* Width Tokens */
+  --content2xs: 256px;
   --contentXs: 304px;
   --contentSm: 432px;
   --contentMd: 688px;
@@ -185,6 +187,7 @@
   color: var(--colorInformational);
   font-family: var(--fontStackFirefox);
   font-weight: 400;
+  background-color: transparent;
 }
 
 .fx-relay-c-button.t-secondary:hover {
