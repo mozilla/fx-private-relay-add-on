@@ -67,9 +67,20 @@
     <content>
         <!-- Panel: Sign Up -->
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
-            <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
-            <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-            <a class="button sign-in-btn blue-primary-btn js-external-link i18n-content" data-relay-internal="true" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+            <div class="fx-relay-panel-content">
+              <div class="fx-relay-sign-in-copy">
+                <img src="/images/panel-images/man-sitting-email.svg" alt="">
+                <h4 class="i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></h4>
+                <p class="i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
+              </div>
+              
+              <!-- Log In Button -->
+              <div class="fx-relay-sign-in-button">
+                <a class="fx-relay-c-button t-primary js-external-link i18n-content" data-relay-internal="true" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelSignIn" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+              </div>
+              
+            </div>
+            
         </sign-up-panel>
 
         <!-- Panel: Masks (Default once logged in) -->

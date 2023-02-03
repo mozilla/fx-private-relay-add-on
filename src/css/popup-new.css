@@ -107,7 +107,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--colorWarning);
+  background-color: var(--colorError);
+  color: var(--colorWhite);
 }
 
 .news-count.is-hidden {
@@ -215,6 +216,43 @@ sign-up-panel::after {
   right: 0;
   top: -1px;
   background-size: 120%;
+}
+
+.fx-relay-sign-in-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--layoutSm);
+}
+
+.fx-relay-sign-in-copy img {
+  margin-bottom: var(--spacingMd);
+}
+
+.fx-relay-sign-in-copy h4 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--colorGrey50);
+  margin: 0 0 var(--spacingMd);
+  padding: 0;
+}
+
+.fx-relay-sign-in-copy p {
+  color: var(--colorGrey50);
+  max-width: var(--contentXs);
+  margin: 0 auto;
+}
+
+.fx-relay-sign-in-button {
+  /* border-top: 1px solid var(--colorGrey10); */
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  padding: var(--spacingMd);
+  background-color: var(--colorGrey05);
 }
 
 /* Settings */
@@ -600,7 +638,7 @@ sign-up-panel::after {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding-top: var(--layoutXl);
+  padding-top: var(--layoutLg);
 }
 
 .fx-relay-no-masks-created img {
@@ -609,9 +647,11 @@ sign-up-panel::after {
 }
 
 .fx-relay-no-masks-created h2 {
+  font-size: 24px;
   font-weight: 700;
-  font-size: 16px;
-  margin: 0 0 var(--spacingMd);
+  color: var(--colorGrey50);
+  margin: 0 auto var(--spacingMd);
+  max-width: var(--content2xs);
 }
 
 .fx-relay-no-masks-created p {
@@ -624,7 +664,6 @@ sign-up-panel::after {
 .fx-relay-generate-mask-buttons {
   border-top: 1px solid var(--colorGrey10);
   position: fixed;
-  /* position: absolute; */
   bottom: 0;
   width: 100%;
   left: 0;
