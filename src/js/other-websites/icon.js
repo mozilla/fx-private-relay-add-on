@@ -3,6 +3,8 @@ run();
 
 const RELAY_INPAGE_MENU_WIDTH = 320;
 const RELAY_ICON_WIDTH = 25;
+const COLOR_VIOLET_20 = "#f68fff";
+const COLOR_VIOLET_30 = "#f770ff";
 
 async function run() {
   // Don't run on Firefox accounts; creating a Relay mask there can result in
@@ -369,7 +371,7 @@ function setHoverStyles(element) {
   const elementStyles = getComputedStyle(element);
   const hoverBackgroundStyle =
     elementStyles.backgroundImage +
-    `, linear-gradient(to left, #f68fff ${
+    `, linear-gradient(to left, ${COLOR_VIOLET_20} ${
       // The icon itself is 25 pixels wide, so we want the gradient to be behind
       // it and the padding surrounding it on hover:
       getPaddingRight(element) * 2 + RELAY_ICON_WIDTH
@@ -428,7 +430,7 @@ function setFocusStyles(element) {
     .relay-email-input-with-button-focused {
       background-image: ${
         elementStyles.backgroundImage
-      }, linear-gradient(#f770ff, #f770ff) !important;
+      }, linear-gradient(${COLOR_VIOLET_30}, ${COLOR_VIOLET_30}) !important;
       background-size: ${
         elementStyles.backgroundSize
       }, ${underlineWidth.toString()}px 3px !important;
