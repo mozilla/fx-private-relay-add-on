@@ -70,9 +70,9 @@ jobs:
       - name: "Remove locales .github folder"
         run: npm run remove-locales-github
 
-      - name: "Configure add-on for the stage site"
-        run: npm run config:stage
-        if: github.ref_type == 'branch'
+      # - name: "Configure add-on for the stage site"
+      #   run: npm run config:stage
+      #   if: github.ref_type == 'branch'
 
       - name: "Configure add-on for the production site"
         run: npm run config:prod
