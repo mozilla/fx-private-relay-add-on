@@ -291,8 +291,17 @@
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
             maskPanel.setAttribute("data-account-level", "free");
-          } else {
+          } else {            
             maskPanel.setAttribute("data-account-level", "premium");
+
+            // Prompt user to register subdomain
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
+            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";  
+          
+            if (!isPremiumSubdomainSet) {
+              const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+              registerSubdomainButton.classList.remove("is-hidden");
+            }
           }
 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
@@ -321,6 +330,12 @@
               // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
               const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
               getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+
+              // If not set, prompt user to register domain
+              if (!isPremiumSubdomainSet) {
+                const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+                registerSubdomainButton.classList.remove("is-hidden");
+              }
 
               // Show Generate Button
               const generateRandomMask = document.querySelector(".js-generate-random-mask");
@@ -416,8 +431,6 @@
                 maskList.firstElementChild.classList.remove("is-new-mask");
               }, 1000);
             }
-
-
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();

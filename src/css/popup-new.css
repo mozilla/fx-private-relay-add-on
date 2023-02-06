@@ -668,6 +668,9 @@ sign-up-panel::after {
   left: 0;
   padding: var(--spacingMd);
   background-color: var(--colorGrey05);
+  display: flex;
+  gap: var(--spacingMd);
+  flex-direction: column;
 }
 
 /* Mask List/Item */
