@@ -423,18 +423,95 @@
               generateRandomMask.classList.add("t-secondary");
             }
           }
-
           
           generateRandomMask.addEventListener("click", (e) => {
               popup.events.generateMask(e, "random");
             }, false);
           
           // Build initial list
+          // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
           popup.panel.masks.utilities.buildMasksList();
 
           // Remove loading state
           document.body.classList.remove("is-loading");
 
+        },
+        search: {
+          filter: (query)=> {
+            
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.classList.add("is-active");
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+
+            maskSearchResults.forEach((maskResult) => {
+              const emailAddress = maskResult.dataset.maskAddress;
+              const label = maskResult.dataset.maskDescription;
+              
+              const matchesSearchFilter =
+                label.toLowerCase().includes(query.toLowerCase()) ||
+                emailAddress.toLowerCase().includes(query.toLowerCase());
+              
+              if (matchesSearchFilter) {
+                maskResult.classList.remove("is-hidden");
+              } else {
+                maskResult.classList.add("is-hidden");
+              }
+
+              // Set #/# labels inside search bar to show results count
+              const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+              const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+
+              searchFilterVisible.textContent = maskSearchResults.filter((maskResult) => !maskResult.classList.contains("is-hidden")).length;
+              searchFilterTotal.textContent = maskSearchResults.length;
+            });
+            
+          },
+          init: () => {            
+            const searchForm = document.querySelector(".fx-relay-masks-search-form");
+            searchForm.classList.add("is-visible");
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.placeholder = browser.i18n.getMessage("labelSearch");
+
+            searchForm.addEventListener("submit", (event) => {
+              event.preventDefault();
+              searchInput.blur();
+            });
+
+            searchInput.addEventListener("input", (event) => {
+              if (event.target.value.length) {
+                popup.panel.masks.search.filter(event.target.value);
+                return;
+              }
+
+              popup.panel.masks.search.reset()
+            });
+            
+            searchInput.addEventListener("reset", popup.panel.masks.search.reset);
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            searchFilterVisible.textContent = maskSearchResults.length;
+            searchFilterTotal.textContent = maskSearchResults.length;
+            
+            searchInput.focus();
+          },
+          reset: () => {
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.classList.remove("is-active");
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            searchFilterVisible.textContent = maskSearchResults.length;
+            searchFilterTotal.textContent = maskSearchResults.length;
+
+            maskSearchResults.forEach((maskResult) => {
+              maskResult.classList.remove("is-hidden");
+            });
+
+          }
         },
         utilities: {
           buildMasksList: async (opts = null) => {
@@ -471,6 +548,8 @@
             masks.forEach(mask => {
               const maskListItem = document.createElement("li");
               maskListItem.setAttribute("data-mask-address", mask.full_address);
+              
+              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
               
               if (mask.used_on !== "") {
                 maskListItem.setAttribute("data-mask-used-on", mask.used_on);
@@ -550,6 +629,11 @@
                 maskList.firstElementChild.classList.remove("is-new-mask");
               }, 1000);
             }
+
+            if (premium) {
+              popup.panel.masks.search.init();
+            }
+
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();
