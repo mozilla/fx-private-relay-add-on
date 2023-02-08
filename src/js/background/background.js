@@ -289,6 +289,90 @@ async function refreshAccountPages() {
 
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare
+async function makeDomainAddress(address, block_list_emails, description = null) {
+  const apiToken = await browser.storage.local.get("apiToken");
+
+  if (!apiToken.apiToken) {
+    browser.tabs.create({
+      url: RELAY_SITE_ORIGIN,
+    });
+    return;
+  }
+
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  const serverStoragePermission = await getServerStoragePref();
+  const relayApiUrlRelayAddress = `${relayApiSource}/domainaddresses/`;
+
+  let apiBody = {
+    "enabled": true,
+    "description": "",
+    "block_list_emails": block_list_emails,
+    "used_on": "",
+    "address": address,
+  };
+
+  // Only send description/generated_for/used_on fields in the request if the user is opt'd into server storage
+  if (description && serverStoragePermission) {
+    apiBody.description = description;
+    apiBody.generated_for = description;
+    apiBody.used_on = description + ",";
+  }
+
+
+  const headers = await createNewHeadersObject({auth: true});
+
+  const newRelayAddressResponse = await fetch(relayApiUrlRelayAddress, {
+    mode: "same-origin",
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(apiBody),
+  });
+
+  if (newRelayAddressResponse.status === 402) {
+    // FIXME: can this just return newRelayAddressResponse ?
+    return { status: 402 };
+  }
+
+  if (newRelayAddressResponse.status === 409) {
+    return { status: 409 };
+  }
+  
+  if (newRelayAddressResponse.status === 400) {
+    return { status: 400 };
+  }
+
+  // Question: Catch 400 (Unavailable/Blocked Word) or 409 (Mask in Use)
+
+  let newRelayAddressJson = await newRelayAddressResponse.json();
+
+  if (description) {
+    // TODO: Update the domain attribute to be "label"
+    newRelayAddressJson.description = description;
+    // Store the domain in which the alias was generated, separate from the label
+    newRelayAddressJson.generated_for = description;
+  }
+
+  // TODO: put this into an updateLocalAddresses() function
+  const localStorageRelayAddresses = await browser.storage.local.get(
+    "relayAddresses"
+  );
+
+  const localRelayAddresses =
+    Object.keys(localStorageRelayAddresses).length === 0
+      ? { relayAddresses: [] }
+      : localStorageRelayAddresses;
+  const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
+    newRelayAddressJson,
+  ]);
+
+  updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  
+  browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
+  return newRelayAddressJson;
+}
+
+// This function is defined as global in the ESLint config _because_ it is created here:
+// eslint-disable-next-line no-redeclare
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
@@ -427,6 +511,8 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
       response = await getCurrentPageHostname();
       break;
+    case "makeDomainAddress":
+      response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
