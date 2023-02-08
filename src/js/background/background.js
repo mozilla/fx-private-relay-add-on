@@ -177,6 +177,19 @@ async function getCurrentPage() {
   return currentTab;
 }
 
+async function getCurrentPageHostname() {
+  const currentPage = await getCurrentPage();
+
+  if (currentPage.url) {
+    const url = new URL(currentPage.url);
+    console.log(url);
+    return url.hostname;
+  }
+
+  // Not a valid URL (about:// or chrome:// internal page)
+  return false;  
+}
+
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare
 async function getServerStoragePref() {
@@ -387,7 +400,6 @@ async function displayBrowserActionBadge() {
 
 browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   let response;
-  const currentPage = await getCurrentPage();
 
   switch (m.method) {
     case "displayBrowserActionBadge":
@@ -411,12 +423,10 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
     case "patchMaskInfo":
       await patchMaskInfo("PATCH", m.id, m.data, m.options);
       break;
-    case "getCurrentPage":
-      response = await getCurrentPage();
-      break;
     case "getCurrentPageHostname":
       // Only capture the page hostanme if the active tab is an non-internal (about:) page.
-      if (currentPage.url) { response = (new URL(currentPage.url)).hostname }
+      response = await getCurrentPageHostname();
+      break;
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);
