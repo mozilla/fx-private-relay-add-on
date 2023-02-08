@@ -1,4 +1,4 @@
-/* global getBrowser checkWaffleFlag */
+/* global getBrowser checkWaffleFlag psl */
 
 (async () => {
   // Global Data
@@ -35,6 +35,7 @@
 
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
   const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
   const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
  
@@ -112,6 +113,10 @@
 
         popup.panel.update(backTarget);
       },
+      dismissErrorClick: async (e) => {
+        e.preventDefault();
+        e.target.classList.remove("is-shown");
+      },
       externalClick: async (e) => {
         e.preventDefault();
         if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
@@ -133,26 +138,39 @@
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
       },
-      generateMask: async (event, type = "random") => {
+      generateMask: async (event, type = "random", data = null) => {
         
         // Types: "random", "custom"
         sendRelayEvent("Panel", "click", `popup-generate-${type}-mask`);
         preventDefaultBehavior(event);
 
+        const isRandomMask = (type == "random");
+        const isCustomMask = (type == "custom");
+        const { premium } = await browser.storage.local.get("premium");
+
         event.target.classList.add("is-loading");
+
+        const newRelayAddressResponseArgs = isCustomMask ?  { method: "makeDomainAddress" } : { method: "makeRelayAddress" }
+        
+        if (isRandomMask) {
+          // When rebuilding panel, scroll to the top of it
+          const panel = document.querySelector(".fx-relay-mask-list");
+          panel.scrollIntoView(true);
+        } 
 
         // Request the active tab from the background script and parse the `document.location.hostname`
         const currentPageHostName = await browser.runtime.sendMessage({
           method: "getCurrentPageHostname",
         });
 
-        const newRelayAddressResponseArgs = {
-          method: "makeRelayAddress"
-        }
-
         // If active tab is a non-internal browser page, add a label to the creation request
         if (currentPageHostName !== null) {
           newRelayAddressResponseArgs.description = currentPageHostName;
+        }
+
+        if (isCustomMask && data) {
+          newRelayAddressResponseArgs.address = data.address
+          newRelayAddressResponseArgs.block_list_emails = data.block_list_emails
         }
 
         // Attempt to create a new alias
@@ -167,6 +185,29 @@
           );
         }
 
+        // Reset previous form
+        if (premium && isCustomMask) {
+            const customMaskDomainInput = document.getElementById("customMaskName");
+            customMaskDomainInput.value = "";
+            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
+            customMaskBlockPromosCheckbox.checked = false;
+        }
+        
+        // Catch edge cases where the "Generate New Alias" button is still enabled,
+        // but the user has already reached the max number of aliases.
+        if (newRelayAddressResponse.status === 409 || newRelayAddressResponse.status === 400) {
+          event.target.classList.remove("is-loading");
+          
+          const errorMessage = document.querySelector(".fx-relay-masks-error-message");
+          errorMessage.classList.add("is-shown");
+          
+          errorMessage.addEventListener("click",popup.events.dismissErrorClick, false);
+
+          await popup.panel.masks.utilities.buildMasksList({newMaskCreated: false});
+          
+          return;
+        }
+
         event.target.classList.remove("is-loading");
 
         // Hide onboarding panel
@@ -175,7 +216,6 @@
 
         await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
 
-        const { premium } = await browser.storage.local.get("premium");
         
         if (!premium) {
           await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -212,6 +252,9 @@
 
       // Set Notification Bug for Unread News Items
       popup.panel.news.utilities.initNewsItemCountNotification();
+
+      // TODO: Focus On Generate Button for Free / Search Filter for Premiums
+
     },
     panel: {
       update: (panelId, data) => {
@@ -229,9 +272,14 @@
       },
       init: (panelId, data) => {
         switch (panelId) {
+          case "custom": 
+            popup.panel.masks.custom.init();
+            break;
+
           case "masks": 
             popup.panel.masks.init();
             break;
+
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
@@ -275,6 +323,59 @@
         }
       },
       masks: {
+        custom: {
+          init: async () => {
+            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
+            const customMaskDomainLabel = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-domain");
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
+            customMaskDomainInput.placeholder = browser.i18n.getMessage("popupCreateCustomFormMaskInputPlaceholder");
+            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", premiumSubdomainSet);
+
+            customMaskDomainInput.addEventListener("input", popup.panel.masks.custom.validateForm);
+            customMaskForm.addEventListener("submit", popup.panel.masks.custom.submit);
+
+            const currentPageHostName = await browser.runtime.sendMessage({
+              method: "getCurrentPageHostname",
+            });
+
+            if (currentPageHostName) {
+              const parsedDomain = psl.parse(currentPageHostName)
+              customMaskDomainInput.value = parsedDomain.sld;
+              customMaskDomainSubmitButton.disabled = false
+            }
+
+            customMaskDomainInput.focus();
+            
+          },
+          submit: async (event) => {
+            event.preventDefault();
+            // const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = document.getElementById("customMaskName");
+            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
+
+            if (!customMaskDomainInput.value) {
+              throw new Error(`No address name set`)
+            }
+
+            popup.events.generateMask(event, "custom", {
+              address: customMaskDomainInput.value,
+              block_list_emails: customMaskBlockPromosCheckbox.checked,
+            });
+
+            popup.panel.update("masks");
+            
+          },
+          validateForm: async () => {
+            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
+
+            // If there's input, make the form submission possible
+            customMaskDomainSubmitButton.disabled = !(customMaskDomainInput.value)
+          }
+        },
         init: async () => {
           
           const masks = await popup.utilities.getMasks();
@@ -287,12 +388,16 @@
           
           const { premium } = await browser.storage.local.get("premium");
           const maskPanel = document.getElementById("masks-panel");
+          const generateRandomMask = document.querySelector(".js-generate-random-mask");
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
             maskPanel.setAttribute("data-account-level", "free");
           } else {            
             maskPanel.setAttribute("data-account-level", "premium");
+
+            // Update language of Generate Random Mask to "Generate random mask"
+            generateRandomMask.textContent = browser.i18n.getMessage("pageInputIconGenerateRandomMask");
 
             // Prompt user to register subdomain
             const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
@@ -301,14 +406,29 @@
             if (!isPremiumSubdomainSet) {
               const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
               registerSubdomainButton.classList.remove("is-hidden");
+            } else {
+
+              const generateCustomMask = document.querySelector(".js-generate-custom-mask");
+              
+              // Show "Generate custom mask" button
+              generateCustomMask.classList.remove("is-hidden");
+
+              generateCustomMask.addEventListener("click", (e) => {
+                e.preventDefault();
+                popup.panel.update("custom");
+              }, false);
+              
+              // Restyle Random Mask button to secondary
+              generateRandomMask.classList.remove("t-primary");
+              generateRandomMask.classList.add("t-secondary");
             }
           }
 
-          const generateRandomMask = document.querySelector(".js-generate-random-mask");
+          
           generateRandomMask.addEventListener("click", (e) => {
               popup.events.generateMask(e, "random");
             }, false);
-
+          
           // Build initial list
           popup.panel.masks.utilities.buildMasksList();
 
@@ -366,7 +486,6 @@
               maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
               maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
               maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
-
 
               const maskListItemLabel = document.createElement("span");
               maskListItemLabel.classList.add("fx-relay-mask-item-label");

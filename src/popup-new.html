@@ -94,6 +94,14 @@
               <span class="fx-relay-masks-limit-upgrade-string"></span>
             </div>
 
+            <!-- Premium Masks / Error / Cannot Make Mask -->
+            <div tabindex="0" class="fx-relay-masks-error-message">
+              <span class="i18n-content fx-relay-masks-error-message-string" data-i18n-message-id="popupCreateCustomFormError"></span>
+              <span class="fx-relay-masks-error-message-icon">
+                <img src="/icons/nebula-close.svg" alt="">
+              </span>
+            </div>
+
             <!-- No Masks Created -->
             <div class="fx-relay-no-masks-created is-hidden">
               <img src="/images/panel-images/email-domain-illustration.svg" alt="">
@@ -105,6 +113,8 @@
 
             <!-- Mask Creation Section -->
             <div class="fx-relay-generate-mask-buttons">
+              <!-- Generate Custom Mask -->
+              <button class="i18n-content fx-relay-c-button t-primary js-generate-custom-mask is-hidden" data-i18n-message-id="pageInputIconGenerateCustomMask"></button>              
               <!-- Generate Random Mask -->
               <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
               <!-- Upgrade Button -->
@@ -116,6 +126,48 @@
           </div>
           
         </masks-panel>
+
+        <custom-panel data-panel-id="custom" class="is-hidden fx-relay-panel" id="custom-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-id="custom" data-nav-level="child" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupCreateCustomMaskTitle"></h2>
+
+          </header>
+          <div class="fx-relay-panel-content">            
+            <p class="i18n-content fx-relay-panel-custom-mask-copy" data-i18n-message-id="popupCreateCustomMaskBody"></p>
+
+            <form class="fx-relay-panel-custom-mask-form" action="">
+              <div class="fx-relay-panel-custom-mask-input">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskInputLabel" for="customMaskName"></label>
+                <input required class="fx-relay-panel-custom-mask-input-name" type="text" name="" id="customMaskName">
+                <span class="fx-relay-panel-custom-mask-input-domain"></span>
+              </div>
+              <div class="fx-relay-panel-custom-mask-checkbox">
+                <input id="customMaskBlockPromos" type="checkbox">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskBlockPromosChecboxLabel" for="customMaskBlockPromos"></label>
+                <div tabindex="0" class="fx-relay-panel-custom-mask-promo-blocking-tooltip-wrapper">
+                  <img class="fx-relay-panel-custom-mask-promo-blocking-icon" src="/icons/nebula-info.svg" alt="">
+                  <div class="fx-relay-panel-custom-mask-promo-blocking-tooltip">
+                    <h3>Block promotional emails</h3>
+                    <p>Enable Block Promotional Emails on a mask to stop marketing emails from reaching your inbox.</p>
+                    <a class="js-external-link fx-relay-c-button t-basic" href="" data-relay-internal="true" data-href="faq/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=create-custom-mask-block-promos-learn-more#faq-promotional-email-blocking">Learn More</a>
+
+
+                  </div>
+                </div>
+              </div>
+              <div class="fx-relay-panel-custom-mask-submit">
+                <button class="i18n-content fx-relay-c-button t-primary" disabled="true" data-i18n-message-id="popupCreateCustomFormMaskBlockSubmitButton" type="submit"></label>
+              </div>
+            </form>
+
+          </div>
+        </custom-panel>
         
         <!-- Panel: Settings -->
         <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
