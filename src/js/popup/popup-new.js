@@ -447,10 +447,15 @@
             maskSearchResults.forEach((maskResult) => {
               const emailAddress = maskResult.dataset.maskAddress;
               const label = maskResult.dataset.maskDescription;
+              const usedOn = maskResult.dataset.maskUsedOn;
+              const generated = maskResult.dataset.maskGenerated;
               
+              // Check search input against any mask name, label or used-on/generated for web details
               const matchesSearchFilter =
+                emailAddress.toLowerCase().includes(query.toLowerCase()) ||
                 label.toLowerCase().includes(query.toLowerCase()) ||
-                emailAddress.toLowerCase().includes(query.toLowerCase());
+                usedOn.toLowerCase().includes(query.toLowerCase()) ||
+                generated.toLowerCase().includes(query.toLowerCase());
               
               if (matchesSearchFilter) {
                 maskResult.classList.remove("is-hidden");
@@ -547,17 +552,12 @@
 
             masks.forEach(mask => {
               const maskListItem = document.createElement("li");
-              maskListItem.setAttribute("data-mask-address", mask.full_address);
-              
-              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
-              
-              if (mask.used_on !== "") {
-                maskListItem.setAttribute("data-mask-used-on", mask.used_on);
-              }
 
-              if (mask.generated_for !== "") {
-                maskListItem.setAttribute("data-mask-generated", mask.generated_for);
-              }
+              // Attributes used to power search filtering
+              maskListItem.setAttribute("data-mask-address", mask.full_address);              
+              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
+              maskListItem.setAttribute("data-mask-used-on", mask.used_on ?? "");
+              maskListItem.setAttribute("data-mask-generated", mask.generated_for ?? "");
               
               maskListItem.classList.add("fx-relay-mask-item");
 
