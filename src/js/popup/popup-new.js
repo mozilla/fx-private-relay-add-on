@@ -474,7 +474,7 @@
           },
           init: () => {            
             const searchForm = document.querySelector(".fx-relay-masks-search-form");
-            searchForm.classList.add("is-visible");
+            
             const searchInput = document.querySelector(".fx-relay-masks-search-input");
             searchInput.placeholder = browser.i18n.getMessage("labelSearch");
 
@@ -500,7 +500,13 @@
             searchFilterVisible.textContent = maskSearchResults.length;
             searchFilterTotal.textContent = maskSearchResults.length;
             
-            searchInput.focus();
+            // Show bar if there's at least one mask created
+            if (maskSearchResults.length) {
+              searchForm.classList.add("is-visible");
+              searchInput.focus();
+            }
+
+            
           },
           reset: () => {
             const searchInput = document.querySelector(".fx-relay-masks-search-input");
