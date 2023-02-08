@@ -50,9 +50,9 @@
   --colorInformationalDisabled: #C9D9F3;
 
   /* Nebula Colors: Button: Error */
-  --colorError: #FF4F5E;
-  --colorErrorActive: #C50042;
-  --colorErrorHover: #E22850;
+  --colorError: #E22850;
+  --colorErrorActive: #810220;
+  --colorErrorHover: #C50042;
   --colorErrorFocus: #FFBDC5 ;
 
   /* Nebula Colors: Button: Warning */
