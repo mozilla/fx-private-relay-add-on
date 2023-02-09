@@ -276,6 +276,10 @@
             popup.panel.masks.custom.init();
             break;
 
+          case "manage": 
+            popup.panel.masks.manage.init(data);
+            break;
+
           case "masks": 
             popup.panel.masks.init();
             break;
@@ -436,6 +440,11 @@
           document.body.classList.remove("is-loading");
 
         },
+        manage: {
+          init: (data) => {
+            console.log("manage mask panel", data);
+          }
+        },
         search: {
           filter: (query)=> {
             
@@ -559,6 +568,8 @@
             masks.forEach(mask => {
               const maskListItem = document.createElement("li");
 
+              console.log(mask);
+
               // Attributes used to power search filtering
               maskListItem.setAttribute("data-mask-address", mask.full_address);              
               maskListItem.setAttribute("data-mask-description", mask.description ?? "");
@@ -613,9 +624,7 @@
 
               const maskListItemToggleButton = document.createElement("button");
               maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
-              maskListItemToggleButton.addEventListener("click", ()=> {
-                // TODO: Add Toggle Function
-              }, false);
+              
               maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
               maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
               maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
@@ -624,6 +633,15 @@
 
               maskListItemAddressBar.appendChild(maskListItemAddressActions);
               maskListItem.appendChild(maskListItemAddressBar);
+
+              maskListItemToggleButton.addEventListener("click", ()=> {
+                popup.panel.update("manage", {
+                  maskId: mask.id,
+                  maskType: mask.type,
+                  html: maskListItem
+                });
+              }, false);
+              
               maskList.appendChild(maskListItem);
             });
 
