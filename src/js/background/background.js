@@ -341,8 +341,6 @@ async function makeDomainAddress(address, block_list_emails, description = null)
     return { status: 400 };
   }
 
-  // Question: Catch 400 (Unavailable/Blocked Word) or 409 (Mask in Use)
-
   let newRelayAddressJson = await newRelayAddressResponse.json();
 
   if (description) {

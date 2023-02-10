@@ -14,7 +14,7 @@
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
   font-family: var(--fontStackBase);
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
   position: relative;
   padding: 0;
   margin: 0;
@@ -95,7 +95,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   position: relative;
   width: 32px;
   height: 32px;
@@ -108,7 +108,7 @@
   border-radius: 100%;
   width: 16px;
   height: 16px;
-  font-size: 12px;
+  font-size: var(--fontSizeBodyXs);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -198,7 +198,7 @@
 }
 
 .fx-relay-panel-header-title {
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
   font-family: var(--relayMetropolis);
   font-weight: 500;
 }
@@ -208,7 +208,7 @@ sign-up-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   position: relative;
 }
 
@@ -237,7 +237,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-sign-in-copy h4 {
-  font-size: 24px;
+  font-size: var(--fontSizeTitleXs);
   font-weight: 700;
   color: var(--colorGrey50);
   margin: 0 0 var(--spacingMd);
@@ -261,7 +261,7 @@ sign-up-panel::after {
 
 /* Settings */
 #settings-panel {
-  font-size: 12px;
+  font-size: var(--fontSizeBodyXs);
 }
 
 .fx-relay-settings-toggles {
@@ -380,7 +380,7 @@ sign-up-panel::after {
   gap: var(--spacingMd);
   padding: var(--spacingMd);
   border: 0 none;
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
 }
 
 .report-section {
@@ -407,9 +407,7 @@ sign-up-panel::after {
 }
 
 .report-section input[type=checkbox]{
-  margin: 0;
-  margin-top: 2px; /* Custom Alignment Issue with Checkbox and Label */
-  margin-right: var(--spacingMd);
+  margin: 2px var(--spacingSm) 0 0; /* Custom Alignment Issue with Checkbox and Label */
   color: var(--colorGrey50);
 }
 
@@ -443,7 +441,7 @@ sign-up-panel::after {
   justify-content: center;
   align-items: center;
   text-align: center;
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
 }
 
 .report-image-success {
@@ -452,7 +450,7 @@ sign-up-panel::after {
 
 .report-success h1 {
   font-weight: 600;
-  font-size: 18px;
+  font-size: var(--fontSizeBodyMd);
 }
 
 .report-continue {
@@ -466,7 +464,7 @@ sign-up-panel::after {
   width: 100%;
   border-radius: var(--borderRadiusSm);
   padding: 0 var(--spacingLg);
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   background: var(--colorWhite);
   margin-bottom: var(--spacingMd);
 }
@@ -581,13 +579,13 @@ sign-up-panel::after {
 
 .fx-relay-news-item-hero {
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
   margin: 0 0 var(--spacingXs);
   line-height: 20px;
 }
 
 .fx-relay-news-item-body {
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   line-height: 20px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -619,7 +617,7 @@ sign-up-panel::after {
 
 .fx-relay-masks-available-count {
   color: var(--colorGrey40);
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   display: inline-block;
   margin-bottom: var(--spacingSm);
 }
@@ -629,7 +627,7 @@ sign-up-panel::after {
   border-radius: var(--borderRadiusSm);
   padding: var(--spacingSm);
   color: var(--colorWhite);
-  font-size: 13px;
+  font-size: var(--fontSizeBodyXs);
   display: flex;
   justify-content: center;
   gap: var(--spacingSm);
@@ -640,7 +638,7 @@ sign-up-panel::after {
   background-color: var(--colorError);
   border-radius: var(--borderRadiusSm);
   color: var(--colorWhite);
-  font-size: 13px;
+  font-size: var(--fontSizeBodyXs);
   display: none;
   margin-bottom: var(--spacingSm);
   align-items: stretch;
@@ -696,7 +694,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-no-masks-created h2 {
-  font-size: 24px;
+  font-size: var(--fontSizeTitleXs);
   font-weight: 700;
   color: var(--colorGrey50);
   margin: 0 auto var(--spacingMd);
@@ -704,7 +702,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-no-masks-created p {
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   max-width: var(--contentXs);
   padding: 0;
   margin: 0 0 var(--spacingLg);
@@ -747,7 +745,7 @@ sign-up-panel::after {
   background-color: var(--colorGreen50);
   border-radius: var(--borderRadiusSm);
   padding: var(--spacingXs) var(--spacingSm);
-  font-size: 13px;
+  font-size: var(--fontSizeBodyXs);
   font-weight: 500;
   /* 
   By allowing this to overlap other elements,
@@ -774,7 +772,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-mask-item-label {
-  font-size: 12px;
+  font-size: var(--fontSizeBodyXs);
   color: var(--colorGrey40);
   overflow: hidden;
   display: block;
@@ -789,7 +787,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address {
   user-select: all;
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
   font-weight: 600;
   color: var(--colorGrey50);
   cursor: pointer;
@@ -836,7 +834,7 @@ sign-up-panel::after {
   background-color: var(--colorGreen50);
   border-radius: var(--borderRadiusSm);
   padding: var(--spacingXs) var(--spacingSm);
-  font-size: 13px;
+  font-size: var(--fontSizeBodyXs);
   font-weight: 500;
   /* 
   By allowing this to overlap other elements,
@@ -939,7 +937,7 @@ sign-up-panel::after {
   gap: var(--spacingMd);
   padding: var(--spacingMd);
   border: 0 none;
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
 }
 
 .fx-relay-panel-custom-mask-input {
@@ -957,9 +955,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-panel-custom-mask-checkbox input[type=checkbox]{
-  margin: 0;
-  margin-top: 2px; /* Custom Alignment Issue with Checkbox and Label */
-  margin-right: var(--spacingSm);
+  margin: 2px var(--spacingSm) 0 0; /* Custom Alignment Issue with Checkbox and Label */
   color: var(--colorGrey50);
 }
 
@@ -990,7 +986,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-panel-custom-mask-copy {
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   padding: 0 var(--spacingMd) var(--spacingMd);
   margin: 0;
   border-bottom: 1px solid var(--colorGrey10);
@@ -1011,7 +1007,6 @@ sign-up-panel::after {
 
 .fx-relay-panel-custom-mask-promo-blocking-tooltip {
   display: none;
-  /* display: flex; */
   position: absolute;
   left: 0;
   bottom: calc(100%);
@@ -1022,23 +1017,24 @@ sign-up-panel::after {
   border-radius: var(--borderRadiusSm);
   flex-direction: column;
   gap: var(--spacingSm);
-  margin-top: -16px;
+  /* This negative margin positions the promo blocking checkbox ABOVE the item  */
+  margin-top: calc(var(--spacingMd) * -1);
 }
 
 .fx-relay-panel-custom-mask-promo-blocking-tooltip h3 {
-  font-size: 18px;
+  font-size: var(--fontSizeBodyMd);
   margin: 0;
   padding: 0;
 }
 
 .fx-relay-panel-custom-mask-promo-blocking-tooltip p {
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   margin: 0;
   padding: 0;
 }
 
 .fx-relay-panel-custom-mask-promo-blocking-tooltip a {
-  font-size: 14px;
+  font-size: var(--fontSizeBodySm);
   margin: 0;
   padding: 0;
 }
