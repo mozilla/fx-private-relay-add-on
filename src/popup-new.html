@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/popup-new.css">
     <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/libs/psl.min.js"></script>
     <script src="/js/shared/i18n.js"></script>
     <script src="/js/shared/data-opt-out-toggle.js"></script>
     <script src="js/shared/utils.js"></script>
@@ -93,6 +94,14 @@
               <span class="fx-relay-masks-limit-upgrade-string"></span>
             </div>
 
+            <!-- Premium Masks / Error / Cannot Make Mask -->
+            <div tabindex="0" class="fx-relay-masks-error-message" role="alert">
+              <span class="i18n-content fx-relay-masks-error-message-string" data-i18n-message-id="popupCreateCustomFormError"></span>
+              <span class="fx-relay-masks-error-message-icon">
+                <img src="/icons/nebula-close.svg" alt="">
+              </span>
+            </div>
+
             <!-- No Masks Created -->
             <div class="fx-relay-no-masks-created is-hidden">
               <img src="/images/panel-images/email-domain-illustration.svg" alt="">
@@ -104,13 +113,61 @@
 
             <!-- Mask Creation Section -->
             <div class="fx-relay-generate-mask-buttons">
-              <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>
+              <!-- Generate Custom Mask -->
+              <button class="i18n-content fx-relay-c-button t-primary js-generate-custom-mask is-hidden" data-i18n-message-id="pageInputIconGenerateCustomMask"></button>              
+              <!-- Generate Random Mask -->
+              <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
+              <!-- Upgrade Button -->
               <button data-href="premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
+              <!-- Register Subdomain -->
+              <button data-href="accounts/profile/#mpp-choose-subdomain" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-regsiter-subdomain-button is-hidden" data-relay-internal="true" data-i18n-message-id="popupGetDomainButton"></button>
             </div>
             
           </div>
           
         </masks-panel>
+
+        <custom-panel data-panel-id="custom" class="is-hidden fx-relay-panel" id="custom-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-id="custom" data-nav-level="child" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupCreateCustomMaskTitle"></h2>
+
+          </header>
+          <div class="fx-relay-panel-content">            
+            <p class="i18n-content fx-relay-panel-custom-mask-copy" data-i18n-message-id="popupCreateCustomMaskBody"></p>
+
+            <form class="fx-relay-panel-custom-mask-form" action="">
+              <div class="fx-relay-panel-custom-mask-input">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskInputLabel" for="customMaskName"></label>
+                <input required class="fx-relay-panel-custom-mask-input-name" type="text" name="" id="customMaskName">
+                <span class="fx-relay-panel-custom-mask-input-domain"></span>
+              </div>
+              <div class="fx-relay-panel-custom-mask-checkbox">
+                <input id="customMaskBlockPromos" type="checkbox">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskBlockPromosChecboxLabel" for="customMaskBlockPromos"></label>
+                <div tabindex="0" class="fx-relay-panel-custom-mask-promo-blocking-tooltip-wrapper">
+                  <img class="fx-relay-panel-custom-mask-promo-blocking-icon" src="/icons/nebula-info.svg" alt="">
+                  <div class="fx-relay-panel-custom-mask-promo-blocking-tooltip">
+                    <h3 class="i18n-content" data-i18n-message-id="popupPromoBlockingButtonTitle"></h3>
+                    <p class="i18n-content" data-i18n-message-id="popupPromoBlockingButtonCopy"></p>
+                    <a data-i18n-message-id="popupPromoBlockingButtonLearnMore" class="js-external-link fx-relay-c-button t-basic i18n-content" href="" data-relay-internal="true" data-href="faq/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=create-custom-mask-block-promos-learn-more#faq-promotional-email-blocking"></a>
+
+
+                  </div>
+                </div>
+              </div>
+              <div class="fx-relay-panel-custom-mask-submit">
+                <button class="i18n-content fx-relay-c-button t-primary" disabled="true" data-i18n-message-id="popupCreateCustomFormMaskBlockSubmitButton" type="submit"></label>
+              </div>
+            </form>
+
+          </div>
+        </custom-panel>
         
         <!-- Panel: Settings -->
         <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">

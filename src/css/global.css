@@ -37,6 +37,21 @@
   --screenLg: 1024px;
   --screenXl: 1312px;
 
+  /* Typography Tokens */
+  --fontSizeTitle2xl: 64px;
+  --fontSizeTitleXl: 56px;
+  --fontSizeTitleLg: 48px;
+  --fontSizeTitleMd: 40px;
+  --fontSizeTitleSm: 32px;
+  --fontSizeTitleXs: 24px;
+  --fontSizeTitle2xs: 20px;
+  --fontSizeTitle3xs: 16px;
+  --fontSizeBodyXl: 21px;
+  --fontSizeBodyLg: 18px;
+  --fontSizeBodyMd: 16px;
+  --fontSizeBodySm: 14px;
+  --fontSizeBodyXs: 12px;
+
   /* Box Shadow Tokens */
   --boxShadowSm: 0 8px 12px 1px rgba(29, 17, 51, .04), 0 3px 16px 2px rgba(9, 32, 77, .12), 0 5px 10px -3px rgba(29, 17, 51, .12);
   --boxShadowMd: 0 16px 24px 2px rgba(29, 17, 51, .04), 0 6px 32px 4px rgba(9, 32, 77, .12), 0 8px 12px -5px rgba(29, 17, 51, .12);
@@ -50,9 +65,9 @@
   --colorInformationalDisabled: #C9D9F3;
 
   /* Nebula Colors: Button: Error */
-  --colorError: #FF4F5E;
-  --colorErrorActive: #C50042;
-  --colorErrorHover: #E22850;
+  --colorError: #E22850;
+  --colorErrorActive: #810220;
+  --colorErrorHover: #C50042;
   --colorErrorFocus: #FFBDC5 ;
 
   /* Nebula Colors: Button: Warning */
@@ -154,7 +169,7 @@
   appearance: none;
   outline: none;
   border: none;
-  font-size: 16px;
+  font: 16px;
   cursor: pointer;
   position: relative;
   width: 100%;
