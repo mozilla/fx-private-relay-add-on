@@ -571,6 +571,12 @@
               maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
               maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
               maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
+              
+              const maskListItemAddressBar = document.createElement("div");
+              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+
+              const maskListItemAddressWrapper = document.createElement("div");
+              maskListItemAddressWrapper.classList.add("fx-relay-mask-item-address-wrapper");
 
               const maskListItemLabel = document.createElement("span");
               maskListItemLabel.classList.add("fx-relay-mask-item-label");
@@ -578,16 +584,16 @@
               
               // Append Label if it exists
               if (mask.description !== "") {
-                maskListItem.appendChild(maskListItemLabel);
+                maskListItemAddressWrapper.appendChild(maskListItemLabel);
               }
               
-              const maskListItemAddressBar = document.createElement("div");
-              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
-
               const maskListItemAddress = document.createElement("div");
               maskListItemAddress.classList.add("fx-relay-mask-item-address");
               maskListItemAddress.textContent = mask.full_address;
-              maskListItemAddressBar.appendChild(maskListItemAddress);
+              maskListItemAddressWrapper.appendChild(maskListItemAddress);
+
+              // Add Mask Address Bar Contents 
+              maskListItemAddressBar.appendChild(maskListItemAddressWrapper);
 
               const maskListItemAddressActions = document.createElement("div");
               maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
@@ -620,7 +626,8 @@
               maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
               maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
 
-              maskListItemAddressActions.appendChild(maskListItemToggleButton);
+              // TODO: Add toggle button back
+              // maskListItemAddressActions.appendChild(maskListItemToggleButton);
 
               maskListItemAddressBar.appendChild(maskListItemAddressActions);
               maskListItem.appendChild(maskListItemAddressBar);
