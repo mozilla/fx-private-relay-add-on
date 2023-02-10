@@ -786,6 +786,12 @@ sign-up-panel::after {
   gap: var(--spacingMd);
 }
 
+.fx-relay-mask-item-address-wrapper {
+  display: flex;
+  gap: var(--spacingXs);
+  flex-direction: column;
+}
+
 .fx-relay-mask-item-address {
   user-select: all;
   font-size: var(--fontSizeBodyMd);
