@@ -306,6 +306,7 @@
   background-color: var(--colorWhite);
   border: 2px solid transparent;
   outline: 1px solid var(--colorGrey30);
+  position: relative;
 }
 
 .fx-relay-c-search-input:focus {
@@ -313,6 +314,7 @@
   border: 2px solid var(--colorInformational);
 }
 
+.fx-relay-c-search-input.is-active + .fx-relay-c-search-controls,
 .fx-relay-c-search-input:focus + .fx-relay-c-search-controls {
   opacity: 1;
 }

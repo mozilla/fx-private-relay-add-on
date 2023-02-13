@@ -423,18 +423,106 @@
               generateRandomMask.classList.add("t-secondary");
             }
           }
-
           
           generateRandomMask.addEventListener("click", (e) => {
               popup.events.generateMask(e, "random");
             }, false);
           
           // Build initial list
+          // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
           popup.panel.masks.utilities.buildMasksList();
 
           // Remove loading state
           document.body.classList.remove("is-loading");
 
+        },
+        search: {
+          filter: (query)=> {
+            
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.classList.add("is-active");
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+
+            maskSearchResults.forEach((maskResult) => {
+              const emailAddress = maskResult.dataset.maskAddress;
+              const label = maskResult.dataset.maskDescription;
+              const usedOn = maskResult.dataset.maskUsedOn;
+              const generated = maskResult.dataset.maskGenerated;
+              
+              // Check search input against any mask name, label or used-on/generated for web details
+              const matchesSearchFilter =
+                emailAddress.toLowerCase().includes(query.toLowerCase()) ||
+                label.toLowerCase().includes(query.toLowerCase()) ||
+                usedOn.toLowerCase().includes(query.toLowerCase()) ||
+                generated.toLowerCase().includes(query.toLowerCase());
+              
+              if (matchesSearchFilter) {
+                maskResult.classList.remove("is-hidden");
+              } else {
+                maskResult.classList.add("is-hidden");
+              }
+
+              // Set #/# labels inside search bar to show results count
+              const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+              const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+
+              searchFilterVisible.textContent = maskSearchResults.filter((maskResult) => !maskResult.classList.contains("is-hidden")).length;
+              searchFilterTotal.textContent = maskSearchResults.length;
+            });
+            
+          },
+          init: () => {            
+            const searchForm = document.querySelector(".fx-relay-masks-search-form");
+            
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.placeholder = browser.i18n.getMessage("labelSearch");
+
+            searchForm.addEventListener("submit", (event) => {
+              event.preventDefault();
+              searchInput.blur();
+            });
+
+            searchInput.addEventListener("input", (event) => {
+              if (event.target.value.length) {
+                popup.panel.masks.search.filter(event.target.value);
+                return;
+              }
+
+              popup.panel.masks.search.reset()
+            });
+            
+            searchInput.addEventListener("reset", popup.panel.masks.search.reset);
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            searchFilterVisible.textContent = maskSearchResults.length;
+            searchFilterTotal.textContent = maskSearchResults.length;
+            
+            // Show bar if there's at least one mask created
+            if (maskSearchResults.length) {
+              searchForm.classList.add("is-visible");
+              searchInput.focus();
+            }
+
+            
+          },
+          reset: () => {
+            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            searchInput.classList.remove("is-active");
+
+            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
+            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            searchFilterVisible.textContent = maskSearchResults.length;
+            searchFilterTotal.textContent = maskSearchResults.length;
+
+            maskSearchResults.forEach((maskResult) => {
+              maskResult.classList.remove("is-hidden");
+            });
+
+          }
         },
         utilities: {
           buildMasksList: async (opts = null) => {
@@ -470,15 +558,12 @@
 
             masks.forEach(mask => {
               const maskListItem = document.createElement("li");
-              maskListItem.setAttribute("data-mask-address", mask.full_address);
-              
-              if (mask.used_on !== "") {
-                maskListItem.setAttribute("data-mask-used-on", mask.used_on);
-              }
 
-              if (mask.generated_for !== "") {
-                maskListItem.setAttribute("data-mask-generated", mask.generated_for);
-              }
+              // Attributes used to power search filtering
+              maskListItem.setAttribute("data-mask-address", mask.full_address);              
+              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
+              maskListItem.setAttribute("data-mask-used-on", mask.used_on ?? "");
+              maskListItem.setAttribute("data-mask-generated", mask.generated_for ?? "");
               
               maskListItem.classList.add("fx-relay-mask-item");
 
@@ -486,6 +571,12 @@
               maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
               maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
               maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
+              
+              const maskListItemAddressBar = document.createElement("div");
+              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+
+              const maskListItemAddressWrapper = document.createElement("div");
+              maskListItemAddressWrapper.classList.add("fx-relay-mask-item-address-wrapper");
 
               const maskListItemLabel = document.createElement("span");
               maskListItemLabel.classList.add("fx-relay-mask-item-label");
@@ -493,16 +584,16 @@
               
               // Append Label if it exists
               if (mask.description !== "") {
-                maskListItem.appendChild(maskListItemLabel);
+                maskListItemAddressWrapper.appendChild(maskListItemLabel);
               }
               
-              const maskListItemAddressBar = document.createElement("div");
-              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
-
               const maskListItemAddress = document.createElement("div");
               maskListItemAddress.classList.add("fx-relay-mask-item-address");
               maskListItemAddress.textContent = mask.full_address;
-              maskListItemAddressBar.appendChild(maskListItemAddress);
+              maskListItemAddressWrapper.appendChild(maskListItemAddress);
+
+              // Add Mask Address Bar Contents 
+              maskListItemAddressBar.appendChild(maskListItemAddressWrapper);
 
               const maskListItemAddressActions = document.createElement("div");
               maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
@@ -535,7 +626,8 @@
               maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
               maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
 
-              maskListItemAddressActions.appendChild(maskListItemToggleButton);
+              // TODO: Add toggle button back
+              // maskListItemAddressActions.appendChild(maskListItemToggleButton);
 
               maskListItemAddressBar.appendChild(maskListItemAddressActions);
               maskListItem.appendChild(maskListItemAddressBar);
@@ -550,6 +642,11 @@
                 maskList.firstElementChild.classList.remove("is-new-mask");
               }, 1000);
             }
+
+            if (premium) {
+              popup.panel.masks.search.init();
+            }
+
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();
