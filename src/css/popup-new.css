@@ -766,6 +766,7 @@ sign-up-panel::after {
   transition: opacity 0s;
 }
 
+.fx-relay-mask-item:focus-within,
 .fx-relay-mask-item:focus,
 .fx-relay-mask-item:hover {
   background-color: var(--colorPurple05);
@@ -783,6 +784,12 @@ sign-up-panel::after {
   display: flex;
   align-items: center;
   gap: var(--spacingMd);
+}
+
+.fx-relay-mask-item-address-wrapper {
+  display: flex;
+  gap: var(--spacingXs);
+  flex-direction: column;
 }
 
 .fx-relay-mask-item-address {
@@ -818,6 +825,7 @@ sign-up-panel::after {
   cursor: pointer;
 }
 
+.fx-relay-mask-item-address-actions > button:focus,
 .fx-relay-mask-item-address-actions > button:hover {
   background-color: white;
   filter: grayscale(0);
@@ -1037,4 +1045,17 @@ sign-up-panel::after {
   font-size: var(--fontSizeBodySm);
   margin: 0;
   padding: 0;
+}
+
+/* Search Bar */
+
+.fx-relay-masks-search-form {
+  padding: var(--spacingXs) var(--spacingSm);
+  margin-bottom: var(--spacingSm);
+  position: relative;
+  display: none;
+}
+
+.fx-relay-masks-search-form.is-visible {
+  display: block;
 }
