@@ -1,16 +1,18 @@
+/* global getBrowser checkWaffleFlag psl */
 
-// eslint-disable-next-line no-unused-vars
-async function checkWaffleFlag(flag) {
-  const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
-  for (let i of waffleFlagArray) {
-    if (i[0] === flag && i[1] === true) {
-      return true;
-    }
-  }
-  return false;
-}
+(async () => {
+  // Global Data
+  const { relaySiteOrigin } = await browser.storage.local.get(
+    "relaySiteOrigin"
+  );
 
-async function getPromoPanels() {
+  const state = {
+    currentPanel: null,
+    newsItemsCount: 0
+  };
+
+  // audience can be premium, free, phones, all
+  // Optional data: waffle, fullCta*
   const savings = "40%"; // For "Save 40%!" in the Bundle promo body
   const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
   const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
@@ -20,757 +22,1177 @@ async function getPromoPanels() {
     style: "currency",
     currency: getBundleCurrency,
   }).format(getBundlePrice);
-
-  return {
-    "announcements": {
-      // Phone Masking Announcement
-      "panel1": {
-        "imgSrc": "announcements/panel-phone-masking-announcement.svg",
-        "imgSrcPremium": "announcements/premium-announcement-phone-masking.svg",
-        "tipHeadline": browser.i18n.getMessage("popupPhoneMaskingPromoHeadline"),
-        "longText": true,
-        "tipBody": browser.i18n.getMessage("popupPhoneMaskingPromoBody"),
-        "tipCta": browser.i18n.getMessage("popupPhoneMaskingPromoCTA"),
-      },
-      "panel2": {
-        "imgSrc": "announcements/panel-bundle-announcement.svg",
-        "imgSrcPremium": "announcements/premium-announcement-bundle.svg",
-        "tipHeadline": browser.i18n.getMessage("popupBundlePromoHeadline_2", savings),
-        "tipBody": browser.i18n.getMessage("popupBundlePromoBody_3", formattedBundlePrice),
-        "tipCta": browser.i18n.getMessage("popupBundlePromoCTA"),
-      },
-    },
-    "premiumPanel": {
-      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
-      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
-      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    }
-  }
-}
-
-async function getOnboardingPanels() {
-  return {
-    "announcements": {
-      "panel1": {
-        "imgSrc": "announcements/panel-announcement-attachment-limit.svg",
-        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-      },
-      "panel2": {
-        "imgSrc": "announcements/panel-announcement-critical-emails.svg",
-        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBodyNonPremium"),
-      },
-      "panel3": {
-        "imgSrc": "announcements/panel-announcement-sign-back-in.svg",
-        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
-      },
-    },
-    "maxAliasesPanel": {
-      "imgSrc": "high-five.svg",
-      "tipHeadline": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelHeadline"),
-      "tipBody": browser.i18n.getMessage("popupOnboardingMaxAliasesPanelBody"),
-      "upgradeButton": browser.i18n.getMessage("popupUpgradeToPremiumBanner"),
-      "upgradeButtonIcon": "/icons/icon.svg",
-    },
-    "premiumPanel": {
-      "aliasesUsedText": browser.i18n.getMessage("popupAliasesUsed_mask"),
-      "emailsBlockedText": browser.i18n.getMessage("popupEmailsBlocked"),
-      "emailsForwardedText": browser.i18n.getMessage("popupEmailsForwarded"),
-    }
-  };
-}
-
-function getEducationalStrings() {
-  return {
-    "announcements": {
-      "panel1": {
-        "imgSrcPremium": "educational-matrix/educationalImg1.png",
-        "tipHeadline": browser.i18n.getMessage("popupEducationalComponent1Headline"),
-        "tipBody": browser.i18n.getMessage("popupEducationalComponent1Body"),
-      },
-      "panel2": {
-        "imgSrcPremium": "educational-matrix/educationalImg-attachment-limit.svg",
-        "tipHeadline": browser.i18n.getMessage("popupAttachmentSizeIncreaseHeadline"),
-        "tipBody": browser.i18n.getMessage("popupAttachmentSizeIncreaseBody"),
-      },
-      "panel3": {
-        "imgSrcPremium": "educational-matrix/educationalImg-block-emails.svg",
-        "tipHeadline": browser.i18n.getMessage("popupBlockPromotionalEmailsHeadline_2"),
-        "tipBody": browser.i18n.getMessage("popupBlockPromotionalEmailsBody_mask"),
-      },
-      "panel4": {
-        "imgSrcPremium": "educational-matrix/educationalImg-sign-back-in.svg",
-        "tipHeadline": browser.i18n.getMessage("popupSignBackInHeadline_mask"),
-        "tipBody": browser.i18n.getMessage("popupSignBackInBody_mask_v2"),
-        "longText": true,
-      }
-    }
-  };
-}
-
-function showSignUpPanel() {
-  const signUpOrInPanel = document.querySelector(".sign-up-panel");
-  document.body.classList.add("sign-up");
-  return signUpOrInPanel.classList.remove("hidden");
-}
-
-const serverStoragePanel = {
-  isRelevant: async () => {
-    const { serverStoragePrompt } = await browser.storage.local.get(
-      "serverStoragePrompt"
-    );
-
-    const serverStoragePref = await browser.runtime.sendMessage({
-      method: "getServerStoragePref"
-    });
-
-    // TODO: Check when user was created
-
-    // Only show the server prompt panel the user has not already opt'd in,
-    // or if they have not interacted with the panel before.
-    if (!serverStoragePref && !serverStoragePrompt) {
-      return true;
-    }
-
-    return false;
-  },
-  hide: () => {
-    const serverStoragePanelWrapper = document.querySelector(
-      ".js-server-storage-wrapper"
-    );
-
-    document.querySelectorAll(".content-wrapper").forEach((div) => {
-      div.classList.remove("is-hidden");
-    });
-
-    serverStoragePanelWrapper.classList.add("is-hidden");
-    serverStoragePanelWrapper
-      .querySelectorAll(".is-hidden")
-      .forEach((childDiv) => childDiv.classList.add("is-hidden"));
-  },
-  init: (premium) => {
-    // Server Storage Prompt Panel
-    const serverStoragePanelWrapper = document.querySelector(
-      ".js-server-storage-wrapper"
-    );
-
-    if (premium) {
-      const panelStatus = document.querySelector(".panel-status");
-      panelStatus.classList.add("is-hidden");
-    }
-
-    document.querySelectorAll(".content-wrapper").forEach((div) => {
-      div.classList.add("is-hidden");
-    });
-
-    serverStoragePanelWrapper.classList.remove("is-hidden");
-
-    serverStoragePanelWrapper
-      .querySelectorAll(".is-hidden")
-      .forEach((childDiv) => childDiv.classList.remove("is-hidden"));
-
-    const serverStoragePanelButtonDismiss =
-      serverStoragePanelWrapper.querySelector(".js-button-dismiss");
-
-    const serverStoragePanelButtonAllow =
-      serverStoragePanelWrapper.querySelector(".js-button-allow");
-
-    serverStoragePanelButtonDismiss.addEventListener(
-      "click",
-      serverStoragePanel.event.dismiss,
-      false
-    );
-
-    serverStoragePanelButtonAllow.addEventListener(
-      "click",
-      serverStoragePanel.event.allow,
-      false
-    );
-  },
-  event: {
-    dismiss: async (e) => {
-      e.preventDefault();
-      serverStoragePanel.event.dontShowPanelAgain();
-      serverStoragePanel.hide();
-      showRelayPanel(1);
-    },
-
-    allow: async (e) => {
-      e.preventDefault();
-
-      const { relaySiteOrigin } = await browser.storage.local.get(
-        "relaySiteOrigin"
-      );
-
-      serverStoragePanel.event.dontShowPanelAgain();
-
-      browser.tabs.create({
-        url: `${relaySiteOrigin}/accounts/profile/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=allow-labels-sync#sync-labels`,
-        active: true,
-      });
-
-      window.close();
-    },
-
-    dontShowPanelAgain: () => {
-      browser.storage.local.set({ serverStoragePrompt: true });
-    }
-  },
-};
-
-async function choosePanel(panelId, premium, premiumSubdomainSet) {
-  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-
-  if (premium) {
-    document.getElementsByClassName("content-wrapper")[0].remove();
-    premiumPanelWrapper.classList.remove("is-hidden");
-    //Toggle register domain or education module
-    checkUserSubdomain(premiumSubdomainSet);
-    return "premiumPanel";
-  } else {
-    const premiumWrapper = document.getElementsByClassName("premium-wrapper");
-    if (premiumWrapper.length) {
-      premiumWrapper[0].remove();
-    }
-
-    return `panel${panelId}`;
-  }
-}
-
-function checkUserSubdomain(premiumSubdomainSet) {
-  const educationalComponent = document.querySelector(".educational-component");
-  const registerDomainComponent = document.querySelector(".register-domain-component");
-
-  if (premiumSubdomainSet !== "None") {
-    registerDomainComponent.classList.add("is-hidden");
-  }
-
-  else {
-    educationalComponent.classList.add("is-hidden");
-  }
-}
-
-
-async function showRelayPanel(tipPanelToShow) {
-  const onboardingPanelWrapper = document.querySelector("onboarding-panel");
-  const tipImageEl = onboardingPanelWrapper.querySelector("img");
-  const tipHeadlineEl = onboardingPanelWrapper.querySelector(".onboarding-h1");
-  const tipBodyEl = onboardingPanelWrapper.querySelector(".onboarding-p");
-  const currentPanel = onboardingPanelWrapper.querySelector(".current-panel");
-  const upgradeButtonEl = onboardingPanelWrapper.querySelector(".upgrade-banner");
-  const upgradeButtonIconEl = onboardingPanelWrapper.querySelector(".upgrade-banner-icon");
-  const promoElements = onboardingPanelWrapper.querySelectorAll(".js-promo-item");
-  const tipCtaEl = onboardingPanelWrapper.querySelector(".onboarding-cta");
-  let premiumPanelStrings = getEducationalStrings();
-  let onboardingPanelStrings = await getOnboardingPanels();
-
-  const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
-  const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+  
+  const isBundleAvailableInCountry = (
+    await browser.storage.local.get("bundlePlans")
+  ).bundlePlans.BUNDLE_PLANS.available_in_country;
+  const isPhoneAvailableInCountry = (
+    await browser.storage.local.get("phonePlans")
+  ).phonePlans.PHONE_PLANS.available_in_country;
 
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
   const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
 
   // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
   const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+
   // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
   const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
+ 
+  // FIXME: The order is not being set correctly
+  const newsContent = [
+    {
+      id: "phones",
+      logicCheck: isPhoneMaskingAvailable,
+      headlineString: "popupPhoneMaskingPromoHeadline",
+      bodyString: "popupPhoneMaskingPromoBody",
+      teaserImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+      fullImg:
+        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaRelayURL: true,
+      fullCtaHref:
+        "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+      fullCtaEventLabel: "panel-news-phone-masking-cta",
+      fullCtaEventAction: "click",
+    },
+
+    {
+      id: "mozilla-vpn-bundle",
+      logicCheck: isBundleAvailable,
+      headlineString: "popupBundlePromoHeadline_2",
+      headlineStringArgs: savings,
+      bodyString: "popupBundlePromoBody_3",
+      bodyStringArgs: formattedBundlePrice,
+      teaserImg:
+        "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
+      fullImg:
+        "/images/panel-images/announcements/panel-bundle-announcement.svg",
+      fullCta: "popupPhoneMaskingPromoCTA",
+      fullCtaRelayURL: true,
+      fullCtaHref:
+        "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+      fullCtaEventLabel: "panel-news-bundle-cta",
+      fullCtaEventAction: "click",
+    },
+    {
+      id: "firefox-integration",
+      waffle: "firefox_integration",
+      locale: "us",
+      audience: "premium",
+      headlineString: "popupPasswordManagerRelayHeadline",
+      bodyString: "popupPasswordManagerRelayBody",
+      teaserImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+      fullImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+    },
+  ];
+
+  // Update news item count
+  state.newsItemsCount = newsContent.length;
   
-  if (
-    isPhoneMaskingAvailable || isBundleAvailable
-  ) {
-    promoElements.forEach(i => {
-      i.classList.remove("is-hidden");
-    });
-    onboardingPanelWrapper.setAttribute("id", "bundle-phones-promo");
-    
-    // If phone masking / bundle is available, switch panels to promo panel set to advertise phone masking/bundle plans
-    onboardingPanelStrings = await getPromoPanels();
-    premiumPanelStrings = await getPromoPanels();
-  }
+  const popup = {
+    events: {
+      backClick: (e) => {
+        e.preventDefault();
+        const backTarget = e.target.dataset.backTarget;
+        const backNavLevel = e.target.dataset.navLevel;
 
-  if (!browser.menus) {
-    // Remove sign back in for browsers that don't support menus API (Chrome)
-    delete onboardingPanelStrings.announcements.panel3;
-    delete premiumPanelStrings.announcements.panel4;
-  }
+        if (backNavLevel === "root") {
+          document
+            .querySelector(".js-internal-link.is-active")
+            ?.classList.remove("is-active");
+        }
 
-  //Premium Panel
-  const premiumPanelWrapper = document.querySelector(".premium-wrapper");
-  const registerDomainImgEl = premiumPanelWrapper.querySelector(".email-domain-illustration");
+        // Custom rule to send "Closed Report Issue" event
+        if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
+          sendRelayEvent("Panel", "click", "closed-report-issue");
+        }
 
-  //Dashboard Statistics
-  const dashboardStatistics = document.querySelectorAll(".dashboard-stats-list");
+        popup.panel.update(backTarget);
+      },
+      dismissErrorClick: async (e) => {
+        e.preventDefault();
+        e.target.classList.remove("is-shown");
+      },
+      externalClick: async (e) => {
+        e.preventDefault();
+        if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
+          sendRelayEvent(
+            "Panel",
+            e.target.dataset.eventAction,
+            e.target.dataset.eventLabel
+          );
+        }
+        await browser.tabs.create({ url: e.target.href });
+        window.close();
+      },
+      navigationClick: (e) => {
+        e.preventDefault();
+        document
+          .querySelector(".js-internal-link.is-active")
+          ?.classList.remove("is-active");
+        e.target.classList.add("is-active");
+        const panelId = e.target.dataset.panelId;
+        popup.panel.update(panelId);
+      },
+      generateMask: async (event, type = "random", data = null) => {
+        
+        // Types: "random", "custom"
+        sendRelayEvent("Panel", "click", `popup-generate-${type}-mask`);
+        preventDefaultBehavior(event);
 
-  //Get profile data from site
-  const { aliasesUsedVal } = await browser.storage.local.get("aliasesUsedVal");
-  const { emailsForwardedVal } = await browser.storage.local.get("emailsForwardedVal");
-  const { emailsBlockedVal } = await browser.storage.local.get("emailsBlockedVal");
-  const { emailTrackersRemovedVal } = await browser.storage.local.get("emailTrackersRemovedVal");
+        const isRandomMask = (type == "random");
+        const isCustomMask = (type == "custom");
+        const { premium } = await browser.storage.local.get("premium");
 
-  dashboardStatistics.forEach((statSet) => {
-    const aliasesUsedValEl = statSet.querySelector(".aliases-used");
-    const emailsBlockedValEl = statSet.querySelector(".emails-blocked");
-    const emailsForwardedValEl = statSet.querySelector(".emails-forwarded");
-    const emailTrackersRemovedValEl = statSet.querySelector(".email-trackers-removed");
+        event.target.classList.add("is-loading");
 
-    aliasesUsedValEl.textContent = aliasesUsedVal;
-    emailsBlockedValEl.textContent = emailsBlockedVal;
-    emailsForwardedValEl.textContent = emailsForwardedVal;
-    emailTrackersRemovedValEl.textContent = emailTrackersRemovedVal;
-  });
+        const newRelayAddressResponseArgs = isCustomMask ?  { method: "makeDomainAddress" } : { method: "makeRelayAddress" }
+        
+        if (isRandomMask) {
+          // When rebuilding panel, scroll to the top of it
+          const panel = document.querySelector(".fx-relay-mask-list");
+          panel.scrollIntoView(true);
+        } 
 
-  //Check if premium features are available
-  const premiumCountryAvailability = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS
+        // Request the active tab from the background script and parse the `document.location.hostname`
+        const currentPageHostName = await browser.runtime.sendMessage({
+          method: "getCurrentPageHostname",
+        });
 
-  //Check if user is premium
-  const { premium } = await browser.storage.local.get("premium");
+        // If active tab is a non-internal browser page, add a label to the creation request
+        if (currentPageHostName !== null) {
+          newRelayAddressResponseArgs.description = currentPageHostName;
+        }
 
-  //Check if user has a subdomain set
-  const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+        if (isCustomMask && data) {
+          newRelayAddressResponseArgs.address = data.address
+          newRelayAddressResponseArgs.block_list_emails = data.block_list_emails
+        }
 
-  //Educational Panel
-  const educationalImgEl = premiumPanelWrapper.querySelector(".education-img");
-  const educationHeadlineEl = premiumPanelWrapper.querySelector(".education-headline");
-  const educationBodyEl = premiumPanelWrapper.querySelector(".education-body");
-  const currentEducationalPanel = premiumPanelWrapper.querySelector(".current-panel");
-  const educationalCtaEl = premiumPanelWrapper.querySelector(".onboarding-cta");
+        // Attempt to create a new alias
+        const newRelayAddressResponse = await browser.runtime.sendMessage(newRelayAddressResponseArgs);
 
-  const updatePremiumPanel = async (panelId) => {
-    const panelToShow = `panel${panelId}`;
-    premiumPanelWrapper.setAttribute("id", panelToShow);
-    let panelStrings = premiumPanelStrings.announcements[`${panelToShow}`];
-    
-    if (!panelStrings) {
-      // Exit early if on a non-onboarding
-      return;
-    }
-    educationBodyEl.classList.remove("small-font-size");
-    if (panelStrings.longText) {
-      educationBodyEl.classList.add("small-font-size");
-    }
+        // Catch edge cases where the "Generate New Alias" button is still enabled,
+        // but the user has already reached the max number of aliases.
+        if (newRelayAddressResponse.status === 402) {
+          event.target.classList.remove("is-loading");
+          throw new Error(
+            browser.i18n.getMessage("pageInputIconMaxAliasesError_mask")
+          );
+        }
 
-    // If bundle is unavailable but phone masking is, only show the phone masking promo
-    if (!isBundleAvailable && isPhoneMaskingAvailable) {
-      delete premiumPanelStrings.announcements.panel2;
-    }
+        // Reset previous form
+        if (premium && isCustomMask) {
+            const customMaskDomainInput = document.getElementById("customMaskName");
+            customMaskDomainInput.value = "";
+            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
+            customMaskBlockPromosCheckbox.checked = false;
+        }
+        
+        // Catch edge cases where the "Generate New Alias" button is still enabled,
+        // but the user has already reached the max number of aliases.
+        if (newRelayAddressResponse.status === 409 || newRelayAddressResponse.status === 400) {
+          event.target.classList.remove("is-loading");
+          
+          const errorMessage = document.querySelector(".fx-relay-masks-error-message");
+          errorMessage.classList.add("is-shown");
+          
+          errorMessage.addEventListener("click",popup.events.dismissErrorClick, false);
 
-    // If phone masking is unavailable but bundle is, only show bundle promo
-    if (!isPhoneMaskingAvailable && isBundleAvailable) {
-      // Force panel to start at panel2, which is the bundle promo
-      panelStrings = premiumPanelStrings.announcements.panel2;
-      delete premiumPanelStrings.announcements.panel1;
-    }
+          await popup.panel.masks.utilities.buildMasksList({newMaskCreated: false});
+          
+          return;
+        }
 
-    setPagination(panelId);
+        event.target.classList.remove("is-loading");
 
-    educationHeadlineEl.textContent = panelStrings.tipHeadline;
-    educationBodyEl.textContent = panelStrings.tipBody;
-    educationalImgEl.src = `/images/panel-images/${panelStrings.imgSrcPremium}`;
-    educationalCtaEl.textContent = panelStrings.tipCta;
-    currentEducationalPanel.textContent = `${tipPanelToShow}`;
+        // Hide onboarding panel
+        const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+        noMasksCreatedPanel.classList.add("is-hidden");
 
-    registerDomainImgEl.src = `/images/panel-images/email-domain-illustration.svg`;
+        await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
 
-    // Remove panel status if user has unlimited aliases, so no negative alias left count
-    if (premium) {
-      const panelStatus = document.querySelector(".panel-status");
-      panelStatus.classList.add("is-hidden");
-    }
+        
+        if (!premium) {
+          await popup.panel.masks.utilities.setRemainingMaskCount();
+        }
 
-    return;
+      }
+    },
+    init: async () => {
+      // Set Navigation Listeners
+      const navigationButtons = document.querySelectorAll(".js-internal-link");
+      navigationButtons.forEach((button) => {
+        button.addEventListener("click", popup.events.navigationClick, false);
+      });
+
+      // Set Back Button Listeners
+      const backButtons = document.querySelectorAll(
+        ".fx-relay-panel-header-btn-back"
+      );
+      backButtons.forEach((button) => {
+        button.addEventListener("click", popup.events.backClick, false);
+      });
+
+      // Check if user is signed in to show default/sign-in panel
+      if (await popup.utilities.isUserSignedIn()) {
+        popup.panel.update("masks");
+        popup.utilities.unhideNavigationItemsOnceLoggedIn();
+      } else {
+        popup.panel.update("sign-up");
+        document.body.classList.remove("is-loading");
+      }
+
+      // Set External Event Listerners
+      await popup.utilities.setExternalLinkEventListeners();
+
+      // Set Notification Bug for Unread News Items
+      popup.panel.news.utilities.initNewsItemCountNotification();
+
+      // TODO: Focus On Generate Button for Free / Search Filter for Premiums
+
+    },
+    panel: {
+      update: (panelId, data) => {
+        const panels = document.querySelectorAll(".fx-relay-panel");
+        panels.forEach((panel) => {
+          panel.classList.add("is-hidden");
+
+          if (panel.dataset.panelId === panelId) {
+            panel.classList.remove("is-hidden");
+            popup.panel.init(panelId, data);
+          }
+        });
+
+        state.currentPanel = panelId;
+      },
+      init: (panelId, data) => {
+        switch (panelId) {
+          case "custom": 
+            popup.panel.masks.custom.init();
+            break;
+
+          case "masks": 
+            popup.panel.masks.init();
+            break;
+
+          case "news":
+            sendRelayEvent("Panel", "click", "opened-news");
+            popup.panel.news.init();
+
+            popup.panel.news.utilities.updateNewsItemCountNotification(true);
+
+            break;
+          case "newsStory":
+            sendRelayEvent("Panel", "click", "opened-news-item");
+            popup.panel.news.storyPanel.update(data.newsItemId);
+            break;
+          case "settings":
+            popup.utilities.enableInputIconDisabling();
+            // Function is imported from data-opt-out-toggle.js
+            enableDataOptOut();
+
+            document
+              .getElementById("popupSettingsReportIssue")
+              .addEventListener(
+                "click",
+                (e) => {
+                  e.preventDefault();
+                  popup.panel.update("webcompat");
+                },
+                false
+              );
+
+            break;
+          case "stats":
+            sendRelayEvent("Panel", "click", "opened-stats");
+            popup.panel.stats.init();
+            break;
+
+          case "webcompat":
+            sendRelayEvent("Panel", "click", "opened-report-issue");
+            popup.panel.webcompat.init();
+            break;
+
+          default:
+            break;
+        }
+      },
+      masks: {
+        custom: {
+          init: async () => {
+            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
+            const customMaskDomainLabel = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-domain");
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
+            customMaskDomainInput.placeholder = browser.i18n.getMessage("popupCreateCustomFormMaskInputPlaceholder");
+            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", premiumSubdomainSet);
+
+            customMaskDomainInput.addEventListener("input", popup.panel.masks.custom.validateForm);
+            customMaskForm.addEventListener("submit", popup.panel.masks.custom.submit);
+
+            const currentPageHostName = await browser.runtime.sendMessage({
+              method: "getCurrentPageHostname",
+            });
+
+            if (currentPageHostName) {
+              const parsedDomain = psl.parse(currentPageHostName)
+              customMaskDomainInput.value = parsedDomain.sld;
+              customMaskDomainSubmitButton.disabled = false
+            }
+
+            customMaskDomainInput.focus();
+            
+          },
+          submit: async (event) => {
+            event.preventDefault();
+            // const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = document.getElementById("customMaskName");
+            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
+
+            if (!customMaskDomainInput.value) {
+              throw new Error(`No address name set`)
+            }
+
+            popup.events.generateMask(event, "custom", {
+              address: customMaskDomainInput.value,
+              block_list_emails: customMaskBlockPromosCheckbox.checked,
+            });
+
+            popup.panel.update("masks");
+            
+          },
+          validateForm: async () => {
+            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
+            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
+
+            // If there's input, make the form submission possible
+            customMaskDomainSubmitButton.disabled = !(customMaskDomainInput.value)
+          }
+        },
+        init: async () => {
+          
+          const masks = await popup.utilities.getMasks();
+          
+          // If no masks are created, 
+          if (masks.length === 0) {
+            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+            noMasksCreatedPanel.classList.remove("is-hidden");
+          }
+          
+          const { premium } = await browser.storage.local.get("premium");
+          const maskPanel = document.getElementById("masks-panel");
+          const generateRandomMask = document.querySelector(".js-generate-random-mask");
+          
+          if (!premium) {
+            await popup.panel.masks.utilities.setRemainingMaskCount();
+            maskPanel.setAttribute("data-account-level", "free");
+          } else {            
+            maskPanel.setAttribute("data-account-level", "premium");
+
+            // Update language of Generate Random Mask to "Generate random mask"
+            generateRandomMask.textContent = browser.i18n.getMessage("pageInputIconGenerateRandomMask");
+
+            // Prompt user to register subdomain
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
+            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";  
+          
+            if (!isPremiumSubdomainSet) {
+              const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+              registerSubdomainButton.classList.remove("is-hidden");
+            } else {
+
+              const generateCustomMask = document.querySelector(".js-generate-custom-mask");
+              
+              // Show "Generate custom mask" button
+              generateCustomMask.classList.remove("is-hidden");
+
+              generateCustomMask.addEventListener("click", (e) => {
+                e.preventDefault();
+                popup.panel.update("custom");
+              }, false);
+              
+              // Restyle Random Mask button to secondary
+              generateRandomMask.classList.remove("t-primary");
+              generateRandomMask.classList.add("t-secondary");
+            }
+          }
+
+          
+          generateRandomMask.addEventListener("click", (e) => {
+              popup.events.generateMask(e, "random");
+            }, false);
+          
+          // Build initial list
+          popup.panel.masks.utilities.buildMasksList();
+
+          // Remove loading state
+          document.body.classList.remove("is-loading");
+
+        },
+        utilities: {
+          buildMasksList: async (opts = null) => {
+            let getMasksOptions = { fetchCustomMasks: false };
+            const { premium } = await browser.storage.local.get("premium");
+
+            if (premium) {
+              // Check if user may have custom domain masks
+              const { premiumSubdomainSet } = await browser.storage.local.get(
+                "premiumSubdomainSet"
+              );
+
+              // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+              const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+              getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+
+              // If not set, prompt user to register domain
+              if (!isPremiumSubdomainSet) {
+                const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+                registerSubdomainButton.classList.remove("is-hidden");
+              }
+
+              // Show Generate Button
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.classList.remove("is-hidden");              
+            }
+            
+            const masks = await popup.utilities.getMasks(getMasksOptions);
+            
+            const maskList = document.querySelector(".fx-relay-mask-list");
+            // Reset mask list
+            maskList.textContent = "";
+
+            masks.forEach(mask => {
+              const maskListItem = document.createElement("li");
+              maskListItem.setAttribute("data-mask-address", mask.full_address);
+              
+              if (mask.used_on !== "") {
+                maskListItem.setAttribute("data-mask-used-on", mask.used_on);
+              }
+
+              if (mask.generated_for !== "") {
+                maskListItem.setAttribute("data-mask-generated", mask.generated_for);
+              }
+              
+              maskListItem.classList.add("fx-relay-mask-item");
+
+              const maskListItemNewMaskCreatedLabel = document.createElement("span");
+              maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
+              maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
+              maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
+
+              const maskListItemLabel = document.createElement("span");
+              maskListItemLabel.classList.add("fx-relay-mask-item-label");
+              maskListItemLabel.textContent = mask.description;
+              
+              // Append Label if it exists
+              if (mask.description !== "") {
+                maskListItem.appendChild(maskListItemLabel);
+              }
+              
+              const maskListItemAddressBar = document.createElement("div");
+              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+
+              const maskListItemAddress = document.createElement("div");
+              maskListItemAddress.classList.add("fx-relay-mask-item-address");
+              maskListItemAddress.textContent = mask.full_address;
+              maskListItemAddressBar.appendChild(maskListItemAddress);
+
+              const maskListItemAddressActions = document.createElement("div");
+              maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
+
+              const maskListItemCopyButton = document.createElement("button");
+              maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
+              maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
+
+              const maskListItemCopyButtonSuccessMessage = document.createElement("span");
+              maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
+              maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
+              maskListItemAddressActions.appendChild(maskListItemCopyButtonSuccessMessage);
+              
+              maskListItemCopyButton.addEventListener("click", (e)=> {
+                e.preventDefault();
+                navigator.clipboard.writeText(e.target.dataset.maskAddress);
+                maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
+                setTimeout(() => {
+                  maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
+                }, 1000);
+              }, false);
+              maskListItemAddressActions.appendChild(maskListItemCopyButton);
+
+              const maskListItemToggleButton = document.createElement("button");
+              maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
+              maskListItemToggleButton.addEventListener("click", ()=> {
+                // TODO: Add Toggle Function
+              }, false);
+              maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
+              maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
+              maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
+
+              maskListItemAddressActions.appendChild(maskListItemToggleButton);
+
+              maskListItemAddressBar.appendChild(maskListItemAddressActions);
+              maskListItem.appendChild(maskListItemAddressBar);
+              maskList.appendChild(maskListItem);
+            });
+
+            // Display "Mask created" temporary label when a new mask is created in the panel
+            if (opts && opts.newMaskCreated && maskList.firstElementChild) {
+              maskList.firstElementChild.classList.add("is-new-mask");
+
+              setTimeout(() => {
+                maskList.firstElementChild.classList.remove("is-new-mask");
+              }, 1000);
+            }
+          },
+          getRemainingAliases: async () => {
+            const masks = await popup.utilities.getMasks();
+            const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+            return { masks, maxNumAliases };
+          },
+          getRemainingMaskCount: async () => {
+            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const numRemaining = maxNumAliases - masks.length;
+            return numRemaining;
+          },
+          setRemainingMaskCount: async () => {
+            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const numRemaining = maxNumAliases - masks.length;
+            const masksAvailable = document.querySelector(".fx-relay-masks-available-count");
+            const masksLimitReached = document.querySelector(".fx-relay-masks-limit-upgrade-string");
+            const limitReachedToast = document.querySelector(".fx-relay-masks-limit-upgrade");
+
+            masksAvailable.textContent = browser.i18n.getMessage("popupFreeMasksAvailable", [numRemaining, maxNumAliases]);
+            masksLimitReached.textContent = browser.i18n.getMessage("popupFreeMasksLimitReached", [maxNumAliases]);
+
+            const generateRandomMask = document.querySelector(".js-generate-random-mask");
+            
+            if (masks.length === 0) {
+              generateRandomMask.classList.remove("is-hidden");
+              return;
+            }
+            
+            if (numRemaining === 0) {
+              // No masks remaining
+              limitReachedToast.classList.remove("is-hidden");
+              masksAvailable.classList.add("is-hidden");
+              
+              // Hide Generate Button
+              generateRandomMask.classList.add("is-hidden");
+
+              // Show Upgrade Button
+              const getUnlimitedMasksBtn = document.querySelector(".fx-relay-mask-upgrade-button");
+              getUnlimitedMasksBtn.classList.remove("is-hidden");
+            } else {
+              
+              // Show Masks Count/Generate Button
+              masksAvailable.classList.remove("is-hidden");
+              generateRandomMask.classList.remove("is-hidden");
+            }
+          
+            
+            
+          }
+        },
+      },
+      news: {
+        init: async () => {
+
+          const newsList = document.querySelector(".fx-relay-news");
+
+          // If there's no news items, go build them
+          if ( !newsList.hasChildNodes() ) {
+            newsContent.forEach(async (newsItem) => {
+              // Check for any catches to not display the item
+              const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
+              
+              if (
+                // Check for waffle (Waffle must return false to catch)
+                (
+                  newsItem.waffle &&
+                  !(await checkWaffleFlag(newsItem.waffle)))
+                ||
+                // logicCheck Function (Must return false to catch)
+                (hasLogicCheck && !newsItem.logicCheck)
+              ) {
+                return;
+              }
+
+              // Build and attach news item
+              const liFxRelayNewsItem = document.createElement("li");
+              liFxRelayNewsItem.classList.add("fx-relay-news-item");
+
+              const button = document.createElement("button");
+              button.classList.add("fx-relay-news-item-button");
+              button.setAttribute("data-news-item-id", newsItem.id);
+              liFxRelayNewsItem.appendChild(button);
+
+              const divTeaserImage = document.createElement("div");
+              divTeaserImage.classList.add("fx-relay-news-item-image");
+
+              const imgTeaserImage = document.createElement("img");
+              imgTeaserImage.src = newsItem.teaserImg;
+              divTeaserImage.appendChild(imgTeaserImage);
+              button.appendChild(divTeaserImage);
+
+              const divTeaserCopy = document.createElement("div");
+              divTeaserCopy.classList.add("fx-relay-news-item-content");
+
+              const h3TeaserTitle = document.createElement("h3");
+              h3TeaserTitle.classList.add("fx-relay-news-item-hero");
+              // Pass i18n Args if applicable
+              const h3TeaserTitleTextContent = newsItem.headlineStringArgs
+                ? browser.i18n.getMessage(
+                    newsItem.headlineString,
+                    newsItem.headlineStringArgs
+                  )
+                : browser.i18n.getMessage(newsItem.headlineString);
+              h3TeaserTitle.textContent = h3TeaserTitleTextContent;
+
+              const divTeaserBody = document.createElement("div");
+              divTeaserBody.classList.add("fx-relay-news-item-body");
+              // Pass i18n Args if applicable
+              const divTeaserBodyTextContent = newsItem.bodyStringArgs
+                ? browser.i18n.getMessage(
+                    newsItem.bodyString,
+                    newsItem.bodyStringArgs
+                  )
+                : browser.i18n.getMessage(newsItem.bodyString);
+              divTeaserBody.textContent = divTeaserBodyTextContent;
+
+              divTeaserCopy.appendChild(h3TeaserTitle);
+              divTeaserCopy.appendChild(divTeaserBody);
+              button.appendChild(divTeaserCopy);
+
+              newsList.appendChild(liFxRelayNewsItem);
+
+              button.addEventListener(
+                "click",
+                popup.panel.news.storyPanel.show,
+                false
+              );
+            });
+          }
+        },
+        storyPanel: {
+          show: (event) => {
+            popup.panel.update("newsStory", {
+              newsItemId: event.target.dataset.newsItemId,
+            });
+          },
+          update: (newsItemId) => {
+            // Get content for news detail view
+            const storyData = newsContent.filter((story) => { return story.id == newsItemId });
+            const newsItemContent = storyData[0];
+            
+            const newsStoryDetail = document.querySelector(".fx-relay-news-story");
+            
+            // Reset news detail item
+            newsStoryDetail.textContent = "";
+
+             // Populate HTML
+            const newsStoryHeroImage = document.createElement("img");
+            newsStoryHeroImage.src = newsItemContent.fullImg;
+            newsStoryDetail.appendChild(newsStoryHeroImage);
+            
+            const newsStoryHeroTitle = document.createElement("h3");
+            const newsStoryHeroTitleTextContent = newsItemContent.headlineStringArgs
+              ? browser.i18n.getMessage(
+                  newsItemContent.headlineString,
+                  newsItemContent.headlineStringArgs
+                )
+              : browser.i18n.getMessage(newsItemContent.headlineString);
+            newsStoryHeroTitle.textContent = newsStoryHeroTitleTextContent;
+            newsStoryDetail.appendChild(newsStoryHeroTitle);
+            
+            const newsStoryHeroBody = document.createElement("div");
+            // Pass i18n Args if applicable
+            const newsStoryHeroBodyTextContent = newsItemContent.bodyStringArgs
+              ? browser.i18n.getMessage(
+                  newsItemContent.bodyString,
+                  newsItemContent.bodyStringArgs
+                )
+              : browser.i18n.getMessage(newsItemContent.bodyString);
+            newsStoryHeroBody.textContent = newsStoryHeroBodyTextContent;
+            newsStoryDetail.appendChild(newsStoryHeroBody);
+
+            // If the section has a CTA, add it.
+            if (newsItemContent.fullCta) {
+              const newsStoryHeroCTA = document.createElement("a");
+              newsStoryHeroCTA.classList.add("fx-relay-news-story-link");
+
+              // If the URL points towards Relay, choose the correct server
+              if (newsItemContent.fullCtaRelayURL) {
+                newsStoryHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
+              } else {
+                newsStoryHeroCTA.href = `${newsItemContent.fullCtaHref}`;
+              }
+              
+              // Set GA data if applicable
+              if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
+                newsStoryHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
+                newsStoryHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
+              }
+
+              newsStoryHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
+              newsStoryHeroCTA.addEventListener("click", popup.events.externalClick, false);
+              newsStoryDetail.appendChild(newsStoryHeroCTA);
+            }
+          },
+        },
+        utilities: {
+          initNewsItemCountNotification: async () => {
+            
+            const localStorage = await browser.storage.local.get();
+
+            const unreadNewsItemsCountExists =
+              Object.prototype.hasOwnProperty.call(
+                localStorage,
+                "unreadNewsItemsCount"
+              );
+              
+            const readNewsItemsCountExists =
+              Object.prototype.hasOwnProperty.call(
+                localStorage,
+                "readNewsItemCount"
+              );
+
+            // First-run user: No unread data present
+            if (!unreadNewsItemsCountExists && !readNewsItemsCountExists) {
+              await browser.storage.local.set({
+                unreadNewsItemsCount: state.newsItemsCount,
+                readNewsItemCount: 0,
+              });
+            }
+
+            // FIXME: The total news item count may differ than what is displayed to the user
+            // Example: Three items total but user doesn't have waffle for one news item. 
+            // Regardless - update the unreadNews count to match whatever is in state
+            await browser.storage.local.set({
+              unreadNewsItemsCount: state.newsItemsCount,
+            });
+
+            const { readNewsItemCount } = await browser.storage.local.get(
+              "readNewsItemCount"
+            );
+
+            const { unreadNewsItemsCount } = await browser.storage.local.get(
+              "unreadNewsItemsCount"
+            );
+
+            // Set unread count
+            const newsItemCountNotification = document.querySelector(
+              ".fx-relay-menu-dashboard-link[data-panel-id='news'] .news-count"
+            );
+            
+            const unreadCount = unreadNewsItemsCount - readNewsItemCount;
+
+            // Show count is it exists
+            if (unreadCount > 0) {
+              newsItemCountNotification.textContent = unreadCount.toString();
+              newsItemCountNotification.classList.remove("is-hidden");
+            }
+            
+          },
+          updateNewsItemCountNotification: async (markAllUnread = false) => {
+            if (markAllUnread) {
+              await browser.storage.local.set({
+                readNewsItemCount: state.newsItemsCount,
+              });
+
+              const newsItemCountNotification = document.querySelector(
+                ".fx-relay-menu-dashboard-link[data-panel-id='news'] .news-count"
+              );
+
+              newsItemCountNotification.classList.add("is-hidden");
+
+            }
+          }
+        },
+      },
+      stats: {
+        init: async () => {
+          // Get Global Mask Stats data
+          const { aliasesUsedVal } = await browser.storage.local.get(
+            "aliasesUsedVal"
+          );
+          const { emailsForwardedVal } = await browser.storage.local.get(
+            "emailsForwardedVal"
+          );
+          const { emailsBlockedVal } = await browser.storage.local.get(
+            "emailsBlockedVal"
+          );
+
+          const globalStatSet = document.querySelector(
+            ".dashboard-stats-list.global-stats"
+          );
+
+          const globalAliasesUsedValEl =
+            globalStatSet.querySelector(".aliases-used");
+          const globalEmailsBlockedValEl =
+            globalStatSet.querySelector(".emails-blocked");
+          const globalEmailsForwardedValEl =
+            globalStatSet.querySelector(".emails-forwarded");
+
+          globalAliasesUsedValEl.textContent = aliasesUsedVal;
+          globalEmailsBlockedValEl.textContent = emailsBlockedVal;
+          globalEmailsForwardedValEl.textContent = emailsForwardedVal;
+
+          // Check if any data applies to the current site
+          const currentPageHostName = await browser.runtime.sendMessage({
+            method: "getCurrentPageHostname",
+          });
+
+          // Check if user is premium (and then check if they have a domain set)
+          // This is needed in order to query both random and custom masks
+          const { premium } = await browser.storage.local.get("premium");
+          let getMasksOptions = { fetchCustomMasks: false };
+
+          if (premium) {
+            // Check if user may have custom domain masks
+            const { premiumSubdomainSet } = await browser.storage.local.get(
+              "premiumSubdomainSet"
+            );
+
+            // API Note: If a user has not registered a subdomain yet, its default stored/queried value is "None";
+            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+            getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
+          }
+
+          const masks = await popup.utilities.getMasks(getMasksOptions);
+
+          const currentWebsiteStateSet = document.querySelector(
+            ".dashboard-stats-list.current-website-stats"
+          );
+
+          if (
+            popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(
+              masks,
+              currentPageHostName
+            )
+          ) {
+            // Some masks are used on the current site. Time to calculate!
+            const filteredMasks = masks.filter(
+              (mask) =>
+                mask.generated_for === currentPageHostName ||
+                popup.utilities.hasMaskBeenUsedOnCurrentSite(
+                  mask,
+                  currentPageHostName
+                )
+            );
+
+            let currentWebsiteForwardedVal = 0;
+            let currentWebsiteBlockedVal = 0;
+
+            filteredMasks.forEach((mask) => {
+              currentWebsiteForwardedVal += mask.num_forwarded;
+              currentWebsiteBlockedVal += mask.num_blocked;
+            });
+
+            const currentWebsiteAliasesUsedValEl =
+              currentWebsiteStateSet.querySelector(".aliases-used");
+            currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
+
+            const currentWebsiteEmailsForwardedValEl =
+              currentWebsiteStateSet.querySelector(".emails-forwarded");
+            currentWebsiteEmailsForwardedValEl.textContent =
+              currentWebsiteForwardedVal;
+
+            const currentWebsiteEmailsBlockedValEl =
+              currentWebsiteStateSet.querySelector(".emails-blocked");
+            currentWebsiteEmailsBlockedValEl.textContent =
+              currentWebsiteBlockedVal;
+
+            const currentWebsiteEmailsBlocked =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-blocked"
+              );
+            const currentWebsiteEmailsForwarded =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-forwarded"
+              );
+            currentWebsiteEmailsBlocked.classList.remove("is-hidden");
+            currentWebsiteEmailsForwarded.classList.remove("is-hidden");
+          }
+        },
+      },
+      webcompat: {
+        init: () => {
+          popup.panel.webcompat.setURLwithIssue();
+          popup.panel.webcompat.showReportInputOtherTextField();
+          popup.panel.webcompat.showSuccessReportSubmission();
+
+          const reportForm = document.querySelector(".report-issue-content");
+          reportForm.addEventListener("submit", async (event) => {
+            await popup.panel.webcompat.handleReportIssueFormSubmission(event);
+          });
+
+          const reportContinueButton =
+            document.querySelector(".report-continue");
+          reportContinueButton.addEventListener(
+            "click",
+            popup.events.backClick,
+            false
+          );
+        },
+        setURLwithIssue: async () => {
+          // Add Site URL placeholder
+          const currentPage = (await popup.utilities.getCurrentPage()).url;
+          const reportIssueSubmitBtn = document.querySelector(
+            ".report-issue-submit-btn"
+          );
+          const inputFieldUrl = document.querySelector(
+            'input[name="issue_on_domain"]'
+          );
+          reportIssueSubmitBtn.disabled = true;
+
+          // Allow for custom URL inputs
+          inputFieldUrl.addEventListener("input", () => {
+            reportIssueSubmitBtn.disabled = true;
+            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
+            if (popup.utilities.isSortaAURL(inputFieldUrl.value)) {
+              reportIssueSubmitBtn.disabled = false;
+            }
+          });
+
+          // Check that the host site has a valid URL
+          if (currentPage) {
+            const url = new URL(currentPage);
+            // returns a http:// or https:// value
+            inputFieldUrl.value = url.origin;
+            reportIssueSubmitBtn.disabled = false;
+          }
+        },
+        showReportInputOtherTextField: () => {
+          const otherCheckbox = document.querySelector(
+            'input[name="issue-case-other"]'
+          );
+          const otherTextField = document.querySelector(
+            'input[name="other_issue"]'
+          );
+          otherCheckbox.addEventListener("click", () => {
+            otherTextField.classList.toggle("is-hidden");
+          });
+
+          // Add placeholder to report input on 'Other' selection
+          const inputFieldOtherDetails = document.querySelector(
+            'input[name="other_issue"]'
+          );
+          inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
+            "popupReportIssueCaseOtherDetails"
+          );
+        },
+        showSuccessReportSubmission: () => {
+          const reportIssueSubmitBtn = document.querySelector(
+            ".report-issue-submit-btn"
+          );
+          const reportSuccess = document.querySelector(".report-success");
+          const reportContent = document.querySelector(".report-issue-content");
+          reportIssueSubmitBtn.addEventListener("click", () => {
+            reportSuccess.classList.remove("is-hidden");
+            reportContent.classList.add("is-hidden");
+          });
+        },
+        handleReportIssueFormSubmission: async (event) => {
+          event.preventDefault();
+          const data = new FormData(event.target);
+          const reportData = Object.fromEntries(data.entries());
+          reportData.user_agent = await getBrowser();
+
+          Object.keys(reportData).forEach(function (value) {
+            // Switch "on" to true
+            if (reportData[value] === "on") {
+              reportData[value] = true;
+            }
+            // Remove from report if empty string
+            if (reportData[value] === "") {
+              delete reportData[value];
+            }
+          });
+
+          // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
+          if (
+            !(
+              reportData.issue_on_domain.startsWith("http://") ||
+              reportData.issue_on_domain.startsWith("https://")
+            )
+          ) {
+            reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
+          }
+
+          await browser.runtime.sendMessage({
+            method: "postReportWebcompatIssue",
+            description: reportData,
+          });
+        },
+      },
+    },
+    utilities: {
+      checkIfAnyMasksWereGeneratedOnCurrentWebsite: (masks, domain) => {
+        return masks.some((mask) => {
+          return domain === mask.generated_for;
+        });
+      },
+      clearBrowserActionBadge: async () => {
+        const { browserActionBadgesClicked } = await browser.storage.local.get(
+          "browserActionBadgesClicked"
+        );
+
+        // Dismiss the browserActionBadge only when it exists
+        if (browserActionBadgesClicked === false) {
+          browser.storage.local.set({ browserActionBadgesClicked: true });
+          browser.browserAction.setBadgeBackgroundColor({ color: null });
+          browser.browserAction.setBadgeText({ text: "" });
+        }
+      },
+      enableInputIconDisabling: async () => {
+        const inputIconVisibilityToggle = document.querySelector(
+          ".toggle-icon-in-page-visibility"
+        );
+
+        const stylePrefToggle = (inputsEnabled) => {
+          if (inputsEnabled === "show-input-icons") {
+            inputIconVisibilityToggle.dataset.iconVisibilityOption =
+              "disable-input-icon";
+            inputIconVisibilityToggle.classList.remove("input-icons-disabled");
+            return;
+          }
+          inputIconVisibilityToggle.dataset.iconVisibilityOption =
+            "enable-input-icon";
+          inputIconVisibilityToggle.classList.add("input-icons-disabled");
+        };
+
+        const iconsAreEnabled = await areInputIconsEnabled();
+        const userIconChoice = iconsAreEnabled
+          ? "show-input-icons"
+          : "hide-input-icons";
+        stylePrefToggle(userIconChoice);
+
+        inputIconVisibilityToggle.addEventListener("click", async () => {
+          const userIconPreference =
+            inputIconVisibilityToggle.dataset.iconVisibilityOption ===
+            "disable-input-icon"
+              ? "hide-input-icons"
+              : "show-input-icons";
+          await browser.runtime.sendMessage({
+            method: "updateInputIconPref",
+            iconPref: userIconPreference,
+          });
+          sendRelayEvent("Panel", "click", userIconPreference);
+          return stylePrefToggle(userIconPreference);
+        });
+      },
+      hasMaskBeenUsedOnCurrentSite: (mask, domain) => {
+        const domainList = mask.used_on;
+
+        // Short circuit out if there's no used_on entry
+        if (
+          domainList === null ||
+          domainList === "" ||
+          domainList === undefined
+        ) {
+          return false;
+        }
+
+        // Domain already exists in used_on field. Just return the list!
+        if (domainList.split(",").includes(domain)) {
+          return true;
+        }
+
+        // No match found!
+        return false;
+      },
+      isSortaAURL: (str) => {
+        return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
+      },
+      isUserSignedIn: async () => {
+        const userApiToken = await browser.storage.local.get("apiToken");
+        const signedInUser = Object.prototype.hasOwnProperty.call(
+          userApiToken,
+          "apiToken"
+        );
+        return signedInUser;
+      },
+      getCachedServerStoragePref: async () => {
+        const serverStoragePref = await browser.storage.local.get(
+          "server_storage"
+        );
+        const serverStoragePrefInLocalStorage =
+          Object.prototype.hasOwnProperty.call(
+            serverStoragePref,
+            "server_storage"
+          );
+
+        if (!serverStoragePrefInLocalStorage) {
+          // There is no reference to the users storage preference saved. Fetch it from the server.
+          return await browser.runtime.sendMessage({
+            method: "getServerStoragePref",
+          });
+        } else {
+          // If the stored pref exists, return value
+          return serverStoragePref.server_storage;
+        }
+      },
+      getCurrentPage: async () => {
+        const [currentTab] = await browser.tabs.query({
+          active: true,
+          currentWindow: true,
+        });
+        return currentTab;
+      },
+      getMasks: async (options = { fetchCustomMasks: false }) => {
+        const serverStoragePref =
+          await popup.utilities.getCachedServerStoragePref();
+
+        if (serverStoragePref) {
+          try {
+            return await browser.runtime.sendMessage({
+              method: "getAliasesFromServer",
+              options,
+            });
+          } catch (error) {
+            console.warn(`getAliasesFromServer Error: ${error}`);
+
+            // API Error — Fallback to local storage
+            const { relayAddresses } = await browser.storage.local.get(
+              "relayAddresses"
+            );
+
+            return relayAddresses;
+          }
+        }
+      },
+      setExternalLinkEventListeners: async () => {
+        const externalLinks = document.querySelectorAll(".js-external-link");
+
+        externalLinks.forEach((link) => {
+          // Because we dynamically set the Relay origin URL (local/dev/stage/prod),
+          // we have to catch Relay-specific links and prepend the correct Relay website URL
+          if (link.dataset.relayInternal === "true") {
+            // TODO: Remove "/" from here. It'll be error prone
+            link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          } else {
+            link.href = `${link.dataset.href}`;
+          }
+
+          link.addEventListener("click", popup.events.externalClick, false);
+        });
+      },
+      unhideNavigationItemsOnceLoggedIn: () => {
+        document
+          .querySelectorAll(".fx-relay-menu-dashboard-link.is-hidden")
+          .forEach((link) => {
+            link.classList.remove("is-hidden");
+          });
+      },
+    },
   };
 
-  const updatePanel = async (numRemaining, panelId) => {
-    const panelToShow = await choosePanel(panelId, premium, premiumSubdomainSet);
-    onboardingPanelWrapper.classList = [panelToShow];
-
-    let panelStrings = onboardingPanelStrings.announcements[`${panelToShow}`];
-
-    // If bundle is unavailable but phone masking is, only show the phone masking promo
-    if (!isBundleAvailable && isPhoneMaskingAvailable) {
-      delete onboardingPanelStrings.announcements.panel2;
-    }
-
-    // If phone masking is unavailable but bundle is, only show bundle promo
-    if (!isPhoneMaskingAvailable && isBundleAvailable) {
-      // Force panel to start at panel2, which is the bundle promo
-      panelStrings = onboardingPanelStrings.announcements.panel2;
-      delete onboardingPanelStrings.announcements.panel1;
-    }
-
-    setPagination(panelId);
-
-    // Only show maxAliasesPanel to users where bundle / phone masking is unavailable
-    // Otherwise, show Phone masking and Bundle promo
-    if (!premium && numRemaining === 0 && !(isPhoneMaskingAvailable || isBundleAvailable)) {
-      panelStrings = onboardingPanelStrings["maxAliasesPanel"];
-      onboardingPanelWrapper.classList = "maxAliasesPanel";
-
-      if (premiumCountryAvailability?.available_in_country === true) {
-        const upgradeButton = document.querySelector(".upgrade-banner-wrapper");
-        upgradeButton.classList.remove("is-hidden");
-      }
-    }
-    if (!panelStrings) {
-      // Exit early if on a non-onboarding
-      return;
-    }
-
-    tipImageEl.src = `/images/panel-images/${panelStrings.imgSrc}`;
-    tipHeadlineEl.textContent = panelStrings.tipHeadline;
-    tipBodyEl.textContent = panelStrings.tipBody;
-    tipCtaEl.textContent = panelStrings.tipCta;
-    currentPanel.textContent = `${panelId}`;
-    upgradeButtonEl.textContent = panelStrings.upgradeButton;
-    upgradeButtonIconEl.src = panelStrings.upgradeButtonIcon;
-
-    //If Premium features are not available, do not show upgrade CTA on the panel
-    if (premiumCountryAvailability?.available_in_country === true) {
-      const premiumCTA = document.querySelector(".premium-cta");
-      premiumCTA.classList.remove("is-hidden");
-    }
-
-    return;
-  };
-
-  const setPagination = (activePanel) => {
-    const pagination = onboardingPanelWrapper.querySelector(".onboarding-pagination");
-    const prevButton = onboardingPanelWrapper.querySelector(".previous-panel");
-    const nextButton = onboardingPanelWrapper.querySelector(".next-panel");
-    const totalPanelsEl = document.querySelector(".total-panels");
-    // Number of panels available for free users
-    let totalPanels = Object.keys(onboardingPanelStrings.announcements).length;
-    if (premium) {
-      totalPanels = Object.keys(premiumPanelStrings.announcements).length;
-    }
-    totalPanelsEl.textContent = totalPanels;
-    prevButton.classList.remove("is-invisible");
-    nextButton.classList.remove("is-invisible");
-    // If user is at the start of the carousel, hide next button
-    if (activePanel === 1) {
-      prevButton.classList.add("is-invisible");
-    }
-    // If user is at the end of the carousel, hide next button
-    if (activePanel === totalPanels) {
-      nextButton.classList.add("is-invisible");
-    }
-    if (totalPanels === 1) {
-      pagination.classList.add("is-hidden");
-    }
-  }
-
-  //Nonpremium panel status 
-  const { relayAddresses, maxNumAliases } = await getRemainingAliases();
-  const numRemaining = maxNumAliases - relayAddresses.length;
-  const remainingAliasMessage = document.querySelector(".aliases-remaining");
-  const getUnlimitedAliases = document.querySelector(".premium-cta");
-  getUnlimitedAliases.textContent = browser.i18n.getMessage("popupGetUnlimitedAliases_mask");
-  document.body.classList.add("relay-panel");
-  
-  // Prevent negative masks from showing, default to 0 if all free masks have been used up
-  // TODO: Create re-usable data fetching and caching method for data syncing
-  let numRemainingNonNegative = numRemaining;
-  if (numRemaining <= 0) {
-    numRemainingNonNegative = 0;
-  }
-  remainingAliasMessage.textContent = browser.i18n.getMessage("popupRemainingAliases_2_mask", [numRemainingNonNegative, maxNumAliases]);
-  
-  updatePremiumPanel(tipPanelToShow);
-  updatePanel(numRemaining, tipPanelToShow);
-
-  document.querySelectorAll(".panel-nav").forEach(navBtn => {
-    navBtn.addEventListener("click", () => {
-      sendRelayEvent("Panel", "click", "panel-navigation-arrow");
-      // pointer events are disabled in popup CSS for the "previous" button on panel 1
-      // and the "next" button on panel 3
-      const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      return updatePanel(numRemaining, tipPanelToShow += nextPanel);
-    });
-  });
-
-  document.querySelectorAll(".premium-panel-nav").forEach(navBtn => {
-    navBtn.addEventListener("click", () => {
-      sendRelayEvent("Panel", "click", "panel-navigation-arrow");
-      // pointer events are disabled in popup CSS for the "previous" button on panel 1
-      // and the "next" button on panel 3
-      const nextPanel = (navBtn.dataset.direction === "-1") ? -1 : 1;
-      return updatePremiumPanel(tipPanelToShow += nextPanel);
-    });
-  });
-
-  if (premium) {
-    remainingAliasMessage.classList.add("is-hidden");
-  }
-
-  if (premiumCountryAvailability?.available_in_country === true) {
-    getUnlimitedAliases.classList.remove("is-hidden");
-  }
-
-  const relayPanel = document.querySelector(".signed-in-panel");
-  relayPanel.classList.remove("hidden");
-
-  if (numRemaining === 0) {
-    return sendRelayEvent("Panel", "viewed-panel", "panel-max-aliases");
-  }
-  return sendRelayEvent("Panel", "viewed-panel", "authenticated-user-panel");
-}
-
-
-async function getAllAliases() {
-  return await browser.storage.local.get("relayAddresses");
-}
-
-
-async function getRemainingAliases() {
-  const { relayAddresses } = await getAllAliases();
-  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
-  return { relayAddresses, maxNumAliases };
-}
-
-async function getBrowser() {
-  if (typeof browser.runtime.getBrowserInfo === "function") {
-    /** @type {{ name: string, vendor: string, version: string, buildID: string }} */
-    const browserInfo = await browser.runtime.getBrowserInfo();
-    return browserInfo.name;
-  }
-  if (navigator.userAgent.toLowerCase().indexOf("firefox") !== -1) {
-    return "Firefox";
-  }
-  return "Chrome";
-}
-
-async function enableSettingsPanel() {
-  const settingsToggles = document.querySelectorAll(".settings-toggle");
-  settingsToggles.forEach(toggle => {
-    toggle.addEventListener("click", () => {
-      document.body.classList.toggle("show-settings");
-      const eventLabel = document.body.classList.contains("show-settings") ? "opened-settings" : "closed-settings";
-      if (document.body.classList.contains("show-settings")) {
-        sendRelayEvent("Panel", "click", eventLabel);
-      }
-    });
-  });
-
-  const currentBrowser = await getBrowser();
-
-  if (currentBrowser === "Chrome") {
-    const supportLink = document.getElementById("popupSettingsLeaveFeedbackLink");
-    const chromeSupportLink = "https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb/?utm_source=fx-relay-addon&utm_medium=popup"
-    supportLink.href = chromeSupportLink;
-  }
-}
-
-function enableReportIssuePanel() {
-  const reportIssueToggle = document.querySelector(".settings-report-issue");
-  const reportIssueSettingsReturn = document.querySelector(".settings-report-issue-return");
-  const submissionSuccessContinue = document.querySelector(".report-continue");
-  [reportIssueToggle, reportIssueSettingsReturn, submissionSuccessContinue].forEach(e => {
-    e.addEventListener("click", () => {
-      document.body.classList.toggle("show-report-issue");
-      const eventLabel = document.body.classList.contains("show-report-issue") ? "opened-report-issue" : "closed-report-issue";
-      if (document.body.classList.contains("show-report-issue")) {
-        sendRelayEvent("Panel", "click", eventLabel);
-      }
-    });
-  });
-  const reportForm = document.querySelector(".report-issue-content");
-  setURLwithIssue();
-  showReportInputOtherTextField();
-  showSuccessReportSubmission();
-  reportForm.addEventListener('submit', handleReportIssueFormSubmission);
-}
-
-async function handleReportIssueFormSubmission(event) {
-  event.preventDefault();
-  const data = new FormData(event.target);
-  const reportData = Object.fromEntries(data.entries());
-  reportData.user_agent = await getBrowser();
-
-  Object.keys(reportData).forEach(function(value) {
-    // Switch "on" to true
-    if (reportData[value] === "on") {
-      reportData[value] = true;
-    }
-    // Remove from report if empty string
-    if (reportData[value] === "") {
-      delete reportData[value];
-    }
-  });
-  // Clean URL data to add "http://" before it if the custom input doesn't contain a HTTP protocol
-  if (!(reportData.issue_on_domain.startsWith("http://") || reportData.issue_on_domain.startsWith("https://"))) {
-    reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
-  }
-  await browser.runtime.sendMessage({
-    method: "postReportWebcompatIssue",
-    description: reportData
-  });
-}
-
-function showSuccessReportSubmission() {
-  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
-  const reportSuccess = document.querySelector(".report-success");
-  const reportContent = document.querySelector(".report-issue-content");
-  reportIssueSubmitBtn.addEventListener("click", () => {
-    reportSuccess.classList.remove("is-hidden");
-    reportContent.classList.add("is-hidden");
-  });
-}
-
-function isSortaAURL(str) {
-  return str.includes(".") && !str.endsWith(".") && !str.startsWith(".");
-}
-
-async function setURLwithIssue() {
-  // Add Site URL placeholder
-  const currentPage = (await getCurrentPage()).url;
-  const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
-  const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-  reportIssueSubmitBtn.disabled = true;
-
-  // Allow for custom URL inputs
-  inputFieldUrl.addEventListener('input', () => {
-    reportIssueSubmitBtn.disabled = true;
-    // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
-    if (isSortaAURL(inputFieldUrl.value)) {
-      reportIssueSubmitBtn.disabled = false;
-    }
-  });
-
-  // Check that the host site has a valid URL
-  if (currentPage) {
-    const url = new URL(currentPage);
-    // returns a http:// or https:// value
-    inputFieldUrl.value = url.origin;
-    reportIssueSubmitBtn.disabled = false;
-  }
-}
-
- function showReportInputOtherTextField() {
-  const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
-  const otherTextField = document.querySelector('input[name="other_issue"]');
-  otherCheckbox.addEventListener("click", () => {
-    otherTextField.classList.toggle("is-hidden");
-  })
-
-  // Add placeholder to report input on 'Other' selection
-  const inputFieldOtherDetails = document.querySelector('input[name="other_issue"]');
-  inputFieldOtherDetails.placeholder = browser.i18n.getMessage("popupReportIssueCaseOtherDetails");
-}
-
-async function getCurrentPage() {
-  const [currentTab] = await browser.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
-  return currentTab;
-}
-
-async function enableInputIconDisabling() {
-  const inputIconVisibilityToggle = document.querySelector(".toggle-icon-in-page-visibility");
-
-  const stylePrefToggle = (inputsEnabled) => {
-    if (inputsEnabled === "show-input-icons") {
-      inputIconVisibilityToggle.dataset.iconVisibilityOption = "disable-input-icon";
-      inputIconVisibilityToggle.classList.remove("input-icons-disabled");
-      return;
-    }
-    inputIconVisibilityToggle.dataset.iconVisibilityOption = "enable-input-icon";
-    inputIconVisibilityToggle.classList.add("input-icons-disabled");
-  };
-
-
-  const iconsAreEnabled = await areInputIconsEnabled();
-  const userIconChoice = iconsAreEnabled ? "show-input-icons" : "hide-input-icons";
-  stylePrefToggle(userIconChoice);
-
-  inputIconVisibilityToggle.addEventListener("click", async () => {
-    const userIconPreference = (inputIconVisibilityToggle.dataset.iconVisibilityOption === "disable-input-icon") ? "hide-input-icons" : "show-input-icons";
-    await browser.runtime.sendMessage({
-      method: "updateInputIconPref",
-      iconPref: userIconPreference,
-    });
-    sendRelayEvent("Panel", "click", userIconPreference);
-    return stylePrefToggle(userIconPreference);
-  });
-
-}
-
-async function clearBrowserActionBadge() {
-  const { browserActionBadgesClicked } = await browser.storage.local.get(
-    "browserActionBadgesClicked"
-  );
-
-  // Dismiss the browserActionBadge only when it exists
-  if (browserActionBadgesClicked === false) {
-    browser.storage.local.set({ browserActionBadgesClicked: true });
-    browser.browserAction.setBadgeBackgroundColor({ color: null });
-    browser.browserAction.setBadgeText({ text: "" });
-  }
-}
-
-async function popup() {
-  sendRelayEvent("Panel", "opened-panel", "any-panel");
-  clearBrowserActionBadge();
-  const userApiToken = await browser.storage.local.get("apiToken");
-  const signedInUser = (Object.prototype.hasOwnProperty.call(userApiToken, "apiToken"));
-
-  // Set custom fonts from the add-on
-  await setCustomFonts();
-
-  if (!signedInUser) {
-    sendRelayEvent("Panel", "viewed-panel", "unauthenticated-user-panel");
-    showSignUpPanel();
-  }
-
-  if (signedInUser) {
-    showRelayPanel(1);
-  }
-
-
-  await enableSettingsPanel();
-  await enableReportIssuePanel();
-
-  enableDataOptOut();
-  enableInputIconDisabling();
-
-  document.querySelectorAll(".close-popup-after-click").forEach(el => {
-    el.addEventListener("click", async (e) => {
-      e.preventDefault();
-      if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
-        sendRelayEvent("Panel", e.target.dataset.eventAction, e.target.dataset.eventLabel);
-      }
-      await browser.tabs.create({ url: el.href });
-      window.close();
-    });
-  });
-
-  const { relaySiteOrigin } = await browser.storage.local.get("relaySiteOrigin");
-
-
-  document.querySelectorAll(".login-link").forEach(loginLink => {
-    loginLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn`;
-  });
-
-  document.querySelectorAll(".dashboard-link").forEach(dashboardLink => {
-    dashboardLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-relay-addresses`;
-  });
-
-  document.querySelectorAll(".get-premium-link").forEach(premiumLink => {
-    premiumLink.href = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=popup&utm_content=get-premium-link`;
-  });
-
-  document.querySelectorAll(".register-domain-cta").forEach(registerDomainLink => {
-    registerDomainLink.href = `${relaySiteOrigin}/accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=register-email-domain#mpp-choose-subdomain`;
-  });
-
-  // Add backlink to pricing section from promo CTAs
-  const promoCTAEl = document.querySelectorAll(".js-promo-link");
-  promoCTAEl.forEach(i => {
-    i.href = `${relaySiteOrigin}/premium#pricing`;
-  })
-
-}
-
-document.addEventListener("DOMContentLoaded", popup);
+  popup.init();
+})();
