@@ -1147,25 +1147,20 @@
         return currentTab;
       },
       getMasks: async (options = { fetchCustomMasks: false }) => {
-        const serverStoragePref =
-          await popup.utilities.getCachedServerStoragePref();
+        try {
+          return await browser.runtime.sendMessage({
+            method: "getAliasesFromServer",
+            options,
+          });
+        } catch (error) {
+          console.warn(`getAliasesFromServer Error: ${error}`);
 
-        if (serverStoragePref) {
-          try {
-            return await browser.runtime.sendMessage({
-              method: "getAliasesFromServer",
-              options,
-            });
-          } catch (error) {
-            console.warn(`getAliasesFromServer Error: ${error}`);
+          // API Error — Fallback to local storage
+          const { relayAddresses } = await browser.storage.local.get(
+            "relayAddresses"
+          );
 
-            // API Error — Fallback to local storage
-            const { relayAddresses } = await browser.storage.local.get(
-              "relayAddresses"
-            );
-
-            return relayAddresses;
-          }
+          return relayAddresses;
         }
       },
       setExternalLinkEventListeners: async () => {
