@@ -1264,6 +1264,10 @@
             return relayAddresses;
           }
         }
+
+        // User is not syncing with the server. Use local storage.
+        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+        return relayAddresses;
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
