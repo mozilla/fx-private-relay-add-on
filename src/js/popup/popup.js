@@ -14,14 +14,6 @@
   // audience can be premium, free, phones, all
   // Optional data: waffle, fullCta*
   const savings = "40%"; // For "Save 40%!" in the Bundle promo body
-  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
-  const userLocale = navigator.language;
-  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
-    style: "currency",
-    currency: getBundleCurrency,
-  }).format(getBundlePrice);
   
   const isBundleAvailableInCountry = (
     await browser.storage.local.get("bundlePlans")
@@ -29,6 +21,8 @@
   const isPhoneAvailableInCountry = (
     await browser.storage.local.get("phonePlans")
   ).phonePlans.PHONE_PLANS.available_in_country;
+
+  
 
   const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
   const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
@@ -42,6 +36,22 @@
   // FIXME: The order is not being set correctly
   const newsContent = [
     {
+      id: "firefox-integration",
+      waffle: "firefox_integration",
+      locale: "us",
+      audience: "premium",
+      headlineString: "popupPasswordManagerRelayHeadline",
+      bodyString: "popupPasswordManagerRelayBody",
+      teaserImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+      fullImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+    },
+  ];
+
+  // Add Phone Masking News Item
+  if (isPhoneMaskingAvailable) {
+    newsContent.push({
       id: "phones",
       logicCheck: isPhoneMaskingAvailable,
       headlineString: "popupPhoneMaskingPromoHeadline",
@@ -56,9 +66,21 @@
         "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
       fullCtaEventLabel: "panel-news-phone-masking-cta",
       fullCtaEventAction: "click",
-    },
+    });
+  }
 
-    {
+  // Add Bundle Pricing News Item
+  if (isBundleAvailable) {
+    const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+    const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+    const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+    const userLocale = navigator.language;
+    const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+      style: "currency",
+      currency: getBundleCurrency,
+    }).format(getBundlePrice);
+    
+    newsContent.push({
       id: "mozilla-vpn-bundle",
       logicCheck: isBundleAvailable,
       headlineString: "popupBundlePromoHeadline_2",
@@ -75,20 +97,8 @@
         "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
       fullCtaEventLabel: "panel-news-bundle-cta",
       fullCtaEventAction: "click",
-    },
-    {
-      id: "firefox-integration",
-      waffle: "firefox_integration",
-      locale: "us",
-      audience: "premium",
-      headlineString: "popupPasswordManagerRelayHeadline",
-      bodyString: "popupPasswordManagerRelayBody",
-      teaserImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
-      fullImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
-    },
-  ];
+    },)
+  }
 
   // Update news item count
   state.newsItemsCount = newsContent.length;
