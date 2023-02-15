@@ -12,99 +12,6 @@
     loggedIn: false,
     newsContent: []
   };
-
-  // Block all API calls until user is signed-in
-  if (state.loggedIn) {
-    // audience can be premium, free, phones, all
-    // Optional data: waffle, fullCta*
-    const savings = "40%"; // For "Save 40%!" in the Bundle promo body
-    
-    const isBundleAvailableInCountry = (
-      await browser.storage.local.get("bundlePlans")
-    ).bundlePlans.BUNDLE_PLANS.available_in_country;
-    const isPhoneAvailableInCountry = (
-      await browser.storage.local.get("phonePlans")
-    ).phonePlans.PHONE_PLANS.available_in_country;
-
-    const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
-    const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
-
-    // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-    const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
-
-    // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-    const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
-  
-    // FIXME: The order is not being set correctly
-    state.newsContent.push({
-      id: "firefox-integration",
-      waffle: "firefox_integration",
-      locale: "us",
-      audience: "premium",
-      headlineString: "popupPasswordManagerRelayHeadline",
-      bodyString: "popupPasswordManagerRelayBody",
-      teaserImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
-      fullImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
-    });
-
-      // Add Phone Masking News Item
-    if (isPhoneMaskingAvailable) {
-      state.newsContent.push({
-        id: "phones",
-        logicCheck: isPhoneMaskingAvailable,
-        headlineString: "popupPhoneMaskingPromoHeadline",
-        bodyString: "popupPhoneMaskingPromoBody",
-        teaserImg:
-          "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
-        fullImg:
-          "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
-        fullCta: "popupPhoneMaskingPromoCTA",
-        fullCtaRelayURL: true,
-        fullCtaHref:
-          "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
-        fullCtaEventLabel: "panel-news-phone-masking-cta",
-        fullCtaEventAction: "click",
-      });
-    }
-
-    // Add Bundle Pricing News Item
-    if (isBundleAvailable) {
-      const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-      const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-      const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
-      const userLocale = navigator.language;
-      const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
-        style: "currency",
-        currency: getBundleCurrency,
-      }).format(getBundlePrice);
-      
-      state.newsContent.push({
-        id: "mozilla-vpn-bundle",
-        logicCheck: isBundleAvailable,
-        headlineString: "popupBundlePromoHeadline_2",
-        headlineStringArgs: savings,
-        bodyString: "popupBundlePromoBody_3",
-        bodyStringArgs: formattedBundlePrice,
-        teaserImg:
-          "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
-        fullImg:
-          "/images/panel-images/announcements/panel-bundle-announcement.svg",
-        fullCta: "popupPhoneMaskingPromoCTA",
-        fullCtaRelayURL: true,
-        fullCtaHref:
-          "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
-        fullCtaEventLabel: "panel-news-bundle-cta",
-        fullCtaEventAction: "click",
-      },)
-    }
-
-    // Update news item count
-    state.newsItemsCount = state.newsContent.length;
-    
-  }
-  
   
   const popup = {
     events: {
@@ -262,15 +169,10 @@
       if (state.loggedIn) {
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
+        popup.utilities.populateNewsFeed();
       } else {
         popup.panel.update("sign-up");
         document.body.classList.remove("is-loading");
-      }
-
-      // Remove news nav link if there's no news items to display to user
-      if (state.newsContent.length === 0 ) {
-        document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
-        return;
       }
 
       // Set External Event Listerners
@@ -1322,6 +1224,96 @@
         // User is not syncing with the server. Use local storage.
         const { relayAddresses } = await browser.storage.local.get("relayAddresses");
         return relayAddresses;
+      },
+      populateNewsFeed: async ()=> {
+        // audience can be premium, free, phones, all
+        // Optional data: waffle, fullCta*
+        const savings = "40%"; // For "Save 40%!" in the Bundle promo body
+        
+        const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+        const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+        const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
+        const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
+
+        // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
+        const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+
+        // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
+        const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
+      
+        // FIXME: The order is not being set correctly
+        state.newsContent.push({
+          id: "firefox-integration",
+          waffle: "firefox_integration",
+          locale: "us",
+          audience: "premium",
+          headlineString: "popupPasswordManagerRelayHeadline",
+          bodyString: "popupPasswordManagerRelayBody",
+          teaserImg:
+            "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+          fullImg:
+            "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+        });
+
+          // Add Phone Masking News Item
+        if (isPhoneMaskingAvailable) {
+          state.newsContent.push({
+            id: "phones",
+            logicCheck: isPhoneMaskingAvailable,
+            headlineString: "popupPhoneMaskingPromoHeadline",
+            bodyString: "popupPhoneMaskingPromoBody",
+            teaserImg:
+              "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+            fullImg:
+              "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+            fullCta: "popupPhoneMaskingPromoCTA",
+            fullCtaRelayURL: true,
+            fullCtaHref:
+              "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+            fullCtaEventLabel: "panel-news-phone-masking-cta",
+            fullCtaEventAction: "click",
+          });
+        }
+
+        // Add Bundle Pricing News Item
+        if (isBundleAvailable) {
+          const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+          const userLocale = navigator.language;
+          const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+            style: "currency",
+            currency: getBundleCurrency,
+          }).format(getBundlePrice);
+          
+          state.newsContent.push({
+            id: "mozilla-vpn-bundle",
+            logicCheck: isBundleAvailable,
+            headlineString: "popupBundlePromoHeadline_2",
+            headlineStringArgs: savings,
+            bodyString: "popupBundlePromoBody_3",
+            bodyStringArgs: formattedBundlePrice,
+            teaserImg:
+              "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-bundle-announcement.svg",
+            fullCta: "popupPhoneMaskingPromoCTA",
+            fullCtaRelayURL: true,
+            fullCtaHref:
+              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+            fullCtaEventLabel: "panel-news-bundle-cta",
+            fullCtaEventAction: "click",
+          },)
+        }
+
+        // Remove news nav link if there's no news items to display to user
+        if (state.newsContent.length === 0 ) {
+          document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
+          return;
+        }
+
+        // Update news item count
+        state.newsItemsCount = state.newsContent.length;
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
