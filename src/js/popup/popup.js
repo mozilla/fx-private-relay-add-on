@@ -267,6 +267,12 @@
         document.body.classList.remove("is-loading");
       }
 
+      // Remove news nav link if there's no news items to display to user
+      if (state.newsContent.length === 0 ) {
+        document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
+        return;
+      }
+
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
 
@@ -725,7 +731,7 @@
           const newsList = document.querySelector(".fx-relay-news");
 
           // If there's any news items, go build them
-          if ( !newsList.hasChildNodes() && state.loggedIn ) {
+          if ( !newsList.hasChildNodes()) {
             state.newsContent.forEach(async (newsItem) => {
               // Check for any catches to not display the item
               const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
