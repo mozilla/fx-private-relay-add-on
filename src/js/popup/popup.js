@@ -1241,21 +1241,26 @@
         // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
         const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
       
+        // Conditions for firefox integration to be shown: if the waffle flag "firefox_integration" is set as true
+        const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
+        
         // FIXME: The order is not being set correctly
-        state.newsContent.push({
-          id: "firefox-integration",
-          waffle: "firefox_integration",
-          locale: "us",
-          audience: "premium",
-          headlineString: "popupPasswordManagerRelayHeadline",
-          bodyString: "popupPasswordManagerRelayBody",
-          teaserImg:
-            "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
-          fullImg:
-            "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
-        });
+        if (isFirefoxIntegrationAvailable) {
+          state.newsContent.push({
+            id: "firefox-integration",
+            waffle: "firefox_integration",
+            locale: "us",
+            audience: "premium",
+            headlineString: "popupPasswordManagerRelayHeadline",
+            bodyString: "popupPasswordManagerRelayBody",
+            teaserImg:
+              "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+          });
+        }
 
-          // Add Phone Masking News Item
+        // Add Phone Masking News Item
         if (isPhoneMaskingAvailable) {
           state.newsContent.push({
             id: "phones",
