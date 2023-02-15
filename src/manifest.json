@@ -29,7 +29,7 @@
       "default_icon": {
           "32": "icons/icon_32.png"
       },
-      "default_popup": "popup-new.html"
+      "default_popup": "popup.html"
   },
 
   "content_scripts": [
