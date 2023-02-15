@@ -392,16 +392,9 @@
         init: async () => {
           
           const masks = await popup.utilities.getMasks();
-          
-          // If no masks are created, 
-          if (masks.length === 0) {
-            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
-            noMasksCreatedPanel.classList.remove("is-hidden");
-          }
-          
+          const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
           const maskPanel = document.getElementById("masks-panel");
-          const generateRandomMask = document.querySelector(".js-generate-random-mask");
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -420,7 +413,6 @@
               const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
               registerSubdomainButton.classList.remove("is-hidden");
             } else {
-
               const generateCustomMask = document.querySelector(".js-generate-custom-mask");
               
               // Show "Generate custom mask" button
@@ -441,9 +433,17 @@
               popup.events.generateMask(e, "random");
             }, false);
           
+
+          // If no masks are created, show onboarding prompt
+          if (masks.length === 0) {
+            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+            noMasksCreatedPanel.classList.remove("is-hidden");
+          }
+
           // Build initial list
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
           popup.panel.masks.utilities.buildMasksList();
+        
 
           // Remove loading state
           document.body.classList.remove("is-loading");
@@ -518,8 +518,6 @@
               searchForm.classList.add("is-visible");
               searchInput.focus();
             }
-
-            
           },
           reset: () => {
             const searchInput = document.querySelector(".fx-relay-masks-search-input");
@@ -656,6 +654,14 @@
               }, 1000);
             }
 
+            // If user has no masks created, focus on random gen button
+            if (masks.length === 0) {
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.focus();
+              return;
+            }
+
+            // If premium, focus on search instead
             if (premium) {
               popup.panel.masks.search.init();
             }
