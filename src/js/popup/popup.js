@@ -10,6 +10,7 @@
     currentPanel: null,
     newsItemsCount: 0,
     loggedIn: false,
+    newsContent: []
   };
 
   // Block all API calls until user is signed-in
@@ -35,24 +36,22 @@
     const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
   
     // FIXME: The order is not being set correctly
-    const newsContent = [
-      {
-        id: "firefox-integration",
-        waffle: "firefox_integration",
-        locale: "us",
-        audience: "premium",
-        headlineString: "popupPasswordManagerRelayHeadline",
-        bodyString: "popupPasswordManagerRelayBody",
-        teaserImg:
-          "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
-        fullImg:
-          "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
-      },
-    ];
+    state.newsContent.push({
+      id: "firefox-integration",
+      waffle: "firefox_integration",
+      locale: "us",
+      audience: "premium",
+      headlineString: "popupPasswordManagerRelayHeadline",
+      bodyString: "popupPasswordManagerRelayBody",
+      teaserImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+      fullImg:
+        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+    });
 
       // Add Phone Masking News Item
     if (isPhoneMaskingAvailable) {
-      newsContent.push({
+      state.newsContent.push({
         id: "phones",
         logicCheck: isPhoneMaskingAvailable,
         headlineString: "popupPhoneMaskingPromoHeadline",
@@ -81,7 +80,7 @@
         currency: getBundleCurrency,
       }).format(getBundlePrice);
       
-      newsContent.push({
+      state.newsContent.push({
         id: "mozilla-vpn-bundle",
         logicCheck: isBundleAvailable,
         headlineString: "popupBundlePromoHeadline_2",
@@ -102,7 +101,7 @@
     }
 
     // Update news item count
-    state.newsItemsCount = newsContent.length;
+    state.newsItemsCount = state.newsContent.length;
     
   }
   
@@ -725,9 +724,9 @@
 
           const newsList = document.querySelector(".fx-relay-news");
 
-          // If there's no news items, go build them
-          if ( !newsList.hasChildNodes() ) {
-            newsContent.forEach(async (newsItem) => {
+          // If there's any news items, go build them
+          if ( !newsList.hasChildNodes() && state.loggedIn ) {
+            state.newsContent.forEach(async (newsItem) => {
               // Check for any catches to not display the item
               const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
               
@@ -807,7 +806,14 @@
           },
           update: (newsItemId) => {
             // Get content for news detail view
-            const storyData = newsContent.filter((story) => { return story.id == newsItemId });
+
+            
+            if (!state.loggedIn) {
+              return;
+            }
+
+            const storyData = state.newsContent.filter((story) => { return story.id == newsItemId });
+            
             const newsItemContent = storyData[0];
             
             const newsStoryDetail = document.querySelector(".fx-relay-news-story");
