@@ -366,6 +366,12 @@ sign-up-panel::after {
   cursor: pointer;
 }
 
+.fx-relay-settings-link.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .fx-relay-settings-link:hover,
 .fx-relay-settings-link:focus {
   background-color: var(--colorViolet05);
