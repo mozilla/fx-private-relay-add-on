@@ -859,13 +859,13 @@
           const reportWebcompatIssueLink = document.getElementById("popupSettingsReportIssue");
             
           if (state.loggedIn) {
-            reportWebcompatIssueLink.classList.remove("is-disabled");
+            reportWebcompatIssueLink.classList.remove("is-hidden");
             reportWebcompatIssueLink.addEventListener("click", (e) => {
                 e.preventDefault();
                 popup.panel.update("webcompat");
               }, false);
           } else {
-            reportWebcompatIssueLink.classList.add("is-disabled");
+            reportWebcompatIssueLink.classList.add("is-hidden");
           }
         }
       },
