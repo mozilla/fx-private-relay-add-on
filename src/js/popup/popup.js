@@ -276,6 +276,10 @@
             popup.panel.masks.custom.init();
             break;
 
+          case "manage": 
+            popup.panel.masks.manage.init(data);
+            break;  
+
           case "masks": 
             popup.panel.masks.init();
             break;
@@ -435,6 +439,13 @@
           // Remove loading state
           document.body.classList.remove("is-loading");
 
+        },
+        manage: {
+          init: (data) => {
+            console.log("manage mask panel", data);
+
+            // TODO: Create 
+          }
         },
         search: {
           filter: (query)=> {
@@ -619,15 +630,20 @@
 
               const maskListItemToggleButton = document.createElement("button");
               maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
-              maskListItemToggleButton.addEventListener("click", ()=> {
-                // TODO: Add Toggle Function
-              }, false);
+
+              // Set data to power "manage mask" panel
               maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
               maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
               maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
-
-              // TODO: Add toggle button back
-              // maskListItemAddressActions.appendChild(maskListItemToggleButton);
+              
+              maskListItemToggleButton.addEventListener("click", ()=> {
+                popup.panel.update("manage", {
+                  maskId: mask.id,
+                  maskType: mask.type,
+                  html: maskListItem
+                });
+              }, false);
+              maskListItemAddressActions.appendChild(maskListItemToggleButton);
 
               maskListItemAddressBar.appendChild(maskListItemAddressActions);
               maskListItem.appendChild(maskListItemAddressBar);
