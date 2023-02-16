@@ -1274,7 +1274,7 @@
             fullCta: "popupPhoneMaskingPromoCTA",
             fullCtaRelayURL: true,
             fullCtaHref:
-              "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
             fullCtaEventLabel: "panel-news-phone-masking-cta",
             fullCtaEventAction: "click",
           });
