@@ -871,6 +871,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address-toggle {
   background-image: url(/icons/nebula-arrow-up-down.svg);
+  transform: rotate(-90deg);
 }
 
 /* Loading Bar */

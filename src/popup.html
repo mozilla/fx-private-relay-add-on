@@ -144,6 +144,48 @@
           
         </masks-panel>
 
+        <manage-panel data-panel-id="manage" class="is-hidden fx-relay-panel" id="manage-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-id="manage" data-nav-level="child" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupManageMaskTitle"></h2>
+
+          </header>
+          <div class="fx-relay-panel-content">
+
+            <!-- Mask Display -->
+            <!-- <div data-mask-address="mozilla@testpremium.mozmail.com" data-mask-description="developer.mozilla.org" data-mask-used-on="developer.mozilla.org,,www.facebook.com" data-mask-generated="" class="fx-relay-mask-item">
+              <span class="fx-relay-mask-item-new-mask-created">Mask created</span><span class="fx-relay-mask-item-label">developer.mozilla.org</span>
+              <div class="fx-relay-mask-item-address-bar">
+                <div class="fx-relay-mask-item-address">mozilla@testpremium.mozmail.com</div>
+                <div class="fx-relay-mask-item-address-actions">
+                  <span class="fx-relay-mask-item-address-copy-success">Copied!</span><button class="fx-relay-mask-item-address-copy" data-mask-address="mozilla@testpremium.mozmail.com"></button>
+                </div>
+              </div>
+            </div> -->
+
+            <div>
+              <h3 class="i18n-content" data-i18n-message-id="popupManageMaskPromoBlockingTitle"></h3>
+              <!-- Update block level -->
+              <form action="">
+                <button class="i18n-content" data-i18n-message-id="popupManageMaskPromoBlockingOptionNone"></button>
+                <button class="i18n-content" data-i18n-message-id="popupManageMaskPromoBlockingOptionPromotional"></button>
+                <button class="i18n-content" data-i18n-message-id="popupManageMaskPromoBlockingOptionAll"></button>
+              </form>
+              <!-- Blocking level description -->
+              <div></div>
+            </div>
+
+
+
+          </div>
+
+        </manage-panel>
+        
         <custom-panel data-panel-id="custom" class="is-hidden fx-relay-panel" id="custom-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
