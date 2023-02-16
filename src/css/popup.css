@@ -792,6 +792,10 @@ sign-up-panel::after {
   display: flex;
   gap: var(--spacingXs);
   flex-direction: column;
+  width: calc( 100% - var(--spacingMd));
+  position: relative;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .fx-relay-mask-item-address {
