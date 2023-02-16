@@ -8,90 +8,10 @@
 
   const state = {
     currentPanel: null,
-    newsItemsCount: 0
+    newsItemsCount: 0,
+    loggedIn: false,
+    newsContent: []
   };
-
-  // audience can be premium, free, phones, all
-  // Optional data: waffle, fullCta*
-  const savings = "40%"; // For "Save 40%!" in the Bundle promo body
-  const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-  const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-  const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
-  const userLocale = navigator.language;
-  const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
-    style: "currency",
-    currency: getBundleCurrency,
-  }).format(getBundlePrice);
-  
-  const isBundleAvailableInCountry = (
-    await browser.storage.local.get("bundlePlans")
-  ).bundlePlans.BUNDLE_PLANS.available_in_country;
-  const isPhoneAvailableInCountry = (
-    await browser.storage.local.get("phonePlans")
-  ).phonePlans.PHONE_PLANS.available_in_country;
-
-  const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
-  const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
-
-  // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
-  const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
-
-  // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
-  const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
- 
-  // FIXME: The order is not being set correctly
-  const newsContent = [
-    {
-      id: "phones",
-      logicCheck: isPhoneMaskingAvailable,
-      headlineString: "popupPhoneMaskingPromoHeadline",
-      bodyString: "popupPhoneMaskingPromoBody",
-      teaserImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
-      fullImg:
-        "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
-      fullCta: "popupPhoneMaskingPromoCTA",
-      fullCtaRelayURL: true,
-      fullCtaHref:
-        "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
-      fullCtaEventLabel: "panel-news-phone-masking-cta",
-      fullCtaEventAction: "click",
-    },
-
-    {
-      id: "mozilla-vpn-bundle",
-      logicCheck: isBundleAvailable,
-      headlineString: "popupBundlePromoHeadline_2",
-      headlineStringArgs: savings,
-      bodyString: "popupBundlePromoBody_3",
-      bodyStringArgs: formattedBundlePrice,
-      teaserImg:
-        "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
-      fullImg:
-        "/images/panel-images/announcements/panel-bundle-announcement.svg",
-      fullCta: "popupPhoneMaskingPromoCTA",
-      fullCtaRelayURL: true,
-      fullCtaHref:
-        "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
-      fullCtaEventLabel: "panel-news-bundle-cta",
-      fullCtaEventAction: "click",
-    },
-    {
-      id: "firefox-integration",
-      waffle: "firefox_integration",
-      locale: "us",
-      audience: "premium",
-      headlineString: "popupPasswordManagerRelayHeadline",
-      bodyString: "popupPasswordManagerRelayBody",
-      teaserImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
-      fullImg:
-        "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
-    },
-  ];
-
-  // Update news item count
-  state.newsItemsCount = newsContent.length;
   
   const popup = {
     events: {
@@ -101,14 +21,18 @@
         const backNavLevel = e.target.dataset.navLevel;
 
         if (backNavLevel === "root") {
-          document
-            .querySelector(".js-internal-link.is-active")
-            ?.classList.remove("is-active");
+          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
         }
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
           sendRelayEvent("Panel", "click", "closed-report-issue");
+        }
+
+        // Catch back button clicks if the user is logged out
+        if (!state.loggedIn && backNavLevel === "root") {
+          popup.panel.update("sign-up");
+          return;
         }
 
         popup.panel.update(backTarget);
@@ -234,14 +158,18 @@
       const backButtons = document.querySelectorAll(
         ".fx-relay-panel-header-btn-back"
       );
+      
       backButtons.forEach((button) => {
         button.addEventListener("click", popup.events.backClick, false);
       });
 
+      state.loggedIn = await popup.utilities.isUserSignedIn();
+
       // Check if user is signed in to show default/sign-in panel
-      if (await popup.utilities.isUserSignedIn()) {
+      if (state.loggedIn) {
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
+        popup.utilities.populateNewsFeed();
       } else {
         popup.panel.update("sign-up");
         document.body.classList.remove("is-loading");
@@ -253,8 +181,12 @@
       // Set Notification Bug for Unread News Items
       popup.panel.news.utilities.initNewsItemCountNotification();
 
-      // TODO: Focus On Generate Button for Free / Search Filter for Premiums
-
+      // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
+      // Cases:
+      //   If not logged in: focused on "Sign In" button
+      //   (Both tiers) If no masks made: focused on primary generate mask button
+      //   If free tier: focused on "Create mask" button
+      //   If premium tier: focused in search bar
     },
     panel: {
       update: (panelId, data) => {
@@ -292,21 +224,9 @@
             popup.panel.news.storyPanel.update(data.newsItemId);
             break;
           case "settings":
-            popup.utilities.enableInputIconDisabling();
-            // Function is imported from data-opt-out-toggle.js
-            enableDataOptOut();
-
-            document
-              .getElementById("popupSettingsReportIssue")
-              .addEventListener(
-                "click",
-                (e) => {
-                  e.preventDefault();
-                  popup.panel.update("webcompat");
-                },
-                false
-              );
-
+            sendRelayEvent("Panel", "click", "opened-settings");
+            popup.panel.settings.init();
+            
             break;
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
@@ -379,16 +299,9 @@
         init: async () => {
           
           const masks = await popup.utilities.getMasks();
-          
-          // If no masks are created, 
-          if (masks.length === 0) {
-            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
-            noMasksCreatedPanel.classList.remove("is-hidden");
-          }
-          
+          const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
           const maskPanel = document.getElementById("masks-panel");
-          const generateRandomMask = document.querySelector(".js-generate-random-mask");
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -407,7 +320,6 @@
               const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
               registerSubdomainButton.classList.remove("is-hidden");
             } else {
-
               const generateCustomMask = document.querySelector(".js-generate-custom-mask");
               
               // Show "Generate custom mask" button
@@ -428,9 +340,17 @@
               popup.events.generateMask(e, "random");
             }, false);
           
+
+          // If no masks are created, show onboarding prompt
+          if (masks.length === 0) {
+            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+            noMasksCreatedPanel.classList.remove("is-hidden");
+          }
+
           // Build initial list
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
           popup.panel.masks.utilities.buildMasksList();
+        
 
           // Remove loading state
           document.body.classList.remove("is-loading");
@@ -505,8 +425,6 @@
               searchForm.classList.add("is-visible");
               searchInput.focus();
             }
-
-            
           },
           reset: () => {
             const searchInput = document.querySelector(".fx-relay-masks-search-input");
@@ -643,6 +561,14 @@
               }, 1000);
             }
 
+            // If user has no masks created, focus on random gen button
+            if (masks.length === 0) {
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.focus();
+              return;
+            }
+
+            // If premium, focus on search instead
             if (premium) {
               popup.panel.masks.search.init();
             }
@@ -686,11 +612,14 @@
               // Show Upgrade Button
               const getUnlimitedMasksBtn = document.querySelector(".fx-relay-mask-upgrade-button");
               getUnlimitedMasksBtn.classList.remove("is-hidden");
+              getUnlimitedMasksBtn.focus();
+
             } else {
               
               // Show Masks Count/Generate Button
               masksAvailable.classList.remove("is-hidden");
               generateRandomMask.classList.remove("is-hidden");
+              generateRandomMask.focus();
             }
           
             
@@ -703,9 +632,9 @@
 
           const newsList = document.querySelector(".fx-relay-news");
 
-          // If there's no news items, go build them
-          if ( !newsList.hasChildNodes() ) {
-            newsContent.forEach(async (newsItem) => {
+          // If there's any news items, go build them
+          if ( !newsList.hasChildNodes()) {
+            state.newsContent.forEach(async (newsItem) => {
               // Check for any catches to not display the item
               const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
               
@@ -785,7 +714,14 @@
           },
           update: (newsItemId) => {
             // Get content for news detail view
-            const storyData = newsContent.filter((story) => { return story.id == newsItemId });
+
+            
+            if (!state.loggedIn) {
+              return;
+            }
+
+            const storyData = state.newsContent.filter((story) => { return story.id == newsItemId });
+            
             const newsItemContent = storyData[0];
             
             const newsStoryDetail = document.querySelector(".fx-relay-news-story");
@@ -912,6 +848,26 @@
             }
           }
         },
+      },
+      settings: {
+        init: () => {
+          popup.utilities.enableInputIconDisabling();
+
+          // Function is imported from data-opt-out-toggle.js
+          enableDataOptOut();
+
+          const reportWebcompatIssueLink = document.getElementById("popupSettingsReportIssue");
+            
+          if (state.loggedIn) {
+            reportWebcompatIssueLink.classList.remove("is-hidden");
+            reportWebcompatIssueLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                popup.panel.update("webcompat");
+              }, false);
+          } else {
+            reportWebcompatIssueLink.classList.add("is-hidden");
+          }
+        }
       },
       stats: {
         init: async () => {
@@ -1268,6 +1224,101 @@
         // User is not syncing with the server. Use local storage.
         const { relayAddresses } = await browser.storage.local.get("relayAddresses");
         return relayAddresses;
+      },
+      populateNewsFeed: async ()=> {
+        // audience can be premium, free, phones, all
+        // Optional data: waffle, fullCta*
+        const savings = "40%"; // For "Save 40%!" in the Bundle promo body
+        
+        const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
+        const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
+        const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
+        const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
+
+        // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
+        const isPhoneMaskingAvailable = isPhoneAvailableInCountry && !hasPhone;
+
+        // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
+        const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
+      
+        // Conditions for firefox integration to be shown: if the waffle flag "firefox_integration" is set as true
+        const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
+        
+        // FIXME: The order is not being set correctly
+        if (isFirefoxIntegrationAvailable) {
+          state.newsContent.push({
+            id: "firefox-integration",
+            waffle: "firefox_integration",
+            locale: "us",
+            audience: "premium",
+            headlineString: "popupPasswordManagerRelayHeadline",
+            bodyString: "popupPasswordManagerRelayBody",
+            teaserImg:
+              "/images/panel-images/announcements/panel-announcement-password-manager-relay-square-illustration.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-announcement-password-manager-relay-illustration.svg",
+          });
+        }
+
+        // Add Phone Masking News Item
+        if (isPhoneMaskingAvailable) {
+          state.newsContent.push({
+            id: "phones",
+            logicCheck: isPhoneMaskingAvailable,
+            headlineString: "popupPhoneMaskingPromoHeadline",
+            bodyString: "popupPhoneMaskingPromoBody",
+            teaserImg:
+              "/images/panel-images/announcements/premium-announcement-phone-masking.svg",
+            fullImg:
+              "/images/panel-images/announcements/premium-announcement-phone-masking-hero.svg",
+            fullCta: "popupPhoneMaskingPromoCTA",
+            fullCtaRelayURL: true,
+            fullCtaHref:
+              "premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+            fullCtaEventLabel: "panel-news-phone-masking-cta",
+            fullCtaEventAction: "click",
+          });
+        }
+
+        // Add Bundle Pricing News Item
+        if (isBundleAvailable) {
+          const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
+          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
+          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+          const userLocale = navigator.language;
+          const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
+            style: "currency",
+            currency: getBundleCurrency,
+          }).format(getBundlePrice);
+          
+          state.newsContent.push({
+            id: "mozilla-vpn-bundle",
+            logicCheck: isBundleAvailable,
+            headlineString: "popupBundlePromoHeadline_2",
+            headlineStringArgs: savings,
+            bodyString: "popupBundlePromoBody_3",
+            bodyStringArgs: formattedBundlePrice,
+            teaserImg:
+              "/images/panel-images/announcements/panel-bundle-announcement-square.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-bundle-announcement.svg",
+            fullCta: "popupPhoneMaskingPromoCTA",
+            fullCtaRelayURL: true,
+            fullCtaHref:
+              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+            fullCtaEventLabel: "panel-news-bundle-cta",
+            fullCtaEventAction: "click",
+          },)
+        }
+
+        // Remove news nav link if there's no news items to display to user
+        if (state.newsContent.length === 0 ) {
+          document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
+          return;
+        }
+
+        // Update news item count
+        state.newsItemsCount = state.newsContent.length;
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
