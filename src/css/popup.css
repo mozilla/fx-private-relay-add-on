@@ -757,6 +757,8 @@ sign-up-panel::after {
   left: var(--spacingSm);
   top: 100%;
   transform: translateY(-50%);
+  /* Z-index usage: raise element above other mask cards  */
+  z-index: 1;
 }
 
 .fx-relay-mask-item.is-new-mask .fx-relay-mask-item-new-mask-created {
