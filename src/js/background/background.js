@@ -1,4 +1,4 @@
-const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
+const RELAY_SITE_ORIGIN = "https://relay.firefox.com";
 
 browser.storage.local.set({ maxNumAliases: 5 });
 browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
@@ -263,7 +263,7 @@ async function createNewHeadersObject(opts) {
 }
 
 async function refreshAccountPages() {
-  browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabs => {
+  browser.tabs.query({url: "https://relay.firefox.com/*"}).then(tabs => {
     for (let tab of tabs) {
       const tabUrl = new URL(tab.url);
       if (tabUrl.pathname.startsWith("/accounts/settings")) {

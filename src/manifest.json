@@ -35,32 +35,32 @@
   "content_scripts": [
     {
       "matches": [
-        "http://127.0.0.1/"
+        "https://relay.firefox.com/"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/track_logout.js"]
     },
     {
       "matches": [
-        "http://127.0.0.1/**"
+        "https://relay.firefox.com/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/inject_addon_data.js"]
     },
     {
       "matches": [
-        "http://127.0.0.1/**"
+        "https://relay.firefox.com/**"
       ],
       "css": ["css/relay-website.css"],
       "run_at": "document_start"
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/profile/**"
+          "https://relay.firefox.com/accounts/profile/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/get_profile_data.js"]
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/settings/**"
+          "https://relay.firefox.com/accounts/settings/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/settings_refresh.js"]
     },
