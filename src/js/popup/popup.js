@@ -246,9 +246,8 @@
             const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
             const customMaskDomainLabel = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-domain");
             const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
-            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
             customMaskDomainInput.placeholder = browser.i18n.getMessage("popupCreateCustomFormMaskInputPlaceholder");
-            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", premiumSubdomainSet);
+            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", sessionState.premiumSubdomain);
 
             customMaskDomainInput.addEventListener("input", popup.panel.masks.custom.validateForm);
             customMaskForm.addEventListener("submit", popup.panel.masks.custom.submit);
@@ -309,13 +308,19 @@
             generateRandomMask.textContent = browser.i18n.getMessage("pageInputIconGenerateRandomMask");
 
             // Prompt user to register subdomain
-            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
-            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";  
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+            const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");  
+            
+            // Store this query locally for this session
+            sessionState.premiumSubdomainSet = isPremiumSubdomainSet;
           
-            if (!isPremiumSubdomainSet) {
+            // premiumSubdomain is not set : display CTA to prompt user to register subdomain
+            if (!sessionState.premiumSubdomainSet) {
               const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
               registerSubdomainButton.classList.remove("is-hidden");
             } else {
+
+              sessionState.premiumSubdomain = premiumSubdomainSet;
               const generateCustomMask = document.querySelector(".js-generate-custom-mask");
               
               // Show "Generate custom mask" button
