@@ -6,13 +6,13 @@
     "relaySiteOrigin"
   );
 
-  const state = {
+  const sessionState = {
     currentPanel: null,
     newsItemsCount: 0,
     loggedIn: false,
     newsContent: []
   };
-  
+
   const popup = {
     events: {
       backClick: (e) => {
@@ -30,7 +30,7 @@
         }
 
         // Catch back button clicks if the user is logged out
-        if (!state.loggedIn && backNavLevel === "root") {
+        if (!sessionState.loggedIn && backNavLevel === "root") {
           popup.panel.update("sign-up");
           return;
         }
@@ -163,10 +163,10 @@
         button.addEventListener("click", popup.events.backClick, false);
       });
 
-      state.loggedIn = await popup.utilities.isUserSignedIn();
+      sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (state.loggedIn) {
+      if (sessionState.loggedIn) {
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
         popup.utilities.populateNewsFeed();
@@ -200,7 +200,7 @@
           }
         });
 
-        state.currentPanel = panelId;
+        sessionState.currentPanel = panelId;
       },
       init: (panelId, data) => {
         switch (panelId) {
@@ -626,7 +626,7 @@
 
           // If there's any news items, go build them
           if ( !newsList.hasChildNodes()) {
-            state.newsContent.forEach(async (newsItem) => {
+            sessionState.newsContent.forEach(async (newsItem) => {
               // Check for any catches to not display the item
               const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
               
@@ -706,11 +706,11 @@
           },
           update: (newsItemId) => {
             // Get content for news detail view
-            if (!state.loggedIn) {
+            if (!sessionState.loggedIn) {
               return;
             }
 
-            const storyData = state.newsContent.filter((story) => { return story.id == newsItemId });
+            const storyData = sessionState.newsContent.filter((story) => { return story.id == newsItemId });
             const newsItemContent = storyData[0];
             const newsItemDetail = document.querySelector(".fx-relay-news-story");
             
@@ -787,7 +787,7 @@
             // First-run user: No unread data present
             if (!unreadNewsItemsCountExists && !readNewsItemsCountExists) {
               await browser.storage.local.set({
-                unreadNewsItemsCount: state.newsItemsCount,
+                unreadNewsItemsCount: sessionState.newsItemsCount,
                 readNewsItemCount: 0,
               });
             }
@@ -796,7 +796,7 @@
             // Example: Three items total but user doesn't have waffle for one news item. 
             // Regardless - update the unreadNews count to match whatever is in state
             await browser.storage.local.set({
-              unreadNewsItemsCount: state.newsItemsCount,
+              unreadNewsItemsCount: sessionState.newsItemsCount,
             });
 
             const { readNewsItemCount } = await browser.storage.local.get(
@@ -824,7 +824,7 @@
           updateNewsItemCountNotification: async (markAllUnread = false) => {
             if (markAllUnread) {
               await browser.storage.local.set({
-                readNewsItemCount: state.newsItemsCount,
+                readNewsItemCount: sessionState.newsItemsCount,
               });
 
               const newsItemCountNotification = document.querySelector(
@@ -846,7 +846,7 @@
 
           const reportWebcompatIssueLink = document.getElementById("popupSettingsReportIssue");
             
-          if (state.loggedIn) {
+          if (sessionState.loggedIn) {
             reportWebcompatIssueLink.classList.remove("is-hidden");
             reportWebcompatIssueLink.addEventListener("click", (e) => {
                 e.preventDefault();
@@ -1234,7 +1234,7 @@
         
         // FIXME: The order is not being set correctly
         if (isFirefoxIntegrationAvailable) {
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "firefox-integration",
             waffle: "firefox_integration",
             locale: "us",
@@ -1250,7 +1250,7 @@
 
         // Add Phone Masking News Item
         if (isPhoneMaskingAvailable) {
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "phones",
             logicCheck: isPhoneMaskingAvailable,
             headlineString: "popupPhoneMaskingPromoHeadline",
@@ -1279,7 +1279,7 @@
             currency: getBundleCurrency,
           }).format(getBundlePrice);
           
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "mozilla-vpn-bundle",
             logicCheck: isBundleAvailable,
             headlineString: "popupBundlePromoHeadline_2",
@@ -1300,13 +1300,13 @@
         }
 
         // Remove news nav link if there's no news items to display to user
-        if (state.newsContent.length === 0 ) {
+        if (sessionState.newsContent.length === 0 ) {
           document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
           return;
         }
 
         // Update news item count
-        state.newsItemsCount = state.newsContent.length;
+        sessionState.newsItemsCount = sessionState.newsContent.length;
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
