@@ -99,6 +99,10 @@
   position: relative;
   width: 32px;
   height: 32px;
+  appearance: none;
+  outline: 0;
+  border: 0;
+  background-color: transparent;
 }
 
 .fx-relay-menu-dashboard-link .news-count {
@@ -127,6 +131,7 @@
   filter: grayscale(1);
 }
 
+.fx-relay-menu-dashboard-link:focus-within img,
 .fx-relay-menu-dashboard-link.is-active img,
 .fx-relay-menu-dashboard-link:hover img {
   filter: grayscale(0);
@@ -364,6 +369,8 @@ sign-up-panel::after {
   text-decoration: none;
   color: var(--colorBlack);
   cursor: pointer;
+  appearance: none;
+  border: 0;
 }
 
 .fx-relay-settings-link:hover,
@@ -457,6 +464,9 @@ sign-up-panel::after {
   margin-top: var(--spacingLg);
   cursor: pointer;
   color: var(--colorInformational);
+  appearance: none;
+  background-color: transparent;
+  border: 0;
 }
 
 /* Stats */
