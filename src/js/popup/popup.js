@@ -715,8 +715,8 @@
               return;
             }
 
-            const storyData = sessionState.newsContent.filter((story) => { return story.id == newsItemId });
-            const newsItemContent = storyData[0];
+            const newsItemsContent = sessionState.newsContent.filter((story) => { return story.id == newsItemId });
+            const newsItemContent = newsItemsContent[0];
             const newsItemDetail = document.querySelector(".fx-relay-news-story");
             
             // Reset news detail item
