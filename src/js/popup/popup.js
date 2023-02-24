@@ -215,19 +215,19 @@
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
-
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
-
             break;
+
           case "newsItem":
             sendRelayEvent("Panel", "click", "opened-news-item");
             popup.panel.news.item.update(data.newsItemId);
             break;
+
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
             popup.panel.settings.init();
-            
             break;
+
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
@@ -236,9 +236,6 @@
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
-            break;
-
-          default:
             break;
         }
       },
@@ -271,7 +268,6 @@
           },
           submit: async (event) => {
             event.preventDefault();
-            // const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
             const customMaskDomainInput = document.getElementById("customMaskName");
             const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
 
@@ -615,15 +611,11 @@
               getUnlimitedMasksBtn.focus();
 
             } else {
-              
               // Show Masks Count/Generate Button
               masksAvailable.classList.remove("is-hidden");
               generateRandomMask.classList.remove("is-hidden");
               generateRandomMask.focus();
             }
-          
-            
-            
           }
         },
       },
@@ -714,16 +706,12 @@
           },
           update: (newsItemId) => {
             // Get content for news detail view
-
-            
             if (!state.loggedIn) {
               return;
             }
 
             const storyData = state.newsContent.filter((story) => { return story.id == newsItemId });
-            
             const newsItemContent = storyData[0];
-            
             const newsItemDetail = document.querySelector(".fx-relay-news-story");
             
             // Reset news detail item
