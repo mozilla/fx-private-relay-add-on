@@ -182,7 +182,6 @@ async function getCurrentPageHostname() {
 
   if (currentPage.url) {
     const url = new URL(currentPage.url);
-    console.log(url);
     return url.hostname;
   }
 
@@ -315,6 +314,9 @@ async function makeDomainAddress(address, block_list_emails, description = null)
   if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
+    // The "," is appended here as this field is a comma-seperated list (but is a strict STRING type in the database). 
+    // used_on lists all the different sites the add-on has populated a form field on for this mask
+    // Because it contains multiple websites, we're using the CSV structure to explode/filter the string later
     apiBody.used_on = description + ",";
   }
 
@@ -350,22 +352,9 @@ async function makeDomainAddress(address, block_list_emails, description = null)
     newRelayAddressJson.generated_for = description;
   }
 
-  // TODO: put this into an updateLocalAddresses() function
-  const localStorageRelayAddresses = await browser.storage.local.get(
-    "relayAddresses"
-  );
-
-  const localRelayAddresses =
-    Object.keys(localStorageRelayAddresses).length === 0
-      ? { relayAddresses: [] }
-      : localStorageRelayAddresses;
-  const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
-    newRelayAddressJson,
-  ]);
-
-  updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-  
-  browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
+  // Save the new mask in local storage
+  updateLocalStorageAddress(newRelayAddressJson);
+ 
   return newRelayAddressJson;
 }
 
@@ -396,6 +385,9 @@ async function makeRelayAddress(description = null) {
   if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
+    // The "," is appended here as this field is a comma-seperated list (but is a strict STRING type in the database). 
+    // used_on lists all the different sites the add-on has populated a form field on for this mask
+    // Because it contains multiple websites, we're using the CSV structure to explode/filter the string later
     apiBody.used_on = description + ",";
   }
 
@@ -422,22 +414,31 @@ async function makeRelayAddress(description = null) {
     newRelayAddressJson.generated_for = description;
   }
 
-  // TODO: put this into an updateLocalAddresses() function
+  // Save the new mask in local storage
+  updateLocalStorageAddress(newRelayAddressJson);
+  
+  return newRelayAddressJson;
+}
+
+async function updateLocalStorageAddress(newMaskJson) {
   const localStorageRelayAddresses = await browser.storage.local.get(
     "relayAddresses"
   );
+
+  // This is a storage function to save the newly created mask in the users local storage.
+  // We first confirm if there are addresses already saved, then add the new one to the list
+  // After adding it to the list, we re-sort the list by date created, ordering the newst masks to be listed first
   const localRelayAddresses =
     Object.keys(localStorageRelayAddresses).length === 0
       ? { relayAddresses: [] }
       : localStorageRelayAddresses;
   const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
-    newRelayAddressJson,
+    newMaskJson,
   ]);
 
   updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   
-  browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
-  return newRelayAddressJson;
+  await browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
 }
 
 async function updateAddOnAuthStatus(status) {
