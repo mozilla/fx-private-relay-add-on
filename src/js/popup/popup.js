@@ -219,9 +219,9 @@
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
 
             break;
-          case "newsStory":
+          case "newsItem":
             sendRelayEvent("Panel", "click", "opened-news-item");
-            popup.panel.news.storyPanel.update(data.newsItemId);
+            popup.panel.news.item.update(data.newsItemId);
             break;
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
@@ -700,15 +700,15 @@
 
               button.addEventListener(
                 "click",
-                popup.panel.news.storyPanel.show,
+                popup.panel.news.item.show,
                 false
               );
             });
           }
         },
-        storyPanel: {
+        item: {
           show: (event) => {
-            popup.panel.update("newsStory", {
+            popup.panel.update("newsItem", {
               newsItemId: event.target.dataset.newsItemId,
             });
           },
@@ -724,58 +724,58 @@
             
             const newsItemContent = storyData[0];
             
-            const newsStoryDetail = document.querySelector(".fx-relay-news-story");
+            const newsItemDetail = document.querySelector(".fx-relay-news-story");
             
             // Reset news detail item
-            newsStoryDetail.textContent = "";
+            newsItemDetail.textContent = "";
 
              // Populate HTML
-            const newsStoryHeroImage = document.createElement("img");
-            newsStoryHeroImage.src = newsItemContent.fullImg;
-            newsStoryDetail.appendChild(newsStoryHeroImage);
+            const newsItemHeroImage = document.createElement("img");
+            newsItemHeroImage.src = newsItemContent.fullImg;
+            newsItemDetail.appendChild(newsItemHeroImage);
             
-            const newsStoryHeroTitle = document.createElement("h3");
-            const newsStoryHeroTitleTextContent = newsItemContent.headlineStringArgs
+            const newsItemHeroTitle = document.createElement("h3");
+            const newsItemHeroTitleTextContent = newsItemContent.headlineStringArgs
               ? browser.i18n.getMessage(
                   newsItemContent.headlineString,
                   newsItemContent.headlineStringArgs
                 )
               : browser.i18n.getMessage(newsItemContent.headlineString);
-            newsStoryHeroTitle.textContent = newsStoryHeroTitleTextContent;
-            newsStoryDetail.appendChild(newsStoryHeroTitle);
+            newsItemHeroTitle.textContent = newsItemHeroTitleTextContent;
+            newsItemDetail.appendChild(newsItemHeroTitle);
             
-            const newsStoryHeroBody = document.createElement("div");
+            const newsItemHeroBody = document.createElement("div");
             // Pass i18n Args if applicable
-            const newsStoryHeroBodyTextContent = newsItemContent.bodyStringArgs
+            const newsItemHeroBodyTextContent = newsItemContent.bodyStringArgs
               ? browser.i18n.getMessage(
                   newsItemContent.bodyString,
                   newsItemContent.bodyStringArgs
                 )
               : browser.i18n.getMessage(newsItemContent.bodyString);
-            newsStoryHeroBody.textContent = newsStoryHeroBodyTextContent;
-            newsStoryDetail.appendChild(newsStoryHeroBody);
+            newsItemHeroBody.textContent = newsItemHeroBodyTextContent;
+            newsItemDetail.appendChild(newsItemHeroBody);
 
             // If the section has a CTA, add it.
             if (newsItemContent.fullCta) {
-              const newsStoryHeroCTA = document.createElement("a");
-              newsStoryHeroCTA.classList.add("fx-relay-news-story-link");
+              const newsItemHeroCTA = document.createElement("a");
+              newsItemHeroCTA.classList.add("fx-relay-news-story-link");
 
               // If the URL points towards Relay, choose the correct server
               if (newsItemContent.fullCtaRelayURL) {
-                newsStoryHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
+                newsItemHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
               } else {
-                newsStoryHeroCTA.href = `${newsItemContent.fullCtaHref}`;
+                newsItemHeroCTA.href = `${newsItemContent.fullCtaHref}`;
               }
               
               // Set GA data if applicable
               if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
-                newsStoryHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
-                newsStoryHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
+                newsItemHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
+                newsItemHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
               }
 
-              newsStoryHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
-              newsStoryHeroCTA.addEventListener("click", popup.events.externalClick, false);
-              newsStoryDetail.appendChild(newsStoryHeroCTA);
+              newsItemHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
+              newsItemHeroCTA.addEventListener("click", popup.events.externalClick, false);
+              newsItemDetail.appendChild(newsItemHeroCTA);
             }
           },
         },

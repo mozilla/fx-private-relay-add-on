@@ -61,7 +61,7 @@
       </div>
     </div>
     
-    <content>
+    <panel-content>
         <!-- Panel: Sign Up -->
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
             <div class="fx-relay-panel-content">
@@ -344,7 +344,7 @@
         </stats-panel>
 
         <!-- Panel: News -->
-        <news-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-panel">
+        <news-feed-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-feed-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
@@ -361,13 +361,13 @@
             <ul class="fx-relay-news"></ul>
           </div>
           
-        </news-panel>
+        </news-feed-panel>
 
         <!-- Panel: News Item -->
-        <newsStory-panel data-panel-id="newsStory" class="is-hidden fx-relay-panel" id="newsStory-panel">
+        <news-item-panel data-panel-id="newsItem" class="is-hidden fx-relay-panel" id="news-item-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-             <button data-nav-id="newsStory" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
+             <button data-nav-id="newsItem" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
               <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
@@ -380,7 +380,7 @@
             <article class="fx-relay-news-story"></article>
           </div>
           
-        </newsStory-panel>
+        </news-item-panel>
         
     </content>
 
