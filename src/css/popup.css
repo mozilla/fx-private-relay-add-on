@@ -196,7 +196,6 @@
 
 .fx-relay-panel-header-btn-back img {
   display: block;
-  width: 100%;
   width: 24px;
   height: 24px;
   pointer-events: none;
@@ -325,10 +324,10 @@ sign-up-panel::after {
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 1);
   position: absolute;
-  top: 0px;
+  top: 0;
   bottom: 0;
   margin: auto;
-  right: 4px;
+  right: var(--spacingXs);
   transition: all 0.2s ease;
 }
 
@@ -1036,6 +1035,7 @@ sign-up-panel::after {
   bottom: calc(100%);
   padding: var(--spacingMd);
   box-shadow: 0px 0px 4px var(--colorGrey20);
+  /* Z-index: This box floats above the content to display informatin on what promo blocking is */
   z-index: 1;
   background-color: var(--colorWhite);
   border-radius: var(--borderRadiusSm);
