@@ -370,6 +370,8 @@ sign-up-panel::after {
   cursor: pointer;
   appearance: none;
   border: 0;
+  text-align: left;
+  font-size: var(--fontSizeBodyXs);
 }
 
 .fx-relay-settings-link:hover,
