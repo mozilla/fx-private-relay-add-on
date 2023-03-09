@@ -330,17 +330,14 @@ async function makeDomainAddress(address, block_list_emails, description = null)
     body: JSON.stringify(apiBody),
   });
 
-  if (newRelayAddressResponse.status === 402) {
-    // FIXME: can this just return newRelayAddressResponse ?
-    return { status: 402 };
-  }
-
-  if (newRelayAddressResponse.status === 409) {
-    return { status: 409 };
-  }
+  // Error Code Context: 
+  // 400: Word not allowed (See https://github.com/mozilla/fx-private-relay/blob/main/emails/badwords.text)
+  // 402: Currently unknown. See FIXME in makeRelayAddress() function.
+  // 409: Custom mask name already exists
   
-  if (newRelayAddressResponse.status === 400) {
-    return { status: 400 };
+  if ([402, 409, 400].includes(newRelayAddressResponse.status)) {
+      console.log(newRelayAddressResponse.status);
+      return newRelayAddressResponse.status;
   }
 
   let newRelayAddressJson = await newRelayAddressResponse.json();
