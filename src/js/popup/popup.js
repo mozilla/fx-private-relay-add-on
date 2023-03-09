@@ -8,7 +8,7 @@
 
   const sessionState = {
     currentPanel: null,
-    newsItemsCount: 0,
+    newsItemsCount: null,
     loggedIn: false,
     newsContent: []
   };
@@ -169,6 +169,7 @@
       if (sessionState.loggedIn) {
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
+        // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
       } else {
         popup.panel.update("sign-up");
@@ -177,9 +178,6 @@
 
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
-
-      // Set Notification Bug for Unread News Items
-      popup.panel.news.utilities.initNewsItemCountNotification();
 
       // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
       // Cases:
@@ -1227,6 +1225,7 @@
         if (isFirefoxIntegrationAvailable) {
           sessionState.newsContent.push({
             id: "firefox-integration",
+            dateAdded: "20230314", // YYYYMMDD
             waffle: "firefox_integration",
             locale: "us",
             audience: "premium",
@@ -1243,6 +1242,7 @@
         if (isPhoneMaskingAvailable) {
           sessionState.newsContent.push({
             id: "phones",
+            dateAdded: "20221006", // YYYYMMDD
             headlineString: "popupPhoneMaskingPromoHeadline",
             bodyString: "popupPhoneMaskingPromoBody",
             teaserImg:
@@ -1271,6 +1271,7 @@
           
           sessionState.newsContent.push({
             id: "mozilla-vpn-bundle",
+            dateAdded: "20221025", // YYYYMMDD
             headlineString: "popupBundlePromoHeadline_2",
             headlineStringArgs: savings,
             bodyString: "popupBundlePromoBody_3",
@@ -1293,9 +1294,15 @@
           document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
           return;
         }
+        
+        // Sort news items by dateAdded field (Newest at the top)
+        sessionState.newsContent.sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : -1));
 
         // Update news item count
         sessionState.newsItemsCount = sessionState.newsContent.length;
+
+        // Set unread notification count
+        await popup.panel.news.utilities.initNewsItemCountNotification();
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
