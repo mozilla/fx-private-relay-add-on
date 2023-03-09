@@ -346,7 +346,6 @@ async function makeDomainAddress(address, block_list_emails, description = null)
   let newRelayAddressJson = await newRelayAddressResponse.json();
 
   if (description) {
-    // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.description = description;
     // Store the domain in which the alias was generated, separate from the label
     newRelayAddressJson.generated_for = description;
@@ -408,7 +407,6 @@ async function makeRelayAddress(description = null) {
   let newRelayAddressJson = await newRelayAddressResponse.json();
 
   if (description) {
-    // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.description = description;
     // Store the domain in which the alias was generated, separate from the label
     newRelayAddressJson.generated_for = description;
