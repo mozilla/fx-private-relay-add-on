@@ -632,21 +632,7 @@
           // If there's any news items, go build them
           if ( !newsList.hasChildNodes()) {
             sessionState.newsContent.forEach(async (newsItem) => {
-              // Check for any catches to not display the item
-              const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
               
-              if (
-                // Check for waffle (Waffle must return false to catch)
-                (
-                  newsItem.waffle &&
-                  !(await checkWaffleFlag(newsItem.waffle)))
-                ||
-                // logicCheck Function (Must return false to catch)
-                (hasLogicCheck && !newsItem.logicCheck)
-              ) {
-                return;
-              }
-
               // Build and attach news item
               const liFxRelayNewsItem = document.createElement("li");
               liFxRelayNewsItem.classList.add("fx-relay-news-item");
@@ -1257,7 +1243,6 @@
         if (isPhoneMaskingAvailable) {
           sessionState.newsContent.push({
             id: "phones",
-            logicCheck: isPhoneMaskingAvailable,
             headlineString: "popupPhoneMaskingPromoHeadline",
             bodyString: "popupPhoneMaskingPromoBody",
             teaserImg:
@@ -1286,7 +1271,6 @@
           
           sessionState.newsContent.push({
             id: "mozilla-vpn-bundle",
-            logicCheck: isBundleAvailable,
             headlineString: "popupBundlePromoHeadline_2",
             headlineStringArgs: savings,
             bodyString: "popupBundlePromoBody_3",
