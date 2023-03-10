@@ -275,6 +275,14 @@ function openMenu(target) {
     if (underlay) {
       underlay.style.display = "none";
       underlay.removeEventListener("click", onUnderlayClick);
+      const iframe = underlay.querySelector("iframe");
+      if (iframe) {
+        // The iframe contents currently assumes it gets reloaded every time the
+        // icon is clicked; otherwise loading animations won't terminate, and
+        // data will never be refreshed. Hence, unload the iframe when the menu
+        // closes:
+        iframe.remove();
+      }
     }
   };
 
