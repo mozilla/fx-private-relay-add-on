@@ -169,7 +169,7 @@
   appearance: none;
   outline: none;
   border: none;
-  font: 16px;
+  font-size: 16px;
   cursor: pointer;
   position: relative;
   width: 100%;

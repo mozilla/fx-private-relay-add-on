@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       el.value = browser.i18n.getMessage(el.dataset.i18nMessageId);
     }
   });
+
+  const i18nContentAltTags = document.querySelectorAll(".i18n-alt-tag");
+  i18nContentAltTags.forEach(el => {
+    el.alt = browser.i18n.getMessage(el.dataset.i18nMessageId);
+  });
   
   const i18nContentAttributes = document.querySelectorAll(".i18n-attribute");
   i18nContentAttributes.forEach(el => {

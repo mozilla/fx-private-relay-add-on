@@ -29,27 +29,23 @@
               </a>
               
               <!-- Settings -->
-              <!-- QUESTION: Should this be a button? -->
-              <a data-panel-id="settings" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
-                <!-- TODO: Add i18n String (popupSettingsTitle)  -->
-                <span class="fx-relay-menu-dashboard-link-tooltip">Settings</span>
+              <button data-panel-id="settings" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupSettingsTitle"></span>
                 <img src="/icons/nebula-gear-purple.svg" alt="" />
-              </a>
+              </button>
               
               <!-- Stats -->
-              <a data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
-                <!-- TODO: Add i18n String (???)  -->
-                <span class="fx-relay-menu-dashboard-link-tooltip">Stats</span>
+              <button data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupStatsTitle"></span>
                 <img src="/icons/nebula-stats-purple.svg" alt="" />
-              </a>
+              </button>
 
               <!-- News -->
-              <a data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
-                <!-- TODO: Add i18n String (???)  -->
-                <span class="fx-relay-menu-dashboard-link-tooltip">News</span>
+              <button data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupNewsLink"></span>
                 <img src="/icons/nebula-gift-purple.svg" alt="" />
                 <span class="news-count is-hidden"></span>
-              </a>
+              </button>
             </nav>
         </div>
     </header>
@@ -65,7 +61,7 @@
       </div>
     </div>
     
-    <content>
+    <panel-content>
         <!-- Panel: Sign Up -->
         <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
             <div class="fx-relay-panel-content">
@@ -98,7 +94,7 @@
             <div tabindex="0" class="fx-relay-masks-error-message" role="alert">
               <span class="i18n-content fx-relay-masks-error-message-string" data-i18n-message-id="popupCreateCustomFormError"></span>
               <span class="fx-relay-masks-error-message-icon">
-                <img src="/icons/nebula-close.svg" alt="">
+                <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/icons/nebula-close.svg">
               </span>
             </div>
 
@@ -126,6 +122,7 @@
               </form>
             </div>
 
+            <!-- This list is dynamically generated from popup via buildMasksList utils function -->
             <ul class="fx-relay-mask-list"></ul>
 
             <!-- Mask Creation Section -->
@@ -135,7 +132,7 @@
               <!-- Generate Random Mask -->
               <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
               <!-- Upgrade Button -->
-              <button data-href="premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
+              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
               <!-- Register Subdomain -->
               <button data-href="accounts/profile/#mpp-choose-subdomain" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-regsiter-subdomain-button is-hidden" data-relay-internal="true" data-i18n-message-id="popupGetDomainButton"></button>
             </div>
@@ -148,7 +145,7 @@
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-id="custom" data-nav-level="child" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
@@ -191,7 +188,7 @@
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
@@ -218,8 +215,8 @@
               <!-- Terms of Service -->
               <a data-href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
               <!-- Report Issue Panel Prompt -->
-              <a id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
-                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
+              <button id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
+                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></button>
             </div>
           </div>
         </settings-panel>
@@ -229,7 +226,7 @@
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-id="webcompat" data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
@@ -242,7 +239,7 @@
               <div class="report-section">
                 <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
                   data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
-                <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
+                <input type="text" id="issue_on_domain" name="issue_on_domain" value="" required />
               </div>
               <div class="report-section">
                 <!-- Select issue checkboxes -->
@@ -268,7 +265,7 @@
                   </li>
                   <li>
                     <!-- Case: Other -->
-                    <input type="checkbox" id="issue-case-other" name="issue-case-other" />
+                    <input id="webcompatOtherCheckbox" type="checkbox" id="issue-case-other" name="issue-case-other" />
                     <label class="i18n-content" for="issue-case-other"
                       data-i18n-message-id="popupReportIssueCaseOther"></label>
                   </li>
@@ -287,8 +284,8 @@
               <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
               <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
               <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
-              <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
-                data-event-action="click" data-nav-id="webcompat" data-nav-level="child" data-back-target="settings"></a>
+              <button class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
+                data-event-action="click" data-nav-id="webcompat" data-nav-level="child" data-back-target="settings"></button>
               </li>
             </div>
           </div>
@@ -301,13 +298,14 @@
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupStatsTitle"></h2>
           </header>
 
+          <!-- Stats are dynamically generated from popup via stats.init function -->
           <div class="fx-relay-panel-content">
             <div class="dashboard-stats-list global-stats">
               <ul>
@@ -346,11 +344,11 @@
         </stats-panel>
 
         <!-- Panel: News -->
-        <news-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-panel">
+        <news-feed-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-feed-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
@@ -359,17 +357,18 @@
           
           <!-- News List -->
           <div class="fx-relay-panel-content">
+            <!-- The news feed is dynamically generated from popup via news.init function -->
             <ul class="fx-relay-news"></ul>
           </div>
           
-        </news-panel>
+        </news-feed-panel>
 
         <!-- Panel: News Item -->
-        <newsStory-panel data-panel-id="newsStory" class="is-hidden fx-relay-panel" id="newsStory-panel">
+        <news-item-panel data-panel-id="newsItem" class="is-hidden fx-relay-panel" id="news-item-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
-             <button data-nav-id="newsStory" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
-              <img src="/icons/nebula-back-arrow.svg" alt="">
+             <button data-nav-id="newsItem" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
             </button>
             
             <!-- Panel Title -->
@@ -377,10 +376,11 @@
           </header>
           
           <div class="fx-relay-panel-content">
+            <!-- News items are dynamically generated from popup via storyPanel.update function -->
             <article class="fx-relay-news-story"></article>
           </div>
           
-        </newsStory-panel>
+        </news-item-panel>
         
     </content>
 

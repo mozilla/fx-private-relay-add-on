@@ -6,13 +6,13 @@
     "relaySiteOrigin"
   );
 
-  const state = {
+  const sessionState = {
     currentPanel: null,
-    newsItemsCount: 0,
+    newsItemsCount: null,
     loggedIn: false,
     newsContent: []
   };
-  
+
   const popup = {
     events: {
       backClick: (e) => {
@@ -30,7 +30,7 @@
         }
 
         // Catch back button clicks if the user is logged out
-        if (!state.loggedIn && backNavLevel === "root") {
+        if (!sessionState.loggedIn && backNavLevel === "root") {
           popup.panel.update("sign-up");
           return;
         }
@@ -163,12 +163,13 @@
         button.addEventListener("click", popup.events.backClick, false);
       });
 
-      state.loggedIn = await popup.utilities.isUserSignedIn();
+      sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (state.loggedIn) {
+      if (sessionState.loggedIn) {
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
+        // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
       } else {
         popup.panel.update("sign-up");
@@ -177,9 +178,6 @@
 
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
-
-      // Set Notification Bug for Unread News Items
-      popup.panel.news.utilities.initNewsItemCountNotification();
 
       // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
       // Cases:
@@ -200,7 +198,7 @@
           }
         });
 
-        state.currentPanel = panelId;
+        sessionState.currentPanel = panelId;
       },
       init: (panelId, data) => {
         switch (panelId) {
@@ -215,19 +213,19 @@
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
-
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
+            break;
 
-            break;
-          case "newsStory":
+          case "newsItem":
             sendRelayEvent("Panel", "click", "opened-news-item");
-            popup.panel.news.storyPanel.update(data.newsItemId);
+            popup.panel.news.item.update(data.newsItemId);
             break;
+
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
             popup.panel.settings.init();
-            
             break;
+
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
@@ -236,9 +234,6 @@
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
-            break;
-
-          default:
             break;
         }
       },
@@ -249,9 +244,8 @@
             const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
             const customMaskDomainLabel = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-domain");
             const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
-            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
             customMaskDomainInput.placeholder = browser.i18n.getMessage("popupCreateCustomFormMaskInputPlaceholder");
-            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", premiumSubdomainSet);
+            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", sessionState.premiumSubdomain);
 
             customMaskDomainInput.addEventListener("input", popup.panel.masks.custom.validateForm);
             customMaskForm.addEventListener("submit", popup.panel.masks.custom.submit);
@@ -271,7 +265,6 @@
           },
           submit: async (event) => {
             event.preventDefault();
-            // const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
             const customMaskDomainInput = document.getElementById("customMaskName");
             const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
 
@@ -313,13 +306,19 @@
             generateRandomMask.textContent = browser.i18n.getMessage("pageInputIconGenerateRandomMask");
 
             // Prompt user to register subdomain
-            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");            
-            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";  
+            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
+            const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");  
+            
+            // Store this query locally for this session
+            sessionState.premiumSubdomainSet = isPremiumSubdomainSet;
           
-            if (!isPremiumSubdomainSet) {
+            // premiumSubdomain is not set : display CTA to prompt user to register subdomain
+            if (!sessionState.premiumSubdomainSet) {
               const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
               registerSubdomainButton.classList.remove("is-hidden");
             } else {
+
+              sessionState.premiumSubdomain = premiumSubdomainSet;
               const generateCustomMask = document.querySelector(".js-generate-custom-mask");
               
               // Show "Generate custom mask" button
@@ -615,15 +614,11 @@
               getUnlimitedMasksBtn.focus();
 
             } else {
-              
               // Show Masks Count/Generate Button
               masksAvailable.classList.remove("is-hidden");
               generateRandomMask.classList.remove("is-hidden");
               generateRandomMask.focus();
             }
-          
-            
-            
           }
         },
       },
@@ -634,22 +629,8 @@
 
           // If there's any news items, go build them
           if ( !newsList.hasChildNodes()) {
-            state.newsContent.forEach(async (newsItem) => {
-              // Check for any catches to not display the item
-              const hasLogicCheck = Object.prototype.hasOwnProperty.call(newsItem, "logicCheck");
+            sessionState.newsContent.forEach(async (newsItem) => {
               
-              if (
-                // Check for waffle (Waffle must return false to catch)
-                (
-                  newsItem.waffle &&
-                  !(await checkWaffleFlag(newsItem.waffle)))
-                ||
-                // logicCheck Function (Must return false to catch)
-                (hasLogicCheck && !newsItem.logicCheck)
-              ) {
-                return;
-              }
-
               // Build and attach news item
               const liFxRelayNewsItem = document.createElement("li");
               liFxRelayNewsItem.classList.add("fx-relay-news-item");
@@ -700,82 +681,78 @@
 
               button.addEventListener(
                 "click",
-                popup.panel.news.storyPanel.show,
+                popup.panel.news.item.show,
                 false
               );
             });
           }
         },
-        storyPanel: {
+        item: {
           show: (event) => {
-            popup.panel.update("newsStory", {
+            popup.panel.update("newsItem", {
               newsItemId: event.target.dataset.newsItemId,
             });
           },
           update: (newsItemId) => {
             // Get content for news detail view
-
-            
-            if (!state.loggedIn) {
+            if (!sessionState.loggedIn) {
               return;
             }
 
-            const storyData = state.newsContent.filter((story) => { return story.id == newsItemId });
-            
-            const newsItemContent = storyData[0];
-            
-            const newsStoryDetail = document.querySelector(".fx-relay-news-story");
+            const newsItemsContent = sessionState.newsContent.filter((story) => { return story.id == newsItemId });
+            const newsItemContent = newsItemsContent[0];
+            const newsItemDetail = document.querySelector(".fx-relay-news-story");
             
             // Reset news detail item
-            newsStoryDetail.textContent = "";
+            newsItemDetail.textContent = "";
 
              // Populate HTML
-            const newsStoryHeroImage = document.createElement("img");
-            newsStoryHeroImage.src = newsItemContent.fullImg;
-            newsStoryDetail.appendChild(newsStoryHeroImage);
+            const newsItemHeroImage = document.createElement("img");
+            newsItemHeroImage.src = newsItemContent.fullImg;
+            newsItemDetail.appendChild(newsItemHeroImage);
             
-            const newsStoryHeroTitle = document.createElement("h3");
-            const newsStoryHeroTitleTextContent = newsItemContent.headlineStringArgs
+            const newsItemHeroTitle = document.createElement("h3");
+            const newsItemHeroTitleTextContent = newsItemContent.headlineStringArgs
               ? browser.i18n.getMessage(
                   newsItemContent.headlineString,
                   newsItemContent.headlineStringArgs
                 )
               : browser.i18n.getMessage(newsItemContent.headlineString);
-            newsStoryHeroTitle.textContent = newsStoryHeroTitleTextContent;
-            newsStoryDetail.appendChild(newsStoryHeroTitle);
+            newsItemHeroTitle.textContent = newsItemHeroTitleTextContent;
+            newsItemDetail.appendChild(newsItemHeroTitle);
             
-            const newsStoryHeroBody = document.createElement("div");
+            const newsItemHeroBody = document.createElement("div");
             // Pass i18n Args if applicable
-            const newsStoryHeroBodyTextContent = newsItemContent.bodyStringArgs
+            const newsItemHeroBodyTextContent = newsItemContent.bodyStringArgs
               ? browser.i18n.getMessage(
                   newsItemContent.bodyString,
                   newsItemContent.bodyStringArgs
                 )
               : browser.i18n.getMessage(newsItemContent.bodyString);
-            newsStoryHeroBody.textContent = newsStoryHeroBodyTextContent;
-            newsStoryDetail.appendChild(newsStoryHeroBody);
+            newsItemHeroBody.textContent = newsItemHeroBodyTextContent;
+            newsItemDetail.appendChild(newsItemHeroBody);
 
             // If the section has a CTA, add it.
             if (newsItemContent.fullCta) {
-              const newsStoryHeroCTA = document.createElement("a");
-              newsStoryHeroCTA.classList.add("fx-relay-news-story-link");
+              const newsItemHeroCTA = document.createElement("a");
+              newsItemHeroCTA.classList.add("fx-relay-news-story-link");
 
               // If the URL points towards Relay, choose the correct server
               if (newsItemContent.fullCtaRelayURL) {
-                newsStoryHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
+                newsItemHeroCTA.href = `${relaySiteOrigin}${newsItemContent.fullCtaHref}`;
               } else {
-                newsStoryHeroCTA.href = `${newsItemContent.fullCtaHref}`;
+                newsItemHeroCTA.href = `${newsItemContent.fullCtaHref}`;
               }
               
               // Set GA data if applicable
               if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
-                newsStoryHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
-                newsStoryHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
+                newsItemHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
+                newsItemHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
               }
 
-              newsStoryHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
-              newsStoryHeroCTA.addEventListener("click", popup.events.externalClick, false);
-              newsStoryDetail.appendChild(newsStoryHeroCTA);
+              newsItemHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
+              newsItemHeroCTA.addEventListener("click", popup.events.externalClick, false);
+              newsItemDetail.appendChild(newsItemHeroCTA);
             }
           },
         },
@@ -799,7 +776,7 @@
             // First-run user: No unread data present
             if (!unreadNewsItemsCountExists && !readNewsItemsCountExists) {
               await browser.storage.local.set({
-                unreadNewsItemsCount: state.newsItemsCount,
+                unreadNewsItemsCount: sessionState.newsItemsCount,
                 readNewsItemCount: 0,
               });
             }
@@ -808,7 +785,7 @@
             // Example: Three items total but user doesn't have waffle for one news item. 
             // Regardless - update the unreadNews count to match whatever is in state
             await browser.storage.local.set({
-              unreadNewsItemsCount: state.newsItemsCount,
+              unreadNewsItemsCount: sessionState.newsItemsCount,
             });
 
             const { readNewsItemCount } = await browser.storage.local.get(
@@ -836,7 +813,7 @@
           updateNewsItemCountNotification: async (markAllUnread = false) => {
             if (markAllUnread) {
               await browser.storage.local.set({
-                readNewsItemCount: state.newsItemsCount,
+                readNewsItemCount: sessionState.newsItemsCount,
               });
 
               const newsItemCountNotification = document.querySelector(
@@ -858,7 +835,7 @@
 
           const reportWebcompatIssueLink = document.getElementById("popupSettingsReportIssue");
             
-          if (state.loggedIn) {
+          if (sessionState.loggedIn) {
             reportWebcompatIssueLink.classList.remove("is-hidden");
             reportWebcompatIssueLink.addEventListener("click", (e) => {
                 e.preventDefault();
@@ -871,37 +848,6 @@
       },
       stats: {
         init: async () => {
-          // Get Global Mask Stats data
-          const { aliasesUsedVal } = await browser.storage.local.get(
-            "aliasesUsedVal"
-          );
-          const { emailsForwardedVal } = await browser.storage.local.get(
-            "emailsForwardedVal"
-          );
-          const { emailsBlockedVal } = await browser.storage.local.get(
-            "emailsBlockedVal"
-          );
-
-          const globalStatSet = document.querySelector(
-            ".dashboard-stats-list.global-stats"
-          );
-
-          const globalAliasesUsedValEl =
-            globalStatSet.querySelector(".aliases-used");
-          const globalEmailsBlockedValEl =
-            globalStatSet.querySelector(".emails-blocked");
-          const globalEmailsForwardedValEl =
-            globalStatSet.querySelector(".emails-forwarded");
-
-          globalAliasesUsedValEl.textContent = aliasesUsedVal;
-          globalEmailsBlockedValEl.textContent = emailsBlockedVal;
-          globalEmailsForwardedValEl.textContent = emailsForwardedVal;
-
-          // Check if any data applies to the current site
-          const currentPageHostName = await browser.runtime.sendMessage({
-            method: "getCurrentPageHostname",
-          });
-
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
@@ -920,16 +866,35 @@
 
           const masks = await popup.utilities.getMasks(getMasksOptions);
 
-          const currentWebsiteStateSet = document.querySelector(
-            ".dashboard-stats-list.current-website-stats"
-          );
+           // Get Global Mask Stats data
+          const totalAliasesUsedVal = masks.length;
+          let totalEmailsForwardedVal = 0;
+          let totalEmailsBlockedVal = 0;
+          
+          // Loop through all masks to calculate totals
+          masks.forEach((mask) => {
+            totalEmailsForwardedVal += mask.num_forwarded;
+            totalEmailsBlockedVal += mask.num_blocked;
+          });
 
-          if (
-            popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(
-              masks,
-              currentPageHostName
-            )
-          ) {
+          // Set global stats data 
+          const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
+          const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
+          const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
+          const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
+
+          globalAliasesUsedValEl.textContent = totalAliasesUsedVal;
+          globalEmailsBlockedValEl.textContent = totalEmailsForwardedVal;
+          globalEmailsForwardedValEl.textContent = totalEmailsBlockedVal;
+         
+          // Get current page
+          const currentPageHostName = await browser.runtime.sendMessage({
+            method: "getCurrentPageHostname",
+          });
+
+          // Check if any data applies to the current site
+          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks,currentPageHostName) ) {
+            
             // Some masks are used on the current site. Time to calculate!
             const filteredMasks = masks.filter(
               (mask) =>
@@ -943,43 +908,38 @@
             let currentWebsiteForwardedVal = 0;
             let currentWebsiteBlockedVal = 0;
 
+            // Calculate forward/blocked counts
             filteredMasks.forEach((mask) => {
               currentWebsiteForwardedVal += mask.num_forwarded;
               currentWebsiteBlockedVal += mask.num_blocked;
             });
 
-            const currentWebsiteAliasesUsedValEl =
-              currentWebsiteStateSet.querySelector(".aliases-used");
+            // Set current website usage data
+            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats");
+
+            const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
             currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
 
-            const currentWebsiteEmailsForwardedValEl =
-              currentWebsiteStateSet.querySelector(".emails-forwarded");
-            currentWebsiteEmailsForwardedValEl.textContent =
-              currentWebsiteForwardedVal;
+            const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
+            currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
 
-            const currentWebsiteEmailsBlockedValEl =
-              currentWebsiteStateSet.querySelector(".emails-blocked");
-            currentWebsiteEmailsBlockedValEl.textContent =
-              currentWebsiteBlockedVal;
+            const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
+            currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal;
 
-            const currentWebsiteEmailsBlocked =
-              currentWebsiteStateSet.querySelector(
-                ".dashboard-info-emails-blocked"
-              );
-            const currentWebsiteEmailsForwarded =
-              currentWebsiteStateSet.querySelector(
-                ".dashboard-info-emails-forwarded"
-              );
+            // If there's usage data for current website stats, show it
+            const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
+            const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
             currentWebsiteEmailsBlocked.classList.remove("is-hidden");
             currentWebsiteEmailsForwarded.classList.remove("is-hidden");
+            
           }
         },
       },
       webcompat: {
         init: () => {
           popup.panel.webcompat.setURLwithIssue();
+          popup.panel.webcompat.setRequiredCheckboxListeners();
           popup.panel.webcompat.showReportInputOtherTextField();
-          popup.panel.webcompat.showSuccessReportSubmission();
 
           const reportForm = document.querySelector(".report-issue-content");
           reportForm.addEventListener("submit", async (event) => {
@@ -994,22 +954,62 @@
             false
           );
         },
+        toggleRequiredCheckboxListeners: (toggleOverride = null) => {
+          const checkboxes = document.querySelectorAll('.report-section ul li input');
+
+          checkboxes.forEach(checkbox => {
+            // Override arg must be present to override
+            if (toggleOverride === null) {
+              checkbox.required = !checkbox.required;
+            } else {
+              checkbox.required =  toggleOverride;
+            }
+          });
+        },
+        setRequiredCheckboxListeners: () => {
+          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+          const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
+          const checkboxes = document.querySelectorAll('.report-section ul li input');
+          const otherTextField = document.querySelector('input[name="other_issue"]');
+          const isChecked = (element) => element.checked;
+          
+          checkboxes.forEach(checkbox => {
+            checkbox.required = true;
+            checkbox.addEventListener("change", ()=> {              
+              // If the user has selected at least one checkbox, and has filled out the website URL input, make the form submittable
+              if ([...checkboxes].some(isChecked) && inputFieldUrl.value && popup.utilities.isSortaAURL(inputFieldUrl.value) && checkbox.name !== "issue-case-other") {
+                reportIssueSubmitBtn.disabled = false;
+                popup.panel.webcompat.toggleRequiredCheckboxListeners(false);
+              } else {
+                reportIssueSubmitBtn.disabled = true;
+                popup.panel.webcompat.toggleRequiredCheckboxListeners(true);
+              }
+
+              // Custom logic if the user clicks the "other" box
+              if (checkbox.name === "issue-case-other" && checkbox.checked && otherTextField.value && popup.utilities.isSortaAURL(otherTextField.value)) {
+                reportIssueSubmitBtn.disabled = false;
+                popup.panel.webcompat.toggleRequiredCheckboxListeners(false);
+              }
+            })
+          });
+
+        },
         setURLwithIssue: async () => {
           // Add Site URL placeholder
           const currentPage = (await popup.utilities.getCurrentPage()).url;
-          const reportIssueSubmitBtn = document.querySelector(
-            ".report-issue-submit-btn"
-          );
-          const inputFieldUrl = document.querySelector(
-            'input[name="issue_on_domain"]'
-          );
+          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+          const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
+          const checkboxes = document.querySelectorAll('.report-section ul li input');
+          const isChecked = (element) => element.checked;
+          
           reportIssueSubmitBtn.disabled = true;
 
           // Allow for custom URL inputs
           inputFieldUrl.addEventListener("input", () => {
             reportIssueSubmitBtn.disabled = true;
-            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com)
-            if (popup.utilities.isSortaAURL(inputFieldUrl.value)) {
+            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
+            // AND at least one checkbox is checked
+            if (popup.utilities.isSortaAURL(inputFieldUrl.value) && [...checkboxes].some(isChecked)) {
               reportIssueSubmitBtn.disabled = false;
             }
           });
@@ -1019,40 +1019,47 @@
             const url = new URL(currentPage);
             // returns a http:// or https:// value
             inputFieldUrl.value = url.origin;
-            reportIssueSubmitBtn.disabled = false;
           }
         },
         showReportInputOtherTextField: () => {
-          const otherCheckbox = document.querySelector(
-            'input[name="issue-case-other"]'
-          );
-          const otherTextField = document.querySelector(
-            'input[name="other_issue"]'
-          );
+          const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
+          const otherTextField = document.querySelector('input[name="other_issue"]');
+          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
+
           otherCheckbox.addEventListener("click", () => {
             otherTextField.classList.toggle("is-hidden");
+
+            if (!otherTextField.classList.contains("is-hidden")) {
+              // If the user has checked "Other", they must add text to the "Other" text input before submitting
+              reportIssueSubmitBtn.disabled = true;
+              otherTextField.required = true;
+            } else {
+              otherTextField.required = false;
+            }
           });
+
+
 
           // Add placeholder to report input on 'Other' selection
           const inputFieldOtherDetails = document.querySelector(
             'input[name="other_issue"]'
           );
+
+          // Allow for custom URL inputs
+          inputFieldOtherDetails.addEventListener("input", () => {
+            reportIssueSubmitBtn.disabled = true;
+            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
+            // AND at least one checkbox is checked
+            if (popup.utilities.isSortaAURL(inputFieldOtherDetails.value)) {
+              reportIssueSubmitBtn.disabled = false;
+            }
+          });
+
           inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
             "popupReportIssueCaseOtherDetails"
           );
         },
-        showSuccessReportSubmission: () => {
-          const reportIssueSubmitBtn = document.querySelector(
-            ".report-issue-submit-btn"
-          );
-          const reportSuccess = document.querySelector(".report-success");
-          const reportContent = document.querySelector(".report-issue-content");
-          reportIssueSubmitBtn.addEventListener("click", () => {
-            reportSuccess.classList.remove("is-hidden");
-            reportContent.classList.add("is-hidden");
-          });
-        },
-        handleReportIssueFormSubmission: async (event) => {
+        handleReportIssueFormSubmission: async (event) => {          
           event.preventDefault();
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
@@ -1246,8 +1253,9 @@
         
         // FIXME: The order is not being set correctly
         if (isFirefoxIntegrationAvailable) {
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "firefox-integration",
+            dateAdded: "20230314", // YYYYMMDD
             waffle: "firefox_integration",
             locale: "us",
             audience: "premium",
@@ -1262,9 +1270,9 @@
 
         // Add Phone Masking News Item
         if (isPhoneMaskingAvailable) {
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "phones",
-            logicCheck: isPhoneMaskingAvailable,
+            dateAdded: "20221006", // YYYYMMDD
             headlineString: "popupPhoneMaskingPromoHeadline",
             bodyString: "popupPhoneMaskingPromoBody",
             teaserImg:
@@ -1274,7 +1282,7 @@
             fullCta: "popupPhoneMaskingPromoCTA",
             fullCtaRelayURL: true,
             fullCtaHref:
-              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+              "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta#pricing",
             fullCtaEventLabel: "panel-news-phone-masking-cta",
             fullCtaEventAction: "click",
           });
@@ -1291,9 +1299,9 @@
             currency: getBundleCurrency,
           }).format(getBundlePrice);
           
-          state.newsContent.push({
+          sessionState.newsContent.push({
             id: "mozilla-vpn-bundle",
-            logicCheck: isBundleAvailable,
+            dateAdded: "20221025", // YYYYMMDD
             headlineString: "popupBundlePromoHeadline_2",
             headlineStringArgs: savings,
             bodyString: "popupBundlePromoBody_3",
@@ -1305,20 +1313,26 @@
             fullCta: "popupPhoneMaskingPromoCTA",
             fullCtaRelayURL: true,
             fullCtaHref:
-              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+              "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta#pricing",
             fullCtaEventLabel: "panel-news-bundle-cta",
             fullCtaEventAction: "click",
           },)
         }
 
         // Remove news nav link if there's no news items to display to user
-        if (state.newsContent.length === 0 ) {
+        if (sessionState.newsContent.length === 0 ) {
           document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
           return;
         }
+        
+        // Sort news items by dateAdded field (Newest at the top)
+        sessionState.newsContent.sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : -1));
 
         // Update news item count
-        state.newsItemsCount = state.newsContent.length;
+        sessionState.newsItemsCount = sessionState.newsContent.length;
+
+        // Set unread notification count
+        await popup.panel.news.utilities.initNewsItemCountNotification();
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
