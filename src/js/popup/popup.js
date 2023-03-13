@@ -848,37 +848,6 @@
       },
       stats: {
         init: async () => {
-          // Get Global Mask Stats data
-          const { aliasesUsedVal } = await browser.storage.local.get(
-            "aliasesUsedVal"
-          );
-          const { emailsForwardedVal } = await browser.storage.local.get(
-            "emailsForwardedVal"
-          );
-          const { emailsBlockedVal } = await browser.storage.local.get(
-            "emailsBlockedVal"
-          );
-
-          const globalStatSet = document.querySelector(
-            ".dashboard-stats-list.global-stats"
-          );
-
-          const globalAliasesUsedValEl =
-            globalStatSet.querySelector(".aliases-used");
-          const globalEmailsBlockedValEl =
-            globalStatSet.querySelector(".emails-blocked");
-          const globalEmailsForwardedValEl =
-            globalStatSet.querySelector(".emails-forwarded");
-
-          globalAliasesUsedValEl.textContent = aliasesUsedVal;
-          globalEmailsBlockedValEl.textContent = emailsBlockedVal;
-          globalEmailsForwardedValEl.textContent = emailsForwardedVal;
-
-          // Check if any data applies to the current site
-          const currentPageHostName = await browser.runtime.sendMessage({
-            method: "getCurrentPageHostname",
-          });
-
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
@@ -897,16 +866,35 @@
 
           const masks = await popup.utilities.getMasks(getMasksOptions);
 
-          const currentWebsiteStateSet = document.querySelector(
-            ".dashboard-stats-list.current-website-stats"
-          );
+           // Get Global Mask Stats data
+          const totalAliasesUsedVal = masks.length;
+          let totalEmailsForwardedVal = 0;
+          let totalEmailsBlockedVal = 0;
+          
+          // Loop through all masks to calculate totals
+          masks.forEach((mask) => {
+            totalEmailsForwardedVal += mask.num_forwarded;
+            totalEmailsBlockedVal += mask.num_blocked;
+          });
 
-          if (
-            popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(
-              masks,
-              currentPageHostName
-            )
-          ) {
+          // Set global stats data 
+          const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
+          const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
+          const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
+          const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
+
+          globalAliasesUsedValEl.textContent = totalAliasesUsedVal;
+          globalEmailsBlockedValEl.textContent = totalEmailsForwardedVal;
+          globalEmailsForwardedValEl.textContent = totalEmailsBlockedVal;
+         
+          // Get current page
+          const currentPageHostName = await browser.runtime.sendMessage({
+            method: "getCurrentPageHostname",
+          });
+
+          // Check if any data applies to the current site
+          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks,currentPageHostName) ) {
+            
             // Some masks are used on the current site. Time to calculate!
             const filteredMasks = masks.filter(
               (mask) =>
@@ -920,35 +908,30 @@
             let currentWebsiteForwardedVal = 0;
             let currentWebsiteBlockedVal = 0;
 
+            // Calculate forward/blocked counts
             filteredMasks.forEach((mask) => {
               currentWebsiteForwardedVal += mask.num_forwarded;
               currentWebsiteBlockedVal += mask.num_blocked;
             });
 
-            const currentWebsiteAliasesUsedValEl =
-              currentWebsiteStateSet.querySelector(".aliases-used");
+            // Set current website usage data
+            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats");
+
+            const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
             currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
 
-            const currentWebsiteEmailsForwardedValEl =
-              currentWebsiteStateSet.querySelector(".emails-forwarded");
-            currentWebsiteEmailsForwardedValEl.textContent =
-              currentWebsiteForwardedVal;
+            const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
+            currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
 
-            const currentWebsiteEmailsBlockedValEl =
-              currentWebsiteStateSet.querySelector(".emails-blocked");
-            currentWebsiteEmailsBlockedValEl.textContent =
-              currentWebsiteBlockedVal;
+            const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
+            currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal;
 
-            const currentWebsiteEmailsBlocked =
-              currentWebsiteStateSet.querySelector(
-                ".dashboard-info-emails-blocked"
-              );
-            const currentWebsiteEmailsForwarded =
-              currentWebsiteStateSet.querySelector(
-                ".dashboard-info-emails-forwarded"
-              );
+            // If there's usage data for current website stats, show it
+            const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
+            const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
             currentWebsiteEmailsBlocked.classList.remove("is-hidden");
             currentWebsiteEmailsForwarded.classList.remove("is-hidden");
+            
           }
         },
       },
