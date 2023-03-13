@@ -1252,7 +1252,7 @@
             fullCta: "popupPhoneMaskingPromoCTA",
             fullCtaRelayURL: true,
             fullCtaHref:
-              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta",
+              "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-phone-masking-cta#pricing",
             fullCtaEventLabel: "panel-news-phone-masking-cta",
             fullCtaEventAction: "click",
           });
@@ -1283,7 +1283,7 @@
             fullCta: "popupPhoneMaskingPromoCTA",
             fullCtaRelayURL: true,
             fullCtaHref:
-              "/premium/#pricing?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta",
+              "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta#pricing",
             fullCtaEventLabel: "panel-news-bundle-cta",
             fullCtaEventAction: "click",
           },)
