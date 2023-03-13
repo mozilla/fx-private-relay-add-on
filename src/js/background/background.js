@@ -182,7 +182,6 @@ async function getCurrentPageHostname() {
 
   if (currentPage.url) {
     const url = new URL(currentPage.url);
-    console.log(url);
     return url.hostname;
   }
 
@@ -315,6 +314,9 @@ async function makeDomainAddress(address, block_list_emails, description = null)
   if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
+    // The "," is appended here as this field is a comma-seperated list (but is a strict STRING type in the database). 
+    // used_on lists all the different sites the add-on has populated a form field on for this mask
+    // Because it contains multiple websites, we're using the CSV structure to explode/filter the string later
     apiBody.used_on = description + ",";
   }
 
@@ -328,44 +330,26 @@ async function makeDomainAddress(address, block_list_emails, description = null)
     body: JSON.stringify(apiBody),
   });
 
-  if (newRelayAddressResponse.status === 402) {
-    // FIXME: can this just return newRelayAddressResponse ?
-    return { status: 402 };
-  }
-
-  if (newRelayAddressResponse.status === 409) {
-    return { status: 409 };
-  }
+  // Error Code Context: 
+  // 400: Word not allowed (See https://github.com/mozilla/fx-private-relay/blob/main/emails/badwords.text)
+  // 402: Currently unknown. See FIXME in makeRelayAddress() function.
+  // 409: Custom mask name already exists
   
-  if (newRelayAddressResponse.status === 400) {
-    return { status: 400 };
+  if ([402, 409, 400].includes(newRelayAddressResponse.status)) {
+      return newRelayAddressResponse.status;
   }
 
   let newRelayAddressJson = await newRelayAddressResponse.json();
 
   if (description) {
-    // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.description = description;
     // Store the domain in which the alias was generated, separate from the label
     newRelayAddressJson.generated_for = description;
   }
 
-  // TODO: put this into an updateLocalAddresses() function
-  const localStorageRelayAddresses = await browser.storage.local.get(
-    "relayAddresses"
-  );
-
-  const localRelayAddresses =
-    Object.keys(localStorageRelayAddresses).length === 0
-      ? { relayAddresses: [] }
-      : localStorageRelayAddresses;
-  const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
-    newRelayAddressJson,
-  ]);
-
-  updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-  
-  browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
+  // Save the new mask in local storage
+  updateLocalStorageAddress(newRelayAddressJson);
+ 
   return newRelayAddressJson;
 }
 
@@ -396,6 +380,9 @@ async function makeRelayAddress(description = null) {
   if (description && serverStoragePermission) {
     apiBody.description = description;
     apiBody.generated_for = description;
+    // The "," is appended here as this field is a comma-seperated list (but is a strict STRING type in the database). 
+    // used_on lists all the different sites the add-on has populated a form field on for this mask
+    // Because it contains multiple websites, we're using the CSV structure to explode/filter the string later
     apiBody.used_on = description + ",";
   }
 
@@ -416,28 +403,36 @@ async function makeRelayAddress(description = null) {
   let newRelayAddressJson = await newRelayAddressResponse.json();
 
   if (description) {
-    // TODO: Update the domain attribute to be "label"
     newRelayAddressJson.description = description;
     // Store the domain in which the alias was generated, separate from the label
     newRelayAddressJson.generated_for = description;
   }
 
-  // TODO: put this into an updateLocalAddresses() function
+  // Save the new mask in local storage
+  updateLocalStorageAddress(newRelayAddressJson);
+  
+  return newRelayAddressJson;
+}
+
+async function updateLocalStorageAddress(newMaskJson) {
   const localStorageRelayAddresses = await browser.storage.local.get(
     "relayAddresses"
   );
+
+  // This is a storage function to save the newly created mask in the users local storage.
+  // We first confirm if there are addresses already saved, then add the new one to the list
+  // After adding it to the list, we re-sort the list by date created, ordering the newst masks to be listed first
   const localRelayAddresses =
     Object.keys(localStorageRelayAddresses).length === 0
       ? { relayAddresses: [] }
       : localStorageRelayAddresses;
   const updatedLocalRelayAddresses = localRelayAddresses.relayAddresses.concat([
-    newRelayAddressJson,
+    newMaskJson,
   ]);
 
   updatedLocalRelayAddresses.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   
-  browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
-  return newRelayAddressJson;
+  await browser.storage.local.set({ relayAddresses: updatedLocalRelayAddresses });
 }
 
 async function updateAddOnAuthStatus(status) {
