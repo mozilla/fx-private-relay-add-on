@@ -336,7 +336,7 @@ async function makeDomainAddress(address, block_list_emails, description = null)
   // 409: Custom mask name already exists
   
   if ([402, 409, 400].includes(newRelayAddressResponse.status)) {
-      return newRelayAddressResponse.status;
+      return {status: newRelayAddressResponse.status};
   }
 
   let newRelayAddressJson = await newRelayAddressResponse.json();
