@@ -1152,11 +1152,7 @@
         const domainList = mask.used_on;
 
         // Short circuit out if there's no used_on entry
-        if (
-          domainList === null ||
-          domainList === "" ||
-          domainList === undefined
-        ) {
+        if ([undefined, null, ""].includes(domainList)) {
           return false;
         }
 

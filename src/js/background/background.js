@@ -179,8 +179,8 @@ async function getCurrentPage() {
 
 async function getCurrentPageHostname() {
   const currentPage = await getCurrentPage();
-
-  if (currentPage.url) {
+  
+  if (currentPage && currentPage.url) {
     const url = new URL(currentPage.url);
     return url.hostname;
   }
