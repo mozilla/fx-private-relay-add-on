@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior */
+/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -41,4 +41,28 @@ function preventDefaultBehavior(clickEvt) {
   clickEvt.stopImmediatePropagation();
   clickEvt.preventDefault();
   return;
+}
+
+// eslint-disable-next-line no-unused-vars
+async function checkWaffleFlag(flag) {
+  const waffleFlagArray = (await browser.storage.local.get("waffleFlags")).waffleFlags.WAFFLE_FLAGS;
+  for (let i of waffleFlagArray) {
+    if (i[0] === flag && i[1] === true) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// eslint-disable-next-line no-unused-vars
+async function getBrowser() {
+  if (typeof browser.runtime.getBrowserInfo === "function") {
+    /** @type {{ name: string, vendor: string, version: string, buildID: string }} */
+    const browserInfo = await browser.runtime.getBrowserInfo();
+    return browserInfo.name;
+  }
+  if (navigator.userAgent.toLowerCase().indexOf("firefox") !== -1) {
+    return "Firefox";
+  }
+  return "Chrome";
 }

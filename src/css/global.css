@@ -15,6 +15,7 @@
   --layoutLg: 64px;
   --layoutXl: 96px;
   --layout2xl: 192px;
+  --layout3xl: 256px;
 
   /* Border Radius */
   --borderRadiusXs: 2px;
@@ -23,6 +24,7 @@
   --borderRadiusLg: 16px;
 
   /* Width Tokens */
+  --content2xs: 256px;
   --contentXs: 304px;
   --contentSm: 432px;
   --contentMd: 688px;
@@ -35,6 +37,21 @@
   --screenLg: 1024px;
   --screenXl: 1312px;
 
+  /* Typography Tokens */
+  --fontSizeTitle2xl: 64px;
+  --fontSizeTitleXl: 56px;
+  --fontSizeTitleLg: 48px;
+  --fontSizeTitleMd: 40px;
+  --fontSizeTitleSm: 32px;
+  --fontSizeTitleXs: 24px;
+  --fontSizeTitle2xs: 20px;
+  --fontSizeTitle3xs: 16px;
+  --fontSizeBodyXl: 21px;
+  --fontSizeBodyLg: 18px;
+  --fontSizeBodyMd: 16px;
+  --fontSizeBodySm: 14px;
+  --fontSizeBodyXs: 12px;
+
   /* Box Shadow Tokens */
   --boxShadowSm: 0 8px 12px 1px rgba(29, 17, 51, .04), 0 3px 16px 2px rgba(9, 32, 77, .12), 0 5px 10px -3px rgba(29, 17, 51, .12);
   --boxShadowMd: 0 16px 24px 2px rgba(29, 17, 51, .04), 0 6px 32px 4px rgba(9, 32, 77, .12), 0 8px 12px -5px rgba(29, 17, 51, .12);
@@ -43,15 +60,21 @@
   /* Primary Nebula Colors */
   --colorInformational: #0060df;
   --colorInformationalActive: #054096;
-  --colorInformationalHover: #bcd0ec;
+  --colorInformationalHover: #0250bb;
   --colorInformationalFocus: rgba(0, 96, 223, 0.4); /*  This is the RGB value of #0060df @ 40% opacity */
   --colorInformationalDisabled: #C9D9F3;
 
   /* Nebula Colors: Button: Error */
-  --colorError: #FF4F5E;
-  --colorErrorActive: #C50042;
-  --colorErrorHover: #E22850;
+  --colorError: #E22850;
+  --colorErrorActive: #810220;
+  --colorErrorHover: #C50042;
   --colorErrorFocus: #FFBDC5 ;
+
+  /* Nebula Colors: Button: Warning */
+  --colorWarning: #ffa436;
+  --colorWarningActive: #c45a27;
+  --colorWarningHover: #e27f2e;
+  --colorWarningFocus: #ffd5b2;
 
   /* Nebula Colors: Blues */
   --colorBlue90: #09204d;
@@ -64,6 +87,18 @@
   --colorBlue20: #00ddff;
   --colorBlue10: #80ebff;
   --colorBlue05: #aaf2ff;
+
+  /* Nebula Colors: Green */
+  --colorGreen90: #00736c;
+  --colorGreen80: #00a49a;
+  --colorGreen70: #1cc4a0;
+  --colorGreen60: #3ad4b3;
+  --colorGreen50: #3fe1b0;
+  --colorGreen40: #54ffbd;
+  --colorGreen30: #88ffd1;
+  --colorGreen20: #b3ffe3;
+  --colorGreen10: #d1ffee;
+  --colorGreen05: #e3fff3;
 
   /* Nebula Colors: Grays */
   --colorBlack: #000000;
@@ -86,6 +121,18 @@
   --colorViolet20: #f68fff;
   --colorViolet10: #f6b8ff;
   --colorViolet05: #f7e2ff;
+
+  /* Nebula Colors: Purple */
+  --colorPurple90: #321c64;
+  --colorPurple80: #45278d;
+  --colorPurple70: #592acb;
+  --colorPurple60: #7542e5;
+  --colorPurple50: #9059ff;
+  --colorPurple40: #ab71ff;
+  --colorPurple30: #c689ff;
+  --colorPurple20: #cb9eff;
+  --colorPurple10: #d9bfff;
+  --colorPurple05: #e7dfff;
 
   /* Nebula Colors: Whites */
   --colorWhite: #ffffff;
@@ -155,6 +202,7 @@
   color: var(--colorInformational);
   font-family: var(--fontStackFirefox);
   font-weight: 400;
+  background-color: transparent;
 }
 
 .fx-relay-c-button.t-secondary:hover {
@@ -258,6 +306,7 @@
   background-color: var(--colorWhite);
   border: 2px solid transparent;
   outline: 1px solid var(--colorGrey30);
+  position: relative;
 }
 
 .fx-relay-c-search-input:focus {
@@ -265,6 +314,7 @@
   border: 2px solid var(--colorInformational);
 }
 
+.fx-relay-c-search-input.is-active + .fx-relay-c-search-controls,
 .fx-relay-c-search-input:focus + .fx-relay-c-search-controls {
   opacity: 1;
 }

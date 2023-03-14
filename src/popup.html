@@ -3,10 +3,10 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Firefox Relay</title>
-    <link rel="stylesheet" href="css/relay.css">
-    <link rel="stylesheet" href="css/popup.css">
     <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/popup.css">
     <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/libs/psl.min.js"></script>
     <script src="/js/shared/i18n.js"></script>
     <script src="/js/shared/data-opt-out-toggle.js"></script>
     <script src="js/shared/utils.js"></script>
@@ -14,225 +14,375 @@
     <script src="js/shared/metrics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body class="fx-relay-panel fx-relay">
+  <body class="fx-relay-panel-wrapper fx-relay is-loading">
+    <header class="fx-relay-menu-header">
+        <div class="fx-relay-menu-header-logo-bar">
+            <h1 class="fx-relay-menu-logo">
+              <img class="fx-relay-menu-logo-image-fx-relay" src="/images/logo-image-fx-relay.svg" alt="" />
+              <img class="fx-relay-menu-logo-text" alt="Firefox Relay" src="/images/logo-text-fx-relay.svg" />
+            </h1>
+            <nav class="fx-relay-menu-header-navigation">
+              <!-- Dashboard -->
+              <a class="fx-relay-menu-dashboard-link js-external-link" data-relay-internal="true" data-href="?utm_source=fx-relay-addon&utm_medium=popup&utm_content=manage-all-addresses" href="" data-event-action="click" data-event-label="panel-manage-btn"  >
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupNavButtonLaunchRelay"></span>
+                <img src="/icons/nebula-link-purple.svg" alt="" />
+              </a>
+              
+              <!-- Settings -->
+              <button data-panel-id="settings" class="fx-relay-menu-dashboard-link js-internal-link" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupSettingsTitle"></span>
+                <img src="/icons/nebula-gear-purple.svg" alt="" />
+              </button>
+              
+              <!-- Stats -->
+              <button data-panel-id="stats" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupStatsTitle"></span>
+                <img src="/icons/nebula-stats-purple.svg" alt="" />
+              </button>
+
+              <!-- News -->
+              <button data-panel-id="news" class="fx-relay-menu-dashboard-link js-internal-link is-hidden" href="#">
+                <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupNewsLink"></span>
+                <img src="/icons/nebula-gift-purple.svg" alt="" />
+                <span class="news-count is-hidden"></span>
+              </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Loading Bar -->
+    <div class="fx-relay-menu-loading-bar">
+      <div class="fx-relay-menu-loading-bar-wrapper">
+        <div class="fx-relay-menu-loading-bar-border">
+          <div class="fx-relay-menu-loading-bar-whitespace">
+            <div class="fx-relay-menu-loading-bar-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <panel-content>
-      <fx-relay-logo-wrapper>
-        <fx-relay-logomark></fx-relay-logomark>
-        <fx-relay-logotype></fx-relay-logotype>
-        <button class="open-settings settings-toggle i18n-attribute" data-i18n-attribute="title" data-i18n-message-id="popupSettingsTitle"></button>
-      </fx-relay-logo-wrapper>
+        <!-- Panel: Sign Up -->
+        <sign-up-panel data-panel-id="sign-up" class="sign-up-panel fx-relay-panel is-hidden" id="sign-up-panel">
+            <div class="fx-relay-panel-content">
+              <!-- Log In Copy/Content -->
+              <div class="fx-relay-sign-in-copy">
+                <img src="/images/panel-images/man-sitting-email.svg" alt="">
+                <h4 class="i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></h4>
+                <p class="i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
+              </div>
+              
+              <!-- Log In Button -->
+              <div class="fx-relay-sign-in-button">
+                <a class="fx-relay-c-button t-primary js-external-link i18n-content" data-relay-internal="true" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelSignIn" data-href="accounts/profile?utm_source=fx-relay-addon&utm_medium=popup&utm_content=popup-continue-btn" href=""></a>
+              </div>
+            </div>            
+        </sign-up-panel>
 
-      <settings>
-        <div class="settings-header">
-          <button class="close-settings settings-toggle i18n-attribute" data-i18n-attribute="title" data-i18n-message-id="popupSettingsReturn"></button>
-          <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsTitle"></h1>
-        </div>
-        <ul class="settings-list">
-          <!-- Settings Toggle -->
-          <li class="setting">
-            <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
-            <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-toggle"></button>
-          </li>
-          <li class="setting">
-            <span class="setting-label flex-col i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
-            <button title="" class="data-collection fx-relay-toggle"></button>
-          </li>
-          <!-- Settings Redirect -->
-          <li class="setting flex-col">
-            <a id="popupSettingsLeaveFeedbackLink" href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
-            <a href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
-            <a href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="setting-label setting-link close-popup-after-click i18n-content" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
-            <!-- Report Issue Panel Prompt -->
-            <a class="setting-label setting-link settings-report-issue i18n-content" data-event-action="click"
-              data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></a>
-          </li>
-        </ul>
-      </settings>
+        <!-- Panel: Masks (Default once logged in) -->
+        <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
+          <div class="fx-relay-panel-content">
+            <!-- Free Masks Count -->
+            <div class="fx-relay-masks-available-count is-hidden"></div>
 
-      <!-- Report Issue Panel -->
-      <report-issue>
-        <div class="settings-header">
-          <button class="close-settings settings-report-issue-return i18n-attribute" data-i18n-attribute="title"
-            data-i18n-message-id="popupSettingsReturn"></button>
-          <h1 class="settings-hl i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h1>
-        </div>
-        <form class="report-issue-content">
-          <!-- Report URL -->
-          <div class="report-section">
-            <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
-              data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
-            <input type="text" id="issue_on_domain" name="issue_on_domain" value="" />
-          </div>
-          <div class="report-section">
-            <!-- Select issue checkboxes -->
-            <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
-            <ul>
-              <li>
-                <!-- Case: Email not accepted -->
-                <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
-                <label class="i18n-content" for="email_mask_not_accepted"
-                  data-i18n-message-id="popupReportIssueCaseOne"></label>
-              </li>
-              <li>
-                <!-- Case: Add on visual issue -->
-                <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
-                <label class="i18n-content" for="add_on_visual_issue"
-                  data-i18n-message-id="popupReportIssueCaseTwo"></label>
-              </li>
-              <li>
-                <!-- Case: Email not received -->
-                <input type="checkbox" id="email_not_received" name="email_not_received" />
-                <label class="i18n-content" for="email_not_received"
-                  data-i18n-message-id="popupReportIssueCaseThree"></label>
-              </li>
-              <li>
-                <!-- Case: Other -->
-                <input type="checkbox" id="issue-case-other" name="issue-case-other" />
-                <label class="i18n-content" for="issue-case-other"
-                  data-i18n-message-id="popupReportIssueCaseOther"></label>
-              </li>
-              <li>
-                <!-- 'Other' option input field -->
-                <input class="report-other-field is-hidden" type="text"
-                  id="other_issue" name="other_issue" />
-              </li>
-            </ul>
-          </div>
-          <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
-        </form>
-
-        <!-- Report Submission Success Panel -->
-        <div class="report-success is-hidden">
-          <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
-          <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
-          <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
-          <a class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
-            data-event-action="click"></a>
-          </li>
-        </div>
-      </report-issue>
-
-      <sign-up-panel class="sign-up-panel hidden">
-        <span class="welcome i18n-content" data-i18n-message-id="popupSignUpPanelWelcome"></span>
-        <p class="intro i18n-content" data-i18n-message-id="popupSignUpPanelIntro"></p>
-        <a class="button sign-in-btn blue-primary-btn close-popup-after-click login-link i18n-content" data-event-action="click" data-event-label="panel-continue-btn" data-i18n-message-id="popupSignUpPanelContinue" href=""></a>
-      </sign-up-panel>
-
-      <main-panel class="signed-in-panel hidden">
-        <span class="panel-status">
-          <p class="aliases-remaining remaining-plural"></p>
-          <a 
-            class="premium-cta i18n-content close-popup-after-click button get-premium-link is-hidden"
-            data-event-action="click" 
-            data-i18n-message-id="popupGetUnlimitedAliases_mask">
-          </a>
-        </span>
-        <onboarding-panel>
-          <!--Non Premium Panel-->
-          <div class="content-wrapper">
-            <div class="img-wrapper">
-              <img class="onboarding-img">
+            <!-- Free Masks / Upgrade Warning -->
+            <div class="fx-relay-masks-limit-upgrade is-hidden">
+              <span class="fx-relay-masks-limit-upgrade-string"></span>
             </div>
-            <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
-            <h1 class="onboarding-h1"></h1>
-            <p class="onboarding-p"></p>
-            <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden" data-event-action="click"></a>
-            <a class="upgrade-banner-wrapper is-hidden close-popup-after-click button get-premium-link" data-event-action="click">
-              <img class="upgrade-banner-icon">
-              <p class="upgrade-banner"></p>
-            </a>
-            <div class="onboarding-pagination">
-              <button class="panel-nav previous-panel i18n-attribute" data-direction="-1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious" aria-label=""></button>
-              <span class="panel-num">
-                <span class="current-panel"></span>/
-                  <span class="total-panels"></span>
+
+            <!-- Premium Masks / Error / Cannot Make Mask -->
+            <div tabindex="0" class="fx-relay-masks-error-message" role="alert">
+              <span class="i18n-content fx-relay-masks-error-message-string" data-i18n-message-id="popupCreateCustomFormError"></span>
+              <span class="fx-relay-masks-error-message-icon">
+                <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/icons/nebula-close.svg">
               </span>
-              <button class="panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
+            </div>
+
+            <!-- No Masks Created -->
+            <div class="fx-relay-no-masks-created is-hidden">
+              <img src="/images/panel-images/email-domain-illustration.svg" alt="">
+              <h2 class="i18n-content"data-i18n-message-id="popupNoMasksCreatedHeadline"></h2>
+              <p class="i18n-content"data-i18n-message-id="popupNoMasksCreatedBody"></p>              
+            </div>
+
+            <!-- Premium / Search Bar -->
+            <div class="fx-relay-masks-search">
+              <form class="fx-relay-masks-search-form">
+                <input
+                  type="search"
+                  class="fx-relay-masks-search-input fx-relay-c-search-input"
+                />
+                <div class="fx-relay-c-search-controls">
+                  <div class="fx-relay-filter-mask-count">
+                    <span class="js-filter-masks-visible"></span>
+                    /
+                    <span class="js-filter-masks-total"></span>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- This list is dynamically generated from popup via buildMasksList utils function -->
+            <ul class="fx-relay-mask-list"></ul>
+
+            <!-- Mask Creation Section -->
+            <div class="fx-relay-generate-mask-buttons">
+              <!-- Generate Custom Mask -->
+              <button class="i18n-content fx-relay-c-button t-primary js-generate-custom-mask is-hidden" data-i18n-message-id="pageInputIconGenerateCustomMask"></button>              
+              <!-- Generate Random Mask -->
+              <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
+              <!-- Upgrade Button -->
+              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
+              <!-- Register Subdomain -->
+              <button data-href="accounts/profile/#mpp-choose-subdomain" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-regsiter-subdomain-button is-hidden" data-relay-internal="true" data-i18n-message-id="popupGetDomainButton"></button>
+            </div>
+            
+          </div>
+          
+        </masks-panel>
+
+        <custom-panel data-panel-id="custom" class="is-hidden fx-relay-panel" id="custom-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-id="custom" data-nav-level="child" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupCreateCustomMaskTitle"></h2>
+
+          </header>
+          <div class="fx-relay-panel-content">            
+            <p class="i18n-content fx-relay-panel-custom-mask-copy" data-i18n-message-id="popupCreateCustomMaskBody"></p>
+
+            <form class="fx-relay-panel-custom-mask-form" action="">
+              <div class="fx-relay-panel-custom-mask-input">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskInputLabel" for="customMaskName"></label>
+                <input required class="fx-relay-panel-custom-mask-input-name" type="text" name="" id="customMaskName">
+                <span class="fx-relay-panel-custom-mask-input-domain"></span>
+              </div>
+              <div class="fx-relay-panel-custom-mask-checkbox">
+                <input id="customMaskBlockPromos" type="checkbox">
+                <label class="i18n-content" data-i18n-message-id="popupCreateCustomFormMaskBlockPromosChecboxLabel" for="customMaskBlockPromos"></label>
+                <div tabindex="0" class="fx-relay-panel-custom-mask-promo-blocking-tooltip-wrapper">
+                  <img class="fx-relay-panel-custom-mask-promo-blocking-icon" src="/icons/nebula-info.svg" alt="">
+                  <div class="fx-relay-panel-custom-mask-promo-blocking-tooltip">
+                    <h3 class="i18n-content" data-i18n-message-id="popupPromoBlockingButtonTitle"></h3>
+                    <p class="i18n-content" data-i18n-message-id="popupPromoBlockingButtonCopy"></p>
+                    <a data-i18n-message-id="popupPromoBlockingButtonLearnMore" class="js-external-link fx-relay-c-button t-basic i18n-content" href="" data-relay-internal="true" data-href="faq/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=create-custom-mask-block-promos-learn-more#faq-promotional-email-blocking"></a>
+
+
+                  </div>
+                </div>
+              </div>
+              <div class="fx-relay-panel-custom-mask-submit">
+                <button class="i18n-content fx-relay-c-button t-primary" disabled="true" data-i18n-message-id="popupCreateCustomFormMaskBlockSubmitButton" type="submit"></label>
+              </div>
+            </form>
+
+          </div>
+        </custom-panel>
+        
+        <!-- Panel: Settings -->
+        <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsTitle"></h2>
+          </header>
+
+          <!-- Settings Content -->
+          <div class="fx-relay-panel-content">
+            <div class="fx-relay-settings-toggles">
+              <div class="fx-relay-settings-toggle-wrapper">
+                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
+                <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-settings-toggle"></button>
+              </div>
+              <div class="fx-relay-settings-toggle-wrapper">
+                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsCollectData"></span>
+                <button title="" data-icon-visibility-option="disable-input-icon" class="data-collection fx-relay-settings-toggle"></button>
+              </div>
+            </div> 
+            <div class="fx-relay-settings-links">
+              <!-- Leave Feedback -->
+              <a id="popupSettingsLeaveFeedbackLink" href="" data-href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+              <!-- Privacy -->
+              <a data-href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup#relay" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
+              <!-- Terms of Service -->
+              <a data-href="https://www.mozilla.org/about/legal/terms/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-terms-of-service" data-i18n-message-id="popupSettingsTermsOfService"></a>
+              <!-- Report Issue Panel Prompt -->
+              <button id="popupSettingsReportIssue" class="settings-report-issue i18n-content fx-relay-settings-link" data-event-action="click"
+                data-event-label="panel-report-issue" data-i18n-message-id="popupSettingsReportIssue"></button>
             </div>
           </div>
-          <!-- Premium Panel-->
-          <div class="premium-wrapper is-hidden">
-            <!-- Dashboard Statistics-->
-            <div class="dashboard-stats-list">
+        </settings-panel>
+
+        <!-- Panel: Report Issue -->
+        <webcompat-panel data-panel-id="webcompat" class="is-hidden fx-relay-panel" id="webcompat-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-id="webcompat" data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h2>
+
+          </header>
+          <div class="fx-relay-panel-content">
+             <!-- Report Submission Form -->
+            <form class="report-issue-content">
+              <div class="report-section">
+                <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
+                  data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
+                <input type="text" id="issue_on_domain" name="issue_on_domain" value="" required />
+              </div>
+              <div class="report-section">
+                <!-- Select issue checkboxes -->
+                <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+                <ul>
+                  <li>
+                    <!-- Case: Email not accepted -->
+                    <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
+                    <label class="i18n-content" for="email_mask_not_accepted"
+                      data-i18n-message-id="popupReportIssueCaseOne"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Add on visual issue -->
+                    <input type="checkbox" id="add_on_visual_issue" name="add_on_visual_issue" />
+                    <label class="i18n-content" for="add_on_visual_issue"
+                      data-i18n-message-id="popupReportIssueCaseTwo"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Email not received -->
+                    <input type="checkbox" id="email_not_received" name="email_not_received" />
+                    <label class="i18n-content" for="email_not_received"
+                      data-i18n-message-id="popupReportIssueCaseThree"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Other -->
+                    <input id="webcompatOtherCheckbox" type="checkbox" id="issue-case-other" name="issue-case-other" />
+                    <label class="i18n-content" for="issue-case-other"
+                      data-i18n-message-id="popupReportIssueCaseOther"></label>
+                  </li>
+                  <li>
+                    <!-- 'Other' option input field -->
+                    <input class="report-other-field is-hidden" type="text"
+                      id="other_issue" name="other_issue" />
+                  </li>
+                </ul>
+              </div>
+              <input class="i18n-content report-issue-submit-btn fx-relay-c-button t-primary" type="submit" data-i18n-message-id="popupSettingsSubmitReport"></input>
+            </form>
+
+            <!-- Report Submission Success -->
+            <div class="report-success is-hidden">
+              <img class="report-image-success" src="images/panel-images/report-submit-success.png" />
+              <h1 class="i18n-content" data-i18n-message-id="popupReportIssueSuccessHeadline"></h1>
+              <p class="i18n-content" data-i18n-message-id="popupReportIssueSuccessBody"></p>
+              <button class="report-continue i18n-content" data-i18n-message-id="popupReportIssueSuccessContinue"
+                data-event-action="click" data-nav-id="webcompat" data-nav-level="child" data-back-target="settings"></button>
+              </li>
+            </div>
+          </div>
+          
+
+        </webcompat-panel>
+
+        <!-- Panel: Stats -->
+        <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupStatsTitle"></h2>
+          </header>
+
+          <!-- Stats are dynamically generated from popup via stats.init function -->
+          <div class="fx-relay-panel-content">
+            <div class="dashboard-stats-list global-stats">
               <ul>
                 <li class="dashboard-info">
-                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupAliasesUsed_mask"></span>
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupTotalMasksUsed"></span>
                   <div class="dashboard-stats aliases-used"></div>
                 </li>
-                <li class="dashboard-info">
+                <li class="dashboard-info dashboard-info-emails-blocked">
                   <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
                   <div class="dashboard-stats emails-blocked"></div>
                 </li>
-                <li class="dashboard-info">
+                <li class="dashboard-info dashboard-info-emails-forwarded">
                   <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
                   <div class="dashboard-stats emails-forwarded"></div>
                 </li>
+              </ul>
+            </div>
+            <div class="dashboard-stats-list current-website-stats">
+              <ul>
                 <li class="dashboard-info">
-                  <span class="email-trackers-removed-text i18n-content"
-                    data-i18n-message-id="popupEmailTrackersRemoved"></span>
-                  <div class="dashboard-stats email-trackers-removed"></div>
+                  <span class="aliases-used-text i18n-content" data-i18n-message-id="popupMasksUsedInThisWebsite"></span>
+                  <div class="dashboard-stats aliases-used">0</div>
+                </li>
+                <li class="dashboard-info dashboard-info-emails-blocked is-hidden">
+                  <span class="emails-blocked-text i18n-content" data-i18n-message-id="popupEmailsBlocked"></span>
+                  <div class="dashboard-stats emails-blocked">0</div>
+                </li>
+                <li class="dashboard-info dashboard-info-emails-forwarded is-hidden">
+                  <span class="emails-forwarded-text i18n-content" data-i18n-message-id="popupEmailsForwarded"></span>
+                  <div class="dashboard-stats emails-forwarded">0</div>
                 </li>
               </ul>
             </div>
-            <!-- Register Domain Component -->
-            <div class="register-domain-component">
-              <div class="img-wrapper">
-                <img class="email-domain-illustration">
-              </div>
-              <p class="register-domain-headline i18n-content" data-i18n-message-id="popupRegisterDomainHeadline_mask"></p>
-              <a class="register-domain-cta i18n-content button sign-in-btn blue-primary-btn close-popup-after-click" data-event-action="click" data-i18n-message-id="popupRegisterDomainButton_mask"></a>
-            </div>
-            <!-- Educational Matrix Module Dashboard-->
-            <div class="educational-component">
-              <div class="education-img-wrapper">
-                <img class="education-img">
-              </div>
-              <div class="education-description">
-                <div class="new-label js-promo-item i18n-content is-hidden" data-i18n-message-id="popupPromoNewLabel"></div>
-                <h1 class="education-headline"></h1>
-                <p class="education-body"></p>
-                <a class="close-popup-after-click onboarding-cta js-promo-link js-promo-item is-hidden" data-event-action="click"></a>
-              </div>
-              <div class="onboarding-pagination">
-                <button class="premium-panel-nav previous-panel i18n-attribute" data-direction="-1"
-                  data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowPrevious"
-                  aria-label=""></button>
-                <span class="js-panel-num">
-                  <span class="current-panel"></span>/
-                  <span class="total-panels"></span>
-                </span>
-                <button class="premium-panel-nav next-panel i18n-attribute" data-direction="1" data-i18n-attribute="aria-label" data-i18n-message-id="popupOnboardingShowNext" aria-label=""></button>
-              </div>
-            </div>
           </div>
-          <!-- Server Storage Opt-in -->
-          <div class="js-server-storage-wrapper newsflash-wrapper is-hidden has-approval-button">
-            <div class="newsflash-description">
-              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupDataCollectionHeadline"></h1>
-              <p class="newsflash-body i18n-content" data-i18n-message-id="popupDataCollectionBody_mask"></p>
-              <a class="newsflash-learn-more i18n-content" href="https://relay.firefox.com/faq?utm_source=fx-relay-addon&utm_medium=popup&utm_content=data-collection-button" data-i18n-message-id="popupDataCollectionButtonLearnMore"></a>
-              <div class="newsflash-buttons">
-                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-allow-pref="false" data-i18n-message-id="popupDataCollectionButtonDecline"></button>
-                <button class="js-button-allow newsflash-button-allow newsflash-button i18n-content" data-allow-pref="true" data-i18n-message-id="popupDataCollectionButtonAllow"></button>
-              </div>
-            </div>
+          
+        </stats-panel>
+
+        <!-- Panel: News -->
+        <news-feed-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-feed-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+            <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupNewsTitle"></h2>
+          </header>
+          
+          <!-- News List -->
+          <div class="fx-relay-panel-content">
+            <!-- The news feed is dynamically generated from popup via news.init function -->
+            <ul class="fx-relay-news"></ul>
           </div>
-          <!-- Privacy Policy update notification -->
-          <div class="js-privacy-policy-update-wrapper newsflash-wrapper is-hidden">
-            <div class="newsflash-description">
-              <h1 class="newsflash-headline i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateHeadline"></h1>
-              <p class="newsflash-body i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateBody"></p>
-              <a class="newsflash-learn-more i18n-content" href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=privacy-notice-update-notification" data-i18n-message-id="popupPrivacyNoticeUpdateButtonLearnMore"></a>
-              <div class="newsflash-buttons">
-                <button class="js-button-dismiss newsflash-button-dismiss newsflash-button i18n-content" data-i18n-message-id="popupPrivacyNoticeUpdateButtonDismiss"></button>
-              </div>
-            </div>
+          
+        </news-feed-panel>
+
+        <!-- Panel: News Item -->
+        <news-item-panel data-panel-id="newsItem" class="is-hidden fx-relay-panel" id="news-item-panel">
+          <header class="fx-relay-panel-header">
+            <!-- Back Button -->
+             <button data-nav-id="newsItem" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
+              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
+            </button>
+            
+            <!-- Panel Title -->
+            <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupNewsTitle"></h2>
+          </header>
+          
+          <div class="fx-relay-panel-content">
+            <!-- News items are dynamically generated from popup via storyPanel.update function -->
+            <article class="fx-relay-news-story"></article>
           </div>
-        </onboarding-panel>
-        <footer>
-          <a class="close-popup-after-click footer-button dashboard-link i18n-content" data-event-action="click" data-event-label="panel-manage-all-aliases-btn" data-i18n-message-id="ManageAllAliases_mask"></a>
-        </footer>
-      </main-panel>
-    </panel-content>
+          
+        </news-item-panel>
+        
+    </content>
+
   </body>
 </html>
