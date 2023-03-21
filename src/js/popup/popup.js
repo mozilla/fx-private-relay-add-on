@@ -889,8 +889,8 @@
           const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
 
           globalAliasesUsedValEl.textContent = totalAliasesUsedVal;
-          globalEmailsBlockedValEl.textContent = totalEmailsForwardedVal;
-          globalEmailsForwardedValEl.textContent = totalEmailsBlockedVal;
+          globalEmailsForwardedValEl.textContent = totalEmailsForwardedVal;
+          globalEmailsBlockedValEl.textContent = totalEmailsBlockedVal;
          
           // Get current page
           const currentPageHostName = await browser.runtime.sendMessage({
