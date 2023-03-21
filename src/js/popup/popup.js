@@ -941,131 +941,14 @@
         },
       },
       webcompat: {
-        init: () => {
-          popup.panel.webcompat.setURLwithIssue();
-          popup.panel.webcompat.setRequiredCheckboxListeners();
-          popup.panel.webcompat.showReportInputOtherTextField();
-
-          const reportForm = document.querySelector(".report-issue-content");
-          reportForm.addEventListener("submit", async (event) => {
-            await popup.panel.webcompat.handleReportIssueFormSubmission(event);
-          });
-
-          const reportContinueButton =
-            document.querySelector(".report-continue");
-          reportContinueButton.addEventListener(
-            "click",
-            popup.events.backClick,
-            false
-          );
-        },
-        toggleRequiredCheckboxListeners: (toggleOverride = null) => {
-          const checkboxes = document.querySelectorAll('.report-section ul li input');
-
-          checkboxes.forEach(checkbox => {
-            // Override arg must be present to override
-            if (toggleOverride === null) {
-              checkbox.required = !checkbox.required;
-            } else {
-              checkbox.required =  toggleOverride;
-            }
-          });
-        },
-        setRequiredCheckboxListeners: () => {
-          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
-          const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-          const checkboxes = document.querySelectorAll('.report-section ul li input');
-          const otherTextField = document.querySelector('input[name="other_issue"]');
-          const isChecked = (element) => element.checked;
-          
-          checkboxes.forEach(checkbox => {
-            checkbox.required = true;
-            checkbox.addEventListener("change", ()=> {              
-              // If the user has selected at least one checkbox, and has filled out the website URL input, make the form submittable
-              if ([...checkboxes].some(isChecked) && inputFieldUrl.value && popup.utilities.isSortaAURL(inputFieldUrl.value) && checkbox.name !== "issue-case-other") {
-                reportIssueSubmitBtn.disabled = false;
-                popup.panel.webcompat.toggleRequiredCheckboxListeners(false);
-              } else {
-                reportIssueSubmitBtn.disabled = true;
-                popup.panel.webcompat.toggleRequiredCheckboxListeners(true);
-              }
-
-              // Custom logic if the user clicks the "other" box
-              if (checkbox.name === "issue-case-other" && checkbox.checked && otherTextField.value && popup.utilities.isSortaAURL(otherTextField.value)) {
-                reportIssueSubmitBtn.disabled = false;
-                popup.panel.webcompat.toggleRequiredCheckboxListeners(false);
-              }
-            })
-          });
-
-        },
-        setURLwithIssue: async () => {
-          // Add Site URL placeholder
-          const currentPage = (await popup.utilities.getCurrentPage()).url;
-          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
-          const inputFieldUrl = document.querySelector('input[name="issue_on_domain"]');
-          const checkboxes = document.querySelectorAll('.report-section ul li input');
-          const isChecked = (element) => element.checked;
-          
-          reportIssueSubmitBtn.disabled = true;
-
-          // Allow for custom URL inputs
-          inputFieldUrl.addEventListener("input", () => {
-            reportIssueSubmitBtn.disabled = true;
-            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
-            // AND at least one checkbox is checked
-            if (popup.utilities.isSortaAURL(inputFieldUrl.value) && [...checkboxes].some(isChecked)) {
-              reportIssueSubmitBtn.disabled = false;
-            }
-          });
-
-          // Check that the host site has a valid URL
-          if (currentPage) {
-            const url = new URL(currentPage);
-            // returns a http:// or https:// value
-            inputFieldUrl.value = url.origin;
-          }
-        },
-        showReportInputOtherTextField: () => {
-          const otherCheckbox = document.querySelector('input[name="issue-case-other"]');
-          const otherTextField = document.querySelector('input[name="other_issue"]');
-          const reportIssueSubmitBtn = document.querySelector(".report-issue-submit-btn");
-
-          otherCheckbox.addEventListener("click", () => {
-            otherTextField.classList.toggle("is-hidden");
-
-            if (!otherTextField.classList.contains("is-hidden")) {
-              // If the user has checked "Other", they must add text to the "Other" text input before submitting
-              reportIssueSubmitBtn.disabled = true;
-              otherTextField.required = true;
-            } else {
-              otherTextField.required = false;
-            }
-          });
-
-
-
-          // Add placeholder to report input on 'Other' selection
-          const inputFieldOtherDetails = document.querySelector(
-            'input[name="other_issue"]'
-          );
-
-          // Allow for custom URL inputs
-          inputFieldOtherDetails.addEventListener("input", () => {
-            reportIssueSubmitBtn.disabled = true;
-            // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
-            // AND at least one checkbox is checked
-            if (popup.utilities.isSortaAURL(inputFieldOtherDetails.value)) {
-              reportIssueSubmitBtn.disabled = false;
-            }
-          });
-
-          inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
-            "popupReportIssueCaseOtherDetails"
-          );
-        },
-        handleReportIssueFormSubmission: async (event) => {          
+        handleReportIssueFormSubmission: async (event, formData) => {          
           event.preventDefault();
+
+          // Do not submit if the form is not valid
+          if (!formData.form.dataset.formIsValid) {
+            return false;
+          }
+          
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
           reportData.user_agent = await getBrowser();
@@ -1096,6 +979,117 @@
             description: reportData,
           });
         },
+        init: () => {
+          const formData = {
+            form: document.querySelector(".report-issue-content"),
+            reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
+            inputFieldUrl: document.querySelector('input[name="issue_on_domain"]'),
+            inputFieldOtherDetails: document.querySelector('input[name="other_issue"]'),
+            checkboxes: document.querySelectorAll('.report-section ul li input'),
+            otherTextField: document.querySelector('input[name="other_issue"]'),
+            otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
+          }
+          
+          // Set the form as invalid
+          formData.form.dataset.formIsValid = false;
+          
+          popup.panel.webcompat.setURLwithIssue(formData);
+          popup.panel.webcompat.setCheckboxListeners(formData);
+          popup.panel.webcompat.showReportInputOtherTextField(formData);
+
+          const reportForm = document.querySelector(".report-issue-content");
+          reportForm.addEventListener("submit", async (event) => {
+            await popup.panel.webcompat.handleReportIssueFormSubmission(event, formData);
+          });
+
+          const reportContinueButton = document.querySelector(".report-continue");
+          reportContinueButton.addEventListener("click", popup.events.backClick, false);
+        },
+        setCheckboxListeners: (formData) => {
+          const checkboxes = formData.checkboxes;
+          
+          checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", ()=> {              
+              popup.panel.webcompat.validateForm(formData);
+            })
+          });
+        },
+        setURLwithIssue: async (formData) => {
+          // Add Site URL placeholder
+          const currentPage = (await popup.utilities.getCurrentPage()).url;
+          const inputFieldUrl = formData.inputFieldUrl;
+
+          // Allow for custom URL inputs
+          inputFieldUrl.addEventListener("input", () => {
+            popup.panel.webcompat.validateForm(formData);
+          });
+
+          // Check that the host site has a valid URL
+          if (currentPage) {
+            const url = new URL(currentPage);
+            // returns a http:// or https:// value
+            inputFieldUrl.value = url.origin;
+          }
+
+          // Check if form is valid
+          popup.panel.webcompat.validateForm(formData);
+        },
+        showReportInputOtherTextField: (formData) => {
+          const otherCheckbox = formData.otherCheckbox;
+          const otherTextField = formData.otherTextField;
+
+          // Show the hidden "OTHER" field, make it required and check if the form is valid
+          otherCheckbox.addEventListener("click", () => {
+            otherTextField.classList.toggle("is-hidden");
+            otherTextField.required = !otherTextField.required;
+            popup.panel.webcompat.validateForm(formData);
+          });
+
+          // Add placeholder to report input on 'Other' selection
+          const inputFieldOtherDetails = formData.inputFieldOtherDetails;
+
+          // Allow for custom URL inputs
+          inputFieldOtherDetails.addEventListener("input", () => {
+            popup.panel.webcompat.validateForm(formData);
+          });
+
+          inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
+            "popupReportIssueCaseOtherDetails"
+          );
+        },
+        validateForm: (formData) => {
+          // Check if inputFieldUrl is valid
+          const inputFieldUrlIsNotEmpty = formData.inputFieldUrl.checkValidity();
+
+          // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
+          const inputFieldUrlIsSortaAUrl = popup.utilities.isSortaAURL(formData.inputFieldUrl.value)
+
+          // Validate that at least one checkbox is checked
+          const checkboxes = formData.checkboxes
+          const isACheckBoxChecked = [...checkboxes].some(e => e.checked == true);
+
+          // If the "other" checkbox is checked, confirm the "other" input is valid
+          const checkedCheckboxes = [...checkboxes].filter(e => e.checked == true);          
+          const isCheckedCheckboxOther = checkedCheckboxes.some(e => e.id == "issue-case-other");
+          const inputFieldOtherDetailsIsValid = formData.inputFieldOtherDetails.checkValidity();
+
+          // This tests for two possible valid form states: 
+          // A: User has URL field filled out correctly AND at least one reason checkbox checked (Not OTHER checkbox)
+          // B: User has URL field filled out correctly AND has checked the OTHER checbox AND filled out the other input form correctly
+          if (
+              (inputFieldUrlIsNotEmpty && inputFieldUrlIsSortaAUrl && isACheckBoxChecked && !isCheckedCheckboxOther) || 
+              (inputFieldUrlIsNotEmpty && inputFieldUrlIsSortaAUrl && isACheckBoxChecked && isCheckedCheckboxOther && inputFieldOtherDetailsIsValid) 
+          ) {
+            formData.reportIssueSubmitBtn.disabled = false;
+            formData.form.dataset.formIsValid = true;
+            return;
+          }
+          
+          // Default / Set Disabled
+          formData.reportIssueSubmitBtn.disabled = true;
+          formData.form.dataset.formIsValid = false;
+        },
+
       },
     },
     utilities: {
