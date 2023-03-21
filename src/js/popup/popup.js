@@ -291,10 +291,10 @@
         },
         init: async () => {
           
-          const masks = await popup.utilities.getMasks();
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
           const maskPanel = document.getElementById("masks-panel");
+          let getMasksOptions = { fetchCustomMasks: false };
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -311,6 +311,9 @@
             
             // Store this query locally for this session
             sessionState.premiumSubdomainSet = isPremiumSubdomainSet;
+
+            // Make sure to query both custom and random masks
+            getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
           
             // premiumSubdomain is not set : display CTA to prompt user to register subdomain
             if (!sessionState.premiumSubdomainSet) {
@@ -339,6 +342,8 @@
               popup.events.generateMask(e, "random");
             }, false);
           
+          // Get masks and determine what to display
+          const masks = await popup.utilities.getMasks(getMasksOptions);
 
           // If no masks are created, show onboarding prompt
           if (masks.length === 0) {
