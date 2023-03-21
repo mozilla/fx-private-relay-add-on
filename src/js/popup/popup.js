@@ -1331,13 +1331,17 @@
       },
       setExternalLinkEventListeners: async () => {
         const externalLinks = document.querySelectorAll(".js-external-link");
+        const currentBrowser = await getBrowser();
 
-        externalLinks.forEach((link) => {
+        externalLinks.forEach((link) => {          
           // Because we dynamically set the Relay origin URL (local/dev/stage/prod),
           // we have to catch Relay-specific links and prepend the correct Relay website URL
           if (link.dataset.relayInternal === "true") {
             // TODO: Remove "/" from here. It'll be error prone
             link.href = `${relaySiteOrigin}/${link.dataset.href}`;
+          } else if (link.dataset.hrefChrome && currentBrowser == "Chrome") {
+            // Override to link to a Chrome-specific link (Example: "Leave Feedback" link)
+            link.href = `${link.dataset.hrefChrome}`;
           } else {
             link.href = `${link.dataset.href}`;
           }
