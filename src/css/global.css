@@ -137,12 +137,9 @@
   /* Nebula Colors: Whites */
   --colorWhite: #ffffff;
 
-  --fontStackFirefoxBold: "Metropolis Bold", "SF Pro Text", "Segoe UI", Roboto,
-    "Open Sans", sans-serif;
-  --fontStackFirefoxSemibold: "Metropolis Semibold", "SF Pro Text", "Segoe UI",
-    Roboto, "Open Sans", sans-serif;
-  --fontStackFirefox: "Metropolis Medium", "SF Pro Text", "Segoe UI", Roboto,
-    "Open Sans", sans-serif;
+  /* Fonts */
+  --fontStackFirefoxBold: "Metropolis Bold", serif;
+  --fontStackFirefox: "Metropolis Medium", serif;
   --fontStackFirefoxLight: "Metropolis Light", "SF Pro Text", "Segoe UI", Roboto,
     "Open Sans", sans-serif;
   --fontStackBase: "InterUI Regular", "SF Pro Text", "Segoe UI", Roboto,
