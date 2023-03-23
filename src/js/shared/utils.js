@@ -24,13 +24,13 @@ async function setCustomFonts() {
 
     // Check if the font has already been loaded
     const doesFontExist = document.fonts.check(`16px ${customFont.font}`);
-    if (doesFontExist) { break; }
-
-    const fontPath = browser.runtime.getURL(customFont.filePath)
-    const font = new FontFace(customFont.font, `url(${fontPath})`);
-    font.weight = customFont.weight;
-    await font.load();
-    document.fonts.add(font);      
+    if (!doesFontExist) {
+      const fontPath = browser.runtime.getURL(customFont.filePath)
+      const font = new FontFace(customFont.font, `url(${fontPath})`);
+      font.weight = customFont.weight;
+      await font.load();
+      document.fonts.add(font);   
+    }
   }
 }
 
