@@ -1058,11 +1058,9 @@
           );
         },
         validateForm: (formData) => {
-          // Check if inputFieldUrl is valid
-          const inputFieldUrlIsNotEmpty = formData.inputFieldUrl.checkValidity();
-
-          // Ensure that the custom input looks like a URL without https:// or http:// (e.g. test.com, www.test.com) 
-          const inputFieldUrlIsSortaAUrl = popup.utilities.isSortaAURL(formData.inputFieldUrl.value)
+          // Check if inputFieldUrl is valid and the custom input looks like a URL 
+          // without https:// or http:// (e.g. test.com, www.test.com) 
+          const inputFieldUrlIsValid = formData.inputFieldUrl.checkValidity() && popup.utilities.isSortaAURL(formData.inputFieldUrl.value);
 
           // Validate that at least one checkbox is checked
           const checkboxes = formData.checkboxes
@@ -1077,8 +1075,8 @@
           // A: User has URL field filled out correctly AND at least one reason checkbox checked (Not OTHER checkbox)
           // B: User has URL field filled out correctly AND has checked the OTHER checbox AND filled out the other input form correctly
           if (
-              (inputFieldUrlIsNotEmpty && inputFieldUrlIsSortaAUrl && isACheckBoxChecked && !isCheckedCheckboxOther) || 
-              (inputFieldUrlIsNotEmpty && inputFieldUrlIsSortaAUrl && isACheckBoxChecked && isCheckedCheckboxOther && inputFieldOtherDetailsIsValid) 
+              (inputFieldUrlIsValid && isACheckBoxChecked && !isCheckedCheckboxOther) || 
+              (inputFieldUrlIsValid && isACheckBoxChecked && isCheckedCheckboxOther && inputFieldOtherDetailsIsValid) 
           ) {
             formData.reportIssueSubmitBtn.disabled = false;
             formData.form.dataset.formIsValid = true;
