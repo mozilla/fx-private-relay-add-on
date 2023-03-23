@@ -605,7 +605,7 @@
               return;
             }
             
-            if (numRemaining === 0) {
+            if (numRemaining <= 0) {
               // No masks remaining
               limitReachedToast.classList.remove("is-hidden");
               masksAvailable.classList.add("is-hidden");
