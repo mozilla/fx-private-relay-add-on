@@ -1,0 +1,48 @@
+@font-face {
+  font-family: "Metropolis Bold";
+  src: url(../fonts/Metropolis/Metropolis-Bold.woff2) format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Metropolis Medium";
+  src: url(../fonts/Metropolis/Metropolis-Medium.woff2) format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Metropolis Light";
+  src: url(../fonts/Metropolis/Metropolis-Light.woff2) format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "InterUI Regular";
+  src: url(../fonts/Inter/Inter-UI-Regular.woff2) format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "InterUI Regular";
+  src: url(../fonts/Inter/Inter-UI-Medium.woff2) format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "InterUI Regular";
+  src: url(../fonts/Inter/Inter-UI-SemiBold.woff2) format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "InterUI Regular";
+  src: url(../fonts/Inter/Inter-UI-Bold.woff2) format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}

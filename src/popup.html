@@ -3,6 +3,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Firefox Relay</title>
+    <link rel="stylesheet" href="css/fonts.css">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/popup.css">
     <script src="/js/libs/browser-polyfill.min.js"></script>
@@ -209,7 +210,7 @@
             </div> 
             <div class="fx-relay-settings-links">
               <!-- Leave Feedback -->
-              <a id="popupSettingsLeaveFeedbackLink" href="" data-href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
+              <a id="popupSettingsLeaveFeedbackLink" href="" data-href-chrome="https://chrome.google.com/webstore/detail/firefox-relay/lknpoadjjkjcmjhbjpcljdednccbldeb?utm_source=fx-relay-addon&utm_medium=popup" data-href="https://addons.mozilla.org/firefox/addon/private-relay/?utm_source=fx-relay-addon&utm_medium=popup" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-leave-feedback-link" data-i18n-message-id="popupSettingsLeaveFeedback"></a>
               <!-- Privacy -->
               <a data-href="https://www.mozilla.org/privacy/firefox-relay/?utm_source=fx-relay-addon&utm_medium=popup#relay" href="" class="js-external-link i18n-content fx-relay-settings-link" data-event-action="click" data-event-label="panel-privacy-link" data-i18n-message-id="popupSettingsPrivacy"></a>
               <!-- Terms of Service -->
@@ -239,7 +240,7 @@
               <div class="report-section">
                 <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
                   data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
-                <input type="text" id="issue_on_domain" name="issue_on_domain" value="" required />
+                <input autocomplete="off" type="text" id="issue_on_domain" name="issue_on_domain" value="" required />
               </div>
               <div class="report-section">
                 <!-- Select issue checkboxes -->
@@ -265,13 +266,13 @@
                   </li>
                   <li>
                     <!-- Case: Other -->
-                    <input id="webcompatOtherCheckbox" type="checkbox" id="issue-case-other" name="issue-case-other" />
+                    <input type="checkbox" id="issue-case-other" name="issue-case-other" />
                     <label class="i18n-content" for="issue-case-other"
                       data-i18n-message-id="popupReportIssueCaseOther"></label>
                   </li>
                   <li>
                     <!-- 'Other' option input field -->
-                    <input class="report-other-field is-hidden" type="text"
+                    <input autocomplete="off" class="report-other-field is-hidden" type="text"
                       id="other_issue" name="other_issue" />
                   </li>
                 </ul>

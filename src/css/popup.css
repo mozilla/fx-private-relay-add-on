@@ -18,6 +18,7 @@
   position: relative;
   padding: 0;
   margin: 0;
+  font-weight: 300;
 }
 
 .fx-relay-panel-wrapper *, .fx-relay-panel-wrapper *:before, .fx-relay-panel-wrapper *:after {
@@ -50,7 +51,7 @@
 /* Header */
 
 .fx-relay-menu-header {
-  border: 0;
+  border: none;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
   /* Bottom corners only */
   border-radius: 0 0 var(--borderRadiusSm) var(--borderRadiusSm);
@@ -101,7 +102,7 @@
   height: 32px;
   appearance: none;
   outline: 0;
-  border: 0;
+  border: none;
   background-color: transparent;
 }
 
@@ -182,7 +183,7 @@
   left: var(--spacingSm);
   appearance: none;
   background-color: transparent;
-  border: 0;
+  border: none;
   margin: 0;
   padding: var(--spacingXs);
   cursor: pointer;
@@ -202,8 +203,8 @@
 }
 
 .fx-relay-panel-header-title {
-  font-size: var(--fontSizeBodyMd);
-  font-family: var(--relayMetropolis);
+  font-size: var(--fontSizeTitle3xs);
+  font-family: var(--fontStackFirefox);
   font-weight: 500;
 }
 
@@ -237,7 +238,9 @@ sign-up-panel::after {
 }
 
 .fx-relay-sign-in-copy img {
-  margin-bottom: var(--spacingMd);
+  display: block;
+  margin: 0 auto var(--spacingMd);
+  max-width: var(--contentXs);
 }
 
 .fx-relay-sign-in-copy h4 {
@@ -246,12 +249,16 @@ sign-up-panel::after {
   color: var(--colorGrey50);
   margin: 0 0 var(--spacingMd);
   padding: 0;
+  font-family: var(--fontStackFirefoxBold);
 }
 
 .fx-relay-sign-in-copy p {
+  font-size: var(--fontSizeBodySm);
+  max-width: var(--content2xs);
   color: var(--colorGrey50);
-  max-width: var(--contentXs);
   margin: 0 auto;
+  line-height: 1.25rem;
+  text-align: center;
 }
 
 .fx-relay-sign-in-button {
@@ -369,7 +376,7 @@ sign-up-panel::after {
   color: var(--colorBlack);
   cursor: pointer;
   appearance: none;
-  border: 0;
+  border: none;
   text-align: left;
   font-size: var(--fontSizeBodyXs);
 }
@@ -387,7 +394,7 @@ sign-up-panel::after {
   flex-direction: column;
   gap: var(--spacingMd);
   padding: var(--spacingMd);
-  border: 0 none;
+  border: none;
   font-size: var(--fontSizeBodySm);
 }
 
@@ -473,7 +480,7 @@ sign-up-panel::after {
   color: var(--colorInformational);
   appearance: none;
   background-color: transparent;
-  border: 0;
+  border: none;
 }
 
 /* Stats */
@@ -702,7 +709,7 @@ sign-up-panel::after {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding-top: var(--layoutLg);
+  padding-top: var(--layoutSm);
 }
 
 .fx-relay-no-masks-created img {
@@ -716,13 +723,16 @@ sign-up-panel::after {
   color: var(--colorGrey50);
   margin: 0 auto var(--spacingMd);
   max-width: var(--content2xs);
+  text-align: center;
+  font-family: var(--fontStackFirefoxBold);
 }
 
 .fx-relay-no-masks-created p {
   font-size: var(--fontSizeBodySm);
-  max-width: var(--contentXs);
-  padding: 0;
-  margin: 0 0 var(--spacingLg);
+  padding: 0 var(--spacingMd);
+  margin: 0;
+  line-height: 1.25rem;
+  text-align: center;
 }
 
 .fx-relay-generate-mask-buttons {
@@ -838,7 +848,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address-actions > button {
   appearance: none;
-  border: 0;
+  border: none;
   border-radius: 100%;
   width: 32px;
   height: 32px;
@@ -967,7 +977,7 @@ sign-up-panel::after {
   flex-direction: column;
   gap: var(--spacingMd);
   padding: var(--spacingMd);
-  border: 0 none;
+  border: none;
   font-size: var(--fontSizeBodySm);
 }
 
