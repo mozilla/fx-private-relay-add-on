@@ -58,6 +58,8 @@
   background-color: var(--colorWhite);
   position: sticky;
   top: 0;
+  /* Z-index usage: This needs to be over absolute elements inside the main content area of the panel (MPP-3006) */
+  z-index: 2;
 }
 
 .fx-relay-menu-header-logo-bar {
