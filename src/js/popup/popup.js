@@ -948,6 +948,9 @@
           if (!formData.form.dataset.formIsValid) {
             return false;
           }
+
+          // Show success state
+          popup.panel.webcompat.showSuccessReportSubmission(formData);
           
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
@@ -983,9 +986,11 @@
           const formData = {
             form: document.querySelector(".report-issue-content"),
             reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
+            reportIssueSuccessDismissBtn: document.querySelector(".report-continue"),
             inputFieldUrl: document.querySelector('input[name="issue_on_domain"]'),
             inputFieldOtherDetails: document.querySelector('input[name="other_issue"]'),
             checkboxes: document.querySelectorAll('.report-section ul li input'),
+            reportSuccess: document.querySelector('.report-success'),
             otherTextField: document.querySelector('input[name="other_issue"]'),
             otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
           }
@@ -996,14 +1001,25 @@
           popup.panel.webcompat.setURLwithIssue(formData);
           popup.panel.webcompat.setCheckboxListeners(formData);
           popup.panel.webcompat.showReportInputOtherTextField(formData);
-
-          const reportForm = document.querySelector(".report-issue-content");
-          reportForm.addEventListener("submit", async (event) => {
+          
+          formData.form.addEventListener("submit", async (event) => {
             await popup.panel.webcompat.handleReportIssueFormSubmission(event, formData);
           });
 
-          const reportContinueButton = document.querySelector(".report-continue");
-          reportContinueButton.addEventListener("click", popup.events.backClick, false);
+          // When clicking the "Continue" button after successfully submitting the webcompat form,
+          // Reset the form and show the settings page again
+          formData.reportIssueSuccessDismissBtn.addEventListener("click", (event)=>{
+            popup.panel.webcompat.resetForm(event, formData);
+          }, false);
+        },
+        resetForm: (event, formData) => {
+          popup.events.backClick(event);
+
+          // Reset the form behind the scenes
+          formData.reportSuccess.classList.add("is-hidden");
+          formData.form.classList.remove("is-hidden"); 
+          formData.form.reset()
+          popup.panel.webcompat.validateForm(formData);
         },
         setCheckboxListeners: (formData) => {
           const checkboxes = formData.checkboxes;
@@ -1056,6 +1072,12 @@
           inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
             "popupReportIssueCaseOtherDetails"
           );
+        },
+        showSuccessReportSubmission: (formData) => {
+          const reportSuccess = formData.reportSuccess;
+          const reportContent = formData.form
+          reportSuccess.classList.remove("is-hidden");
+          reportContent.classList.add("is-hidden");          
         },
         validateForm: (formData) => {
           // Check if inputFieldUrl is valid and the custom input looks like a URL 

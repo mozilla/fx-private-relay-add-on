@@ -96,9 +96,11 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 
 async function postReportWebcompatIssue(description) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  
   if (!relayApiSource) {
     return;
   }
+
   const headers = await createNewHeadersObject({auth: true});
   const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
 
@@ -111,16 +113,12 @@ async function postReportWebcompatIssue(description) {
     user_agent: description.user_agent
   };
 
-  const newReportedIssueResponse = await fetch(reportWebCompatResponse, {
+  await fetch(reportWebCompatResponse, {
     mode: "same-origin",
     method: "POST",
     headers: headers,
     body: JSON.stringify(apiBody),
   });
-
-  let newReportedIssueForm = await newReportedIssueResponse.json();
-  return newReportedIssueForm;
-
 }
 
 async function storeRuntimeData(opts={forceUpdate: false}) {  
@@ -511,7 +509,7 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       response = await makeRelayAddress(m.description);
       break;
     case "postReportWebcompatIssue":
-      response = await postReportWebcompatIssue(m.description);
+      await postReportWebcompatIssue(m.description);
       break;
     case "openRelayHomepage":
       browser.tabs.create({
