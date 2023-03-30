@@ -1270,8 +1270,9 @@
         // Conditions for firefox integration to be shown: if the waffle flag "firefox_integration" is set as true
         const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
         
-        // FIXME: The order is not being set correctly
-        if (isFirefoxIntegrationAvailable) {
+        const currentBrowser = await getBrowser();
+
+        if (isFirefoxIntegrationAvailable && currentBrowser == "Firefox") {
           sessionState.newsContent.push({
             id: "firefox-integration",
             dateAdded: "20230314", // YYYYMMDD
