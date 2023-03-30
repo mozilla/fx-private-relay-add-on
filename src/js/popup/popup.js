@@ -26,6 +26,19 @@
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
+
+          // Reset Form
+          popup.panel.webcompat.resetForm();
+
+          // Remove event listeners
+          const panel = document.getElementById('webcompat-panel');
+          const clonedPanel = panel.cloneNode(true);
+          panel.parentNode.replaceChild(clonedPanel, panel);
+
+          // Set back button listeners again for webcompat
+          const webcompatBackButton = document.querySelector("#webcompat-panel .fx-relay-panel-header-btn-back");
+          webcompatBackButton.addEventListener("click", popup.events.backClick, false);
+          
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
@@ -944,13 +957,14 @@
         handleReportIssueFormSubmission: async (event, formData) => {          
           event.preventDefault();
 
+          formData = popup.panel.webcompat.getFormData();
+
           // Do not submit if the form is not valid
           if (!formData.form.dataset.formIsValid) {
             return false;
           }
 
-          // Show success state
-          popup.panel.webcompat.showSuccessReportSubmission(formData);
+          formData.reportIssueSubmitBtn.classList.toggle("is-loading");
           
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
@@ -977,12 +991,42 @@
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
 
+          // Send data
           await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
             description: reportData,
           });
+
+          // TODO: Add error catching comment
+          popup.panel.webcompat.showSuccessReportSubmission(formData);
+          formData.reportIssueSubmitBtn.classList.remove("is-loading");
+          
+          // // If submission is successful
+          // if (postReportWebcompatIssue.ok) {
+          //   popup.panel.webcompat.showSuccessReportSubmission(formData);
+          // } else {
+          //   // TODO: Add localized error state
+          //   formData.reportIssueSubmitBtn.classList.remove("is-loading");
+          //   formData.reportIssueSubmitBtn.classList.add("t-error");
+          // }
         },
         init: () => {
+          const formData = popup.panel.webcompat.getFormData();
+          
+          // Set the form as invalid
+          formData.form.dataset.formIsValid = false;
+          
+          popup.panel.webcompat.setURLwithIssue(formData);
+          popup.panel.webcompat.setCheckboxListeners(formData);
+          popup.panel.webcompat.showReportInputOtherTextField(formData);
+          
+          formData.form.addEventListener("submit", popup.panel.webcompat.handleReportIssueFormSubmission);
+
+          // When clicking the "Continue" button after successfully submitting the webcompat form,
+          // Reset the form and show the settings page again
+          formData.reportIssueSuccessDismissBtn.addEventListener("click", popup.events.backClick, false);
+        },
+        getFormData: () => {
           const formData = {
             form: document.querySelector(".report-issue-content"),
             reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
@@ -994,31 +1038,24 @@
             otherTextField: document.querySelector('input[name="other_issue"]'),
             otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
           }
-          
-          // Set the form as invalid
-          formData.form.dataset.formIsValid = false;
-          
-          popup.panel.webcompat.setURLwithIssue(formData);
-          popup.panel.webcompat.setCheckboxListeners(formData);
-          popup.panel.webcompat.showReportInputOtherTextField(formData);
-          
-          formData.form.addEventListener("submit", async (event) => {
-            await popup.panel.webcompat.handleReportIssueFormSubmission(event, formData);
-          });
 
-          // When clicking the "Continue" button after successfully submitting the webcompat form,
-          // Reset the form and show the settings page again
-          formData.reportIssueSuccessDismissBtn.addEventListener("click", (event)=>{
-            popup.panel.webcompat.resetForm(event, formData);
-          }, false);
-        },
-        resetForm: (event, formData) => {
-          popup.events.backClick(event);
+          return formData;
+        },        
+        resetForm: () => {
+          const formData = popup.panel.webcompat.getFormData();
 
           // Reset the form behind the scenes
           formData.reportSuccess.classList.add("is-hidden");
           formData.form.classList.remove("is-hidden"); 
           formData.form.reset()
+
+          // If other field is open, close it
+          const otherTextField = formData.otherTextField;
+          if ( !otherTextField.classList.contains("is-hidden") ) {
+            otherTextField.classList.toggle("is-hidden");
+            otherTextField.required = !otherTextField.required;
+          }
+          
           popup.panel.webcompat.validateForm(formData);
         },
         setCheckboxListeners: (formData) => {

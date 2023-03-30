@@ -113,12 +113,15 @@ async function postReportWebcompatIssue(description) {
     user_agent: description.user_agent
   };
 
-  await fetch(reportWebCompatResponse, {
+  const newReportedIssueFetch = await fetch(reportWebCompatResponse, {
     mode: "same-origin",
     method: "POST",
     headers: headers,
     body: JSON.stringify(apiBody),
   });
+
+  return newReportedIssueFetch;
+
 }
 
 async function storeRuntimeData(opts={forceUpdate: false}) {  
@@ -509,7 +512,7 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       response = await makeRelayAddress(m.description);
       break;
     case "postReportWebcompatIssue":
-      await postReportWebcompatIssue(m.description);
+      response = await postReportWebcompatIssue(m.description);
       break;
     case "openRelayHomepage":
       browser.tabs.create({
