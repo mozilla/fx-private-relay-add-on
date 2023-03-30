@@ -113,14 +113,15 @@ async function postReportWebcompatIssue(description) {
     user_agent: description.user_agent
   };
 
-  const newReportedIssueResponse = await fetch(reportWebCompatResponse, {
+  const newReportedIssueFetch = await fetch(reportWebCompatResponse, {
     mode: "same-origin",
     method: "POST",
     headers: headers,
     body: JSON.stringify(apiBody),
   });
 
-  return newReportedIssueResponse;
+  return await newReportedIssueFetch;
+
 }
 
 async function storeRuntimeData(opts={forceUpdate: false}) {  

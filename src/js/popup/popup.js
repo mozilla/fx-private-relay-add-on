@@ -977,19 +977,23 @@
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
 
-          const postReportWebcompatIssueResp = await browser.runtime.sendMessage({
+          // Send data
+          await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
             description: reportData,
           });
 
-          // If submission is successful
-          if (await postReportWebcompatIssueResp.ok) {
-            popup.panel.webcompat.showSuccessReportSubmission(formData);
-          } else {
-            // TODO: Add localized error state
-            formData.reportIssueSubmitBtn.classList.remove("is-loading");
-            formData.reportIssueSubmitBtn.classList.add("t-error");
-          }
+          // TODO: Add error catching comment
+          popup.panel.webcompat.showSuccessReportSubmission(formData);
+          
+          // // If submission is successful
+          // if (postReportWebcompatIssue.ok) {
+          //   popup.panel.webcompat.showSuccessReportSubmission(formData);
+          // } else {
+          //   // TODO: Add localized error state
+          //   formData.reportIssueSubmitBtn.classList.remove("is-loading");
+          //   formData.reportIssueSubmitBtn.classList.add("t-error");
+          // }
         },
         init: () => {
           const formData = {
