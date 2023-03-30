@@ -949,8 +949,8 @@
             return false;
           }
 
-          // Show success state
-          popup.panel.webcompat.showSuccessReportSubmission(formData);
+          formData.reportIssueSubmitBtn.classList.toggle("is-loading");
+          
           
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
@@ -977,10 +977,19 @@
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
 
-          await browser.runtime.sendMessage({
+          const postReportWebcompatIssueResp = await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
             description: reportData,
           });
+
+          // If submission is successful
+          if (postReportWebcompatIssueResp.ok) {
+            popup.panel.webcompat.showSuccessReportSubmission(formData);
+          } else {
+            // TODO: Add localized error state
+            formData.reportIssueSubmitBtn.classList.remove("is-loading");
+            formData.reportIssueSubmitBtn.classList.add("t-error");
+          }
         },
         init: () => {
           const formData = {
