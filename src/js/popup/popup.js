@@ -951,7 +951,6 @@
 
           formData.reportIssueSubmitBtn.classList.toggle("is-loading");
           
-          
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
           reportData.user_agent = await getBrowser();
@@ -985,6 +984,7 @@
 
           // TODO: Add error catching comment
           popup.panel.webcompat.showSuccessReportSubmission(formData);
+          formData.reportIssueSubmitBtn.classList.remove("is-loading");
           
           // // If submission is successful
           // if (postReportWebcompatIssue.ok) {

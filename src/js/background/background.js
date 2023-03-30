@@ -120,7 +120,7 @@ async function postReportWebcompatIssue(description) {
     body: JSON.stringify(apiBody),
   });
 
-  return await newReportedIssueFetch;
+  return newReportedIssueFetch;
 
 }
 
