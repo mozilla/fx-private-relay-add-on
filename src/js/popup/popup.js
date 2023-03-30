@@ -26,19 +26,6 @@
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
-
-          // Reset Form
-          popup.panel.webcompat.resetForm();
-
-          // Remove event listeners
-          const panel = document.getElementById('webcompat-panel');
-          const clonedPanel = panel.cloneNode(true);
-          panel.parentNode.replaceChild(clonedPanel, panel);
-
-          // Set back button listeners again for webcompat
-          const webcompatBackButton = document.querySelector("#webcompat-panel .fx-relay-panel-header-btn-back");
-          webcompatBackButton.addEventListener("click", popup.events.backClick, false);
-          
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
@@ -991,24 +978,21 @@
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
 
-          // Send data
-          await browser.runtime.sendMessage({
+          // Send data and get a status code back
+          const postReportWebcompatIssueRespStatus = await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
             description: reportData,
           });
-
-          // TODO: Add error catching comment
-          popup.panel.webcompat.showSuccessReportSubmission(formData);
-          formData.reportIssueSubmitBtn.classList.remove("is-loading");
           
-          // // If submission is successful
-          // if (postReportWebcompatIssue.ok) {
-          //   popup.panel.webcompat.showSuccessReportSubmission(formData);
-          // } else {
-          //   // TODO: Add localized error state
-          //   formData.reportIssueSubmitBtn.classList.remove("is-loading");
-          //   formData.reportIssueSubmitBtn.classList.add("t-error");
-          // }
+          // If submission is successful
+          if (postReportWebcompatIssueRespStatus == 201) {
+            popup.panel.webcompat.showSuccessReportSubmission(formData);
+            formData.reportIssueSubmitBtn.classList.remove("is-loading");
+          } else {
+            // TODO: Add localized error state
+            formData.reportIssueSubmitBtn.classList.remove("is-loading");
+            formData.reportIssueSubmitBtn.classList.add("t-error");
+          }
         },
         init: () => {
           const formData = popup.panel.webcompat.getFormData();
@@ -1041,23 +1025,6 @@
 
           return formData;
         },        
-        resetForm: () => {
-          const formData = popup.panel.webcompat.getFormData();
-
-          // Reset the form behind the scenes
-          formData.reportSuccess.classList.add("is-hidden");
-          formData.form.classList.remove("is-hidden"); 
-          formData.form.reset()
-
-          // If other field is open, close it
-          const otherTextField = formData.otherTextField;
-          if ( !otherTextField.classList.contains("is-hidden") ) {
-            otherTextField.classList.toggle("is-hidden");
-            otherTextField.required = !otherTextField.required;
-          }
-          
-          popup.panel.webcompat.validateForm(formData);
-        },
         setCheckboxListeners: (formData) => {
           const checkboxes = formData.checkboxes;
           

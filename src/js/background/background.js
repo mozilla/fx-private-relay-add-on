@@ -120,7 +120,9 @@ async function postReportWebcompatIssue(description) {
     body: JSON.stringify(apiBody),
   });
 
-  return newReportedIssueFetch;
+  // NOTE: This API call does NOT return a JSON object. 
+  // Returning the status is enough to run pass/fail logic for the submission
+  return newReportedIssueFetch.status;
 
 }
 
