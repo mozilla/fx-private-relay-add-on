@@ -944,6 +944,8 @@
         handleReportIssueFormSubmission: async (event, formData) => {          
           event.preventDefault();
 
+          formData = popup.panel.webcompat.getFormData();
+
           // Do not submit if the form is not valid
           if (!formData.form.dataset.formIsValid) {
             return false;
@@ -996,6 +998,22 @@
           // }
         },
         init: () => {
+          const formData = popup.panel.webcompat.getFormData();
+          
+          // Set the form as invalid
+          formData.form.dataset.formIsValid = false;
+          
+          popup.panel.webcompat.setURLwithIssue(formData);
+          popup.panel.webcompat.setCheckboxListeners(formData);
+          popup.panel.webcompat.showReportInputOtherTextField(formData);
+          
+          formData.form.addEventListener("submit", popup.panel.webcompat.handleReportIssueFormSubmission);
+
+          // When clicking the "Continue" button after successfully submitting the webcompat form,
+          // Reset the form and show the settings page again
+          formData.reportIssueSuccessDismissBtn.addEventListener("click", popup.panel.webcompat.resetForm, false);
+        },
+        getFormData: () => {
           const formData = {
             form: document.querySelector(".report-issue-content"),
             reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
@@ -1007,25 +1025,12 @@
             otherTextField: document.querySelector('input[name="other_issue"]'),
             otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
           }
-          
-          // Set the form as invalid
-          formData.form.dataset.formIsValid = false;
-          
-          popup.panel.webcompat.setURLwithIssue(formData);
-          popup.panel.webcompat.setCheckboxListeners(formData);
-          popup.panel.webcompat.showReportInputOtherTextField(formData);
-          
-          formData.form.addEventListener("submit", async (event) => {
-            await popup.panel.webcompat.handleReportIssueFormSubmission(event, formData);
-          });
 
-          // When clicking the "Continue" button after successfully submitting the webcompat form,
-          // Reset the form and show the settings page again
-          formData.reportIssueSuccessDismissBtn.addEventListener("click", (event)=>{
-            popup.panel.webcompat.resetForm(event, formData);
-          }, false);
-        },
+          return formData;
+        },        
         resetForm: (event, formData) => {
+          formData = popup.panel.webcompat.getFormData();
+          
           popup.events.backClick(event);
 
           // Reset the form behind the scenes
