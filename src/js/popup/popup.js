@@ -983,7 +983,7 @@
           });
 
           // If submission is successful
-          if (postReportWebcompatIssueResp.ok) {
+          if (await postReportWebcompatIssueResp.ok) {
             popup.panel.webcompat.showSuccessReportSubmission(formData);
           } else {
             // TODO: Add localized error state
