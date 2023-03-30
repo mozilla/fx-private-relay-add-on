@@ -3,10 +3,9 @@
 .fx-relay-panel-wrapper {
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
-  --panelHeight: 500px;
+  --panelHeight: 400px;
   background-color: var(--colorGrey05);
   min-width: var(--panelWidth);
-  min-height: var(--panelHeight);
   max-width: var(--panelWidth);
   color: var(--relayInk70);
   overflow: hidden;
@@ -34,18 +33,30 @@
 
 .fx-relay-panel-content {
   padding: var(--spacingMd);
+  background: transparent;
+  overflow: auto;
+  height: 100%;
+  margin-bottom: 0;
 }
 
 /* FIXME: Refactor to account for height dynamically */
 /* Magic Number: Custom max-height for masks panel */
 #masks-panel[data-account-level="free"] .fx-relay-panel-content {
-  max-height: 384px;
+  min-height: 344px;
+  max-height: 344px;
+  margin-bottom: 50px;
   overflow: auto;
 }
 
 #masks-panel[data-account-level="premium"] .fx-relay-panel-content {
+  min-height: 336px;
   max-height: 336px;
   overflow: auto;
+  margin-bottom: 100px;
+}
+
+#webcompat-panel .fx-relay-panel-content {
+  padding-top: var(--spacingSm);
 }
 
 /* Header */
