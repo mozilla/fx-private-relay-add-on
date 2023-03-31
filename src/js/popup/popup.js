@@ -944,10 +944,14 @@
         handleReportIssueFormSubmission: async (event, formData) => {          
           event.preventDefault();
 
+          formData = popup.panel.webcompat.getFormData();
+
           // Do not submit if the form is not valid
           if (!formData.form.dataset.formIsValid) {
             return false;
           }
+
+          formData.reportIssueSubmitBtn.classList.toggle("is-loading");
           
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
@@ -974,21 +978,24 @@
             reportData.issue_on_domain = "http://" + reportData.issue_on_domain;
           }
 
-          await browser.runtime.sendMessage({
+          // Send data and get a status code back
+          const postReportWebcompatIssueRespStatus = await browser.runtime.sendMessage({
             method: "postReportWebcompatIssue",
             description: reportData,
           });
+          
+          // If submission is successful
+          if (postReportWebcompatIssueRespStatus == 201) {
+            popup.panel.webcompat.showSuccessReportSubmission(formData);
+            formData.reportIssueSubmitBtn.classList.remove("is-loading");
+          } else {
+            // TODO: Add localized error state
+            formData.reportIssueSubmitBtn.classList.remove("is-loading");
+            formData.reportIssueSubmitBtn.classList.add("t-error");
+          }
         },
         init: () => {
-          const formData = {
-            form: document.querySelector(".report-issue-content"),
-            reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
-            inputFieldUrl: document.querySelector('input[name="issue_on_domain"]'),
-            inputFieldOtherDetails: document.querySelector('input[name="other_issue"]'),
-            checkboxes: document.querySelectorAll('.report-section ul li input'),
-            otherTextField: document.querySelector('input[name="other_issue"]'),
-            otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
-          }
+          const formData = popup.panel.webcompat.getFormData();
           
           // Set the form as invalid
           formData.form.dataset.formIsValid = false;
@@ -996,15 +1003,28 @@
           popup.panel.webcompat.setURLwithIssue(formData);
           popup.panel.webcompat.setCheckboxListeners(formData);
           popup.panel.webcompat.showReportInputOtherTextField(formData);
+          
+          formData.form.addEventListener("submit", popup.panel.webcompat.handleReportIssueFormSubmission);
 
-          const reportForm = document.querySelector(".report-issue-content");
-          reportForm.addEventListener("submit", async (event) => {
-            await popup.panel.webcompat.handleReportIssueFormSubmission(event, formData);
-          });
-
-          const reportContinueButton = document.querySelector(".report-continue");
-          reportContinueButton.addEventListener("click", popup.events.backClick, false);
+          // When clicking the "Continue" button after successfully submitting the webcompat form,
+          // Reset the form and show the settings page again
+          formData.reportIssueSuccessDismissBtn.addEventListener("click", popup.events.backClick, false);
         },
+        getFormData: () => {
+          const formData = {
+            form: document.querySelector(".report-issue-content"),
+            reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
+            reportIssueSuccessDismissBtn: document.querySelector(".report-continue"),
+            inputFieldUrl: document.querySelector('input[name="issue_on_domain"]'),
+            inputFieldOtherDetails: document.querySelector('input[name="other_issue"]'),
+            checkboxes: document.querySelectorAll('.report-section ul li input'),
+            reportSuccess: document.querySelector('.report-success'),
+            otherTextField: document.querySelector('input[name="other_issue"]'),
+            otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
+          }
+
+          return formData;
+        },        
         setCheckboxListeners: (formData) => {
           const checkboxes = formData.checkboxes;
           
@@ -1056,6 +1076,12 @@
           inputFieldOtherDetails.placeholder = browser.i18n.getMessage(
             "popupReportIssueCaseOtherDetails"
           );
+        },
+        showSuccessReportSubmission: (formData) => {
+          const reportSuccess = formData.reportSuccess;
+          const reportContent = formData.form
+          reportSuccess.classList.remove("is-hidden");
+          reportContent.classList.add("is-hidden");          
         },
         validateForm: (formData) => {
           // Check if inputFieldUrl is valid and the custom input looks like a URL 
@@ -1244,8 +1270,9 @@
         // Conditions for firefox integration to be shown: if the waffle flag "firefox_integration" is set as true
         const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
         
-        // FIXME: The order is not being set correctly
-        if (isFirefoxIntegrationAvailable) {
+        const currentBrowser = await getBrowser();
+
+        if (isFirefoxIntegrationAvailable && currentBrowser == "Firefox") {
           sessionState.newsContent.push({
             id: "firefox-integration",
             dateAdded: "20230314", // YYYYMMDD

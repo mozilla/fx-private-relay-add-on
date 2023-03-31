@@ -96,9 +96,11 @@ async function patchMaskInfo(method = "PATCH", id, data, opts=null) {
 
 async function postReportWebcompatIssue(description) {
   const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  
   if (!relayApiSource) {
     return;
   }
+
   const headers = await createNewHeadersObject({auth: true});
   const reportWebCompatResponse = `${relayApiSource}/report_webcompat_issue`;
 
@@ -111,15 +113,16 @@ async function postReportWebcompatIssue(description) {
     user_agent: description.user_agent
   };
 
-  const newReportedIssueResponse = await fetch(reportWebCompatResponse, {
+  const newReportedIssueFetch = await fetch(reportWebCompatResponse, {
     mode: "same-origin",
     method: "POST",
     headers: headers,
     body: JSON.stringify(apiBody),
   });
 
-  let newReportedIssueForm = await newReportedIssueResponse.json();
-  return newReportedIssueForm;
+  // NOTE: This API call does NOT return a JSON object. 
+  // Returning the status is enough to run pass/fail logic for the submission
+  return newReportedIssueFetch.status;
 
 }
 
