@@ -247,7 +247,8 @@ sign-up-panel::after {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding-top: var(--layoutSm);
+  /* Padding note: Bottom padding is necessary for bottom/fixed sign-in button */
+  padding: var(--layoutSm) 0 var(--layoutLg);
 }
 
 .fx-relay-sign-in-copy img {
