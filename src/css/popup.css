@@ -173,6 +173,7 @@
   top: calc(100% + var(--spacingXs));
   right: 0;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
