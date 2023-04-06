@@ -173,6 +173,7 @@
   top: calc(100% + var(--spacingXs));
   right: 0;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .fx-relay-menu-dashboard-link:hover .fx-relay-menu-dashboard-link-tooltip,
@@ -247,7 +248,8 @@ sign-up-panel::after {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding-top: var(--layoutSm);
+  /* Padding note: Bottom padding is necessary for bottom/fixed sign-in button */
+  padding: var(--layoutSm) 0 var(--layoutLg);
 }
 
 .fx-relay-sign-in-copy img {

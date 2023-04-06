@@ -1196,6 +1196,15 @@
           userApiToken,
           "apiToken"
         );
+
+        // MPP-2857: During upgrade, the profile ID may be dropped, so if that is not 
+        // available to the add-on, prompt the user to reauthenticate
+        const { profileID } = await browser.storage.local.get("profileID");
+
+        if (!profileID) {
+          return false;
+        }
+        
         return signedInUser;
       },
       getCachedServerStoragePref: async () => {
