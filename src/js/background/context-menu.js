@@ -8,21 +8,21 @@ const staticMenuData = {
   existingAlias: {
     type: "radio",
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   generateAliasEnabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     enabled: true,
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   generateAliasDisabled: {
     id: "fx-private-relay-generate-alias",
     title: browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask"),
     enabled: false,
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   manageAliases: {
     id: "fx-private-relay-manage-aliases",
@@ -35,7 +35,7 @@ const staticMenuData = {
     title: browser.i18n.getMessage("pageInputIconInsertPhoneMask"),
     enabled: true,
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   upgradeToPremium: {
     id: "fx-private-relay-get-unlimited-aliases",
@@ -55,13 +55,13 @@ const staticMenuData = {
       "pageInputIconUseExistingAliasFromTheSite_mask"
     ),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
   useExistingAlias: {
     id: "fx-private-relay-use-existing-aliases",
     title: browser.i18n.getMessage("pageInputIconRecentAliases_mask"),
     visible: true,
-    contexts: ["all"],
+    contexts: ["editable"],
   },
 };
 
