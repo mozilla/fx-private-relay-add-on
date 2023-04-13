@@ -572,7 +572,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         action: "click",
         label: "context-menu-relay-manage-aliases",
         dimension5: await getBrowser(),
-        imension7: "add-on",
+        dimension7: "add-on",
       });
       await browser.tabs.create({ url: urlManageAliases });
       break;
