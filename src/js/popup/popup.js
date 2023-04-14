@@ -10,7 +10,7 @@
     currentPanel: null,
     newsItemsCount: null,
     loggedIn: false,
-    newsContent: []
+    newsContent: [],
   };
 
   const popup = {
@@ -21,7 +21,9 @@
         const backNavLevel = e.target.dataset.navLevel;
 
         if (backNavLevel === "root") {
-          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document
+            .querySelector(".js-internal-link.is-active")
+            ?.classList.remove("is-active");
         }
 
         // Custom rule to send "Closed Report Issue" event
@@ -43,6 +45,7 @@
       },
       externalClick: async (e) => {
         e.preventDefault();
+        // TODO
         if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
           sendRelayEvent(
             "Panel",
@@ -63,24 +66,25 @@
         popup.panel.update(panelId);
       },
       generateMask: async (event, type = "random", data = null) => {
-        
         // Types: "random", "custom"
         sendRelayEvent("Panel", "click", `popup-generate-${type}-mask`);
         preventDefaultBehavior(event);
 
-        const isRandomMask = (type == "random");
-        const isCustomMask = (type == "custom");
+        const isRandomMask = type == "random";
+        const isCustomMask = type == "custom";
         const { premium } = await browser.storage.local.get("premium");
 
         event.target.classList.add("is-loading");
 
-        const newRelayAddressResponseArgs = isCustomMask ?  { method: "makeDomainAddress" } : { method: "makeRelayAddress" }
-        
+        const newRelayAddressResponseArgs = isCustomMask
+          ? { method: "makeDomainAddress" }
+          : { method: "makeRelayAddress" };
+
         if (isRandomMask) {
           // When rebuilding panel, scroll to the top of it
           const panel = document.querySelector(".fx-relay-mask-list");
           panel.scrollIntoView(true);
-        } 
+        }
 
         // Request the active tab from the background script and parse the `document.location.hostname`
         const currentPageHostName = await browser.runtime.sendMessage({
@@ -93,12 +97,15 @@
         }
 
         if (isCustomMask && data) {
-          newRelayAddressResponseArgs.address = data.address
-          newRelayAddressResponseArgs.block_list_emails = data.block_list_emails
+          newRelayAddressResponseArgs.address = data.address;
+          newRelayAddressResponseArgs.block_list_emails =
+            data.block_list_emails;
         }
 
         // Attempt to create a new alias
-        const newRelayAddressResponse = await browser.runtime.sendMessage(newRelayAddressResponseArgs);
+        const newRelayAddressResponse = await browser.runtime.sendMessage(
+          newRelayAddressResponseArgs
+        );
 
         // Catch edge cases where the "Generate New Alias" button is still enabled,
         // but the user has already reached the max number of aliases.
@@ -111,41 +118,57 @@
 
         // Reset previous form
         if (premium && isCustomMask) {
-            const customMaskDomainInput = document.getElementById("customMaskName");
-            customMaskDomainInput.value = "";
-            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
-            customMaskBlockPromosCheckbox.checked = false;
+          const customMaskDomainInput =
+            document.getElementById("customMaskName");
+          customMaskDomainInput.value = "";
+          const customMaskBlockPromosCheckbox = document.getElementById(
+            "customMaskBlockPromos"
+          );
+          customMaskBlockPromosCheckbox.checked = false;
         }
-        
+
         // Catch edge cases where the "Generate New Alias" button is still enabled,
         // but the user has already reached the max number of aliases.
-        if (newRelayAddressResponse.status === 409 || newRelayAddressResponse.status === 400) {
+        if (
+          newRelayAddressResponse.status === 409 ||
+          newRelayAddressResponse.status === 400
+        ) {
           event.target.classList.remove("is-loading");
-          
-          const errorMessage = document.querySelector(".fx-relay-masks-error-message");
-          errorMessage.classList.add("is-shown");
-          
-          errorMessage.addEventListener("click",popup.events.dismissErrorClick, false);
 
-          await popup.panel.masks.utilities.buildMasksList({newMaskCreated: false});
-          
+          const errorMessage = document.querySelector(
+            ".fx-relay-masks-error-message"
+          );
+          errorMessage.classList.add("is-shown");
+
+          errorMessage.addEventListener(
+            "click",
+            popup.events.dismissErrorClick,
+            false
+          );
+
+          await popup.panel.masks.utilities.buildMasksList({
+            newMaskCreated: false,
+          });
+
           return;
         }
 
         event.target.classList.remove("is-loading");
 
         // Hide onboarding panel
-        const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+        const noMasksCreatedPanel = document.querySelector(
+          ".fx-relay-no-masks-created"
+        );
         noMasksCreatedPanel.classList.add("is-hidden");
 
-        await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
+        await popup.panel.masks.utilities.buildMasksList({
+          newMaskCreated: true,
+        });
 
-        
         if (!premium) {
           await popup.panel.masks.utilities.setRemainingMaskCount();
         }
-
-      }
+      },
     },
     init: async () => {
       // Set Navigation Listeners
@@ -158,7 +181,7 @@
       const backButtons = document.querySelectorAll(
         ".fx-relay-panel-header-btn-back"
       );
-      
+
       backButtons.forEach((button) => {
         button.addEventListener("click", popup.events.backClick, false);
       });
@@ -179,7 +202,7 @@
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
 
-      // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
+      // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element:
       // Cases:
       //   If not logged in: focused on "Sign In" button
       //   (Both tiers) If no masks made: focused on primary generate mask button
@@ -202,11 +225,11 @@
       },
       init: (panelId, data) => {
         switch (panelId) {
-          case "custom": 
+          case "custom":
             popup.panel.masks.custom.init();
             break;
 
-          case "masks": 
+          case "masks":
             popup.panel.masks.init();
             break;
 
@@ -214,6 +237,11 @@
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
+            break;
+
+          case "survey":
+            sendRelayEvent("Panel", "click", "opened-CSAT");
+            popup.panel.survey.init();
             break;
 
           case "newsItem":
@@ -240,36 +268,57 @@
       masks: {
         custom: {
           init: async () => {
-            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
-            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
-            const customMaskDomainLabel = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-domain");
-            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
-            customMaskDomainInput.placeholder = browser.i18n.getMessage("popupCreateCustomFormMaskInputPlaceholder");
-            customMaskDomainLabel.textContent = browser.i18n.getMessage("popupCreateCustomFormMaskInputDescription", sessionState.premiumSubdomain);
+            const customMaskForm = document.querySelector(
+              ".fx-relay-panel-custom-mask-form"
+            );
+            const customMaskDomainInput = customMaskForm.querySelector(
+              ".fx-relay-panel-custom-mask-input-name"
+            );
+            const customMaskDomainLabel = customMaskForm.querySelector(
+              ".fx-relay-panel-custom-mask-input-domain"
+            );
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(
+              ".fx-relay-panel-custom-mask-submit button"
+            );
+            customMaskDomainInput.placeholder = browser.i18n.getMessage(
+              "popupCreateCustomFormMaskInputPlaceholder"
+            );
+            customMaskDomainLabel.textContent = browser.i18n.getMessage(
+              "popupCreateCustomFormMaskInputDescription",
+              sessionState.premiumSubdomain
+            );
 
-            customMaskDomainInput.addEventListener("input", popup.panel.masks.custom.validateForm);
-            customMaskForm.addEventListener("submit", popup.panel.masks.custom.submit);
+            customMaskDomainInput.addEventListener(
+              "input",
+              popup.panel.masks.custom.validateForm
+            );
+            customMaskForm.addEventListener(
+              "submit",
+              popup.panel.masks.custom.submit
+            );
 
             const currentPageHostName = await browser.runtime.sendMessage({
               method: "getCurrentPageHostname",
             });
 
             if (currentPageHostName) {
-              const parsedDomain = psl.parse(currentPageHostName)
+              const parsedDomain = psl.parse(currentPageHostName);
               customMaskDomainInput.value = parsedDomain.sld;
-              customMaskDomainSubmitButton.disabled = false
+              customMaskDomainSubmitButton.disabled = false;
             }
 
             customMaskDomainInput.focus();
-            
           },
           submit: async (event) => {
             event.preventDefault();
-            const customMaskDomainInput = document.getElementById("customMaskName");
-            const customMaskBlockPromosCheckbox = document.getElementById("customMaskBlockPromos");
+            const customMaskDomainInput =
+              document.getElementById("customMaskName");
+            const customMaskBlockPromosCheckbox = document.getElementById(
+              "customMaskBlockPromos"
+            );
 
             if (!customMaskDomainInput.value) {
-              throw new Error(`No address name set`)
+              throw new Error(`No address name set`);
             }
 
             popup.events.generateMask(event, "custom", {
@@ -278,109 +327,162 @@
             });
 
             popup.panel.update("masks");
-            
           },
           validateForm: async () => {
-            const customMaskForm = document.querySelector(".fx-relay-panel-custom-mask-form");
-            const customMaskDomainInput = customMaskForm.querySelector(".fx-relay-panel-custom-mask-input-name");
-            const customMaskDomainSubmitButton = customMaskForm.querySelector(".fx-relay-panel-custom-mask-submit button");
+            const customMaskForm = document.querySelector(
+              ".fx-relay-panel-custom-mask-form"
+            );
+            const customMaskDomainInput = customMaskForm.querySelector(
+              ".fx-relay-panel-custom-mask-input-name"
+            );
+            const customMaskDomainSubmitButton = customMaskForm.querySelector(
+              ".fx-relay-panel-custom-mask-submit button"
+            );
 
             // If there's input, make the form submission possible
-            customMaskDomainSubmitButton.disabled = !(customMaskDomainInput.value)
-          }
+            customMaskDomainSubmitButton.disabled =
+              !customMaskDomainInput.value;
+          },
         },
         init: async () => {
-          
-          const generateRandomMask = document.querySelector(".js-generate-random-mask");
+          const generateRandomMask = document.querySelector(
+            ".js-generate-random-mask"
+          );
           const { premium } = await browser.storage.local.get("premium");
+          const { dataCollection } = await browser.storage.local.get(
+            "dataCollection"
+          );
           const maskPanel = document.getElementById("masks-panel");
           let getMasksOptions = { fetchCustomMasks: false };
-          
+
+          // TODO: Add logic to determine when to show CSAT (ref. react app)
+          const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
+
+          // reason to show and locale check?
+
+          if (shouldShowCSAT && dataCollection === "data-enabled") {
+            const survey = popup.panel.survey;
+
+            survey.utils.showSurveyLink();
+
+            // TODO: add a dismissal event click
+            // Show the survey panel when the link is clicked
+            survey.select
+              .surveyLink()
+              .addEventListener("click", async () =>
+                popup.panel.update("survey")
+              );
+
+            survey.select
+              .closeSurveyLinkButton()
+              .addEventListener("click", async () =>
+                survey.utils.closeSurveyLink()
+              );
+          }
+
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
             maskPanel.setAttribute("data-account-level", "free");
-          } else {            
+          } else {
             maskPanel.setAttribute("data-account-level", "premium");
 
             // Update language of Generate Random Mask to "Generate random mask"
-            generateRandomMask.textContent = browser.i18n.getMessage("pageInputIconGenerateRandomMask");
+            generateRandomMask.textContent = browser.i18n.getMessage(
+              "pageInputIconGenerateRandomMask"
+            );
 
             // Prompt user to register subdomain
-            const { premiumSubdomainSet } = await browser.storage.local.get("premiumSubdomainSet");
-            const isPremiumSubdomainSet = (premiumSubdomainSet !== "None");  
-            
+            const { premiumSubdomainSet } = await browser.storage.local.get(
+              "premiumSubdomainSet"
+            );
+            const isPremiumSubdomainSet = premiumSubdomainSet !== "None";
+
             // Store this query locally for this session
             sessionState.premiumSubdomainSet = isPremiumSubdomainSet;
 
             // Make sure to query both custom and random masks
             getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
-          
+
             // premiumSubdomain is not set : display CTA to prompt user to register subdomain
             if (!sessionState.premiumSubdomainSet) {
-              const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+              const registerSubdomainButton = document.querySelector(
+                ".fx-relay-regsiter-subdomain-button"
+              );
               registerSubdomainButton.classList.remove("is-hidden");
             } else {
-
               sessionState.premiumSubdomain = premiumSubdomainSet;
-              const generateCustomMask = document.querySelector(".js-generate-custom-mask");
-              
+              const generateCustomMask = document.querySelector(
+                ".js-generate-custom-mask"
+              );
+
               // Show "Generate custom mask" button
               generateCustomMask.classList.remove("is-hidden");
 
-              generateCustomMask.addEventListener("click", (e) => {
-                e.preventDefault();
-                popup.panel.update("custom");
-              }, false);
-              
+              generateCustomMask.addEventListener(
+                "click",
+                (e) => {
+                  e.preventDefault();
+                  popup.panel.update("custom");
+                },
+                false
+              );
+
               // Restyle Random Mask button to secondary
               generateRandomMask.classList.remove("t-primary");
               generateRandomMask.classList.add("t-secondary");
             }
           }
-          
-          generateRandomMask.addEventListener("click", (e) => {
+
+          generateRandomMask.addEventListener(
+            "click",
+            (e) => {
               popup.events.generateMask(e, "random");
-            }, false);
-          
+            },
+            false
+          );
+
           // Get masks and determine what to display
           const masks = await popup.utilities.getMasks(getMasksOptions);
 
           // If no masks are created, show onboarding prompt
           if (masks.length === 0) {
-            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+            const noMasksCreatedPanel = document.querySelector(
+              ".fx-relay-no-masks-created"
+            );
             noMasksCreatedPanel.classList.remove("is-hidden");
           }
 
           // Build initial list
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
           popup.panel.masks.utilities.buildMasksList();
-        
 
           // Remove loading state
           document.body.classList.remove("is-loading");
-
         },
         search: {
-          filter: (query)=> {
-            
-            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+          filter: (query) => {
+            const searchInput = document.querySelector(
+              ".fx-relay-masks-search-input"
+            );
             searchInput.classList.add("is-active");
 
-            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
+            const maskSearchResults = Array.from(
+              document.querySelectorAll(".fx-relay-mask-list li")
+            );
 
             maskSearchResults.forEach((maskResult) => {
               const emailAddress = maskResult.dataset.maskAddress;
               const label = maskResult.dataset.maskDescription;
               const usedOn = maskResult.dataset.maskUsedOn;
               const generated = maskResult.dataset.maskGenerated;
-              
+
               // Check search input against any mask name, label or used-on/generated for web details
               const matchesSearchFilter =
                 emailAddress.toLowerCase().includes(query.toLowerCase()) ||
                 label.toLowerCase().includes(query.toLowerCase()) ||
                 usedOn.toLowerCase().includes(query.toLowerCase()) ||
                 generated.toLowerCase().includes(query.toLowerCase());
-              
+
               if (matchesSearchFilter) {
                 maskResult.classList.remove("is-hidden");
               } else {
@@ -388,18 +490,27 @@
               }
 
               // Set #/# labels inside search bar to show results count
-              const searchFilterTotal = document.querySelector(".js-filter-masks-total");
-              const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+              const searchFilterTotal = document.querySelector(
+                ".js-filter-masks-total"
+              );
+              const searchFilterVisible = document.querySelector(
+                ".js-filter-masks-visible"
+              );
 
-              searchFilterVisible.textContent = maskSearchResults.filter((maskResult) => !maskResult.classList.contains("is-hidden")).length;
+              searchFilterVisible.textContent = maskSearchResults.filter(
+                (maskResult) => !maskResult.classList.contains("is-hidden")
+              ).length;
               searchFilterTotal.textContent = maskSearchResults.length;
             });
-            
           },
-          init: () => {            
-            const searchForm = document.querySelector(".fx-relay-masks-search-form");
-            
-            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+          init: () => {
+            const searchForm = document.querySelector(
+              ".fx-relay-masks-search-form"
+            );
+
+            const searchInput = document.querySelector(
+              ".fx-relay-masks-search-input"
+            );
             searchInput.placeholder = browser.i18n.getMessage("labelSearch");
 
             searchForm.addEventListener("submit", (event) => {
@@ -413,17 +524,26 @@
                 return;
               }
 
-              popup.panel.masks.search.reset()
+              popup.panel.masks.search.reset();
             });
-            
-            searchInput.addEventListener("reset", popup.panel.masks.search.reset);
 
-            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
-            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
-            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            searchInput.addEventListener(
+              "reset",
+              popup.panel.masks.search.reset
+            );
+
+            const maskSearchResults = Array.from(
+              document.querySelectorAll(".fx-relay-mask-list li")
+            );
+            const searchFilterTotal = document.querySelector(
+              ".js-filter-masks-total"
+            );
+            const searchFilterVisible = document.querySelector(
+              ".js-filter-masks-visible"
+            );
             searchFilterVisible.textContent = maskSearchResults.length;
             searchFilterTotal.textContent = maskSearchResults.length;
-            
+
             // Show bar if there's at least one mask created
             if (maskSearchResults.length) {
               searchForm.classList.add("is-visible");
@@ -431,20 +551,27 @@
             }
           },
           reset: () => {
-            const searchInput = document.querySelector(".fx-relay-masks-search-input");
+            const searchInput = document.querySelector(
+              ".fx-relay-masks-search-input"
+            );
             searchInput.classList.remove("is-active");
 
-            const maskSearchResults = Array.from(document.querySelectorAll(".fx-relay-mask-list li"));
-            const searchFilterTotal = document.querySelector(".js-filter-masks-total");
-            const searchFilterVisible = document.querySelector(".js-filter-masks-visible");
+            const maskSearchResults = Array.from(
+              document.querySelectorAll(".fx-relay-mask-list li")
+            );
+            const searchFilterTotal = document.querySelector(
+              ".js-filter-masks-total"
+            );
+            const searchFilterVisible = document.querySelector(
+              ".js-filter-masks-visible"
+            );
             searchFilterVisible.textContent = maskSearchResults.length;
             searchFilterTotal.textContent = maskSearchResults.length;
 
             maskSearchResults.forEach((maskResult) => {
               maskResult.classList.remove("is-hidden");
             });
-
-          }
+          },
         },
         utilities: {
           buildMasksList: async (opts = null) => {
@@ -463,90 +590,144 @@
 
               // If not set, prompt user to register domain
               if (!isPremiumSubdomainSet) {
-                const registerSubdomainButton = document.querySelector(".fx-relay-regsiter-subdomain-button");
+                const registerSubdomainButton = document.querySelector(
+                  ".fx-relay-regsiter-subdomain-button"
+                );
                 registerSubdomainButton.classList.remove("is-hidden");
               }
 
               // Show Generate Button
-              const generateRandomMask = document.querySelector(".js-generate-random-mask");
-              generateRandomMask.classList.remove("is-hidden");              
+              const generateRandomMask = document.querySelector(
+                ".js-generate-random-mask"
+              );
+              generateRandomMask.classList.remove("is-hidden");
             }
-            
+
             const masks = await popup.utilities.getMasks(getMasksOptions);
-            
+
             const maskList = document.querySelector(".fx-relay-mask-list");
             // Reset mask list
             maskList.textContent = "";
 
-            masks.forEach(mask => {
+            masks.forEach((mask) => {
               const maskListItem = document.createElement("li");
 
               // Attributes used to power search filtering
-              maskListItem.setAttribute("data-mask-address", mask.full_address);              
-              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
-              maskListItem.setAttribute("data-mask-used-on", mask.used_on ?? "");
-              maskListItem.setAttribute("data-mask-generated", mask.generated_for ?? "");
-              
+              maskListItem.setAttribute("data-mask-address", mask.full_address);
+              maskListItem.setAttribute(
+                "data-mask-description",
+                mask.description ?? ""
+              );
+              maskListItem.setAttribute(
+                "data-mask-used-on",
+                mask.used_on ?? ""
+              );
+              maskListItem.setAttribute(
+                "data-mask-generated",
+                mask.generated_for ?? ""
+              );
+
               maskListItem.classList.add("fx-relay-mask-item");
 
-              const maskListItemNewMaskCreatedLabel = document.createElement("span");
-              maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
-              maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
+              const maskListItemNewMaskCreatedLabel =
+                document.createElement("span");
+              maskListItemNewMaskCreatedLabel.textContent =
+                browser.i18n.getMessage("labelMaskCreated");
+              maskListItemNewMaskCreatedLabel.classList.add(
+                "fx-relay-mask-item-new-mask-created"
+              );
               maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
-              
+
               const maskListItemAddressBar = document.createElement("div");
-              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+              maskListItemAddressBar.classList.add(
+                "fx-relay-mask-item-address-bar"
+              );
 
               const maskListItemAddressWrapper = document.createElement("div");
-              maskListItemAddressWrapper.classList.add("fx-relay-mask-item-address-wrapper");
+              maskListItemAddressWrapper.classList.add(
+                "fx-relay-mask-item-address-wrapper"
+              );
 
               const maskListItemLabel = document.createElement("span");
               maskListItemLabel.classList.add("fx-relay-mask-item-label");
               maskListItemLabel.textContent = mask.description;
-              
+
               // Append Label if it exists
               if (mask.description !== "") {
                 maskListItemAddressWrapper.appendChild(maskListItemLabel);
               }
-              
+
               const maskListItemAddress = document.createElement("div");
               maskListItemAddress.classList.add("fx-relay-mask-item-address");
               maskListItemAddress.textContent = mask.full_address;
               maskListItemAddressWrapper.appendChild(maskListItemAddress);
 
-              // Add Mask Address Bar Contents 
+              // Add Mask Address Bar Contents
               maskListItemAddressBar.appendChild(maskListItemAddressWrapper);
 
               const maskListItemAddressActions = document.createElement("div");
-              maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
+              maskListItemAddressActions.classList.add(
+                "fx-relay-mask-item-address-actions"
+              );
 
               const maskListItemCopyButton = document.createElement("button");
-              maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
-              maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
+              maskListItemCopyButton.classList.add(
+                "fx-relay-mask-item-address-copy"
+              );
+              maskListItemCopyButton.setAttribute(
+                "data-mask-address",
+                mask.full_address
+              );
 
-              const maskListItemCopyButtonSuccessMessage = document.createElement("span");
-              maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
-              maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
-              maskListItemAddressActions.appendChild(maskListItemCopyButtonSuccessMessage);
-              
-              maskListItemCopyButton.addEventListener("click", (e)=> {
-                e.preventDefault();
-                navigator.clipboard.writeText(e.target.dataset.maskAddress);
-                maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
-                setTimeout(() => {
-                  maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
-                }, 1000);
-              }, false);
+              const maskListItemCopyButtonSuccessMessage =
+                document.createElement("span");
+              maskListItemCopyButtonSuccessMessage.textContent =
+                browser.i18n.getMessage("popupCopyMaskButtonCopied");
+              maskListItemCopyButtonSuccessMessage.classList.add(
+                "fx-relay-mask-item-address-copy-success"
+              );
+              maskListItemAddressActions.appendChild(
+                maskListItemCopyButtonSuccessMessage
+              );
+
+              maskListItemCopyButton.addEventListener(
+                "click",
+                (e) => {
+                  e.preventDefault();
+                  navigator.clipboard.writeText(e.target.dataset.maskAddress);
+                  maskListItemCopyButtonSuccessMessage.classList.add(
+                    "is-shown"
+                  );
+                  setTimeout(() => {
+                    maskListItemCopyButtonSuccessMessage.classList.remove(
+                      "is-shown"
+                    );
+                  }, 1000);
+                },
+                false
+              );
               maskListItemAddressActions.appendChild(maskListItemCopyButton);
 
               const maskListItemToggleButton = document.createElement("button");
-              maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
-              maskListItemToggleButton.addEventListener("click", ()=> {
-                // TODO: Add Toggle Function
-              }, false);
+              maskListItemToggleButton.classList.add(
+                "fx-relay-mask-item-address-toggle"
+              );
+              maskListItemToggleButton.addEventListener(
+                "click",
+                () => {
+                  // TODO: Add Toggle Function
+                },
+                false
+              );
               maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
-              maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
-              maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
+              maskListItemToggleButton.setAttribute(
+                "data-mask-type",
+                mask.mask_type
+              );
+              maskListItemToggleButton.setAttribute(
+                "data-mask-address",
+                mask.full_address
+              );
 
               // TODO: Add toggle button back
               // maskListItemAddressActions.appendChild(maskListItemToggleButton);
@@ -567,7 +748,9 @@
 
             // If user has no masks created, focus on random gen button
             if (masks.length === 0) {
-              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              const generateRandomMask = document.querySelector(
+                ".js-generate-random-mask"
+              );
               generateRandomMask.focus();
               return;
             }
@@ -576,66 +759,82 @@
             if (premium) {
               popup.panel.masks.search.init();
             }
-
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();
-            const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+            const { maxNumAliases } = await browser.storage.local.get(
+              "maxNumAliases"
+            );
             return { masks, maxNumAliases };
           },
           getRemainingMaskCount: async () => {
-            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const { masks, maxNumAliases } =
+              await popup.panel.masks.utilities.getRemainingAliases();
             const numRemaining = maxNumAliases - masks.length;
             return numRemaining;
           },
           setRemainingMaskCount: async () => {
-            const { masks, maxNumAliases } = await popup.panel.masks.utilities.getRemainingAliases();
+            const { masks, maxNumAliases } =
+              await popup.panel.masks.utilities.getRemainingAliases();
             const numRemaining = maxNumAliases - masks.length;
-            const masksAvailable = document.querySelector(".fx-relay-masks-available-count");
-            const masksLimitReached = document.querySelector(".fx-relay-masks-limit-upgrade-string");
-            const limitReachedToast = document.querySelector(".fx-relay-masks-limit-upgrade");
+            const masksAvailable = document.querySelector(
+              ".fx-relay-masks-available-count"
+            );
+            const masksLimitReached = document.querySelector(
+              ".fx-relay-masks-limit-upgrade-string"
+            );
+            const limitReachedToast = document.querySelector(
+              ".fx-relay-masks-limit-upgrade"
+            );
 
-            masksAvailable.textContent = browser.i18n.getMessage("popupFreeMasksAvailable", [numRemaining, maxNumAliases]);
-            masksLimitReached.textContent = browser.i18n.getMessage("popupFreeMasksLimitReached", [maxNumAliases]);
+            masksAvailable.textContent = browser.i18n.getMessage(
+              "popupFreeMasksAvailable",
+              [numRemaining, maxNumAliases]
+            );
+            masksLimitReached.textContent = browser.i18n.getMessage(
+              "popupFreeMasksLimitReached",
+              [maxNumAliases]
+            );
 
-            const generateRandomMask = document.querySelector(".js-generate-random-mask");
-            
+            const generateRandomMask = document.querySelector(
+              ".js-generate-random-mask"
+            );
+
             if (masks.length === 0) {
               generateRandomMask.classList.remove("is-hidden");
               return;
             }
-            
+
             if (numRemaining <= 0) {
               // No masks remaining
               limitReachedToast.classList.remove("is-hidden");
               masksAvailable.classList.add("is-hidden");
-              
+
               // Hide Generate Button
               generateRandomMask.classList.add("is-hidden");
 
               // Show Upgrade Button
-              const getUnlimitedMasksBtn = document.querySelector(".fx-relay-mask-upgrade-button");
+              const getUnlimitedMasksBtn = document.querySelector(
+                ".fx-relay-mask-upgrade-button"
+              );
               getUnlimitedMasksBtn.classList.remove("is-hidden");
               getUnlimitedMasksBtn.focus();
-
             } else {
               // Show Masks Count/Generate Button
               masksAvailable.classList.remove("is-hidden");
               generateRandomMask.classList.remove("is-hidden");
               generateRandomMask.focus();
             }
-          }
+          },
         },
       },
       news: {
         init: async () => {
-
           const newsList = document.querySelector(".fx-relay-news");
 
           // If there's any news items, go build them
-          if ( !newsList.hasChildNodes()) {
+          if (!newsList.hasChildNodes()) {
             sessionState.newsContent.forEach(async (newsItem) => {
-              
               // Build and attach news item
               const liFxRelayNewsItem = document.createElement("li");
               liFxRelayNewsItem.classList.add("fx-relay-news-item");
@@ -704,28 +903,35 @@
               return;
             }
 
-            const newsItemsContent = sessionState.newsContent.filter((story) => { return story.id == newsItemId });
+            const newsItemsContent = sessionState.newsContent.filter(
+              (story) => {
+                return story.id == newsItemId;
+              }
+            );
             const newsItemContent = newsItemsContent[0];
-            const newsItemDetail = document.querySelector(".fx-relay-news-story");
-            
+            const newsItemDetail = document.querySelector(
+              ".fx-relay-news-story"
+            );
+
             // Reset news detail item
             newsItemDetail.textContent = "";
 
-             // Populate HTML
+            // Populate HTML
             const newsItemHeroImage = document.createElement("img");
             newsItemHeroImage.src = newsItemContent.fullImg;
             newsItemDetail.appendChild(newsItemHeroImage);
-            
+
             const newsItemHeroTitle = document.createElement("h3");
-            const newsItemHeroTitleTextContent = newsItemContent.headlineStringArgs
-              ? browser.i18n.getMessage(
-                  newsItemContent.headlineString,
-                  newsItemContent.headlineStringArgs
-                )
-              : browser.i18n.getMessage(newsItemContent.headlineString);
+            const newsItemHeroTitleTextContent =
+              newsItemContent.headlineStringArgs
+                ? browser.i18n.getMessage(
+                    newsItemContent.headlineString,
+                    newsItemContent.headlineStringArgs
+                  )
+                : browser.i18n.getMessage(newsItemContent.headlineString);
             newsItemHeroTitle.textContent = newsItemHeroTitleTextContent;
             newsItemDetail.appendChild(newsItemHeroTitle);
-            
+
             const newsItemHeroBody = document.createElement("div");
             // Pass i18n Args if applicable
             const newsItemHeroBodyTextContent = newsItemContent.bodyStringArgs
@@ -748,22 +954,36 @@
               } else {
                 newsItemHeroCTA.href = `${newsItemContent.fullCtaHref}`;
               }
-              
+
               // Set GA data if applicable
-              if (newsItemContent.fullCtaEventLabel && newsItemContent.fullCtaEventAction) {
-                newsItemHeroCTA.setAttribute("data-event-action", newsItemContent.fullCtaEventAction);
-                newsItemHeroCTA.setAttribute("data-event-label", newsItemContent.fullCtaEventLabel);
+              if (
+                newsItemContent.fullCtaEventLabel &&
+                newsItemContent.fullCtaEventAction
+              ) {
+                newsItemHeroCTA.setAttribute(
+                  "data-event-action",
+                  newsItemContent.fullCtaEventAction
+                );
+                newsItemHeroCTA.setAttribute(
+                  "data-event-label",
+                  newsItemContent.fullCtaEventLabel
+                );
               }
 
-              newsItemHeroCTA.textContent = browser.i18n.getMessage(newsItemContent.fullCta);
-              newsItemHeroCTA.addEventListener("click", popup.events.externalClick, false);
+              newsItemHeroCTA.textContent = browser.i18n.getMessage(
+                newsItemContent.fullCta
+              );
+              newsItemHeroCTA.addEventListener(
+                "click",
+                popup.events.externalClick,
+                false
+              );
               newsItemDetail.appendChild(newsItemHeroCTA);
             }
           },
         },
         utilities: {
           initNewsItemCountNotification: async () => {
-            
             const localStorage = await browser.storage.local.get();
 
             const unreadNewsItemsCountExists =
@@ -771,7 +991,7 @@
                 localStorage,
                 "unreadNewsItemsCount"
               );
-              
+
             const readNewsItemsCountExists =
               Object.prototype.hasOwnProperty.call(
                 localStorage,
@@ -787,7 +1007,7 @@
             }
 
             // FIXME: The total news item count may differ than what is displayed to the user
-            // Example: Three items total but user doesn't have waffle for one news item. 
+            // Example: Three items total but user doesn't have waffle for one news item.
             // Regardless - update the unreadNews count to match whatever is in state
             await browser.storage.local.set({
               unreadNewsItemsCount: sessionState.newsItemsCount,
@@ -805,7 +1025,7 @@
             const newsItemCountNotification = document.querySelector(
               ".fx-relay-menu-dashboard-link[data-panel-id='news'] .news-count"
             );
-            
+
             const unreadCount = unreadNewsItemsCount - readNewsItemCount;
 
             // Show count is it exists
@@ -813,7 +1033,6 @@
               newsItemCountNotification.textContent = unreadCount.toString();
               newsItemCountNotification.classList.remove("is-hidden");
             }
-            
           },
           updateNewsItemCountNotification: async (markAllUnread = false) => {
             if (markAllUnread) {
@@ -826,9 +1045,8 @@
               );
 
               newsItemCountNotification.classList.add("is-hidden");
-
             }
-          }
+          },
         },
       },
       settings: {
@@ -838,18 +1056,24 @@
           // Function is imported from data-opt-out-toggle.js
           enableDataOptOut();
 
-          const reportWebcompatIssueLink = document.getElementById("popupSettingsReportIssue");
-            
+          const reportWebcompatIssueLink = document.getElementById(
+            "popupSettingsReportIssue"
+          );
+
           if (sessionState.loggedIn) {
             reportWebcompatIssueLink.classList.remove("is-hidden");
-            reportWebcompatIssueLink.addEventListener("click", (e) => {
+            reportWebcompatIssueLink.addEventListener(
+              "click",
+              (e) => {
                 e.preventDefault();
                 popup.panel.update("webcompat");
-              }, false);
+              },
+              false
+            );
           } else {
             reportWebcompatIssueLink.classList.add("is-hidden");
           }
-        }
+        },
       },
       stats: {
         init: async () => {
@@ -871,35 +1095,44 @@
 
           const masks = await popup.utilities.getMasks(getMasksOptions);
 
-           // Get Global Mask Stats data
+          // Get Global Mask Stats data
           const totalAliasesUsedVal = masks.length;
           let totalEmailsForwardedVal = 0;
           let totalEmailsBlockedVal = 0;
-          
+
           // Loop through all masks to calculate totals
           masks.forEach((mask) => {
             totalEmailsForwardedVal += mask.num_forwarded;
             totalEmailsBlockedVal += mask.num_blocked;
           });
 
-          // Set global stats data 
-          const globalStatSet = document.querySelector(".dashboard-stats-list.global-stats");
-          const globalAliasesUsedValEl = globalStatSet.querySelector(".aliases-used");
-          const globalEmailsBlockedValEl = globalStatSet.querySelector(".emails-blocked");
-          const globalEmailsForwardedValEl = globalStatSet.querySelector(".emails-forwarded");
+          // Set global stats data
+          const globalStatSet = document.querySelector(
+            ".dashboard-stats-list.global-stats"
+          );
+          const globalAliasesUsedValEl =
+            globalStatSet.querySelector(".aliases-used");
+          const globalEmailsBlockedValEl =
+            globalStatSet.querySelector(".emails-blocked");
+          const globalEmailsForwardedValEl =
+            globalStatSet.querySelector(".emails-forwarded");
 
           globalAliasesUsedValEl.textContent = totalAliasesUsedVal;
           globalEmailsForwardedValEl.textContent = totalEmailsForwardedVal;
           globalEmailsBlockedValEl.textContent = totalEmailsBlockedVal;
-         
+
           // Get current page
           const currentPageHostName = await browser.runtime.sendMessage({
             method: "getCurrentPageHostname",
           });
 
           // Check if any data applies to the current site
-          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks,currentPageHostName) ) {
-            
+          if (
+            popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(
+              masks,
+              currentPageHostName
+            )
+          ) {
             // Some masks are used on the current site. Time to calculate!
             const filteredMasks = masks.filter(
               (mask) =>
@@ -920,28 +1153,279 @@
             });
 
             // Set current website usage data
-            const currentWebsiteStateSet = document.querySelector(".dashboard-stats-list.current-website-stats");
+            const currentWebsiteStateSet = document.querySelector(
+              ".dashboard-stats-list.current-website-stats"
+            );
 
-            const currentWebsiteAliasesUsedValEl = currentWebsiteStateSet.querySelector(".aliases-used");
+            const currentWebsiteAliasesUsedValEl =
+              currentWebsiteStateSet.querySelector(".aliases-used");
             currentWebsiteAliasesUsedValEl.textContent = filteredMasks.length;
 
-            const currentWebsiteEmailsForwardedValEl = currentWebsiteStateSet.querySelector(".emails-forwarded");
-            currentWebsiteEmailsForwardedValEl.textContent = currentWebsiteForwardedVal;
+            const currentWebsiteEmailsForwardedValEl =
+              currentWebsiteStateSet.querySelector(".emails-forwarded");
+            currentWebsiteEmailsForwardedValEl.textContent =
+              currentWebsiteForwardedVal;
 
-            const currentWebsiteEmailsBlockedValEl = currentWebsiteStateSet.querySelector(".emails-blocked");
-            currentWebsiteEmailsBlockedValEl.textContent = currentWebsiteBlockedVal;
+            const currentWebsiteEmailsBlockedValEl =
+              currentWebsiteStateSet.querySelector(".emails-blocked");
+            currentWebsiteEmailsBlockedValEl.textContent =
+              currentWebsiteBlockedVal;
 
             // If there's usage data for current website stats, show it
-            const currentWebsiteEmailsBlocked = currentWebsiteStateSet.querySelector(".dashboard-info-emails-blocked");
-            const currentWebsiteEmailsForwarded = currentWebsiteStateSet.querySelector(".dashboard-info-emails-forwarded");
+            const currentWebsiteEmailsBlocked =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-blocked"
+              );
+            const currentWebsiteEmailsForwarded =
+              currentWebsiteStateSet.querySelector(
+                ".dashboard-info-emails-forwarded"
+              );
             currentWebsiteEmailsBlocked.classList.remove("is-hidden");
             currentWebsiteEmailsForwarded.classList.remove("is-hidden");
-            
           }
         },
       },
+      survey: {
+        init: async () => {
+          const survey = popup.panel.survey;
+          const surveyButtons = survey.select.surveyButtons();
+          const { premium } = await browser.storage.local.get("premium");
+          const tier = premium ? "premium" : "free";
+
+          // loop through all satisfaction buttons
+          surveyButtons.forEach(async (button) => {
+            // check if button is disabled
+            if (button.hasAttribute("disabled")) {
+              // do nothing and exit early
+              return;
+            }
+
+            // button is not disabled, add event listener
+            button.addEventListener("click", async (e) => {
+              e.preventDefault();
+
+              const satisfactionLevel = e.target.dataset.satisfaction;
+
+              // user has chosen a satisfaction level
+              // mark button as selected
+              e.target.classList.add("is-selected");
+
+              // disable all buttons
+              survey.utils.disableSurveyButtons();
+
+              // show success message
+              survey.utils.showSurveySuccessMessage();
+
+              // set correct survey link based on tier and satisfaction level
+              survey.utils.setExternalSurveyLink(tier, satisfactionLevel);
+
+              // show external survey link
+              survey.utils.showSurveyExternalLink();
+            });
+          });
+        },
+        links: {
+          // 0-4: Satisfaction levels
+          // very dissatisfied, dissatisfied, neutral, satisfied, very satisfied
+          free: {
+            0: "https://survey.alchemer.com/s3/6665054/7a7bd09a1f5c", // Very Dissatisfied
+            1: "https://survey.alchemer.com/s3/6665054/81559277cf08", // Dissatisfied
+            2: "https://survey.alchemer.com/s3/6665054/bfd35b01db10", // Neutral
+            3: "https://survey.alchemer.com/s3/6665054/ba5457f41c63", // Satisfied
+            4: "https://survey.alchemer.com/s3/6665054/8a601f0da387", // Very Satisfied
+          },
+          premium: {
+            0: "https://survey.alchemer.com/s3/6665054/7d42fcea7798", // Very Dissatisfied
+            1: "https://survey.alchemer.com/s3/6665054/36db655e146f", // Dissatisfied
+            2: "https://survey.alchemer.com/s3/6665054/865f28c68bd4", // Neutral
+            3: "https://survey.alchemer.com/s3/6665054/4f963f89e498", // Satisfied
+            4: "https://survey.alchemer.com/s3/6665054/2c8b192bd4c7", // Very Satisfied
+          },
+        },
+        utils: {
+          getExternalSurveyLink: (tier, satisfactionLevel) => {
+            return popup.panel.survey.links[tier][satisfactionLevel];
+          },
+          setExternalSurveyLink: (tier, satisfactionLevel) => {
+            const link = popup.panel.survey.utils.getExternalSurveyLink(
+              tier,
+              satisfactionLevel
+            );
+            console.log(tier, satisfactionLevel, link);
+
+            popup.panel.survey.select
+              .externalSurveyLink()
+              .setAttribute("href", link);
+          },
+          showSurveyLink: () => {
+            popup.panel.survey.select
+              .surveyLinkContainer()
+              .classList.remove("is-hidden");
+          },
+          showSurveySuccessMessage: () => {
+            popup.panel.survey.select
+              .successMessage()
+              .classList.remove("is-hidden");
+          },
+          showSurveyExternalLink: () => {
+            popup.panel.survey.select
+              .externalSurveyLink()
+              .classList.remove("is-hidden");
+          },
+          closeSurveyLink: () => {
+            popup.panel.survey.select
+              .surveyLinkContainer()
+              .classList.add("is-hidden");
+          },
+          disableSurveyButtons: () => {
+            popup.panel.survey.select
+              .surveyButtons()
+              .forEach(
+                (button) =>
+                  button.setAttribute("disabled", true) &&
+                  button.setAttribute("aria-disabled", true)
+              );
+          },
+          userFirstSeen: async () => {
+            const isLoggedIn = sessionState.loggedIn;
+            const id = await browser.storage.local.get("profileID");
+
+            if (!isLoggedIn || !id) {
+              return null;
+            }
+
+            const firstSeenString = popup.utilities.setStorageItem(
+              "first_seen_" + id
+            );
+
+            if (typeof firstSeenString === "string") {
+              return new Date(Number.parseInt(firstSeenString, 10));
+            }
+
+            const currentTimestamp = Date.now();
+
+            popup.utilities.setStorageItem(
+              "first_seen_" + id,
+              currentTimestamp.toString(),
+              10 * 365 * 24 * 60 * 60
+            );
+
+            return new Date(currentTimestamp);
+          },
+          getReasonToShowSurvey: async () => {
+            let reasonToShow = null;
+            const firstSeen = popup.panel.survey.utils.userFirstSeen();
+            const has_premium = await browser.storage.local.get("premium");
+            const { profileID } = await browser.storage.local.get("profileID");
+            const dismiss = popup.panel.survey.dismiss;
+            const free7DaysDismissal = dismiss.free7DaysDismissal(profileID);
+            const free30DaysDismissal = dismiss.free30DaysDismissal(profileID);
+            const free90DaysDismissal = dismiss.free90DaysDismissal(profileID);
+            const premium7DaysDismissal =
+              dismiss.premium7DaysDismissal(profileID);
+            const premium30DaysDismissal =
+              dismiss.premium30DaysDismissal(profileID);
+            const premium90DaysDismissal =
+              dismiss.premium90DaysDismissal(profileID);
+
+            // TODO: get date_subscribed from profile data?
+            const date_subscribed = await browser.storage.local.get(
+              "date_subscribed"
+            );
+
+            if (has_premium && (date_subscribed || firstSeen instanceof Date)) {
+              const subscriptionDate = date_subscribed
+                ? new Date(date_subscribed)
+                : firstSeen;
+              const daysSinceSubscription =
+                (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
+
+              if (daysSinceSubscription >= 90) {
+                if (!premium90DaysDismissal.isDismissed) {
+                  reasonToShow = "premium90days";
+                }
+              } else if (daysSinceSubscription >= 30) {
+                if (!premium30DaysDismissal.isDismissed) {
+                  reasonToShow = "premium30days";
+                }
+              } else if (daysSinceSubscription >= 7) {
+                if (!premium7DaysDismissal.isDismissed) {
+                  reasonToShow = "premium7days";
+                }
+              }
+            } else if (!has_premium && firstSeen instanceof Date) {
+              const daysSinceFirstSeen =
+                (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
+              if (daysSinceFirstSeen >= 90) {
+                if (!free90DaysDismissal.isDismissed) {
+                  reasonToShow = "free90days";
+                }
+              } else if (daysSinceFirstSeen >= 30) {
+                if (!free30DaysDismissal.isDismissed) {
+                  reasonToShow = "free30days";
+                }
+              } else if (daysSinceFirstSeen >= 7) {
+                if (!free7DaysDismissal.isDismissed) {
+                  reasonToShow = "free7days";
+                }
+              }
+            }
+
+            return reasonToShow;
+          },
+          shouldShowSurvey: async () => {
+            const reasonToShow =
+              await popup.panel.survey.utils.getReasonToShowSurvey();
+            const locale = navigator.language;
+
+            console.log(reasonToShow, locale);
+            return (
+              reasonToShow !== null &&
+              ["en", "fr", "de"].includes(locale.split("-")[0])
+            );
+          },
+        },
+        dismiss: {
+          // dismissals are keyed by the profile ID
+          free7DaysDismissal: (id) =>
+            popup.utilities.localDismiss("csat-survey-free-7days_" + id),
+          free30DaysDismissal: (id) =>
+            popup.utilities.localDismiss("csat-survey-free-30days_" + id),
+          free90DaysDismissal: (id) =>
+            popup.utilities.localDismiss(
+              "csat-survey-free-90days_" + id,
+              // After the third month, show every three months:
+              { duration: 90 * 24 * 60 * 60 }
+            ),
+          premium7DaysDismissal: (id) =>
+            popup.utilities.localDismiss("csat-survey-premium-7days_" + id),
+          premium30DaysDismissal: (id) =>
+            popup.utilities.localDismiss("csat-survey-premium-30days_" + id),
+          premium90DaysDismissal: (id) =>
+            popup.utilities.localDismiss(
+              "csat-survey-premium-90days_" + id,
+              // After the third month, show every three months:
+              { duration: 90 * 24 * 60 * 60 }
+            ),
+        },
+        select: {
+          // storing as functions to avoid caching
+          surveyLinkContainer: () =>
+            document.querySelector(".fx-relay-csat-survey-link-container"),
+          closeSurveyLinkButton: () =>
+            document.querySelector(".fx-relay-csat-survey-close-icon"),
+          surveyLink: () =>
+            document.querySelector(".fx-relay-csat-survey-link"),
+          surveyButtons: () =>
+            document.querySelectorAll(".fx-relay-csat-button"),
+          successMessage: () =>
+            document.querySelector(".fx-relay-survey-success"),
+          externalSurveyLink: () =>
+            document.querySelector(".fx-relay-external-survey-link"),
+        },
+      },
       webcompat: {
-        handleReportIssueFormSubmission: async (event, formData) => {          
+        handleReportIssueFormSubmission: async (event, formData) => {
           event.preventDefault();
 
           formData = popup.panel.webcompat.getFormData();
@@ -952,7 +1436,7 @@
           }
 
           formData.reportIssueSubmitBtn.classList.toggle("is-loading");
-          
+
           const data = new FormData(event.target);
           const reportData = Object.fromEntries(data.entries());
           reportData.user_agent = await getBrowser();
@@ -979,11 +1463,12 @@
           }
 
           // Send data and get a status code back
-          const postReportWebcompatIssueRespStatus = await browser.runtime.sendMessage({
-            method: "postReportWebcompatIssue",
-            description: reportData,
-          });
-          
+          const postReportWebcompatIssueRespStatus =
+            await browser.runtime.sendMessage({
+              method: "postReportWebcompatIssue",
+              description: reportData,
+            });
+
           // If submission is successful
           if (postReportWebcompatIssueRespStatus == 201) {
             popup.panel.webcompat.showSuccessReportSubmission(formData);
@@ -996,42 +1481,60 @@
         },
         init: () => {
           const formData = popup.panel.webcompat.getFormData();
-          
+
           // Set the form as invalid
           formData.form.dataset.formIsValid = false;
-          
+
           popup.panel.webcompat.setURLwithIssue(formData);
           popup.panel.webcompat.setCheckboxListeners(formData);
           popup.panel.webcompat.showReportInputOtherTextField(formData);
-          
-          formData.form.addEventListener("submit", popup.panel.webcompat.handleReportIssueFormSubmission);
+
+          formData.form.addEventListener(
+            "submit",
+            popup.panel.webcompat.handleReportIssueFormSubmission
+          );
 
           // When clicking the "Continue" button after successfully submitting the webcompat form,
           // Reset the form and show the settings page again
-          formData.reportIssueSuccessDismissBtn.addEventListener("click", popup.events.backClick, false);
+          formData.reportIssueSuccessDismissBtn.addEventListener(
+            "click",
+            popup.events.backClick,
+            false
+          );
         },
         getFormData: () => {
           const formData = {
             form: document.querySelector(".report-issue-content"),
-            reportIssueSubmitBtn: document.querySelector(".report-issue-submit-btn"),
-            reportIssueSuccessDismissBtn: document.querySelector(".report-continue"),
-            inputFieldUrl: document.querySelector('input[name="issue_on_domain"]'),
-            inputFieldOtherDetails: document.querySelector('input[name="other_issue"]'),
-            checkboxes: document.querySelectorAll('.report-section ul li input'),
-            reportSuccess: document.querySelector('.report-success'),
+            reportIssueSubmitBtn: document.querySelector(
+              ".report-issue-submit-btn"
+            ),
+            reportIssueSuccessDismissBtn:
+              document.querySelector(".report-continue"),
+            inputFieldUrl: document.querySelector(
+              'input[name="issue_on_domain"]'
+            ),
+            inputFieldOtherDetails: document.querySelector(
+              'input[name="other_issue"]'
+            ),
+            checkboxes: document.querySelectorAll(
+              ".report-section ul li input"
+            ),
+            reportSuccess: document.querySelector(".report-success"),
             otherTextField: document.querySelector('input[name="other_issue"]'),
-            otherCheckbox: document.querySelector('input[name="issue-case-other"]'),
-          }
+            otherCheckbox: document.querySelector(
+              'input[name="issue-case-other"]'
+            ),
+          };
 
           return formData;
-        },        
+        },
         setCheckboxListeners: (formData) => {
           const checkboxes = formData.checkboxes;
-          
-          checkboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", ()=> {              
+
+          checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", () => {
               popup.panel.webcompat.validateForm(formData);
-            })
+            });
           });
         },
         setURLwithIssue: async (formData) => {
@@ -1079,41 +1582,54 @@
         },
         showSuccessReportSubmission: (formData) => {
           const reportSuccess = formData.reportSuccess;
-          const reportContent = formData.form
+          const reportContent = formData.form;
           reportSuccess.classList.remove("is-hidden");
-          reportContent.classList.add("is-hidden");          
+          reportContent.classList.add("is-hidden");
         },
         validateForm: (formData) => {
-          // Check if inputFieldUrl is valid and the custom input looks like a URL 
-          // without https:// or http:// (e.g. test.com, www.test.com) 
-          const inputFieldUrlIsValid = formData.inputFieldUrl.checkValidity() && popup.utilities.isSortaAURL(formData.inputFieldUrl.value);
+          // Check if inputFieldUrl is valid and the custom input looks like a URL
+          // without https:// or http:// (e.g. test.com, www.test.com)
+          const inputFieldUrlIsValid =
+            formData.inputFieldUrl.checkValidity() &&
+            popup.utilities.isSortaAURL(formData.inputFieldUrl.value);
 
           // Validate that at least one checkbox is checked
-          const checkboxes = formData.checkboxes
-          const isACheckBoxChecked = [...checkboxes].some(e => e.checked == true);
+          const checkboxes = formData.checkboxes;
+          const isACheckBoxChecked = [...checkboxes].some(
+            (e) => e.checked == true
+          );
 
           // If the "other" checkbox is checked, confirm the "other" input is valid
-          const checkedCheckboxes = [...checkboxes].filter(e => e.checked == true);          
-          const isCheckedCheckboxOther = checkedCheckboxes.some(e => e.id == "issue-case-other");
-          const inputFieldOtherDetailsIsValid = formData.inputFieldOtherDetails.checkValidity();
+          const checkedCheckboxes = [...checkboxes].filter(
+            (e) => e.checked == true
+          );
+          const isCheckedCheckboxOther = checkedCheckboxes.some(
+            (e) => e.id == "issue-case-other"
+          );
+          const inputFieldOtherDetailsIsValid =
+            formData.inputFieldOtherDetails.checkValidity();
 
-          // This tests for two possible valid form states: 
+          // This tests for two possible valid form states:
           // A: User has URL field filled out correctly AND at least one reason checkbox checked (Not OTHER checkbox)
           // B: User has URL field filled out correctly AND has checked the OTHER checbox AND filled out the other input form correctly
           if (
-              (inputFieldUrlIsValid && isACheckBoxChecked && !isCheckedCheckboxOther) || 
-              (inputFieldUrlIsValid && isACheckBoxChecked && isCheckedCheckboxOther && inputFieldOtherDetailsIsValid) 
+            (inputFieldUrlIsValid &&
+              isACheckBoxChecked &&
+              !isCheckedCheckboxOther) ||
+            (inputFieldUrlIsValid &&
+              isACheckBoxChecked &&
+              isCheckedCheckboxOther &&
+              inputFieldOtherDetailsIsValid)
           ) {
             formData.reportIssueSubmitBtn.disabled = false;
             formData.form.dataset.formIsValid = true;
             return;
           }
-          
+
           // Default / Set Disabled
           formData.reportIssueSubmitBtn.disabled = true;
           formData.form.dataset.formIsValid = false;
         },
-
       },
     },
     utilities: {
@@ -1197,14 +1713,14 @@
           "apiToken"
         );
 
-        // MPP-2857: During upgrade, the profile ID may be dropped, so if that is not 
+        // MPP-2857: During upgrade, the profile ID may be dropped, so if that is not
         // available to the add-on, prompt the user to reauthenticate
         const { profileID } = await browser.storage.local.get("profileID");
 
         if (!profileID) {
           return false;
         }
-        
+
         return signedInUser;
       },
       getCachedServerStoragePref: async () => {
@@ -1257,17 +1773,24 @@
         }
 
         // User is not syncing with the server. Use local storage.
-        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+        const { relayAddresses } = await browser.storage.local.get(
+          "relayAddresses"
+        );
         return relayAddresses;
       },
-      populateNewsFeed: async ()=> {
+      populateNewsFeed: async () => {
         // audience can be premium, free, phones, all
         // Optional data: waffle, fullCta*
         const savings = "40%"; // For "Save 40%!" in the Bundle promo body
-        
-        const isBundleAvailableInCountry = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS.available_in_country;
-        const isPhoneAvailableInCountry = (await browser.storage.local.get("phonePlans")).phonePlans.PHONE_PLANS.available_in_country;
-        const hasPhone = (await browser.storage.local.get("has_phone")).has_phone;
+
+        const isBundleAvailableInCountry = (
+          await browser.storage.local.get("bundlePlans")
+        ).bundlePlans.BUNDLE_PLANS.available_in_country;
+        const isPhoneAvailableInCountry = (
+          await browser.storage.local.get("phonePlans")
+        ).phonePlans.PHONE_PLANS.available_in_country;
+        const hasPhone = (await browser.storage.local.get("has_phone"))
+          .has_phone;
         const hasVpn = (await browser.storage.local.get("has_vpn")).has_vpn;
 
         // Conditions for phone masking announcement to be shown: if the user is in US/CAN, phone flag is on, and user has not purchased phone plan yet
@@ -1275,10 +1798,12 @@
 
         // Conditions for bundle announcement to be shown: if the user is in US/CAN, bundle flag is on, and user has not purchased bundle plan yet
         const isBundleAvailable = isBundleAvailableInCountry && !hasVpn;
-      
+
         // Conditions for firefox integration to be shown: if the waffle flag "firefox_integration" is set as true
-        const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
-        
+        const isFirefoxIntegrationAvailable = await checkWaffleFlag(
+          "firefox_integration"
+        );
+
         const currentBrowser = await getBrowser();
 
         if (isFirefoxIntegrationAvailable && currentBrowser == "Firefox") {
@@ -1319,15 +1844,23 @@
 
         // Add Bundle Pricing News Item
         if (isBundleAvailable) {
-          const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+          const getBundlePlans = (
+            await browser.storage.local.get("bundlePlans")
+          ).bundlePlans.BUNDLE_PLANS;
+          const getBundlePrice =
+            getBundlePlans.plan_country_lang_mapping[
+              getBundlePlans.country_code
+            ].en.yearly.price;
+          const getBundleCurrency =
+            getBundlePlans.plan_country_lang_mapping[
+              getBundlePlans.country_code
+            ].en.yearly.currency;
           const userLocale = navigator.language;
           const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
             style: "currency",
             currency: getBundleCurrency,
           }).format(getBundlePrice);
-          
+
           sessionState.newsContent.push({
             id: "mozilla-vpn-bundle",
             dateAdded: "20221025", // YYYYMMDD
@@ -1345,17 +1878,23 @@
               "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-bundle-cta#pricing",
             fullCtaEventLabel: "panel-news-bundle-cta",
             fullCtaEventAction: "click",
-          },)
+          });
         }
 
         // Remove news nav link if there's no news items to display to user
-        if (sessionState.newsContent.length === 0 ) {
-          document.querySelector(".fx-relay-menu-dashboard-link[data-panel-id='news']").remove();
+        if (sessionState.newsContent.length === 0) {
+          document
+            .querySelector(
+              ".fx-relay-menu-dashboard-link[data-panel-id='news']"
+            )
+            .remove();
           return;
         }
-        
+
         // Sort news items by dateAdded field (Newest at the top)
-        sessionState.newsContent.sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : -1));
+        sessionState.newsContent.sort((a, b) =>
+          a.dateAdded < b.dateAdded ? 1 : -1
+        );
 
         // Update news item count
         sessionState.newsItemsCount = sessionState.newsContent.length;
@@ -1367,7 +1906,7 @@
         const externalLinks = document.querySelectorAll(".js-external-link");
         const currentBrowser = await getBrowser();
 
-        externalLinks.forEach((link) => {          
+        externalLinks.forEach((link) => {
           // Because we dynamically set the Relay origin URL (local/dev/stage/prod),
           // we have to catch Relay-specific links and prepend the correct Relay website URL
           if (link.dataset.relayInternal === "true") {
@@ -1389,6 +1928,84 @@
           .forEach((link) => {
             link.classList.remove("is-hidden");
           });
+      },
+      getStorageItem: async (key) => {
+        const result = await browser.storage.local.get(key);
+        const item = result[key];
+        if (
+          item &&
+          item.expirationTime &&
+          item.expirationTime < new Date().getTime()
+        ) {
+          await browser.storage.local.remove(key);
+          return undefined;
+        }
+        return item?.value;
+      },
+      setStorageItem: async (key, value, expirationTimeInMinutes) => {
+        const expirationTimeInMillis = expirationTimeInMinutes * 60 * 1000;
+        const item = {
+          value: value,
+          expirationTime: new Date().getTime() + expirationTimeInMillis,
+        };
+        await browser.storage.local.set({ [key]: item });
+      },
+      removeStorageItem: async (key) => {
+        const result = await browser.storage.local.get(key);
+        if (Object.keys(result).length > 0) {
+          await browser.storage.local.remove(key);
+        } else {
+          console.log(
+            `Item with key "${key}" does not exist in browser.storage.local.`
+          );
+        }
+      },
+      localDismiss: (key, options = {}) => {
+        const cookieId = key + "_dismissed";
+
+        let isDismissed = popup.utilities.hasDismissedStorageItem(
+          cookieId,
+          options.duration
+        );
+
+        const dismiss = (dismissOptions = {}) => {
+          const maxAgeInSeconds =
+            typeof options.duration === "number"
+              ? options.duration
+              : 100 * 365 * 24 * 60 * 60;
+
+          const now = new Date().getTime();
+          popup.utilities.setStorageItem(
+            cookieId,
+            now.toString(),
+            maxAgeInSeconds
+          );
+
+          if (dismissOptions?.soft !== true) {
+            isDismissed = true;
+          }
+        };
+
+        return {
+          isDismissed: isDismissed,
+          dismiss: dismiss,
+        };
+      },
+      hasDismissedStorageItem: (key, duration) => {
+        const dismissalStorageItemValue = popup.utilities.getStorageItem(key);
+        const dismissalTimeStamp = dismissalStorageItemValue
+          ? Number.parseInt(dismissalStorageItemValue, 10)
+          : undefined;
+
+        const wasDismissedBefore =
+          // To be dismissed, the cookie has to be set, and either...
+          typeof dismissalTimeStamp === "number" &&
+          //   ...the dismissal should not be limited in duration, or...
+          (typeof duration !== "number" ||
+            //   ...the dismissal was long enough ago:
+            Date.now() - dismissalTimeStamp <= duration * 1000);
+
+        return wasDismissedBefore;
       },
     },
   };
