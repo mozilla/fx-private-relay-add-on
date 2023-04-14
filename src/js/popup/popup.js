@@ -45,7 +45,7 @@
       },
       externalClick: async (e) => {
         e.preventDefault();
-        // TODO
+        
         if (e.target.dataset.eventLabel && e.target.dataset.eventAction) {
           sendRelayEvent(
             "Panel",
@@ -355,7 +355,7 @@
           const maskPanel = document.getElementById("masks-panel");
           let getMasksOptions = { fetchCustomMasks: false };
 
-          // TODO: Add logic to determine when to show CSAT (ref. react app)
+          // logic to show survey is found in shouldShowSurvey function
           const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
 
           // reason to show and locale check?
@@ -1327,11 +1327,12 @@
               dismiss.premium30DaysDismissal(profileID);
             const premium90DaysDismissal =
               dismiss.premium90DaysDismissal(profileID);
-
-            // TODO: get date_subscribed from profile data?
-            const date_subscribed = await browser.storage.local.get(
+            // TODO: if this data doesn't exist we will have to query it 
+            const { date_subscribed } = await browser.storage.local.get(
               "date_subscribed"
             );
+
+            console.log(date_subscribed);
 
             if (has_premium && (date_subscribed || firstSeen instanceof Date)) {
               const subscriptionDate = date_subscribed

@@ -103,7 +103,8 @@
       profileID: parseInt(serverProfileData[0].id, 10),
       server_storage: serverProfileData[0].server_storage,
       has_phone: serverProfileData[0].has_phone,
-      has_vpn: serverProfileData[0].has_vpn
+      has_vpn: serverProfileData[0].has_vpn,
+      date_subscribed: serverProfileData[0].date_subscribed
     });
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
