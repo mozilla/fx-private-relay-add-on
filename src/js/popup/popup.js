@@ -127,7 +127,7 @@
           
           errorMessage.addEventListener("click",popup.events.dismissErrorClick, false);
 
-          await popup.panel.masks.utilities.buildMasksList({newMaskCreated: false});
+          await popup.panel.masks.utilities.buildMasksList(null, {newMaskCreated: false});
           
           return;
         }
@@ -138,10 +138,11 @@
         const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
         noMasksCreatedPanel.classList.add("is-hidden");
 
-        await popup.panel.masks.utilities.buildMasksList({newMaskCreated: true});
+        await popup.panel.masks.utilities.buildMasksList(null, {newMaskCreated: true});
 
         
         if (!premium) {
+          console.log("maskcall");
           await popup.panel.masks.utilities.setRemainingMaskCount();
         }
 
@@ -294,7 +295,9 @@
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
           const maskPanel = document.getElementById("masks-panel");
-          let getMasksOptions = { fetchCustomMasks: false };
+          const { relayAddresses } = await browser.storage.local.get("relayAddresses");
+
+          let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false, source: "masks.init" };
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -343,17 +346,18 @@
             }, false);
           
           // Get masks and determine what to display
-          const masks = await popup.utilities.getMasks(getMasksOptions);
+          // FIXME: Figure out correct Order of Ops to fetch masks only once
+          // const masks = await popup.utilities.getMasks(getMasksOptions);
 
           // If no masks are created, show onboarding prompt
-          if (masks.length === 0) {
+          if (relayAddresses.length === 0) {
             const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
             noMasksCreatedPanel.classList.remove("is-hidden");
           }
 
-          // Build initial list
+          // Build initial list based on local storage
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
-          popup.panel.masks.utilities.buildMasksList();
+          popup.panel.masks.utilities.buildMasksList(relayAddresses);
         
 
           // Remove loading state
@@ -447,8 +451,8 @@
           }
         },
         utilities: {
-          buildMasksList: async (opts = null) => {
-            let getMasksOptions = { fetchCustomMasks: false };
+          buildMasksList: async (localMasks = null, opts = null, remoteMasks = null) => {
+            let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false, source: "utils.buildMasksList"  };
             const { premium } = await browser.storage.local.get("premium");
 
             if (premium) {
@@ -472,8 +476,17 @@
               generateRandomMask.classList.remove("is-hidden");              
             }
             
-            const masks = await popup.utilities.getMasks(getMasksOptions);
-            
+            const masks = localMasks;
+            let masksFromApi = remoteMasks;
+
+            if (!remoteMasks) {
+              console.log("No remote mask arg passed");
+              // masksFromApi = await popup.utilities.getMasks(getMasksOptions, {updateLocalMasks: true});
+            }
+          
+            const { hashOfLocalStorageMasks } = await browser.storage.local.get("hashOfLocalStorageMasks");
+            const { hashOfRemoteServerMasks } = await browser.storage.local.get("hashOfRemoteServerMasks");
+
             const maskList = document.querySelector(".fx-relay-mask-list");
             // Reset mask list
             maskList.textContent = "";
@@ -565,6 +578,14 @@
               }, 1000);
             }
 
+            console.log(hashOfLocalStorageMasks, hashOfRemoteServerMasks);
+            
+            if ( hashOfLocalStorageMasks !== hashOfRemoteServerMasks) {
+              // TODO: Write update function that takes masks as argument
+              console.log("Update mask list for masks from server")
+              // console.log(masksFromApi);
+            }
+
             // If user has no masks created, focus on random gen button
             if (masks.length === 0) {
               const generateRandomMask = document.querySelector(".js-generate-random-mask");
@@ -579,7 +600,7 @@
 
           },
           getRemainingAliases: async () => {
-            const masks = await popup.utilities.getMasks();
+            const masks = await popup.utilities.getMasks({source: "getRemainingAliases"});
             const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
             return { masks, maxNumAliases };
           },
@@ -856,7 +877,7 @@
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
-          let getMasksOptions = { fetchCustomMasks: false };
+          let getMasksOptions = { fetchCustomMasks: false, source: "stats.init" };
 
           if (premium) {
             // Check if user may have custom domain masks
@@ -1234,16 +1255,39 @@
         });
         return currentTab;
       },
-      getMasks: async (options = { fetchCustomMasks: false }) => {
+      getMasks: async (options = { fetchCustomMasks: false, updateLocalMasks: false, source: "test" }) => {
         const serverStoragePref =
           await popup.utilities.getCachedServerStoragePref();
 
         if (serverStoragePref) {
           try {
-            return await browser.runtime.sendMessage({
+            const masksFromServer = await browser.runtime.sendMessage({
               method: "getAliasesFromServer",
               options,
             });
+
+            const hash = await popup.utilities.getSHA256Hash(JSON.stringify(masksFromServer));
+            
+            await browser.storage.local.set({
+              hashOfRemoteServerMasks: hash,
+            });
+
+            if (options.updateLocalMasks) {
+              
+              // Save this query to local storage
+              await browser.storage.local.set({
+                relayAddresses: masksFromServer,
+              });
+
+              // If we're saving masks, save a new hash too
+              await browser.storage.local.set({
+                hashOfLocalStorageMasks: hash,
+              });
+            }
+            
+            
+            
+            return masksFromServer;
           } catch (error) {
             console.warn(`getAliasesFromServer Error: ${error}`);
 
@@ -1259,6 +1303,15 @@
         // User is not syncing with the server. Use local storage.
         const { relayAddresses } = await browser.storage.local.get("relayAddresses");
         return relayAddresses;
+      },
+      getSHA256Hash: async (input) => {
+        const textAsBuffer = new TextEncoder().encode(input);
+        const hashBuffer = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray
+          .map((item) => item.toString(16).padStart(2, "0"))
+          .join("");
+        return hash;
       },
       populateNewsFeed: async ()=> {
         // audience can be premium, free, phones, all
