@@ -297,7 +297,7 @@
           const maskPanel = document.getElementById("masks-panel");
           const { relayAddresses } = await browser.storage.local.get("relayAddresses");
 
-          let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false, source: "masks.init" };
+          let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false };
           
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -452,7 +452,7 @@
         },
         utilities: {
           buildMasksList: async (localMasks = null, opts = null, remoteMasks = null) => {
-            let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false, source: "utils.buildMasksList"  };
+            let getMasksOptions = { fetchCustomMasks: false, updateLocalMasks: false };
             const { premium } = await browser.storage.local.get("premium");
 
             if (premium) {
@@ -606,7 +606,7 @@
               return maskListItem;
           },
           getRemainingAliases: async () => {
-            const masks = await popup.utilities.getMasks({source: "getRemainingAliases"});
+            const masks = await popup.utilities.getMasks();
             const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
             return { masks, maxNumAliases };
           },
@@ -883,7 +883,7 @@
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
-          let getMasksOptions = { fetchCustomMasks: false, source: "stats.init" };
+          let getMasksOptions = { fetchCustomMasks: false };
 
           if (premium) {
             // Check if user may have custom domain masks
@@ -1261,7 +1261,7 @@
         });
         return currentTab;
       },
-      getMasks: async (options = { fetchCustomMasks: false, updateLocalMasks: false, source: "test" }) => {
+      getMasks: async (options = { fetchCustomMasks: false, updateLocalMasks: false }) => {
         const serverStoragePref =
           await popup.utilities.getCachedServerStoragePref();
 
