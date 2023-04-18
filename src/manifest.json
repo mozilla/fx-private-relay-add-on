@@ -56,7 +56,7 @@
       "matches": [
           "http://127.0.0.1/accounts/profile/**"
       ],
-      "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/get_profile_data.js"]
+      "js": ["js/libs/browser-polyfill.min.js", "js/shared/utils.js", "js/relay.firefox.com/get_profile_data.js"]
     },
     {
       "matches": [

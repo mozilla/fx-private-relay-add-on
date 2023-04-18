@@ -1,3 +1,5 @@
+/* global getSHA256Hash */
+
 /**
  * @typedef {object} RandomMask
  * @property {boolean} enabled
@@ -257,19 +259,27 @@
     if (siteStorageEnabled) {
       // Sync alias data from server page.
       // If local storage items exist AND have label metadata stored, sync it to the server.
-      const serverRelayAddresses = await apiRequest(relayApiUrlRelayAddresses);
-      const serverDomainAddresses = isPremiumUser
-        ? await apiRequest(relayApiUrlDomainAddresses)
-        : [];
+      const getMasksOptions = { fetchCustomMasks: isPremiumUser, updateLocalMasks: true }; 
+      const remoteCopyOfServerMasks = await browser.runtime.sendMessage({
+        method: "getAliasesFromServer",
+        options: getMasksOptions,
+      });
+      
+      // Store hash of server response to compare for future changes 
+      const hash = await getSHA256Hash(JSON.stringify(remoteCopyOfServerMasks));
+      await browser.storage.local.set({
+        hashOfLocalStorageMasks: hash,
+      });
 
       // let usage: This data may be overwritten when merging the local storage dataset with the server set.
-      let localCopyOfServerMasks = serverRelayAddresses.concat(serverDomainAddresses);
+      let localCopyOfServerMasks = remoteCopyOfServerMasks;
 
       // Check/cache local storage
       const localMasks = (await browser.storage.local.get(
         "relayAddresses"
       )).relayAddresses;
 
+      // FIXME: These changes to local storage may break the hash stored above.
       if (
         localMasks &&
         localMasks.length > 0 &&
