@@ -488,11 +488,48 @@
             const { hashOfRemoteServerMasks } = await browser.storage.local.get("hashOfRemoteServerMasks");
 
             const maskList = document.querySelector(".fx-relay-mask-list");
+            
             // Reset mask list
             maskList.textContent = "";
 
+            // Make row element for each mask and append it to mask list
             masks.forEach(mask => {
-              const maskListItem = document.createElement("li");
+              const maskListItem = popup.panel.masks.utilities.buildMaskListItem(mask);
+              maskList.appendChild(maskListItem);
+            });
+
+            // Display "Mask created" temporary label when a new mask is created in the panel
+            if (opts && opts.newMaskCreated && maskList.firstElementChild) {
+              maskList.firstElementChild.classList.add("is-new-mask");
+
+              setTimeout(() => {
+                maskList.firstElementChild.classList.remove("is-new-mask");
+              }, 1000);
+            }
+
+            console.log(hashOfLocalStorageMasks, hashOfRemoteServerMasks);
+            
+            if ( hashOfLocalStorageMasks !== hashOfRemoteServerMasks) {
+              // TODO: Write update function that takes masks as argument
+              console.log("Update mask list for masks from server")
+              // console.log(masksFromApi);
+            }
+
+            // If user has no masks created, focus on random gen button
+            if (masks.length === 0) {
+              const generateRandomMask = document.querySelector(".js-generate-random-mask");
+              generateRandomMask.focus();
+              return;
+            }
+
+            // If premium, focus on search instead
+            if (premium) {
+              popup.panel.masks.search.init();
+            }
+
+          },
+          buildMaskListItem: (mask) => {
+            const maskListItem = document.createElement("li");
 
               // Attributes used to power search filtering
               maskListItem.setAttribute("data-mask-address", mask.full_address);              
@@ -566,38 +603,7 @@
 
               maskListItemAddressBar.appendChild(maskListItemAddressActions);
               maskListItem.appendChild(maskListItemAddressBar);
-              maskList.appendChild(maskListItem);
-            });
-
-            // Display "Mask created" temporary label when a new mask is created in the panel
-            if (opts && opts.newMaskCreated && maskList.firstElementChild) {
-              maskList.firstElementChild.classList.add("is-new-mask");
-
-              setTimeout(() => {
-                maskList.firstElementChild.classList.remove("is-new-mask");
-              }, 1000);
-            }
-
-            console.log(hashOfLocalStorageMasks, hashOfRemoteServerMasks);
-            
-            if ( hashOfLocalStorageMasks !== hashOfRemoteServerMasks) {
-              // TODO: Write update function that takes masks as argument
-              console.log("Update mask list for masks from server")
-              // console.log(masksFromApi);
-            }
-
-            // If user has no masks created, focus on random gen button
-            if (masks.length === 0) {
-              const generateRandomMask = document.querySelector(".js-generate-random-mask");
-              generateRandomMask.focus();
-              return;
-            }
-
-            // If premium, focus on search instead
-            if (premium) {
-              popup.panel.masks.search.init();
-            }
-
+              return maskListItem;
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks({source: "getRemainingAliases"});
