@@ -172,9 +172,6 @@ async function addRelayIconToInput(emailInput) {
   relayIconBtn.id = "fx-relay-button";
   relayIconBtn.type = "button";
   relayIconBtn.title = browser.i18n.getMessage("pageInputIconGenerateNewAlias_mask");
-  const makeNewAliasImagePath = browser.runtime.getURL('/images/logo-image-fx-relay.svg');
-  relayIconBtn.style.backgroundImage = `url(${makeNewAliasImagePath})`;
-
 
   const relayIconHeight = 30;
   if (relayIconHeight > inputHeight) {
