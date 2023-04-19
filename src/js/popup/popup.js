@@ -343,10 +343,12 @@
             }, false);
           
           // Get masks and determine what to display
-          const masks = await popup.utilities.getMasks(getMasksOptions);
+          const { relayAddresses } = await browser.storage.local.get(
+            "relayAddresses"
+          );
 
           // If no masks are created, show onboarding prompt
-          if (masks.length === 0) {
+          if (relayAddresses.length === 0) {
             const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
             noMasksCreatedPanel.classList.remove("is-hidden");
           }
@@ -356,8 +358,7 @@
           popup.panel.masks.utilities.buildMasksList();
         
 
-          // Remove loading state
-          document.body.classList.remove("is-loading");
+          
 
         },
         search: {
@@ -576,6 +577,9 @@
             if (premium) {
               popup.panel.masks.search.init();
             }
+
+            // Remove loading state
+            document.body.classList.remove("is-loading");
 
           },
           getRemainingAliases: async () => {
@@ -1240,10 +1244,15 @@
 
         if (serverStoragePref) {
           try {
-            return await browser.runtime.sendMessage({
+            const masks = await browser.runtime.sendMessage({
               method: "getAliasesFromServer",
               options,
             });
+
+            await browser.storage.local.set({"relayAddresses": masks});
+
+            return masks;
+
           } catch (error) {
             console.warn(`getAliasesFromServer Error: ${error}`);
 
