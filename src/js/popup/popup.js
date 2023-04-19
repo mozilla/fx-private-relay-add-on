@@ -187,8 +187,9 @@
       //   If free tier: focused on "Create mask" button
       //   If premium tier: focused in search bar
 
-      window.addEventListener("rebuildMaskListWithNewContent", (e)=>{
+      window.addEventListener("rebuildMaskListWithNewContent", async (e)=>{
         console.log("custom event fired", e);
+        await popup.panel.masks.utilities.buildMasksList(e.detail, {});
       });
 
     },
@@ -362,12 +363,7 @@
 
           // Build initial list based on local storage
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
-          popup.panel.masks.utilities.buildMasksList(relayAddresses);
-        
-
-          // Remove loading state
-          document.body.classList.remove("is-loading");
-
+          popup.panel.masks.utilities.buildMasksList(relayAddresses);        
         },
         search: {
           filter: (query)=> {
@@ -602,6 +598,7 @@
               return maskListItem;
           },
           checkForNewMasks: async (options) => {
+            console.log("checkForNewMasks // masksFromRemote");
             const masksFromRemote = await popup.utilities.getMasks(options);
             console.log(masksFromRemote);
 
@@ -1293,15 +1290,21 @@
             const { hashOfLocalStorageMasks } = await browser.storage.local.get("hashOfLocalStorageMasks");
             const { hashOfRemoteServerMasks } = await browser.storage.local.get("hashOfRemoteServerMasks");
 
+            const { relayAddresses } = await browser.storage.local.get(
+              "relayAddresses"
+            );
+
+            console.log("relayAddresses.length", relayAddresses.length);
+            console.log("masksFromServer.length", masksFromServer.length);
             console.log("hashOfLocalStorageMasks", hashOfLocalStorageMasks);
             console.log("hashOfRemoteServerMasks", hashOfRemoteServerMasks);
 
-            if (hashOfLocalStorageMasks && hashOfRemoteServerMasks && hashOfRemoteServerMasks !== hashOfLocalStorageMasks) {
+            const remoteAndLocalMismatch = (hashOfRemoteServerMasks !== hashOfLocalStorageMasks);
+            
+            if (options.updateLocalMasks || remoteAndLocalMismatch) {
+              console.log("hashOfRemoteServerMasks !== hashOfLocalStorageMasks");
               const event = new CustomEvent("rebuildMaskListWithNewContent", { detail: masksFromServer });
               window.dispatchEvent(event);
-            }
-
-            if (options.updateLocalMasks) {
               
               // Save this query to local storage
               await browser.storage.local.set({
@@ -1313,6 +1316,9 @@
                 hashOfLocalStorageMasks: hash,
               });
             }
+
+            // Remove loading state
+            document.body.classList.remove("is-loading");
             
             return masksFromServer;
           } catch (error) {
