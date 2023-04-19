@@ -873,15 +873,16 @@
             getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
           }
 
-          const masks = await popup.utilities.getMasks(getMasksOptions);
+          // Use localStorage of Masks
+          const { relayAddresses } = await browser.storage.local.get("relayAddresses");
 
            // Get Global Mask Stats data
-          const totalAliasesUsedVal = masks.length;
+          const totalAliasesUsedVal = relayAddresses.length;
           let totalEmailsForwardedVal = 0;
           let totalEmailsBlockedVal = 0;
           
           // Loop through all masks to calculate totals
-          masks.forEach((mask) => {
+          relayAddresses.forEach((mask) => {
             totalEmailsForwardedVal += mask.num_forwarded;
             totalEmailsBlockedVal += mask.num_blocked;
           });
@@ -902,10 +903,10 @@
           });
 
           // Check if any data applies to the current site
-          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks,currentPageHostName) ) {
+          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(relayAddresses,currentPageHostName) ) {
             
             // Some masks are used on the current site. Time to calculate!
-            const filteredMasks = masks.filter(
+            const filteredMasks = relayAddresses.filter(
               (mask) =>
                 mask.generated_for === currentPageHostName ||
                 popup.utilities.hasMaskBeenUsedOnCurrentSite(
