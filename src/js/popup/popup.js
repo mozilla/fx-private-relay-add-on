@@ -342,23 +342,10 @@
               popup.events.generateMask(e, "random");
             }, false);
           
-          // Get masks and determine what to display
-          const masks = await popup.utilities.getMasks(getMasksOptions);
-
-          // If no masks are created, show onboarding prompt
-          if (masks.length === 0) {
-            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
-            noMasksCreatedPanel.classList.remove("is-hidden");
-          }
-
           // Build initial list
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
+          // If no masks are created, this will show onboarding prompt
           popup.panel.masks.utilities.buildMasksList();
-        
-
-          // Remove loading state
-          document.body.classList.remove("is-loading");
-
         },
         search: {
           filter: (query)=> {
@@ -475,85 +462,14 @@
             const masks = await popup.utilities.getMasks(getMasksOptions);
             
             const maskList = document.querySelector(".fx-relay-mask-list");
+
             // Reset mask list
             maskList.textContent = "";
-
-            masks.forEach(mask => {
-              const maskListItem = document.createElement("li");
-
-              // Attributes used to power search filtering
-              maskListItem.setAttribute("data-mask-address", mask.full_address);              
-              maskListItem.setAttribute("data-mask-description", mask.description ?? "");
-              maskListItem.setAttribute("data-mask-used-on", mask.used_on ?? "");
-              maskListItem.setAttribute("data-mask-generated", mask.generated_for ?? "");
-              
-              maskListItem.classList.add("fx-relay-mask-item");
-
-              const maskListItemNewMaskCreatedLabel = document.createElement("span");
-              maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
-              maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
-              maskListItem.appendChild(maskListItemNewMaskCreatedLabel);
-              
-              const maskListItemAddressBar = document.createElement("div");
-              maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
-
-              const maskListItemAddressWrapper = document.createElement("div");
-              maskListItemAddressWrapper.classList.add("fx-relay-mask-item-address-wrapper");
-
-              const maskListItemLabel = document.createElement("span");
-              maskListItemLabel.classList.add("fx-relay-mask-item-label");
-              maskListItemLabel.textContent = mask.description;
-              
-              // Append Label if it exists
-              if (mask.description !== "") {
-                maskListItemAddressWrapper.appendChild(maskListItemLabel);
-              }
-              
-              const maskListItemAddress = document.createElement("div");
-              maskListItemAddress.classList.add("fx-relay-mask-item-address");
-              maskListItemAddress.textContent = mask.full_address;
-              maskListItemAddressWrapper.appendChild(maskListItemAddress);
-
-              // Add Mask Address Bar Contents 
-              maskListItemAddressBar.appendChild(maskListItemAddressWrapper);
-
-              const maskListItemAddressActions = document.createElement("div");
-              maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
-
-              const maskListItemCopyButton = document.createElement("button");
-              maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
-              maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
-
-              const maskListItemCopyButtonSuccessMessage = document.createElement("span");
-              maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
-              maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
-              maskListItemAddressActions.appendChild(maskListItemCopyButtonSuccessMessage);
-              
-              maskListItemCopyButton.addEventListener("click", (e)=> {
-                e.preventDefault();
-                navigator.clipboard.writeText(e.target.dataset.maskAddress);
-                maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
-                setTimeout(() => {
-                  maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
-                }, 1000);
-              }, false);
-              maskListItemAddressActions.appendChild(maskListItemCopyButton);
-
-              const maskListItemToggleButton = document.createElement("button");
-              maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
-              maskListItemToggleButton.addEventListener("click", ()=> {
-                // TODO: Add Toggle Function
-              }, false);
-              maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
-              maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
-              maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
-
-              // TODO: Add toggle button back
-              // maskListItemAddressActions.appendChild(maskListItemToggleButton);
-
-              maskListItemAddressBar.appendChild(maskListItemAddressActions);
-              maskListItem.appendChild(maskListItemAddressBar);
-              maskList.appendChild(maskListItem);
+            
+            // Generate and append each mask item to the mask list
+            masks.forEach( mask => {
+                const maskListItem = popup.panel.masks.utilities.buildMaskListItem(mask);
+                maskList.append(maskListItem);
             });
 
             // Display "Mask created" temporary label when a new mask is created in the panel
@@ -565,10 +481,16 @@
               }, 1000);
             }
 
-            // If user has no masks created, focus on random gen button
+            // If user has no masks created, show onboarding prompt and focus on random gen button
             if (masks.length === 0) {
+              const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+              noMasksCreatedPanel.classList.remove("is-hidden");
+              
               const generateRandomMask = document.querySelector(".js-generate-random-mask");
               generateRandomMask.focus();
+
+              // Remove loading state since exiting early
+              document.body.classList.remove("is-loading");
               return;
             }
 
@@ -577,6 +499,86 @@
               popup.panel.masks.search.init();
             }
 
+            // Remove loading state
+            document.body.classList.remove("is-loading");
+
+          },
+          buildMaskListItem: (mask) => {
+            const maskListItem = document.createElement("li");
+
+            // Attributes used to power search filtering
+            maskListItem.setAttribute("data-mask-address", mask.full_address);              
+            maskListItem.setAttribute("data-mask-description", mask.description ?? "");
+            maskListItem.setAttribute("data-mask-used-on", mask.used_on ?? "");
+            maskListItem.setAttribute("data-mask-generated", mask.generated_for ?? "");
+            
+            maskListItem.classList.add("fx-relay-mask-item");
+
+            const maskListItemNewMaskCreatedLabel = document.createElement("span");
+            maskListItemNewMaskCreatedLabel.textContent = browser.i18n.getMessage("labelMaskCreated");
+            maskListItemNewMaskCreatedLabel.classList.add("fx-relay-mask-item-new-mask-created");
+            maskListItem.append(maskListItemNewMaskCreatedLabel);
+            
+            const maskListItemAddressBar = document.createElement("div");
+            maskListItemAddressBar.classList.add("fx-relay-mask-item-address-bar");
+
+            const maskListItemAddressWrapper = document.createElement("div");
+            maskListItemAddressWrapper.classList.add("fx-relay-mask-item-address-wrapper");
+
+            const maskListItemLabel = document.createElement("span");
+            maskListItemLabel.classList.add("fx-relay-mask-item-label");
+            maskListItemLabel.textContent = mask.description;
+            
+            // Append Label if it exists
+            if (mask.description !== "") {
+              maskListItemAddressWrapper.append(maskListItemLabel);
+            }
+            
+            const maskListItemAddress = document.createElement("div");
+            maskListItemAddress.classList.add("fx-relay-mask-item-address");
+            maskListItemAddress.textContent = mask.full_address;
+            maskListItemAddressWrapper.append(maskListItemAddress);
+
+            // Add Mask Address Bar Contents 
+            maskListItemAddressBar.append(maskListItemAddressWrapper);
+
+            const maskListItemAddressActions = document.createElement("div");
+            maskListItemAddressActions.classList.add("fx-relay-mask-item-address-actions");
+
+            const maskListItemCopyButton = document.createElement("button");
+            maskListItemCopyButton.classList.add("fx-relay-mask-item-address-copy");
+            maskListItemCopyButton.setAttribute("data-mask-address", mask.full_address);
+
+            const maskListItemCopyButtonSuccessMessage = document.createElement("span");
+            maskListItemCopyButtonSuccessMessage.textContent = browser.i18n.getMessage("popupCopyMaskButtonCopied");
+            maskListItemCopyButtonSuccessMessage.classList.add("fx-relay-mask-item-address-copy-success");
+            maskListItemAddressActions.append(maskListItemCopyButtonSuccessMessage);
+            
+            maskListItemCopyButton.addEventListener("click", (e)=> {
+              e.preventDefault();
+              navigator.clipboard.writeText(e.target.dataset.maskAddress);
+              maskListItemCopyButtonSuccessMessage.classList.add("is-shown");
+              setTimeout(() => {
+                maskListItemCopyButtonSuccessMessage.classList.remove("is-shown")
+              }, 1000);
+            }, false);
+            maskListItemAddressActions.append(maskListItemCopyButton);
+
+            const maskListItemToggleButton = document.createElement("button");
+            maskListItemToggleButton.classList.add("fx-relay-mask-item-address-toggle");
+            maskListItemToggleButton.addEventListener("click", ()=> {
+              // TODO: Add Toggle Function
+            }, false);
+            maskListItemToggleButton.setAttribute("data-mask-id", mask.id);
+            maskListItemToggleButton.setAttribute("data-mask-type", mask.mask_type);
+            maskListItemToggleButton.setAttribute("data-mask-address", mask.full_address);
+
+            // TODO: Add toggle button back
+            // maskListItemAddressActions.append(maskListItemToggleButton);
+
+            maskListItemAddressBar.append(maskListItemAddressActions);
+            maskListItem.append(maskListItemAddressBar);
+            return maskListItem;
           },
           getRemainingAliases: async () => {
             const masks = await popup.utilities.getMasks();
@@ -869,15 +871,16 @@
             getMasksOptions.fetchCustomMasks = isPremiumSubdomainSet;
           }
 
-          const masks = await popup.utilities.getMasks(getMasksOptions);
+          // Use localStorage of Masks
+          const { relayAddresses } = await browser.storage.local.get("relayAddresses");
 
            // Get Global Mask Stats data
-          const totalAliasesUsedVal = masks.length;
+          const totalAliasesUsedVal = relayAddresses.length;
           let totalEmailsForwardedVal = 0;
           let totalEmailsBlockedVal = 0;
           
           // Loop through all masks to calculate totals
-          masks.forEach((mask) => {
+          relayAddresses.forEach((mask) => {
             totalEmailsForwardedVal += mask.num_forwarded;
             totalEmailsBlockedVal += mask.num_blocked;
           });
@@ -898,10 +901,10 @@
           });
 
           // Check if any data applies to the current site
-          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(masks,currentPageHostName) ) {
+          if ( popup.utilities.checkIfAnyMasksWereGeneratedOnCurrentWebsite(relayAddresses,currentPageHostName) ) {
             
             // Some masks are used on the current site. Time to calculate!
-            const filteredMasks = masks.filter(
+            const filteredMasks = relayAddresses.filter(
               (mask) =>
                 mask.generated_for === currentPageHostName ||
                 popup.utilities.hasMaskBeenUsedOnCurrentSite(
