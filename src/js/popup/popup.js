@@ -342,24 +342,10 @@
               popup.events.generateMask(e, "random");
             }, false);
           
-          // Get masks and determine what to display
-          const { relayAddresses } = await browser.storage.local.get(
-            "relayAddresses"
-          );
-
-          // If no masks are created, show onboarding prompt
-          if (relayAddresses.length === 0) {
-            const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
-            noMasksCreatedPanel.classList.remove("is-hidden");
-          }
-
           // Build initial list
           // Note: If premium, buildMasksList runs `popup.panel.masks.search.init()` after completing
+          // If no masks are created, this will show onboarding prompt
           popup.panel.masks.utilities.buildMasksList();
-        
-
-          
-
         },
         search: {
           filter: (query)=> {
@@ -495,10 +481,16 @@
               }, 1000);
             }
 
-            // If user has no masks created, focus on random gen button
+            // If user has no masks created, show onboarding prompt and focus on random gen button
             if (masks.length === 0) {
+              const noMasksCreatedPanel = document.querySelector(".fx-relay-no-masks-created");
+              noMasksCreatedPanel.classList.remove("is-hidden");
+              
               const generateRandomMask = document.querySelector(".js-generate-random-mask");
               generateRandomMask.focus();
+
+              // Remove loading state since exiting early
+              document.body.classList.remove("is-loading");
               return;
             }
 
