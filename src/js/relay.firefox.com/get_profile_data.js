@@ -258,29 +258,27 @@
     if (siteStorageEnabled) {
       // Sync alias data from server page.
       // If local storage items exist AND have label metadata stored, sync it to the server.
-      const serverRelayAddresses = await apiRequest(relayApiUrlRelayAddresses);
-      const serverDomainAddresses = isPremiumUser
-        ? await apiRequest(relayApiUrlDomainAddresses)
-        : [];
+      const remoteCopyOfServerMasks = await browser.runtime.sendMessage({
+        method: "getAliasesFromServer",
+        options: { fetchCustomMasks: isPremiumUser },
+      });
 
       // let usage: This data may be overwritten when merging the local storage dataset with the server set.
-      let localCopyOfServerMasks = serverRelayAddresses.concat(serverDomainAddresses);
+      let localCopyOfServerMasks = remoteCopyOfServerMasks;
 
       // Check/cache local storage
-      const localMasks = (await browser.storage.local.get(
-        "relayAddresses"
-      )).relayAddresses;
+      const { relayAddresses } = await browser.storage.local.get("relayAddresses");
 
       if (
-        localMasks &&
-        localMasks.length > 0 &&
-        aliasesHaveStoredMetadata(localMasks) && // Make sure there is meta data in the local dataset
+        relayAddresses &&
+        relayAddresses.length > 0 &&
+        aliasesHaveStoredMetadata(relayAddresses) && // Make sure there is meta data in the local dataset
         !aliasesHaveStoredMetadata(localCopyOfServerMasks) // Make sure there is no meta data in the server dataset
       ) {
-        await sendMetaDataToServer(localMasks);
+        await sendMetaDataToServer(relayAddresses);
         localCopyOfServerMasks = getAliasesWithUpdatedMetadata(
           localCopyOfServerMasks,
-          localMasks
+          relayAddresses
         );
       }
 
@@ -298,14 +296,14 @@
       "firefox-private-relay-addon"
     ).addEventListener("website", async (event) => {
       if (event.detail.type === "labelUpdate") {
-        const existingAddresses = (await browser.storage.local.get("relayAddresses")).relayAddresses;
+        const { relayAddresses } = await browser.storage.local.get("relayAddresses");
         const update = event.detail;
-        const oldAddress = existingAddresses.find(existingAddress =>
+        const oldAddress = relayAddresses.find(existingAddress =>
           existingAddress.id === update.alias.id &&
           existingAddress.address === update.alias.address &&
           existingAddress.domain === update.alias.domain
         );
-        const newAddresses = existingAddresses.filter(existingAddress => existingAddress !== oldAddress);
+        const newAddresses = relayAddresses.filter(existingAddress => existingAddress !== oldAddress);
         newAddresses.push({
           ...oldAddress,
           description: update.newLabel,
