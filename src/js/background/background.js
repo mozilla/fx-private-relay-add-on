@@ -25,6 +25,45 @@ browser.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
+/**
+ * Function that makes any API/fetch request on behalf of a content script
+ * 
+ * @async
+ * @function fetchRequestFromBackground
+ * @param  {string} url=null - URL of API route
+ * @param  {string} fetchMethod="GET" - fetch method type 
+ * @param  {object} body=null - Overwrite if the request type (PATCH, POST) is method that needs to send data to the server
+ * @param  {object} opts=null} Option to add users apiToken for protected API calls 
+ * @return {string} JSON formatted response from the API
+ */
+async function fetchRequestFromBackground({url = null, fetchMethod = "GET", body = null, opts=null} = {}) {
+  // URL is the only "required" argument to make a fetch. 
+  // Default
+  if (url == null) {
+    return false;
+  }
+  
+  const headers = new Headers();
+
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+
+  if (opts && opts.auth) {
+    const apiToken = await browser.storage.local.get("apiToken");
+    headers.set("Authorization", `Token ${apiToken.apiToken}`);
+  }
+
+  const response = await fetch(url, {
+    mode: "same-origin",
+    method: fetchMethod,
+    headers: headers,
+    body,
+  });
+
+  const answer = await response.json();
+  return answer;
+}
+
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare, no-unused-vars
 async function getAliasesFromServer(method = "GET", opts=null) {
@@ -487,6 +526,11 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+      break;
+    case "fetchRequestFromBackground": 
+      response = await fetchRequestFromBackground(
+        m.fetchRequest
+      );
       break;
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);

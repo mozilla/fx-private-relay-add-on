@@ -46,6 +46,24 @@
     const apiToken = profileMainElement.dataset.apiToken;
     await browser.storage.local.set({ apiToken });
 
+    const cookieString =
+    typeof document.cookie === "string" ? document.cookie : "";
+    
+    const cookieStringArray = cookieString
+      .split(";")
+      .map((individualCookieString) => individualCookieString.split("="))
+      .map(([cookieKey, cookieValue]) => [
+        cookieKey.trim(),
+        cookieValue.trim(),
+      ]);
+
+    const [_csrfCookieKey, csrfCookieValue] = cookieStringArray.find(
+      ([cookieKey, _cookieValue]) => cookieKey === "csrftoken"
+    );
+
+    await browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
+
+
     // API URL is ${RELAY_SITE_ORIGIN}/api/v1/
     const { relayApiSource } = await browser.storage.local.get("relayApiSource");
 
@@ -54,50 +72,13 @@
     const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
     const relayApiUrlRelayNumbers = `${relayApiSource}/relaynumber/`;
 
-    async function apiRequest(url, method = "GET", body = null, opts=null) {
-
-      const cookieString =
-        typeof document.cookie === "string" ? document.cookie : "";
-      const cookieStringArray = cookieString
-        .split(";")
-        .map((individualCookieString) => individualCookieString.split("="))
-        .map(([cookieKey, cookieValue]) => [
-          cookieKey.trim(),
-          cookieValue.trim(),
-        ]);
-
-      const [_csrfCookieKey, csrfCookieValue] = cookieStringArray.find(
-        ([cookieKey, _cookieValue]) => cookieKey === "csrftoken"
-      );
-
-      browser.storage.local.set({ csrfCookieValue: csrfCookieValue });
-
-
-      const headers = new Headers();
-
-
-      headers.set("X-CSRFToken", csrfCookieValue);
-      headers.set("Content-Type", "application/json");
-      headers.set("Accept", "application/json");
-
-      if (opts && opts.auth) {
-        const apiToken = await browser.storage.local.get("apiToken");
-        headers.set("Authorization", `Token ${apiToken.apiToken}`);
+    
+    const serverProfileData = await browser.runtime.sendMessage({
+      method: "fetchRequestFromBackground",
+      fetchRequest: {
+        url: apiProfileURL
       }
-
-
-      const response = await fetch(url, {
-        mode: "same-origin",
-        method,
-        headers: headers,
-        body,
-      });
-
-      const answer = await response.json();
-      return answer;
-    }
-
-    const serverProfileData = await apiRequest(apiProfileURL);
+    });
 
     browser.storage.local.set({
       profileID: parseInt(serverProfileData[0].id, 10),
@@ -108,7 +89,13 @@
 
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
-    const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+    const relayNumbers = await await browser.runtime.sendMessage({
+      method: "fetchRequestFromBackground",
+      fetchRequest: {
+        url: relayApiUrlRelayNumbers
+      }
+    });
+
     if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
       browser.storage.local.set({
         relayNumbers: relayNumbers,
@@ -121,10 +108,21 @@
      * @param {{ fetchCustomMasks?: boolean }} options - Set `fetchCustomMasks` to `true` if the user is a Premium user.
      */
     async function refreshLocalLabelCache(options = {}) {
+      
       /** @type {RandomMask[]} */
-      const relayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      const relayAddresses = await browser.runtime.sendMessage({
+        method: "fetchRequestFromBackground",
+        fetchRequest: {
+          url: relayApiUrlRelayAddresses
+        }
+      });
       const domainAddresses = options.fetchCustomMasks
-        ? await apiRequest(relayApiUrlDomainAddresses)
+        ? await browser.runtime.sendMessage({
+          method: "fetchRequestFromBackground",
+          fetchRequest: {
+            url: relayApiUrlDomainAddresses
+          }
+        })
         : [];
       await browser.storage.local.set({
         relayAddresses:
@@ -235,7 +233,15 @@
 
         if (body.description.length > 0 || body.generated_for.length > 0 || body.used_on.length > 0) {
           const endpoint = alias.mask_type === "custom" ? relayApiUrlDomainAddresses : relayApiUrlRelayAddresses;
-          await apiRequest(`${endpoint}${alias.id}/`, "PATCH", JSON.stringify(body), {auth: true});
+          await browser.runtime.sendMessage({
+            method: "fetchRequestFromBackground",
+            fetchRequest: {
+              url: `${endpoint}${alias.id}/`,
+              fetchMethod: "PATCH",
+              body: JSON.stringify(body),
+              opts: {auth: true}
+            }
+          });
         }
       }
     }
@@ -257,9 +263,21 @@
     if (siteStorageEnabled) {
       // Sync alias data from server page.
       // If local storage items exist AND have label metadata stored, sync it to the server.
-      const serverRelayAddresses = await apiRequest(relayApiUrlRelayAddresses);
+      
+      const serverRelayAddresses = await browser.runtime.sendMessage({
+        method: "fetchRequestFromBackground",
+        fetchRequest: {
+          url: relayApiUrlRelayAddresses
+        }
+      });
+      
       const serverDomainAddresses = isPremiumUser
-        ? await apiRequest(relayApiUrlDomainAddresses)
+        ? await browser.runtime.sendMessage({
+          method: "fetchRequestFromBackground",
+          fetchRequest: {
+            url: relayApiUrlDomainAddresses
+          }
+        })
         : [];
 
       // let usage: This data may be overwritten when merging the local storage dataset with the server set.
