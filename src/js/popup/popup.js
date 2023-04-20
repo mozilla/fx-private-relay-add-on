@@ -1251,15 +1251,10 @@
 
         if (serverStoragePref) {
           try {
-            const masks = await browser.runtime.sendMessage({
+            return await browser.runtime.sendMessage({
               method: "getAliasesFromServer",
               options,
             });
-
-            await browser.storage.local.set({"relayAddresses": masks});
-
-            return masks;
-
           } catch (error) {
             console.warn(`getAliasesFromServer Error: ${error}`);
 
