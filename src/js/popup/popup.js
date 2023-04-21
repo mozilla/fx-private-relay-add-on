@@ -180,6 +180,9 @@
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
 
+      // Clear browser action "!" badge
+      await popup.utilities.clearBrowserActionBadge();
+
       // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
       // Cases:
       //   If not logged in: focused on "Sign In" button
@@ -1127,9 +1130,7 @@
         });
       },
       clearBrowserActionBadge: async () => {
-        const { browserActionBadgesClicked } = await browser.storage.local.get(
-          "browserActionBadgesClicked"
-        );
+        const { browserActionBadgesClicked } = await browser.storage.local.get("browserActionBadgesClicked");
 
         // Dismiss the browserActionBadge only when it exists
         if (browserActionBadgesClicked === false) {
@@ -1365,6 +1366,7 @@
         sessionState.newsItemsCount = sessionState.newsContent.length;
 
         // Set unread notification count
+        // TODO: Move some of this logic to get_profile_data to set the browserActionBadge to a #
         await popup.panel.news.utilities.initNewsItemCountNotification();
       },
       setExternalLinkEventListeners: async () => {
