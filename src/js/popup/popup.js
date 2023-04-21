@@ -1106,31 +1106,35 @@
           getReasonToShowSurvey: async () => {
             let reasonToShow = null;
             const firstSeen = popup.panel.survey.utils.userFirstSeen();
-            const has_premium = await browser.storage.local.get("premium");
+            const { premium } = await browser.storage.local.get("premium");
             const { profileID } = await browser.storage.local.get("profileID");
             const dismiss = popup.panel.survey.dismiss;
             const free7DaysDismissal = dismiss.free7DaysDismissal(profileID);
             const free30DaysDismissal = dismiss.free30DaysDismissal(profileID);
             const free90DaysDismissal = dismiss.free90DaysDismissal(profileID);
-            const premium7DaysDismissal =
-              dismiss.premium7DaysDismissal(profileID);
-            const premium30DaysDismissal =
-              dismiss.premium30DaysDismissal(profileID);
-            const premium90DaysDismissal =
-              dismiss.premium90DaysDismissal(profileID);
+            const premium7DaysDismissal = dismiss.premium7DaysDismissal(profileID);
+            const premium30DaysDismissal = dismiss.premium30DaysDismissal(profileID);
+            const premium90DaysDismissal = dismiss.premium90DaysDismissal(profileID);
+
+            console.log({free7DaysDismissal, free30DaysDismissal, free90DaysDismissal, premium7DaysDismissal, premium30DaysDismissal, premium90DaysDismissal});
             // TODO: if this data doesn't exist we will have to query it 
             const { date_subscribed } = await browser.storage.local.get(
               "date_subscribed"
             );
 
-            console.log(date_subscribed);
+            console.log("premium", premium);
+            console.log("date_subscribed", date_subscribed);
+            console.log("firstSeen instanceof Date", firstSeen instanceof Date);
 
-            if (has_premium && (date_subscribed || firstSeen instanceof Date)) {
-              const subscriptionDate = date_subscribed
-                ? new Date(date_subscribed)
-                : firstSeen;
-              const daysSinceSubscription =
-                (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
+            if (premium && (date_subscribed || firstSeen instanceof Date)) {
+              const subscriptionDate = date_subscribed ? new Date(date_subscribed) : firstSeen;
+              // const daysSinceSubscription = (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
+
+              const daysSinceSubscription = 91;
+
+              console.log("subscriptionDate", subscriptionDate);
+              console.log("daysSinceSubscription", daysSinceSubscription);
+              
 
               if (daysSinceSubscription >= 90) {
                 if (!premium90DaysDismissal.isDismissed) {
@@ -1145,9 +1149,9 @@
                   reasonToShow = "premium7days";
                 }
               }
-            } else if (!has_premium && firstSeen instanceof Date) {
-              const daysSinceFirstSeen =
-                (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
+            } else if (!premium && firstSeen instanceof Date) {
+              console.log("else if (!premium && firstSeen instanceof Date) {");
+              const daysSinceFirstSeen = (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
               if (daysSinceFirstSeen >= 90) {
                 if (!free90DaysDismissal.isDismissed) {
                   reasonToShow = "free90days";
@@ -1166,8 +1170,7 @@
             return reasonToShow;
           },
           shouldShowSurvey: async () => {
-            const reasonToShow =
-              await popup.panel.survey.utils.getReasonToShowSurvey();
+            const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
             const locale = navigator.language;
 
             console.log(reasonToShow, locale);
@@ -1179,22 +1182,16 @@
         },
         dismiss: {
           // dismissals are keyed by the profile ID
-          free7DaysDismissal: (id) =>
-            popup.utilities.localDismiss("csat-survey-free-7days_" + id),
-          free30DaysDismissal: (id) =>
-            popup.utilities.localDismiss("csat-survey-free-30days_" + id),
-          free90DaysDismissal: (id) =>
-            popup.utilities.localDismiss(
+          free7DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-free-7days_" + id),
+          free30DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-free-30days_" + id),
+          free90DaysDismissal: (id) => popup.utilities.localDismiss(
               "csat-survey-free-90days_" + id,
               // After the third month, show every three months:
               { duration: 90 * 24 * 60 * 60 }
             ),
-          premium7DaysDismissal: (id) =>
-            popup.utilities.localDismiss("csat-survey-premium-7days_" + id),
-          premium30DaysDismissal: (id) =>
-            popup.utilities.localDismiss("csat-survey-premium-30days_" + id),
-          premium90DaysDismissal: (id) =>
-            popup.utilities.localDismiss(
+          premium7DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-premium-7days_" + id),
+          premium30DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-premium-30days_" + id),
+          premium90DaysDismissal: (id) => popup.utilities.localDismiss(
               "csat-survey-premium-90days_" + id,
               // After the third month, show every three months:
               { duration: 90 * 24 * 60 * 60 }
@@ -1202,18 +1199,12 @@
         },
         select: {
           // storing as functions to avoid caching
-          surveyLinkContainer: () =>
-            document.querySelector(".fx-relay-csat-survey-link-container"),
-          closeSurveyLinkButton: () =>
-            document.querySelector(".fx-relay-csat-survey-close-icon"),
-          surveyLink: () =>
-            document.querySelector(".fx-relay-csat-survey-link"),
-          surveyButtons: () =>
-            document.querySelectorAll(".fx-relay-csat-button"),
-          successMessage: () =>
-            document.querySelector(".fx-relay-survey-success"),
-          externalSurveyLink: () =>
-            document.querySelector(".fx-relay-external-survey-link"),
+          surveyLinkContainer: () => document.querySelector(".fx-relay-csat-survey-link-container"),
+          closeSurveyLinkButton: () => document.querySelector(".fx-relay-csat-survey-close-icon"),
+          surveyLink: () => document.querySelector(".fx-relay-csat-survey-link"),
+          surveyButtons: () => document.querySelectorAll(".fx-relay-csat-button"),
+          successMessage: () => document.querySelector(".fx-relay-survey-success"),
+          externalSurveyLink: () => document.querySelector(".fx-relay-external-survey-link"),
         },
       },
       webcompat: {
