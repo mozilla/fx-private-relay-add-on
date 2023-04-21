@@ -825,9 +825,12 @@ sign-up-panel::after {
 .fx-relay-mask-item-label {
   font-size: var(--fontSizeBodyXs);
   color: var(--colorGrey40);
+  text-overflow: ellipsis;
   overflow: hidden;
   display: block;
   line-height: 1;
+  /* Custom height to account for cropped descender text */
+  height: 13px;
 }
 
 .fx-relay-mask-item-address-bar {
@@ -838,7 +841,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address-wrapper {
   display: flex;
-  gap: var(--spacingXs);
+  gap: var(--spacing2xs);
   flex-direction: column;
   width: calc( 100% - var(--spacingMd));
   position: relative;
