@@ -933,6 +933,7 @@ sign-up-panel::after {
   position: absolute;
   overflow: hidden;
   display: none;
+  top: 49px;
 }
 
 .fx-relay-menu-loading-bar-wrapper {
