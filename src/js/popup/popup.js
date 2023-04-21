@@ -180,6 +180,9 @@
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
 
+      // Clear browser action "!" badge
+      popup.utilities.clearBrowserActionBadge();
+
       // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
       // Cases:
       //   If not logged in: focused on "Sign In" button
