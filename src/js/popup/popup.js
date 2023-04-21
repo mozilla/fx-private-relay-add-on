@@ -29,6 +29,19 @@
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
+        // Custom rule to fix Firefox bug where popup does not 
+        // resize from larger sized panels to smaller sized panels
+        if (e.target.dataset.navId && e.target.dataset.navId === "custom") {
+          console.log("custom back to masks");
+          const maskPanel = document.querySelector("masks-panel");
+          maskPanel.classList.add("custom-return");
+          
+          setTimeout(() => {
+            maskPanel.classList.remove("custom-return");
+          }, 10);
+          
+        }
+
         // Catch back button clicks if the user is logged out
         if (!sessionState.loggedIn && backNavLevel === "root") {
           popup.panel.update("sign-up");
