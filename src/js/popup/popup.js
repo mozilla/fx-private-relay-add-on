@@ -61,6 +61,7 @@
         e.target.classList.add("is-active");
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
+        e.target.blur();
       },
       generateMask: async (event, type = "random", data = null) => {
         
