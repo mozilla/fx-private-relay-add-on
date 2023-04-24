@@ -4,6 +4,7 @@
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 400px;
+  --panelHeaderHeight: 49px;
   background-color: var(--colorGrey05);
   min-width: var(--panelWidth);
   max-width: var(--panelWidth);
@@ -77,6 +78,8 @@
   top: 0;
   /* Z-index usage: This needs to be over absolute elements inside the main content area of the panel (MPP-3006) */
   z-index: 2;
+  /* Custom height defined to fix visual bug on Firefox for loading animation */
+  height: var(--panelHeaderHeight);
 }
 
 .fx-relay-menu-header-logo-bar {
@@ -939,7 +942,8 @@ sign-up-panel::after {
   position: absolute;
   overflow: hidden;
   display: none;
-  top: 49px;
+  /* Magic number: This is the height of the "header" for the pop-up. */
+  top: var(--panelHeaderHeight);
 }
 
 .fx-relay-menu-loading-bar-wrapper {

@@ -32,7 +32,6 @@
         // Custom rule to fix Firefox bug where popup does not 
         // resize from larger sized panels to smaller sized panels
         if (e.target.dataset.navId && e.target.dataset.navId === "custom") {
-          console.log("custom back to masks");
           const maskPanel = document.querySelector("masks-panel");
           maskPanel.classList.add("custom-return");
           
