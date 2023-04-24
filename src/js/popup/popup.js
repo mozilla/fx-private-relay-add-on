@@ -29,6 +29,18 @@
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
+        // Custom rule to fix Firefox bug where popup does not 
+        // resize from larger sized panels to smaller sized panels
+        if (e.target.dataset.navId && e.target.dataset.navId === "custom") {
+          const maskPanel = document.querySelector("masks-panel");
+          maskPanel.classList.add("custom-return");
+          
+          setTimeout(() => {
+            maskPanel.classList.remove("custom-return");
+          }, 10);
+          
+        }
+
         // Catch back button clicks if the user is logged out
         if (!sessionState.loggedIn && backNavLevel === "root") {
           popup.panel.update("sign-up");
@@ -61,6 +73,7 @@
         e.target.classList.add("is-active");
         const panelId = e.target.dataset.panelId;
         popup.panel.update(panelId);
+        e.target.blur();
       },
       generateMask: async (event, type = "random", data = null) => {
         
@@ -178,6 +191,9 @@
 
       // Set External Event Listerners
       await popup.utilities.setExternalLinkEventListeners();
+
+      // Clear browser action "!" badge
+      await popup.utilities.clearBrowserActionBadge();
 
       // Note: There's a chain of functions that run from init, and end with putting focus on the most reasonable element: 
       // Cases:
@@ -1126,9 +1142,7 @@
         });
       },
       clearBrowserActionBadge: async () => {
-        const { browserActionBadgesClicked } = await browser.storage.local.get(
-          "browserActionBadgesClicked"
-        );
+        const { browserActionBadgesClicked } = await browser.storage.local.get("browserActionBadgesClicked");
 
         // Dismiss the browserActionBadge only when it exists
         if (browserActionBadgesClicked === false) {
@@ -1364,6 +1378,7 @@
         sessionState.newsItemsCount = sessionState.newsContent.length;
 
         // Set unread notification count
+        // TODO: Move some of this logic to get_profile_data to set the browserActionBadge to a #
         await popup.panel.news.utilities.initNewsItemCountNotification();
       },
       setExternalLinkEventListeners: async () => {

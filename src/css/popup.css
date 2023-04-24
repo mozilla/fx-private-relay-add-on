@@ -4,6 +4,7 @@
   --panelWidth: 360px;
   /* Any changes to --panelHeight should be reflected in the screen media query */
   --panelHeight: 400px;
+  --panelHeaderHeight: 49px;
   background-color: var(--colorGrey05);
   min-width: var(--panelWidth);
   max-width: var(--panelWidth);
@@ -55,6 +56,12 @@
   margin-bottom: 100px;
 }
 
+/* Custom fix for Firefox bug where changing panel size from large to small does not trigger refresh */
+#masks-panel[data-account-level="premium"].custom-return .fx-relay-panel-content {
+  min-height: 300px;
+  max-height: 300px;
+}
+
 #webcompat-panel .fx-relay-panel-content {
   padding-top: var(--spacingSm);
 }
@@ -71,6 +78,8 @@
   top: 0;
   /* Z-index usage: This needs to be over absolute elements inside the main content area of the panel (MPP-3006) */
   z-index: 2;
+  /* Custom height defined to fix visual bug on Firefox for loading animation */
+  height: var(--panelHeaderHeight);
 }
 
 .fx-relay-menu-header-logo-bar {
@@ -117,6 +126,7 @@
   outline: 0;
   border: none;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .fx-relay-menu-dashboard-link .news-count {
@@ -190,6 +200,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  padding: 0 var(--spacingXl);
 }
 
 .fx-relay-panel-header-btn-back {
@@ -220,6 +231,10 @@
   font-size: var(--fontSizeTitle3xs);
   font-family: var(--fontStackFirefox);
   font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  width: 100%;
+  
 }
 
 /* Sign Up/In Panel */
@@ -819,9 +834,12 @@ sign-up-panel::after {
 .fx-relay-mask-item-label {
   font-size: var(--fontSizeBodyXs);
   color: var(--colorGrey40);
+  text-overflow: ellipsis;
   overflow: hidden;
   display: block;
   line-height: 1;
+  /* Custom height to account for cropped descender text */
+  height: 13px;
 }
 
 .fx-relay-mask-item-address-bar {
@@ -832,7 +850,7 @@ sign-up-panel::after {
 
 .fx-relay-mask-item-address-wrapper {
   display: flex;
-  gap: var(--spacingXs);
+  gap: var(--spacing2xs);
   flex-direction: column;
   width: calc( 100% - var(--spacingMd));
   position: relative;
@@ -924,6 +942,8 @@ sign-up-panel::after {
   position: absolute;
   overflow: hidden;
   display: none;
+  /* Magic number: This is the height of the "header" for the pop-up. */
+  top: var(--panelHeaderHeight);
 }
 
 .fx-relay-menu-loading-bar-wrapper {
