@@ -1308,14 +1308,32 @@
         if (
           !premium &&
           isEuCountryExpansion &&
-          ["cy", "ee", "gr", "lv", "lt", "lu", "mt", "pt", "sk", "si"].includes(
+          [
+            "bg",
+            "cs",
+            "cy",
+            "da",
+            "ee",
+            "gr",
+            "hr",
+            "hu",
+            "lt",
+            "lv",
+            "lu",
+            "mt",
+            "pl",
+            "pt",
+            "ro",
+            "si",
+            "sk",
+          ].includes(
             countryCode
           )
         ) {
           sessionState.newsContent.push({
             id: "eu-country-expansion",
             dateAdded: "20230620", // YYYYMMDD
-            waffle: "eu_count3ry_expansion",
+            waffle: "eu_country_expansion",
             locale: "us",
             audience: "free",
             headlineString: "popupEuCountryExpansionHeadline",
