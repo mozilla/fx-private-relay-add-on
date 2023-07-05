@@ -1297,6 +1297,59 @@
         const isFirefoxIntegrationAvailable = await checkWaffleFlag("firefox_integration");
         
         const currentBrowser = await getBrowser();
+        const isEuCountryExpansion = await checkWaffleFlag(
+          "eu_country_expansion"
+        );
+        const countryCode = (
+          await browser.storage.local.get("periodicalPremiumPlans")
+        ).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS.country_code;
+        const premium = (await browser.storage.local.get("premium")).premium;
+
+        if (
+          !premium &&
+          isEuCountryExpansion &&
+          [
+            "bg",
+            "cs",
+            "cy",
+            "da",
+            "ee",
+            "gr",
+            "hr",
+            "hu",
+            "lt",
+            "lv",
+            "lu",
+            "mt",
+            "pl",
+            "pt",
+            "ro",
+            "si",
+            "sk",
+          ].includes(
+            countryCode
+          )
+        ) {
+          sessionState.newsContent.push({
+            id: "eu-country-expansion",
+            dateAdded: "20230620", // YYYYMMDD
+            waffle: "eu_country_expansion",
+            locale: "us",
+            audience: "free",
+            headlineString: "popupEuCountryExpansionHeadline",
+            bodyString: "popupEuCountryExpansionBody",
+            teaserImg:
+              "/images/panel-images/announcements/panel-announcement-eu-expansion-square-illustration.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-announcement-eu-expansion-illustration.svg",
+            fullCta: "popupEuCountryExpansionPromoCTA",
+            fullCtaRelayURL: true,
+            fullCtaHref:
+              "/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-eu-country-expansion-cta#pricing",
+            fullCtaEventLabel: "panel-news-eu-country-expansion-cta",
+            fullCtaEventAction: "click",
+          });
+        }
 
         if (isFirefoxIntegrationAvailable && currentBrowser == "Firefox") {
           sessionState.newsContent.push({
