@@ -1310,9 +1310,9 @@
           isEuCountryExpansion &&
           [
             "bg",
-            "cs",
+            "cz",
             "cy",
-            "da",
+            "dk",
             "ee",
             "gr",
             "hr",
