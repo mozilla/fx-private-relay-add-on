@@ -1310,9 +1310,9 @@
           isEuCountryExpansion &&
           [
             "bg",
-            "cs",
+            "cz",
             "cy",
-            "da",
+            "dk",
             "ee",
             "gr",
             "hr",
@@ -1332,7 +1332,7 @@
         ) {
           sessionState.newsContent.push({
             id: "eu-country-expansion",
-            dateAdded: "20230620", // YYYYMMDD
+            dateAdded: "20230726", // YYYYMMDD
             waffle: "eu_country_expansion",
             locale: "us",
             audience: "free",
