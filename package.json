@@ -5,7 +5,7 @@
   "main": "index.js",
   "devDependencies": {
     "eslint": "^8.13.0",
-    "web-ext": "^7.6.0"
+    "web-ext": "^7.6.2"
   },
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
