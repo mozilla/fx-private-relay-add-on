@@ -1,4 +1,13 @@
-# Private Relay
+<p align="center">
+<img src="https://raw.githubusercontent.com/mozilla/fx-private-relay/11ad17e197e23a0453bfb74fa3670c87cfc35e36/frontend/src/components/landing/images/logo-firefox-relay.svg" width="250" />
+</p>
+
+
+# Private Relay 
+<!-- Badges include: license and size of repository -->
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://raw.githubusercontent.com/mozilla/fx-private-relay-add-on/main/LICENSE)
+![Repo Size](https://img.shields.io/github/repo-size/Mozilla/fx-private-relay-add-on)
+
 Private Relay generates email aliases to use in place of personal email addresses.
 
 Recipients will still receive emails, but Private Relay keeps their personal
@@ -7,6 +16,24 @@ and then [bought, sold, traded, or combined](https://www.bookyourdata.com/)
 with  other data to personally identify, track, and/or [target
 them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content).
 
+- [Private Relay](#private-relay)
+  - [Usage (for now)](#usage-for-now)
+  - [Local Extension Development](#local-extension-development)
+    - [Working with translations](#working-with-translations)
+      - [Getting the latest translations](#getting-the-latest-translations)
+      - [Running with the latest translations](#running-with-the-latest-translations)
+        - [Create a Firefox profile set to use the target language](#create-a-firefox-profile-set-to-use-the-target-language)
+        - [Run `web-ext` with that profile](#run-web-ext-with-that-profile)
+      - [Add/update messages for translation](#addupdate-messages-for-translation)
+  - [Build for other environments](#build-for-other-environments)
+    - [Distributing](#distributing)
+      - [Add-on Submission Process](#add-on-submission-process)
+      - [Continuous Pre-releases](#continuous-pre-releases)
+      - [Make the new version](#make-the-new-version)
+      - [Publish to AMO](#publish-to-amo)
+      - [Publish to Chrome](#publish-to-chrome)
+      - [Publish to GitHub](#publish-to-github)
+  
 ## Usage (for now)
 
 1. Install the extension.
@@ -118,7 +145,24 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
  * `npm run build:prod`: https://relay.firefox.com/
 
 ### Distributing
+
+#### Add-on Submission Process
+
+See internal documentation [here](https://mozilla-hub.atlassian.net/wiki/spaces/SECPRV/pages/27034372/Firefox+Relay+Add-on+Submission+Process). This document outlines how to submit and release the Firefox Relay add-on (extension) to the different add-on stores.
+
+Process summary: 
+
+![](https://i.imgur.com/rimgrmE.png)
+
+1. Cut Release: Create a new release on GitHub (new tag) with new version number.
+2. Open ADDONOPS ticket: Create a new Jira ticket for the ADDONOPS team using their form, filling out all the particulars. 
+3. QA Greelight: Link to QA comment or have QA comment directly on the ticket with greenlight. 
+4. Approval: If approval is given, you will be asked to submit to AMO.
+5. Submit to AMO: Submit the add-on to AMO. <br> 
+   <span style="color: red">**WARNING:**</span> make sure to choose the right options.
+
 #### Continuous Pre-releases
+
 The `sign-and-release-to-github` action creates a signed add-on after every
 merge to `main`. These pre-releases are available on the [GitHub Releases
 page](https://github.com/mozilla/fx-private-relay-add-on/releases).
@@ -138,7 +182,7 @@ to each release, under the release "Assets" section.
 2. Commit the version number bump
 3. Create a git tag for the version: `git tag <version>`
 4. Push the tag up to GitHub: `git push --tags`
-
+ 
 #### Publish to AMO
 
 1. After pushing the new version to GitHub, open the "continuous prerelease to GitHub" run for that tag: https://github.com/mozilla/fx-private-relay-add-on/actions/workflows/sign-and-release-to-github.yml
@@ -164,3 +208,4 @@ Finally, we also publish the release to GitHub for those followers.
    * Use the version number for "Tag version" and "Release title"
    * Release notes: copy the output of `git log --no-merges --pretty=format:"%h %s" <previous-version>..<new-version>`
    * Attach binaries: select the signed `.xpi` file
+
