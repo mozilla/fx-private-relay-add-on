@@ -159,7 +159,7 @@ Process summary:
 3. QA Greelight: Link to QA comment or have QA comment directly on the ticket with greenlight. 
 4. Approval: If approval is given, you will be asked to submit to AMO.
 5. Submit to AMO: Submit the add-on to AMO. <br> 
-   <span style="color: red">**WARNING:**</span> make sure to choose the right options.
+   **WARNING:** make sure to choose the right options.
 
 #### Continuous Pre-releases
 
