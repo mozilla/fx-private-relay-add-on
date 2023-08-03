@@ -1,0 +1,141 @@
+.fx-relay-modal-body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--colorWhite);
+  box-sizing: border-box;
+  font-size: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--fontStackBase);
+  -moz-osx-font-smoothing: grayscale;
+}
+.container {
+  margin: 8px;
+}
+
+.flexbox {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.description {
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+  flex-direction: column;
+}
+
+.description > * {
+  margin: 0;
+  line-height: 120%;
+  font-size: 13px;
+
+}
+
+.headline {
+  padding-top: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.footer > * {
+  font-size: 14px;
+}
+
+.masks-left-row {
+  padding-top: 6px;
+  font-weight: 600;
+}
+
+.get-unlimited {
+  background: transparent;
+}
+
+.fx-relay-manage-masks {
+  background: transparent;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.top-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  color: gray;
+  margin: 0;
+  width: auto;
+  align-self: flex-start;
+}
+
+.close:hover {
+  opacity: 0.5;
+}
+
+.recommended {
+  align-self: start;
+  background: #9059FF;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 6px 8px;
+  line-height: 100%;
+  align-self: left;
+  border-radius: 4px;
+}
+
+.maxxuardo-wrapper {
+  padding-right: 8px;
+  display: flex;
+  border-right: 1px solid #eee;
+}
+
+.maxxuardo {
+  align-self: center;
+  width: 120px;
+  height: 120px;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.fx-relay-logo {
+  width: 20px;
+}
+
+.get-unlimited-mask-btn {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  background-color: #3D04AD;
+  color: var(--colorWhite);
+  font-weight: 600;
+  justify-content: start;
+  width: auto;
+}
+
+.fx-relay-modal-body *,
+.fx-relay-modal-body *:before,
+.fx-relay-modal-body *:after {
+  box-sizing: inherit;
+}

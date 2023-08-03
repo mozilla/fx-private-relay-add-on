@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Firefox Relay</title>
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/in-page-modal.css" />
+    <script src="/js/libs/browser-polyfill.min.js"></script>
+    <script src="/js/shared/utils.js"></script>
+    <script src="/js/shared/metrics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body class="fx-relay-modal-body fx-relay is-premium is-loading">
+    <div class="container fx-relay-modal">
+      <div class="flexbox">
+        <div class="maxxuardo-wrapper">
+          <img class="maxxuardo" src="/images/maxxuardo.webp" alt="" />
+        </div>
+        <div class="description">
+          <div class="top-row">
+            <div class="recommended">✨ Recommended for this site</div>
+            <button
+              class="js-close-modal close fx-relay-c-button t-basic get-unlimited"
+            >
+              <img src="/images/dismiss-btn.svg" />
+            </button>
+          </div>
+          <p class="headline"></p>
+          <p class="body"></p>
+          <p class="masks-left-row">
+            Masks remaining: <span class="masks-left"></span>
+          </p>
+          <!-- With aliases left -->
+          <div class="js-generate-mask-modal-footer footer">
+            <button
+              class="js-fx-relay-generate-mask fx-relay-c-button t-primary"
+            >
+              Generate new mask
+            </button>
+            <a class="fx-relay-c-button t-secondary t-basic get-unlimited">
+              Get unlimited masks
+            </a>
+          </div>
+
+          <!-- Without aliases left -->
+          <div class="js-upgrade-modal-footer footer hidden">
+            <a
+              class="js-get-unlimited-masks get-unlimited-mask-btn js-fx-relay-get-unlimited-mask fx-relay-c-button"
+            >
+              <img
+                class="fx-relay-logo"
+                src="/images/logo-image-fx-relay.svg"
+                alt=""
+              />
+              <span>Get unlimited masks</span>
+            </a>
+
+            <a
+              class="js-manage-masks fx-relay-c-button t-secondary t-basic fx-relay-manage-masks"
+            >
+              Manage all masks
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/other-websites/inpage_modal.js"></script>
+  </body>
+</html>

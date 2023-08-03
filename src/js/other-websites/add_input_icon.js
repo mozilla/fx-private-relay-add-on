@@ -10,6 +10,15 @@ function closeRelayInPageMenu() {
   return;
 }
 
+function closeRelayInPageModal() {
+  const openMenuEl = document.querySelector(".fx-relay-modal-iframe");
+  openMenuEl.remove();
+
+  const relayInPageModal = buildInPageModalIframe();
+  addRelayModalToPage(relayInPageModal);
+  return;
+}
+
 function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   relayMenuWrapper.appendChild(relayInPageMenu);
   document.body.appendChild(relayMenuWrapper);
@@ -20,6 +29,16 @@ function addRelayMenuToPage(relayMenuWrapper, relayInPageMenu) {
   const relayInPageMenuIframe = document.querySelector(".fx-relay-menu-iframe iframe");
   relayInPageMenuIframe.ariaHidden = "false"
   relayInPageMenuIframe.focus();
+  return;
+}
+
+function addRelayModalToPage(relayInPageModal) {
+  document.body.appendChild(relayInPageModal);
+
+  const relayInPageModalIframe = document.querySelector(".fx-relay-modal-iframe iframe");
+  relayInPageModalIframe.ariaHidden = "false"
+  relayInPageModalIframe.focus();
+
   return;
 }
 
@@ -93,7 +112,6 @@ function buildInpageIframe(opts) {
   iframe.tabIndex = 0;
   iframe.ariaHidden = "false";
   
-
   if (!opts.isSignedIn) {
     // If the user is not signed in, the content is shorter. Build the iframe accordingly.
     iframe.height = 200;
@@ -103,6 +121,34 @@ function buildInpageIframe(opts) {
   
   return div;
 }
+
+function buildInPageModalIframe() {
+  const div = createElementWithClassList(
+    "div",
+    "fx-relay-modal-iframe"
+  );
+  const iframe = document.createElement("iframe");
+  iframe.src = browser.runtime.getURL("inpage-modal.html");
+  iframe.width = 500;
+  // This height is derived from the Figma file. However, this is just the starting instance of the iframe/inpage menu. After it's built out, it resizes itself based on the inner contents.
+  iframe.height = 210;
+  iframe.title = "This is a modal";
+  iframe.tabIndex = 0;
+  iframe.style.overflow = "hidden";
+  iframe.ariaHidden = "false";
+  div.classList.add("fx-relay-hidden");
+
+  // if (!opts.isSignedIn) {
+  //   // If the user is not signed in, the content is shorter. Build the iframe accordingly.
+  //   iframe.height = 200;
+  // }
+  // iframe.addEventListener("load", requestAnimationFrame.bind(this, fit))
+
+  div.appendChild(iframe);
+  
+  return div;
+}
+
 
 function addPaddingRight(element, paddingInPixels) {
   const computedElementStyles = getComputedStyle(element);
@@ -128,7 +174,6 @@ function addPaddingRight(element, paddingInPixels) {
     element.style.width = newWidth.toString() + "px";
   }
 }
-
 
 let lastClickedEmailInput;
 
@@ -187,6 +232,53 @@ async function addRelayIconToInput(emailInput) {
     sendRelayEvent("In-page", evtAction, evtLabel);
   };
 
+
+  const relayModal = document.querySelector(".fx-relay-modal-iframe");
+
+  async function currentPageURL() {
+    const current = await browser.runtime.sendMessage({
+       method: "getCurrentPageURL",
+     });
+     return current;
+   }
+   
+   const signUpTerms = ["signup", "sign-up", "register"];
+
+   async function isASignUpFlow() {
+     const current = await currentPageURL(); 
+     let signUpFlowBool = false;
+
+     signUpTerms.forEach((e) => {
+      if (current.includes(e)) {
+        signUpFlowBool = true;
+      }
+     });
+
+    return signUpFlowBool;
+   }
+
+  if (await isASignUpFlow()) {
+    lastClickedEmailInput = emailInput;
+
+    if (!relayModal) {
+      const relayInPageModal = buildInPageModalIframe();
+      addRelayModalToPage(relayInPageModal);
+      emailInput.classList.toggle("fx-relay-modal-open"); 
+    }
+  }
+
+  // Show only when listener input field
+  emailInput.addEventListener("input", async (e) => {
+    const emailInputValue = emailInput.value;
+    const relayModal = document.querySelector(".fx-relay-modal-iframe");
+
+    if (emailInputValue.includes("@gmail") || emailInputValue.includes("@yahoo") || emailInputValue.includes("@hotmail")) {
+      
+      relayModal.classList.remove("fx-relay-hidden");
+      return;
+    }
+  });
+
   relayIconBtn.addEventListener("click", async (e) => {
     if (!e.isTrusted) {
       // The click was not user generated so ignore
@@ -201,7 +293,6 @@ async function addRelayIconToInput(emailInput) {
     window.addEventListener("scroll", positionRelayMenu);
 
     const signedInUser = await isUserSignedIn();
-
     const relayInPageMenu = buildInpageIframe({isSignedIn: signedInUser});
     const relayMenuWrapper = createElementWithClassList(
       "div",
@@ -247,6 +338,7 @@ function updateIframeHeight(height) {
 browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
   if (m.filter == "fillInputWithAlias") {
     fillInputWithAlias(lastClickedEmailInput, m.newRelayAddressResponse);
+    console.log(lastClickedEmailInput);
     const relayIconBtn = document.querySelector(".fx-relay-menu-open");
     relayIconBtn?.classList.add("user-generated-relay");
     return closeRelayInPageMenu();
@@ -256,6 +348,10 @@ browser.runtime.onMessage.addListener(function(m, _sender, _sendResponse) {
   if (m.message === "iframeCloseRelayInPageMenu") {
       return closeRelayInPageMenu();
   }  
+  // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
+  if ((m.message === "iframeCloseRelayInPageModal")) {
+    return closeRelayInPageModal();
+} 
 
   // This event is fired from the iframe when the user presses "Escape" key or completes an action (Generate alias, manage aliases)
   if (m.method == "updateIframeHeight") {

@@ -488,6 +488,9 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
     case "iframeCloseRelayInPageMenu":
       browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
       break;
+    case "iframeCloseRelayInPageModal":
+      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageModal"});
+      break;
     case "fillInputWithAlias":
       browser.tabs.sendMessage(sender.tab.id, m.message);
       break;
@@ -509,6 +512,10 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
       break;
     case "makeDomainAddress":
       response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
+      break;
+    case "getCurrentPageURL":
+      // Only capture the page hostanme if the active tab is an non-internal (about:) page.
+      if (currentPage.url) { response = (new URL(currentPage.url)).href }
       break;
     case "makeRelayAddress":
       response = await makeRelayAddress(m.description);

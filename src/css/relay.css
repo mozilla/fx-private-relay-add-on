@@ -1,5 +1,6 @@
 .fx-relay-first-run,
 .fx-relay-menu-wrapper,
+.fx-relay-modal-iframe,
 .fx-relay-menu-iframe,
 .fx-relay-menu,
 .fx-relay-panel,
@@ -35,6 +36,7 @@
 }
 
 .fx-relay-menu-iframe ::-moz-focus-inner,
+.fx-relay-modal-iframe ::-moz-focus-inner,
 .fx-relay-menu ::-moz-focus-inner,
 .fx-relay-icon ::-moz-focus-inner {
   border: 0;
@@ -91,6 +93,24 @@
   z-index: 9999999999999999999999;
   background-color: rgba(0, 0, 0, 0.1);
   animation: fxRelayFadeIn 0.2s ease forwards;
+}
+
+.fx-relay-modal-iframe {
+  top: 0;
+  right: 0;
+  position: fixed;
+  overflow: hidden;
+  margin: 20px;
+  z-index: 9999999999999999999999;
+  animation: fxRelayFadeIn 0.5s ease-in-out;
+  box-shadow: 0 5px 12px 0 rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.fx-relay-modal-iframe iframe{
+  border-width: 0;
+  overflow: hidden;
+
 }
 
 fx-relay-logotype {
@@ -254,4 +274,10 @@ button.fx-relay-button {
   100% {
     opacity: 1;
   }
+}
+
+.fx-relay-hidden {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
 }
