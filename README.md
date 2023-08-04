@@ -156,7 +156,7 @@ Process summary:
 
 1. Cut Release: Create a new release on GitHub (new tag) with new version number.
 2. Open ADDONOPS ticket: Create a new Jira ticket for the ADDONOPS team using their form, filling out all the particulars. 
-3. QA Greelight: Link to QA comment or have QA comment directly on the ticket with greenlight. 
+3. QA Greenlight: Link to QA comment or have QA comment directly on the ticket with greenlight. 
 4. Approval: If approval is given, you will be asked to submit to AMO.
 5. Submit to AMO: Submit the add-on to AMO. <br> 
    **WARNING:** make sure to choose the right options.
