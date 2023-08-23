@@ -1390,8 +1390,8 @@
         // Add Bundle Pricing News Item
         if (isBundleAvailable) {
           const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code]["*"].yearly.price;
+          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code]["*"].yearly.currency;
           const userLocale = navigator.language;
           const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
             style: "currency",
