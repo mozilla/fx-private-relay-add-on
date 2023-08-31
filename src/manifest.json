@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Firefox Relay",
-  "version": "2.7.0",
+  "version": "2.7.3",
 
   "description": "__MSG_extensionDescription_mask__",
 
@@ -21,7 +21,12 @@
   },
 
   "background": {
-      "scripts": ["js/libs/browser-polyfill.min.js", "js/background/background.js", "js/background/context-menu.js"]
+      "scripts": [
+        "js/libs/browser-polyfill.min.js",
+        "js/shared/utils.js",
+        "js/background/background.js",
+        "js/background/context-menu.js"
+      ]
   },
 
   "browser_action": {
@@ -73,7 +78,7 @@
         "js/shared/utils.js",
         "js/other-websites/fathom.js",
         "js/other-websites/email_detector.js",
-        "js/other-websites/add_input_icon.js",
+        "js/other-websites/icon.js",
         "js/other-websites/fill_relay_address.js",
         "js/shared/metrics.js"
       ],

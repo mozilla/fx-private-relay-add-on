@@ -12,7 +12,7 @@ module.exports = {
     "globals": {
         "areInputIconsEnabled": "readonly",
         "createElementWithClassList": "readonly",
-        "detectEmailInputs": "readonly",
+        "findEmailInputs": "readonly",
         "enableDataOptOut": "readonly",
         "fathom": "readonly",
         "fillInputWithAlias": "readonly",

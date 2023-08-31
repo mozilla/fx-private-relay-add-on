@@ -2,6 +2,7 @@
 
 .fx-relay {
   /* Spacing/Layout Tokens */
+  --spacing2xs: 2px;
   --spacingXs: 4px;
   --spacingSm: 8px;
   --spacingMd: 16px;

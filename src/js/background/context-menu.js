@@ -1,4 +1,4 @@
-/* global patchMaskInfo */
+/* global patchMaskInfo getBrowser */
 
 // The static data used to create different context menu items.
 // These are the same everytime, as opposed to the dynamic menu items: reusing aliases
@@ -542,12 +542,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
   const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
   const urlManageAliases = `${relaySiteOrigin}/accounts/profile/`;
   const phoneMask = await relayContextMenus.utils.getPhoneMask();
+  const currentBrowser = await getBrowser();
   switch (info.menuItemId) {
     case "fx-private-relay-generate-alias":
       sendMetricsEvent({
         category: "Extension: Context Menu",
         action: "click",
         label: "context-menu-generate-alias",
+        dimension5: currentBrowser,
+        dimension7: "add-on",
       });
       await relayContextMenus.listeners.onMakeRelayAddressForTargetElement(
         info,
@@ -559,6 +562,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         category: "Extension: Context Menu",
         action: "click",
         label: "context-menu-get-unlimited-aliases",
+        dimension5: currentBrowser,
+        dimension7: "add-on",
       });
       await browser.tabs.create({ url: urlPremium });
       break;
@@ -567,6 +572,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         category: "Extension: Context Menu",
         action: "click",
         label: "context-menu-relay-manage-aliases",
+        dimension5: currentBrowser,
+        dimension7: "add-on",
       });
       await browser.tabs.create({ url: urlManageAliases });
       break;
@@ -575,6 +582,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         category: "Extension: Context Menu",
         action: "click",
         label: "context-menu-insert-phone-mask",
+        dimension5: currentBrowser,
+        dimension7: "add-on",
       });
       if (phoneMask) {
         browser.tabs.sendMessage(
@@ -597,6 +606,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       category: "Extension: Context Menu",
       action: "click",
       label: "context-menu-" + info.parentMenuItemId,
+      dimension5: currentBrowser,
+      dimension7: "add-on",
     });
     await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
   }
