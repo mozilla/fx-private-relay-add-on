@@ -323,14 +323,11 @@
           // logic to show survey is found in shouldShowSurvey function
           const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
 
-          // reason to show and locale check?
-
           if (shouldShowCSAT && dataCollection === "data-enabled") {
             const survey = popup.panel.survey;
 
             survey.utils.showSurveyLink();
 
-            // TODO: add a dismissal event click
             // Show the survey panel when the link is clicked
             survey.select
               .surveyLink()
@@ -1058,7 +1055,6 @@
               tier,
               satisfactionLevel
             );
-            console.log(tier, satisfactionLevel, link);
 
             popup.panel.survey.select
               .externalSurveyLink()
@@ -1093,7 +1089,7 @@
                   button.setAttribute("aria-disabled", true)
               );
           },
-          userFirstSeen: async () => {
+          useFirstSeen: async () => {
             const isLoggedIn = sessionState.loggedIn;
             const id = await browser.storage.local.get("profileID");
 
@@ -1101,18 +1097,18 @@
               return null;
             }
 
-            const firstSeenString = popup.utilities.setStorageItem(
-              "first_seen_" + id
+            const firstSeenString = await popup.utilities.getStorageItem(
+              "first_seen_" + id.profileID
             );
-
+ 
             if (typeof firstSeenString === "string") {
               return new Date(Number.parseInt(firstSeenString, 10));
             }
 
             const currentTimestamp = Date.now();
 
-            popup.utilities.setStorageItem(
-              "first_seen_" + id,
+            await popup.utilities.setStorageItem(
+              "first_seen_" + id.profileID,
               currentTimestamp.toString(),
               10 * 365 * 24 * 60 * 60
             );
@@ -1121,36 +1117,34 @@
           },
           getReasonToShowSurvey: async () => {
             let reasonToShow = null;
-            const firstSeen = popup.panel.survey.utils.userFirstSeen();
+            const firstSeen = await popup.panel.survey.utils.useFirstSeen();
             const { premium } = await browser.storage.local.get("premium");
             const { profileID } = await browser.storage.local.get("profileID");
             const dismiss = popup.panel.survey.dismiss;
+            const free1DayDismissal = dismiss.free1DayDismissal(profileID);
             const free7DaysDismissal = dismiss.free7DaysDismissal(profileID);
             const free30DaysDismissal = dismiss.free30DaysDismissal(profileID);
             const free90DaysDismissal = dismiss.free90DaysDismissal(profileID);
             const premium7DaysDismissal = dismiss.premium7DaysDismissal(profileID);
             const premium30DaysDismissal = dismiss.premium30DaysDismissal(profileID);
             const premium90DaysDismissal = dismiss.premium90DaysDismissal(profileID);
-
-            console.log({free7DaysDismissal, free30DaysDismissal, free90DaysDismissal, premium7DaysDismissal, premium30DaysDismissal, premium90DaysDismissal});
-            // TODO: if this data doesn't exist we will have to query it 
             const { date_subscribed } = await browser.storage.local.get(
               "date_subscribed"
             );
 
-            console.log("premium", premium);
-            console.log("date_subscribed", date_subscribed);
-            console.log("firstSeen instanceof Date", firstSeen instanceof Date);
+            console.log(firstSeen);
 
             if (premium && (date_subscribed || firstSeen instanceof Date)) {
+              // There are two reasons why someone might not have a subscription date set:
+              // - They subscribed before we started tracking that.
+              // - They have Premium because they have a Mozilla email address.
+              // In the latter case, their first visit date is effectively their
+              // subscription date. In the former case, they will have had Premium for
+              // a while, so they can be shown the survey too. Their first visit will
+              // have been a while ago, so we'll just use that as a proxy for the
+              // subscription date:
               const subscriptionDate = date_subscribed ? new Date(date_subscribed) : firstSeen;
-              // const daysSinceSubscription = (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
-
-              const daysSinceSubscription = 91;
-
-              console.log("subscriptionDate", subscriptionDate);
-              console.log("daysSinceSubscription", daysSinceSubscription);
-              
+              const daysSinceSubscription = (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
 
               if (daysSinceSubscription >= 90) {
                 if (!premium90DaysDismissal.isDismissed) {
@@ -1166,8 +1160,8 @@
                 }
               }
             } else if (!premium && firstSeen instanceof Date) {
-              console.log("else if (!premium && firstSeen instanceof Date) {");
-              const daysSinceFirstSeen = (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
+              const daysSinceFirstSeen = 91;//(Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24; 
+
               if (daysSinceFirstSeen >= 90) {
                 if (!free90DaysDismissal.isDismissed) {
                   reasonToShow = "free90days";
@@ -1180,6 +1174,10 @@
                 if (!free7DaysDismissal.isDismissed) {
                   reasonToShow = "free7days";
                 }
+              } else if (daysSinceFirstSeen >= 1) {
+                if (!free1DayDismissal.isDismissed) {
+                  reasonToShow = "free1day";
+                }
               }
             }
 
@@ -1189,7 +1187,6 @@
             const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
             const locale = navigator.language;
 
-            console.log(reasonToShow, locale);
             return (
               reasonToShow !== null &&
               ["en", "fr", "de"].includes(locale.split("-")[0])
@@ -1198,6 +1195,7 @@
         },
         dismiss: {
           // dismissals are keyed by the profile ID
+          free1DayDismissal: (id) => popup.utilities.localDismiss("csat-survey-free-1day_" + id),
           free7DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-free-7days_" + id),
           free30DaysDismissal: (id) => popup.utilities.localDismiss("csat-survey-free-30days_" + id),
           free90DaysDismissal: (id) => popup.utilities.localDismiss(
@@ -1654,8 +1652,8 @@
         // Add Bundle Pricing News Item
         if (isBundleAvailable) {
           const getBundlePlans = (await browser.storage.local.get("bundlePlans")).bundlePlans.BUNDLE_PLANS;
-          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.price;
-          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code].en.yearly.currency
+          const getBundlePrice = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code]["*"].yearly.price;
+          const getBundleCurrency = getBundlePlans.plan_country_lang_mapping[getBundlePlans.country_code]["*"].yearly.currency
           const userLocale = navigator.language;
           const formattedBundlePrice = new Intl.NumberFormat(userLocale, {
             style: "currency",
