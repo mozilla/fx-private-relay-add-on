@@ -340,6 +340,16 @@
               .addEventListener("click", async () =>
                 survey.utils.closeSurveyLink()
               );
+
+            // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
+            survey.select
+              .surveyDismiss()
+              .addEventListener("click", async () => {
+                const { profileID } = await browser.storage.local.get("profileID"); 
+                const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
+
+                await popup.utilities.dismissByReason(reasonToShow, profileID);
+              });
           }
 
           if (!premium) {
@@ -1121,18 +1131,31 @@
             const { premium } = await browser.storage.local.get("premium");
             const { profileID } = await browser.storage.local.get("profileID");
             const dismiss = popup.panel.survey.dismiss;
-            const free1DayDismissal = dismiss.free1DayDismissal(profileID);
-            const free7DaysDismissal = dismiss.free7DaysDismissal(profileID);
-            const free30DaysDismissal = dismiss.free30DaysDismissal(profileID);
-            const free90DaysDismissal = dismiss.free90DaysDismissal(profileID);
-            const premium7DaysDismissal = dismiss.premium7DaysDismissal(profileID);
-            const premium30DaysDismissal = dismiss.premium30DaysDismissal(profileID);
-            const premium90DaysDismissal = dismiss.premium90DaysDismissal(profileID);
+            const free1DayDismissal = await dismiss.free1DayDismissal(
+              profileID
+            );
+            const free7DaysDismissal = await dismiss.free7DaysDismissal(
+              profileID
+            );
+            const free30DaysDismissal = await dismiss.free30DaysDismissal(
+              profileID
+            );
+            const free90DaysDismissal = await dismiss.free90DaysDismissal(
+              profileID
+            );
+            const premium7DaysDismissal = await dismiss.premium7DaysDismissal(
+              profileID
+            );
+            const premium30DaysDismissal = await dismiss.premium30DaysDismissal(
+              profileID
+            );
+            const premium90DaysDismissal = await dismiss.premium90DaysDismissal(
+              profileID
+            );
             const { date_subscribed } = await browser.storage.local.get(
               "date_subscribed"
             );
-
-            console.log(firstSeen);
+            let isDismissed;
 
             if (premium && (date_subscribed || firstSeen instanceof Date)) {
               // There are two reasons why someone might not have a subscription date set:
@@ -1143,39 +1166,50 @@
               // a while, so they can be shown the survey too. Their first visit will
               // have been a while ago, so we'll just use that as a proxy for the
               // subscription date:
-              const subscriptionDate = date_subscribed ? new Date(date_subscribed) : firstSeen;
-              const daysSinceSubscription = (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
+              const subscriptionDate = date_subscribed
+                ? new Date(date_subscribed)
+                : firstSeen;
+              const daysSinceSubscription =
+                (Date.now() - subscriptionDate.getTime()) / 1000 / 60 / 60 / 24;
 
               if (daysSinceSubscription >= 90) {
-                if (!premium90DaysDismissal.isDismissed) {
+                isDismissed = await premium90DaysDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "premium90days";
                 }
               } else if (daysSinceSubscription >= 30) {
-                if (!premium30DaysDismissal.isDismissed) {
+                isDismissed = await premium30DaysDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "premium30days";
                 }
               } else if (daysSinceSubscription >= 7) {
-                if (!premium7DaysDismissal.isDismissed) {
+                isDismissed = await premium7DaysDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "premium7days";
                 }
               }
             } else if (!premium && firstSeen instanceof Date) {
-              const daysSinceFirstSeen = 91;//(Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24; 
+              const daysSinceFirstSeen =
+                (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
 
               if (daysSinceFirstSeen >= 90) {
-                if (!free90DaysDismissal.isDismissed) {
+                isDismissed = await free90DaysDismissal.isDismissed();
+                if (!free90DaysDismissal.isDismissed()) {
                   reasonToShow = "free90days";
                 }
               } else if (daysSinceFirstSeen >= 30) {
-                if (!free30DaysDismissal.isDismissed) {
+                isDismissed = await free30DaysDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "free30days";
                 }
               } else if (daysSinceFirstSeen >= 7) {
-                if (!free7DaysDismissal.isDismissed) {
+                isDismissed = await free7DaysDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "free7days";
                 }
-              } else if (daysSinceFirstSeen >= 1) {
-                if (!free1DayDismissal.isDismissed) {
+              } else if (daysSinceFirstSeen > 1) {
+                isDismissed = await free1DayDismissal.isDismissed();
+                if (!isDismissed) {
                   reasonToShow = "free1day";
                 }
               }
@@ -1218,6 +1252,7 @@
           surveyLink: () => document.querySelector(".fx-relay-csat-survey-link"),
           surveyButtons: () => document.querySelectorAll(".fx-relay-csat-button"),
           successMessage: () => document.querySelector(".fx-relay-survey-success"),
+          surveyDismiss: () => document.querySelector(".fx-relay-survey-dismiss"),
           externalSurveyLink: () => document.querySelector(".fx-relay-external-survey-link"),
         },
       },
@@ -1743,64 +1778,52 @@
           expirationTime: new Date().getTime() + expirationTimeInMillis,
         };
         await browser.storage.local.set({ [key]: item });
-      },
-      removeStorageItem: async (key) => {
-        const result = await browser.storage.local.get(key);
-        if (Object.keys(result).length > 0) {
-          await browser.storage.local.remove(key);
-        } else {
-          console.log(
-            `Item with key "${key}" does not exist in browser.storage.local.`
-          );
-        }
-      },
+      }, 
       localDismiss: (key, options = {}) => {
-        const cookieId = key + "_dismissed";
+        const storageId = key + "_dismissed";
 
-        let isDismissed = popup.utilities.hasDismissedStorageItem(
-          cookieId,
-          options.duration
-        );
+        const isDismissed = async () => {
+            let dismissedTime = await browser.storage.local.get(storageId);
+            if (dismissedTime[storageId]) {
+                const currentTime = Date.now();
+                const elapsedTime = currentTime - dismissedTime[storageId];
+                const maxAge = (typeof options.duration === "number" ? options.duration : 100 * 365 * 24 * 60 * 60) * 1000; // Convert to milliseconds
+                return elapsedTime < maxAge;
+            }
+            return false;
+        };
 
-        const dismiss = (dismissOptions = {}) => {
-          const maxAgeInSeconds =
-            typeof options.duration === "number"
-              ? options.duration
-              : 100 * 365 * 24 * 60 * 60;
-
-          const now = new Date().getTime();
-          popup.utilities.setStorageItem(
-            cookieId,
-            now.toString(),
-            maxAgeInSeconds
-          );
-
-          if (dismissOptions?.soft !== true) {
-            isDismissed = true;
-          }
+        const dismiss = async (dismissOptions = {}) => {
+            const currentTime = Date.now();
+            await browser.storage.local.set({ [storageId]: currentTime });
+            if (dismissOptions.soft !== true) {
+                return true; // Indicating it's dismissed
+            }
+            return await isDismissed();
         };
 
         return {
-          isDismissed: isDismissed,
-          dismiss: dismiss,
+            isDismissed: isDismissed,
+            dismiss: dismiss
         };
-      },
-      hasDismissedStorageItem: (key, duration) => {
-        const dismissalStorageItemValue = popup.utilities.getStorageItem(key);
-        const dismissalTimeStamp = dismissalStorageItemValue
-          ? Number.parseInt(dismissalStorageItemValue, 10)
-          : undefined;
-
-        const wasDismissedBefore =
-          // To be dismissed, the cookie has to be set, and either...
-          typeof dismissalTimeStamp === "number" &&
-          //   ...the dismissal should not be limited in duration, or...
-          (typeof duration !== "number" ||
-            //   ...the dismissal was long enough ago:
-            Date.now() - dismissalTimeStamp <= duration * 1000);
-
-        return wasDismissedBefore;
-      },
+      }, 
+      dismissByReason: (reasonToShow, profileID) => {
+        const dismissalMapping = {
+          "free90days": popup.panel.survey.dismiss.free90DaysDismissal,
+          "free30days": popup.panel.survey.dismiss.free30DaysDismissal,
+          "free7days": popup.panel.survey.dismiss.free7DaysDismissal,
+          "free1day": popup.panel.survey.dismiss.free1DayDismissal,
+          "premium90days": popup.panel.survey.dismiss.premium90DaysDismissal,
+          "premium30days": popup.panel.survey.dismiss.premium30DaysDismissal,
+          "premium7days": popup.panel.survey.dismiss.premium7DaysDismissal
+      };
+  
+      const dismissalFunction = dismissalMapping[reasonToShow];
+      if (dismissalFunction) {
+          const dismissalInstance = dismissalFunction(profileID);
+          dismissalInstance.dismiss();
+      } 
+     },
     },
   };
 
