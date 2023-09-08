@@ -736,6 +736,11 @@ sign-up-panel::after {
   color: var(--colorGrey50)
 }
 
+#survey-label {
+  background-color: transparent;
+  border: none;
+}
+
 #survey-panel .fx-relay-panel-content {
   min-height: 344px;
   max-height: 344px; 
@@ -813,6 +818,9 @@ sign-up-panel::after {
   font-size:  var(--fontSizeBodyMd);
   text-decoration: none;
   font-family: var(--fontStackBase);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 
 }
 .fx-relay-masks-error-message {
