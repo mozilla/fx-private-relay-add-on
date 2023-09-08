@@ -718,13 +718,15 @@ sign-up-panel::after {
 
 .fx-relay-csat-survey-close-icon {
   padding: 0 var(--spacingXs);
+  border: none;
+  background-color: transparent;
   cursor: pointer;
 }
 
 .csat-survey-satisfaction-section {
   margin-bottom: var(--spacingMd);
   display: flex;
-  gap: 6px;
+  gap: var(--spacingXs);
   flex-direction: row;
   flex-wrap: wrap;
 }
@@ -789,7 +791,7 @@ sign-up-panel::after {
 }
 
 .fx-relay-survey-success {
-  margin-top: 10px;
+  margin-top: var(--spacingSm);
 }
 
 .fx-relay-survey-success-body {
@@ -803,7 +805,7 @@ sign-up-panel::after {
   padding: var(--spacingMd);
   flex-direction: row;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: var(--fontSizeTitle3xs);
 }
 
 .fx-relay-survey-action {

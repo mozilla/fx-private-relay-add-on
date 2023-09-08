@@ -336,10 +336,12 @@
               );
 
             survey.select
-              .closeSurveyLinkButton()
-              .addEventListener("click", async () =>
-                survey.utils.closeSurveyLink()
-              );
+            .closeSurveyLinkButton()
+            .addEventListener("click", async () => {
+              survey.utils.closeSurveyLink();
+
+              window.close();
+            });
 
             // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
             survey.select
@@ -349,6 +351,8 @@
                 const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
 
                 await popup.utilities.dismissByReason(reasonToShow, profileID);
+
+                window.close();
               });
           }
 
@@ -1069,6 +1073,19 @@
             popup.panel.survey.select
               .externalSurveyLink()
               .setAttribute("href", link);
+
+            // set onclick for popup.panel.survey.select.externalSurveyLink()
+            popup.panel.survey.select
+              .externalSurveyLink()
+              .addEventListener("click", (e) => {
+                e.preventDefault();
+
+                // supported by Firefox and Chrome
+                chrome.tabs.create({ url: e.target.href });
+
+                // close panel after opening survey in new tab
+                window.close();
+              });
           },
           showSurveyLink: () => {
             popup.panel.survey.select
@@ -1120,6 +1137,7 @@
             await popup.utilities.setStorageItem(
               "first_seen_" + id.profileID,
               currentTimestamp.toString(),
+              // expiration: (10 years * 365 days/year * 24 hours/day * 60 minutes/hour * 60 seconds/minute)
               10 * 365 * 24 * 60 * 60
             );
 

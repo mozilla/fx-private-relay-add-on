@@ -84,11 +84,11 @@
         <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
           <div class="fx-relay-panel-content">
             <!-- CSAT Survey -->
-            <div class="fx-relay-csat-survey-link-container is-hidden" role="alert"> 
-              <span class="i18n-content fx-relay-csat-survey-link" data-i18n-message-id="popupSurveyLink"></span>
-              <span class="fx-relay-csat-survey-close-icon">
-                <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/icons/nebula-close.svg">
-              </span>
+            <div class="fx-relay-csat-survey-link-container is-hidden" role="alert" aria-labelledby="surveyLabel" aria-hidden="true">
+              <span id="surveyLabel" class="i18n-content fx-relay-csat-survey-link" data-i18n-message-id="popupSurveyLink"></span>
+              <button class="fx-relay-csat-survey-close-icon" aria-label="Close survey" tabindex="0" onclick="closeSurvey();">
+                <img class="i18n-alt-tag" data-i18n-message-id="close" alt="Close icon" src="/icons/nebula-close.svg">
+              </button>
             </div>
 
             <!-- Free Masks Count -->
@@ -252,14 +252,15 @@
 
               <div class="csat-survey-satisfaction-section">
                 <!-- Select issue checkboxes -->
-                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="0" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionVeryDissatisfied"></button>
-                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="1" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionDissatisfied"></button>
-                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="2" data-event-action="click"  data-i18n-message-id="popupCsatSurveySatisfactionNeutral"></button>
-                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="3" data-event-action="click"  data-i18n-message-id="popupCsatSurveySatisfactionSatisfied"></button>
-                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="4" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionVerySatisfied"></button> 
+                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="0" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionVeryDissatisfied" aria-label="Very Dissatisfied"></button>
+                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="1" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionDissatisfied" aria-label="Dissatisfied"></button>
+                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="2" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionNeutral" aria-label="Neutral"></button>
+                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="3" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionSatisfied" aria-label="Satisfied"></button>
+                <button class="i18n-content fx-relay-csat-button" type="button" data-satisfaction="4" data-event-action="click" data-i18n-message-id="popupCsatSurveySatisfactionVerySatisfied" aria-label="Very Satisfied"></button>
+                </div>
 
                 <!-- User made a choice about their satisfaction -->
-                <div class="fx-relay-survey-success is-hidden"> 
+                <div class="fx-relay-survey-success is-hidden" aria-hidden="true"> 
                   <h1 class="i18n-content fx-relay-survey-success-title" data-i18n-message-id="popupCsatSurveyChoiceMadeTitle"></h1>
                   <p class="i18n-content fx-relay-survey-success-body" data-i18n-message-id="popupCsatSurveyChoiceMadeBody"></p> 
                 </div>
