@@ -1022,11 +1022,14 @@
             button.addEventListener("click", async (e) => {
               e.preventDefault();
 
+              const satisfaction = ["very dissatisfied", "dissatisfied", "neutral", "satisfied", "very satisfied"];
               const satisfactionLevel = e.target.dataset.satisfaction;
 
               // user has chosen a satisfaction level
               // mark button as selected
               e.target.classList.add("is-selected");
+
+              sendRelayEvent("CSAT Survey", "submitted", satisfaction[satisfactionLevel]);
 
               // disable all buttons
               survey.utils.disableSurveyButtons();
@@ -1080,6 +1083,8 @@
               .addEventListener("click", (e) => {
                 e.preventDefault();
  
+                sendRelayEvent("CSAT Survey", "click", "panel-survey-external-link");
+                
                 // Open the URL in a new tab
                  browser.tabs.create({ url: link });
 
