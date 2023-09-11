@@ -1079,9 +1079,9 @@
               .externalSurveyLink()
               .addEventListener("click", (e) => {
                 e.preventDefault();
-
-                // supported by Firefox and Chrome
-                chrome.tabs.create({ url: e.target.href });
+ 
+                // Open the URL in a new tab
+                 browser.tabs.create({ url: link });
 
                 // close panel after opening survey in new tab
                 window.close();
