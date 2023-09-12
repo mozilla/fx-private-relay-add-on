@@ -352,6 +352,7 @@
 
                 await popup.utilities.dismissByReason(reasonToShow, profileID);
 
+                sendRelayEvent("CSAT Survey", "click", "dismissed-CSAT");
                 window.close();
               });
           }
