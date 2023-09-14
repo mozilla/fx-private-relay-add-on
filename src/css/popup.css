@@ -687,7 +687,142 @@ sign-up-panel::after {
   gap: var(--spacingSm);
   margin-bottom: var(--spacingSm);
 }
+.fx-relay-csat-survey-link-container {
+  background-color: var(--colorViolet60);
+  border-radius: var(--borderRadiusSm);
+  padding: var(--spacingSm);
+  color: var(--colorWhite);
+  font-size: var(--fontSizeBodyXs);
+  display: flex;
+  justify-content: center;
+  gap: var(--spacingSm);
+  margin-bottom: var(--spacingSm);
+  align-items: center;
+}
+/* TODO: down to 730 - reuse */
 
+.fx-relay-csat-survey-link {
+  color: var(--colorWhite);
+  text-decoration: underline;
+  font-size: var(--fontSizeTitle3xs);
+  padding: var( --spacingXs) var(--spacingMd);
+  cursor: pointer;
+  font-weight: 600;
+  text-underline-offset: var(--spacingXs);
+}
+
+.fx-relay-csat-survey-link,
+.fx-relay-csat-survey-close-icon {
+  margin-left: auto;
+}
+
+.fx-relay-csat-survey-close-icon {
+  padding: 0 var(--spacingXs);
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.csat-survey-satisfaction-section {
+  margin-bottom: var(--spacingMd);
+  display: flex;
+  gap: var(--spacingXs);
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.csat-survey-text {
+  margin: 0 auto;
+  color: var(--colorGrey50)
+}
+
+#survey-label {
+  background-color: transparent;
+  border: none;
+}
+
+#survey-panel .fx-relay-panel-content {
+  min-height: 344px;
+  max-height: 344px; 
+  overflow: auto;
+}
+
+.fx-relay-csat-button {
+  display: flex; 
+  border: 1px solid var(--colorGrey20);
+  border-radius: var(--borderRadiusSm);
+  color: var(--colorGrey40);
+  background-color: var(--colorWhite);
+  font-size: var(--fontSizeBodyMd);
+  align-items: center;
+  font-weight: 500;
+  padding: var(--spacingXs) var(--spacingSm);
+  white-space: pre;
+  font-family: var(--fontStackBase);
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fx-relay-csat-button:hover:not([disabled="true"]) {
+  border-color: var(--colorPurple70);
+  color: var(--colorPurple70);
+  background-color: var(--colorViolet05);
+}
+
+.fx-relay-csat-button[disabled="true"] {
+  cursor: not-allowed;
+}
+
+.fx-relay-csat-button.is-selected {
+  background-color: var(--colorPurple70);
+  color: var(--colorWhite); 
+}
+
+.csat-survey-content {
+  padding: var(--spacingMd);
+  background-color: white;
+  border-radius: var(--borderRadiusSm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMd);
+}
+
+.fx-relay-survey-success-title {
+  font-size: var(--fontSizeBodyLg);
+  font-family: var(--fontStackBase);
+  color: var(--colorGrey50);
+  font-weight: 500;
+  margin: 0;
+}
+
+.fx-relay-survey-success {
+  margin-top: var(--spacingSm);
+}
+
+.fx-relay-survey-success-body {
+  color: var(--colorGrey50); 
+  font-size:  var(--fontSizeBodyMd);
+  font-family: var(--fontStackBase);
+}
+
+.fx-relay-survey-actions {
+  display: flex;
+  padding: var(--spacingMd);
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: var(--fontSizeTitle3xs);
+}
+
+.fx-relay-survey-action {
+  color: var(--colorBlue50);
+  font-size:  var(--fontSizeBodyMd);
+  text-decoration: none;
+  font-family: var(--fontStackBase);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+}
 .fx-relay-masks-error-message {
   background-color: var(--colorError);
   border-radius: var(--borderRadiusSm);
