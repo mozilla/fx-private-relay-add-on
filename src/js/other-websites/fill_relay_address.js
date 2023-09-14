@@ -37,9 +37,8 @@ function fillInputWithRelayNumber(emailInput, relayNumber) {
     : relayNumber.number;
   emailInput.value = normalisedNumber;
 
-
   emailInput.dispatchEvent(new Event('input', {bubbles:true}));
-
+  emailInput.dispatchEvent(new Event('change', {bubbles:true}));
 }
 
 

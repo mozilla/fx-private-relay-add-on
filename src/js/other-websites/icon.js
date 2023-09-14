@@ -215,6 +215,7 @@ function openMenu(target) {
       // `address` does contain the full address (i.e. including @mozmail.com):
       target.value = message.newRelayAddressResponse.full_address ?? message.newRelayAddressResponse.address;
       target.dispatchEvent(new Event("input", { bubbles: true }));
+      target.dispatchEvent(new Event('change', { bubbles: true }));
       closeMenu();
     }
   };
