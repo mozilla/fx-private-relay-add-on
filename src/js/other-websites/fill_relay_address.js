@@ -15,9 +15,11 @@ function fillInputWithAlias(emailInput, relayAlias) {
   // Set the value of the target field to the selected/generated mask
   emailInput.value = emailMask;
 
-
   emailInput.dispatchEvent(new Event('input', {bubbles:true}));
-
+  // 'change' event, is needed to trigger the change event listeners (i.e this event is needed when 
+  // clicking a mask from the relay button, instead of typing it, since change events run when the input is out of focus (input events don't))
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/change_event
+  emailInput.dispatchEvent(new Event('change', {bubbles:true}));
 }
 
 function fillInputWithRelayNumber(emailInput, relayNumber) {

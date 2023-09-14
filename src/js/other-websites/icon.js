@@ -106,7 +106,8 @@ function wireUpInputs(emailInputs) {
       event.preventDefault();
       openMenu(input);
     });
-    input.insertAdjacentElement("afterend", invisibleFocusableButton);
+
+    input.parentElement.appendChild(invisibleFocusableButton);
   }
 
   sendRelayEvent("In-page", "input-icon-injected", "input-icon");
