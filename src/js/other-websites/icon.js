@@ -19,8 +19,15 @@ async function run() {
   if (!inputIconsAreEnabled) {
     return;
   }
+
+  const pwdMgrCompat = await isPwdMgrCompatEnabled();
+
+  if (pwdMgrCompat) {
+    // TODO: Set RELAY_ICON_WIDTH width, hover state calcs
+  }
+
   const emailInputs = findEmailInputs(document);
-  wireUpInputs(emailInputs);
+  wireUpInputs(emailInputs, pwdMgrCompat);
 
   const potentialNewInputObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
@@ -30,7 +37,7 @@ async function run() {
       for (const addedNode of mutation.addedNodes) {
         if (addedNode instanceof HTMLElement) {
           const addedEmailInputs = findEmailInputs(addedNode);
-          wireUpInputs(addedEmailInputs);
+          wireUpInputs(addedEmailInputs, pwdMgrCompat);
         }
       }
     });
@@ -46,7 +53,7 @@ async function run() {
  * @param {HTMLInputElement[]} emailInputs 
  * @returns void
  */
-function wireUpInputs(emailInputs) {
+function wireUpInputs(emailInputs, pwdMgrCompat) {
   if (emailInputs.length === 0) {
     return;
   }
@@ -60,6 +67,8 @@ function wireUpInputs(emailInputs) {
       backgroundImage: computedStyles.backgroundImage,
       backgroundRepeat: computedStyles.backgroundRepeat,
       backgroundPosition: computedStyles.backgroundPosition,
+      backgroundPositionX: computedStyles.backgroundPositionX,
+      backgroundPositionY: computedStyles.backgroundPositionY,
       backgroundOrigin: computedStyles.backgroundOrigin,
     };
     const iconUrl = (
@@ -70,9 +79,14 @@ function wireUpInputs(emailInputs) {
       existingStyles.backgroundImage + `, url("${iconUrl}")`;
     input.style.backgroundRepeat =
       existingStyles.backgroundRepeat + ", no-repeat";
-    input.style.backgroundPosition =
-      existingStyles.backgroundPosition +
-      `, right calc(50% - ((${computedStyles.paddingTop} - ${computedStyles.paddingBottom}) / 2))`;
+    input.style.backgroundPositionY =
+      existingStyles.backgroundPositionY +
+      `, calc(50% - ((${computedStyles.paddingTop} - ${computedStyles.paddingBottom}) / 2))`;
+    // Note - We're calculating X/Y differently to offset the icon when another icon is visible
+    input.style.backgroundPositionX = pwdMgrCompat ?
+      existingStyles.backgroundPositionX +
+      `, calc(100% - 32px)` : existingStyles.backgroundPositionX +
+      `, right`;
     input.style.backgroundOrigin =
       existingStyles.backgroundOrigin + ", content-box";
     input.removeEventListener("click", onEmailInputClick);

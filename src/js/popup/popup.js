@@ -897,6 +897,7 @@
       settings: {
         init: () => {
           popup.utilities.enableInputIconDisabling();
+          popup.utilities.togglePwdMgrCompat();
 
           // Function is imported from data-opt-out-toggle.js
           enableDataOptOut();
@@ -1774,6 +1775,36 @@
 
           link.addEventListener("click", popup.events.externalClick, false);
         });
+      },
+      togglePwdMgrCompat: async () => {
+        const pwdMgrCompatPrefToggle = document.querySelector(".toggle-pwdmgr-compat");
+        
+        const stylePrefToggle = (userPref) => {
+          if (userPref === "pwdmgr-compat-enabled") {
+            pwdMgrCompatPrefToggle.classList.remove("pwdmgr-compat-disabled");
+            pwdMgrCompatPrefToggle.dataset.pwdMgrCompatPreference = "pwdmgr-compat-disabled";
+            return;
+          }
+          pwdMgrCompatPrefToggle.classList.add("pwdmgr-compat-disabled");
+          pwdMgrCompatPrefToggle.dataset.pwdMgrCompatPreference = "pwdmgr-compat-enabled";
+        };
+
+
+        const { pwdMgrCompat } = await browser.storage.local.get("pwdMgrCompat");
+
+        if (!pwdMgrCompat) {
+          browser.storage.local.set({ "pwdMgrCompat": "pwdmgr-compat-enabled" });
+          stylePrefToggle("pwdmgr-compat-enabled")
+        } else {
+          stylePrefToggle(pwdMgrCompat);
+        }
+
+        pwdMgrCompatPrefToggle.addEventListener("click", async(e) => {
+          const pwdMgrCompatPreference = e.target.dataset.pwdMgrCompatPreference;
+          await browser.storage.local.set({ "pwdMgrCompat" : pwdMgrCompatPreference });
+          stylePrefToggle(pwdMgrCompatPreference);
+        });
+        
       },
       unhideNavigationItemsOnceLoggedIn: () => {
         document

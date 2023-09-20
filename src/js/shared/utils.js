@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser */
+/* exported areInputIconsEnabled isPwdMgrCompatEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -8,6 +8,16 @@ async function areInputIconsEnabled() {
     return true;
   }
   return (showInputIcons === "show-input-icons");
+}
+
+// eslint-disable-next-line no-redeclare
+async function isPwdMgrCompatEnabled() {
+  const { pwdMgrCompat } = await browser.storage.local.get("pwdMgrCompat");
+  if (!pwdMgrCompat) {
+    browser.storage.local.set({ "showInputIcons" : "pwdmgr-compat-enabled"})
+    return true;
+  }
+  return (pwdMgrCompat === "pwdmgr-compat-enabled");
 }
 
 // This function is defined as global in the ESLint config _because_ it is created here:

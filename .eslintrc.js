@@ -23,7 +23,8 @@ module.exports = {
         "relayContextMenus": "readonly",
         "sendMetricsEvent": "readonly",
         "sendRelayEvent": "readonly",
-        "setCustomFonts": "readonly"
+        "setCustomFonts": "readonly",
+        "isPwdMgrCompatEnabled": "readonly"
     },
     "rules": {
         "no-unused-vars": [

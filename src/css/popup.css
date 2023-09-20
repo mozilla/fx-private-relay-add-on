@@ -369,6 +369,7 @@ sign-up-panel::after {
 }
 
 .data-disabled::after,
+.pwdmgr-compat-disabled::after,
 .input-icons-disabled::after {
   left: 4px;
   right: 18px;
@@ -376,18 +377,22 @@ sign-up-panel::after {
 }
 
 .data-disabled:hover,
+.pwdmgr-compat-disabled:hover,
 .data-disabled:focus,
+.pwdmgr-compat-disabled:focus,
 .input-icons-disabled:hover,
 .input-icons-disabled:focus {
   background-color: var(--colorGrey40);
 }
 
 .data-disabled:active,
+.pwdmgr-compat-disabled:active,
 .input-icons-disabled:active {
   background-color: var(--colorGrey50);
 }
 
 .data-disabled,
+.pwdmgr-compat-disabled,
 .input-icons-disabled {
   background-color: var(--colorGrey30);
 }

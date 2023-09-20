@@ -536,6 +536,9 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
     case "updateInputIconPref":
       browser.storage.local.set({ showInputIcons: m.iconPref });
       break;
+    case "updatePwdMgrCompatPref":
+      browser.storage.local.set({ pwdMgrCompat: m.pref });
+      break;
   }
   return response;
 });
