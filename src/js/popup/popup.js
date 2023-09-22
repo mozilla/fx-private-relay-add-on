@@ -1239,7 +1239,7 @@
           },
           shouldShowSurvey: async () => {
             const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
-            const locale = navigator.language;
+            const locale = browser.i18n.getUILanguage()
 
             return (
               reasonToShow !== null &&
