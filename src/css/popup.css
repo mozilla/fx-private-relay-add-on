@@ -695,9 +695,8 @@ sign-up-panel::after {
   font-size: var(--fontSizeBodyXs);
   display: flex;
   justify-content: center;
-  gap: var(--spacingSm);
+  gap: var(--spacingLg);
   margin-bottom: var(--spacingSm);
-  align-items: center;
 }
 /* TODO: down to 730 - reuse */
 
@@ -716,7 +715,7 @@ sign-up-panel::after {
   margin-left: auto;
 }
 
-.fx-relay-csat-survey-close-icon {
+.fx-relay-csat-survey-view-icon {
   padding: 0 var(--spacingXs);
   border: none;
   background-color: transparent;

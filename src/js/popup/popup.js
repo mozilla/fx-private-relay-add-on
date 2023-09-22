@@ -336,11 +336,9 @@
               );
 
             survey.select
-            .closeSurveyLinkButton()
-            .addEventListener("click", async () => {
-              survey.utils.closeSurveyLink();
-
-              window.close();
+              .viewSurveyLinkButton()
+              .addEventListener("click", async () => {
+                popup.panel.update("survey")
             });
 
             // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
@@ -1026,15 +1024,15 @@
               const satisfaction = ["very dissatisfied", "dissatisfied", "neutral", "satisfied", "very satisfied"];
               const satisfactionLevel = e.target.dataset.satisfaction;
 
+               // reset all buttons
+               survey.utils.resetSurveyButtons();
+
               // user has chosen a satisfaction level
               // mark button as selected
               e.target.classList.add("is-selected");
 
-              sendRelayEvent("CSAT Survey", "submitted", satisfaction[satisfactionLevel]);
-
-              // disable all buttons
-              survey.utils.disableSurveyButtons();
-
+              sendRelayEvent("CSAT Survey", "submitted", satisfaction[satisfactionLevel]); 
+              
               // show success message
               survey.utils.showSurveySuccessMessage();
 
@@ -1113,13 +1111,11 @@
               .surveyLinkContainer()
               .classList.add("is-hidden");
           },
-          disableSurveyButtons: () => {
+          resetSurveyButtons: () => {
             popup.panel.survey.select
               .surveyButtons()
               .forEach(
-                (button) =>
-                  button.setAttribute("disabled", true) &&
-                  button.setAttribute("aria-disabled", true)
+                (button) => button.classList.remove("is-selected"),
               );
           },
           useFirstSeen: async () => {
@@ -1272,7 +1268,7 @@
         select: {
           // storing as functions to avoid caching
           surveyLinkContainer: () => document.querySelector(".fx-relay-csat-survey-link-container"),
-          closeSurveyLinkButton: () => document.querySelector(".fx-relay-csat-survey-close-icon"),
+          viewSurveyLinkButton: () => document.querySelector(".fx-relay-csat-survey-view-icon"),
           surveyLink: () => document.querySelector(".fx-relay-csat-survey-link"),
           surveyButtons: () => document.querySelectorAll(".fx-relay-csat-button"),
           successMessage: () => document.querySelector(".fx-relay-survey-success"),
