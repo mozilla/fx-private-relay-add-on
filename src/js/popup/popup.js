@@ -322,8 +322,9 @@
 
           // logic to show survey is found in shouldShowSurvey function
           const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
-
-          if (shouldShowCSAT && dataCollection === "data-enabled") {
+          const csatSurveyFlag = await checkWaffleFlag('csat_survey');
+          
+          if (shouldShowCSAT && csatSurveyFlag && dataCollection === "data-enabled") {
             const survey = popup.panel.survey;
 
             survey.utils.showSurveyLink();
