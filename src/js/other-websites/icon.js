@@ -7,7 +7,7 @@ const COLOR_VIOLET_20 = "#f68fff";
 const COLOR_VIOLET_30 = "#f770ff";
 
 async function run() {
-  // Don't run on Firefox accounts; creating a Relay mask there can result in
+  // Don't run on Mozilla accounts; creating a Relay mask there can result in
   // an endless loop of self-referencing accounts:
   if ([
     "https://accounts.stage.mozaws.net",
