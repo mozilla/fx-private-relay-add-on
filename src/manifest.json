@@ -6,7 +6,7 @@
   "description": "__MSG_extensionDescription_mask__",
 
   "default_locale": "en",
-
+  "default_area": "navbar",
   "icons": {
     "16": "icons/icon_16.png",
     "48": "icons/icon_48.png",
