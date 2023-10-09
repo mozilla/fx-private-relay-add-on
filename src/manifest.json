@@ -26,7 +26,8 @@
         "js/shared/utils.js",
         "js/background/background.js",
         "js/background/context-menu.js"
-      ]
+      ],
+      "persistent": false
   },
 
   "browser_action": {
