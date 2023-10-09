@@ -121,6 +121,9 @@ jobs:
           name: fx-private-relay-stage.xpi
           path: web-ext-artifacts/private_relay-${{ steps.version.outputs.version }}.xpi
 
+      - name: "Configure manifest.json for Chrome build"
+        run: npm run config:chrome
+
       - uses: actions/upload-artifact@v2
         with:
           name: fx-private-relay-extension.zip
