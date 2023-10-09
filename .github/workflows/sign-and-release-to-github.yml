@@ -102,7 +102,7 @@ jobs:
 
       - name: "Sign"
         run: ./node_modules/.bin/web-ext sign -s src --channel=unlisted --api-key=${{ secrets.AMO_API_KEY }} --api-secret=${{ secrets.AMO_API_SECRET }}
-        if: github.ref_type == 'branch'
+        if: github.ref_type == 'tag'
 
       - name: "Tag"
         run: |
