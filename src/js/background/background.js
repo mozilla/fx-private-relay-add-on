@@ -1,8 +1,13 @@
-const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
+function startupInit() {
+  const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";  
+  browser.storage.local.set({ RELAY_SITE_ORIGIN });
+  browser.storage.local.set({ maxNumAliases: 5 });
+  browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
+  browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
+}
 
-browser.storage.local.set({ maxNumAliases: 5 });
-browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
-browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
+browser.runtime.onStartup.addListener(startupInit);
+
 
 browser.runtime.onInstalled.addListener(async (details) => {
   const { firstRunShown } = await browser.storage.local.get("firstRunShown");
@@ -257,6 +262,7 @@ async function sendMetricsEvent(eventData) {
 
   const ga_uuid = await getOrMakeGAUUID();
   const eventDataWithGAUUID = Object.assign({ ga_uuid }, eventData);
+  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
   const sendMetricsEventUrl = `${RELAY_SITE_ORIGIN}/metrics-event`;
   fetch(sendMetricsEventUrl, {
     method: "POST",
@@ -302,6 +308,8 @@ async function refreshAccountPages() {
 async function makeDomainAddress(address, block_list_emails, description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
+  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+  
   if (!apiToken.apiToken) {
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
@@ -368,8 +376,10 @@ async function makeDomainAddress(address, block_list_emails, description = null)
 // eslint-disable-next-line no-redeclare
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
-
+  
   if (!apiToken.apiToken) {
+    const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+    
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
     });
@@ -489,6 +499,8 @@ async function displayBrowserActionBadge() {
 browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   let response;
 
+  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+
   switch (m.method) {
     case "displayBrowserActionBadge":
       await displayBrowserActionBadge();
@@ -548,8 +560,8 @@ browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
   return response;
 });
 
-
 (async () => {
+  startupInit();
   await displayBrowserActionBadge();
   await storeRuntimeData();
 })();
