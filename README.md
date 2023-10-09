@@ -59,16 +59,13 @@ them](https://www.facebook.com/business/help/606443329504150?helpref=faq_content
     npm run web-ext-run
     ```
 
-   By default, this will open and run the extension in Firefox. If you'd like to run this in Chrome, run the following: 
+   By default, this will open and run the extension in Firefox. If you'd like to run this in Chrome, run the following:
+   
+   > [!WARNING]
+   > This will run a script that will introduce breaking changes to `manifest.json`. Please do not commit any script-changed edits to your PR.
 
       ```
       npm run web-ext-run:chrome
-      ```
-
-   If you'd like to run the extension in both Chrome and Firefox at the same time, use this command: 
-
-      ```
-      npm run web-ext-run:all
       ```
 
    If you want to run the extension on Android, you'll need to install the [Android SDK platform tools](https://developer.android.com/studio/releases/platform-tools.html):
