@@ -10,9 +10,13 @@
   "scripts": {
     "build": "web-ext build -s src/ && npm run build:clean",
     "build:clean": "git checkout src/manifest.json src/js/background/background.js src/popup.html",
-    "build:dev": "npm run build:clean && npm run config:dev && npm run package:chrome && npm run build",
-    "build:stage": "npm run build:clean && npm run config:stage && npm run package:chrome && npm run build",
-    "build:prod": "npm run build:clean && npm run config:prod && npm run package:chrome && npm run build",
+    "build:dev": "npm run build:clean && npm run config:dev && npm run build",
+    "build:stage": "npm run build:clean && npm run config:stage && npm run build",
+    "build:prod": "npm run build:clean && npm run config:prod && npm run build",
+    "build:chrome-dev": "npm run build:clean && npm run config:chrome && npm run config:dev && npm run build && npm run package:chrome",
+    "build:chrome-stage": "npm run build:clean && npm run config:chrome && npm run config:stage && npm run build && npm run package:chrome",
+    "build:chrome-prod": "npm run build:clean && npm run config:chrome && npm run config:prod && npm run build && npm run package:chrome",
+    "config:chrome": "./config-permissions.sh",
     "config:dev": "npm run build:clean && ./config-domain.sh https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:stage": "npm run build:clean && ./config-domain.sh https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:prod": "npm run build:clean && ./config-domain.sh https://relay.firefox.com",
@@ -26,8 +30,7 @@
     "web-ext-run:firefox": "npm run web-ext-run -- --target firefox-desktop",
     "web-ext-run:firefox-mv3": "npm run web-ext-run -- --firefox-preview --pref=extensions.eventPages.enabled=true --verbose",
     "web-ext-run:android": "npm run web-ext-run -- --target firefox-android --adb-device $npm_config_device --firefox-apk org.mozilla.fenix",
-    "web-ext-run:chrome": "npm run web-ext-run -- --target chromium",
-    "web-ext-run:desktop": "npm run web-ext-run -- --target chromium --target firefox-desktop"
+    "web-ext-run:chrome": "npm run config:chrome && npm run web-ext-run -- --target chromium"
   },
   "private": false,
   "repository": {
