@@ -141,7 +141,7 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
  * `npm run build:stage`: https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net/
  * `npm run build:prod`: https://relay.firefox.com/
 
-If you want to Chrome build of the add-on, use the following scripts:
+If you want to run the Chrome build of the add-on, use the following scripts:
  
 > [!NOTE]  
 > It runs the same scripts as above, but also edits the [`menus`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus) permission listed in the manifest.json*
