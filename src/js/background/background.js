@@ -488,68 +488,75 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
-  let response;
+browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
+  (async () => {
+    let response = null;
 
-  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+    const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
 
-  switch (m.method) {
-    case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
-      break;
-    case "iframeCloseRelayInPageMenu":
-      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
-      break;
-    case "fillInputWithAlias":
-      browser.tabs.sendMessage(sender.tab.id, m.message);
-      break;
-    case "updateIframeHeight":
-      browser.tabs.sendMessage(sender.tab.id, m);
-      break;
-    case "getServerStoragePref":
-      response = await getServerStoragePref();
-      break;
-    case "getAliasesFromServer":
-      response = await getAliasesFromServer("GET", m.options);
-      break;
-    case "patchMaskInfo":
-      await patchMaskInfo("PATCH", m.id, m.data, m.options);
-      break;
-    case "getCurrentPageHostname":
-      // Only capture the page hostanme if the active tab is an non-internal (about:) page.
-      response = await getCurrentPageHostname();
-      break;
-    case "makeDomainAddress":
-      response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
-      break;
-    case "makeRelayAddress":
-      response = await makeRelayAddress(m.description);
-      break;
-    case "postReportWebcompatIssue":
-      response = await postReportWebcompatIssue(m.description);
-      break;
-    case "openRelayHomepage":
-      browser.tabs.create({
-        url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
-      });
-      break;
-    case "rebuildContextMenuUpgrade":
-      await relayContextMenus.init();
-      break;
-    case "refreshAccountPages":
-      await refreshAccountPages();
-      break;
-    case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
-    case "updateAddOnAuthStatus":
-      await updateAddOnAuthStatus(m.status);
-      break;
-    case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
-      break;
-  }
-  return response;
+    switch (m.method) {
+      case "displayBrowserActionBadge":
+        await displayBrowserActionBadge();
+        break;
+      case "iframeCloseRelayInPageMenu":
+        browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+        break;
+      case "fillInputWithAlias":
+        browser.tabs.sendMessage(sender.tab.id, m.message);
+        break;
+      case "updateIframeHeight":
+        browser.tabs.sendMessage(sender.tab.id, m);
+        break;
+      case "getServerStoragePref":
+        response = await getServerStoragePref();
+        break;
+      case "getAliasesFromServer":
+        response = await getAliasesFromServer("GET", m.options);
+        break;
+      case "patchMaskInfo":
+        await patchMaskInfo("PATCH", m.id, m.data, m.options);
+        break;
+      case "getCurrentPageHostname":
+        // Only capture the page hostanme if the active tab is an non-internal (about:) page.
+        response = await getCurrentPageHostname();
+        break;
+      case "makeDomainAddress":
+        response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
+        break;
+      case "makeRelayAddress":
+        response = await makeRelayAddress(m.description);
+        break;
+      case "postReportWebcompatIssue":
+        response = await postReportWebcompatIssue(m.description);
+        break;
+      case "openRelayHomepage":
+        browser.tabs.create({
+          url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
+        });
+        break;
+      case "rebuildContextMenuUpgrade":
+        await relayContextMenus.init();
+        break;
+      case "refreshAccountPages":
+        await refreshAccountPages();
+        break;
+      case "sendMetricsEvent":
+        response = await sendMetricsEvent(m.eventData);
+        break;
+      case "updateAddOnAuthStatus":
+        await updateAddOnAuthStatus(m.status);
+        break;
+      case "updateInputIconPref":
+        browser.storage.local.set({ showInputIcons: m.iconPref });
+        break;
+    }
+    
+    if (response) {
+      sendResponse(response);
+    }
+  })();
+
+  return true;
 });
 
 (async () => {
