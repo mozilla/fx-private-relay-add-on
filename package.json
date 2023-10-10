@@ -17,7 +17,7 @@
     "build:chrome-dev": "npm run build:clean && npm run config:dev && npm run config:chrome && npm run build:dirty && npm run package:chrome && npm run build:clean",
     "build:chrome-stage": "npm run build:clean && npm run config:stage && npm run config:chrome && npm run build:dirty && npm run package:chrome && npm run build:clean",
     "build:chrome-prod": "npm run build:clean && npm run config:prod && npm run config:chrome && npm run build:dirty && npm run package:chrome && npm run build:clean",
-    "config:chrome": "./config-permissions.sh",
+    "config:chrome": "./config-chrome.sh",
     "config:dev": "npm run build:clean && ./config-domain.sh https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:stage": "npm run build:clean && ./config-domain.sh https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net",
     "config:prod": "npm run build:clean && ./config-domain.sh https://relay.firefox.com",
