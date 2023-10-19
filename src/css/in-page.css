@@ -12,6 +12,7 @@
   font-family: var(--fontStackBase);
   font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: hidden;
 }
 
 .fx-relay-menu-body.is-premium.is-loading {
