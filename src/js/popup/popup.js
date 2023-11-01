@@ -1213,20 +1213,15 @@
               const daysSinceFirstSeen =
                 (Date.now() - firstSeen.getTime()) / 1000 / 60 / 60 / 24;
 
-                console.log("daysSinceFirstSeen: ", daysSinceFirstSeen);
-
               if (daysSinceFirstSeen >= 90) {
                 isDismissed = await free90DaysDismissal.isDismissed();
-                console.log("isDismissed: ", isDismissed);
-
                 if (!isDismissed) {
-                  console.log("reasonToShow: free90days");
                   reasonToShow = "free90days";
                 }
               } else if (daysSinceFirstSeen >= 30) {
                 isDismissed = await free30DaysDismissal.isDismissed();
                 if (!isDismissed) {
-                  reasonToShow = "free30days"; 
+                  reasonToShow = "free30days";
                 }
               } else if (daysSinceFirstSeen >= 7) {
                 isDismissed = await free7DaysDismissal.isDismissed();
@@ -1824,7 +1819,7 @@
           const currentTime = Date.now();
           let dismissedTime = {
             value: currentTime,
-            duration: storageId.includes("90day") ? 90 * 24 * 60 * 60 * 1000 : undefined
+            duration: storageId.includes("90day") ? 90 * 24 * 60 * 60 * 1000 : undefined // this provides us the recurring 90 day dismissal
           };
         
           await browser.storage.local.set({ [storageId]: dismissedTime });
