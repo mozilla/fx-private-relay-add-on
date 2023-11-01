@@ -1804,17 +1804,17 @@
         const storageId = key + "_dismissed";
 
         const isDismissed = async () => {
-          let storedData = await browser.storage.local.get(storageId);
-          if (storedData[storageId]) {
+          let dismissedTime = await browser.storage.local.get(storageId);
+          if (dismissedTime[storageId]) {
             const currentTime = Date.now();
-            const elapsedTime = currentTime - storedData[storageId].value;
-            const maxAge = storedData[storageId].duration || (100 * 365 * 24 * 60 * 60 * 1000); // Default to 100 years if duration is not set
+            const elapsedTime = currentTime - dismissedTime[storageId].value;
+            const maxAge = dismissedTime[storageId].duration || (100 * 365 * 24 * 60 * 60 * 1000); // Default to 100 years if duration is not set
         
             return elapsedTime < maxAge;
           }
           return false;
         };
-        
+
         const dismiss = async (dismissOptions = {}) => {
           const currentTime = Date.now();
           let dismissedTime = {
