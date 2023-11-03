@@ -1215,7 +1215,7 @@
 
               if (daysSinceFirstSeen >= 90) {
                 isDismissed = await free90DaysDismissal.isDismissed();
-                if (!free90DaysDismissal.isDismissed()) {
+                if (!isDismissed) {
                   reasonToShow = "free90days";
                 }
               } else if (daysSinceFirstSeen >= 30) {
@@ -1800,27 +1800,33 @@
         };
         await browser.storage.local.set({ [key]: item });
       }, 
-      localDismiss: (key, options = {}) => {
+      localDismiss: (key) => {
         const storageId = key + "_dismissed";
 
         const isDismissed = async () => {
-            let dismissedTime = await browser.storage.local.get(storageId);
-            if (dismissedTime[storageId]) {
-                const currentTime = Date.now();
-                const elapsedTime = currentTime - dismissedTime[storageId];
-                const maxAge = (typeof options.duration === "number" ? options.duration : 100 * 365 * 24 * 60 * 60) * 1000; // Convert to milliseconds
-                return elapsedTime < maxAge;
-            }
-            return false;
+          let dismissedTime = await browser.storage.local.get(storageId);
+          if (dismissedTime[storageId]) {
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - dismissedTime[storageId].value;
+            const maxAge = dismissedTime[storageId].duration || (100 * 365 * 24 * 60 * 60 * 1000); // Default to 100 years if duration is not set
+        
+            return elapsedTime < maxAge;
+          }
+          return false;
         };
 
         const dismiss = async (dismissOptions = {}) => {
-            const currentTime = Date.now();
-            await browser.storage.local.set({ [storageId]: currentTime });
-            if (dismissOptions.soft !== true) {
-                return true; // Indicating it's dismissed
-            }
-            return await isDismissed();
+          const currentTime = Date.now();
+          let dismissedTime = {
+            value: currentTime,
+            duration: storageId.includes("90day") ? 90 * 24 * 60 * 60 * 1000 : undefined // this provides us the recurring 90 day dismissal
+          };
+        
+          await browser.storage.local.set({ [storageId]: dismissedTime });
+          if (dismissOptions.soft !== true) {
+            return true; // Indicating it's dismissed
+          }
+          return await isDismissed();
         };
 
         return {
