@@ -146,7 +146,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
 
   if (serverStoragePref) {
     // Update server info with site usage
-    await browser.runtime.sendMessage({
+    browser.runtime.sendMessage({
       method: "patchMaskInfo",
       id: parseInt(maskAddressId, 10),
       data: {
