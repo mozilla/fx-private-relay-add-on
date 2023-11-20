@@ -94,9 +94,10 @@
   ],
 
   "permissions": [
-      "<all_urls>",
-      "storage",
-      "menus"
+    "<all_urls>",
+    "storage",
+    "menus",
+    "contextMenus"
   ],
 
   "web_accessible_resources": [
