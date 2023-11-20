@@ -1,5 +1,5 @@
 function startupInit() {
-  const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";  
+  const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
   browser.storage.local.set({ RELAY_SITE_ORIGIN });
   browser.storage.local.set({ maxNumAliases: 5 });
   browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
