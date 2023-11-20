@@ -519,7 +519,12 @@ const relayContextMenus = {
   },
 };
 
-// Events
+(async () => {
+  // Only show is platform support context menus
+  if (browser.menus || browser.contextMenus) {
+    await relayContextMenus.init();
+  }
+})();
 
 // COMPATIBILITY NOTE: The onShown event is not available on the Chrome contextMenus API
 if (browser.menus) {
@@ -535,84 +540,86 @@ if (browser.menus) {
     await relayContextMenus.init(domain);
   });
 }
-browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  const { relaySiteOrigin } = await browser.storage.local.get(
-    "relaySiteOrigin"
-  );
-  const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
-  const urlManageAliases = `${relaySiteOrigin}/accounts/profile/`;
-  const phoneMask = await relayContextMenus.utils.getPhoneMask();
-  const currentBrowser = await getBrowser();
-  switch (info.menuItemId) {
-    case "fx-private-relay-generate-alias":
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-generate-alias",
-        dimension5: currentBrowser,
-        dimension7: "add-on",
-      });
-      await relayContextMenus.listeners.onMakeRelayAddressForTargetElement(
-        info,
-        tab
-      );
-      break;
-    case "fx-private-relay-get-unlimited-aliases":
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-get-unlimited-aliases",
-        dimension5: currentBrowser,
-        dimension7: "add-on",
-      });
-      await browser.tabs.create({ url: urlPremium });
-      break;
-    case "fx-private-relay-manage-aliases":
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-relay-manage-aliases",
-        dimension5: currentBrowser,
-        dimension7: "add-on",
-      });
-      await browser.tabs.create({ url: urlManageAliases });
-      break;
-    case staticMenuData.insertPhoneMask.id:
-      sendMetricsEvent({
-        category: "Extension: Context Menu",
-        action: "click",
-        label: "context-menu-insert-phone-mask",
-        dimension5: currentBrowser,
-        dimension7: "add-on",
-      });
-      if (phoneMask) {
-        browser.tabs.sendMessage(
-          tab.id,
-          {
-            type: "fillTargetWithRelayNumber",
-            targetElementId: info.targetElementId,
-            relayNumber: phoneMask,
-          },
-          {
-            frameId: info.frameId,
-          }
+
+if (browser.contextMenus) {
+  browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    const { relaySiteOrigin } = await browser.storage.local.get(
+      "relaySiteOrigin"
+    );
+    const urlPremium = `${relaySiteOrigin}/premium?utm_source=fx-relay-addon&utm_medium=context-menu&utm_content=get-premium-link`;
+    const urlManageAliases = `${relaySiteOrigin}/accounts/profile/`;
+    const phoneMask = await relayContextMenus.utils.getPhoneMask();
+    const currentBrowser = await getBrowser();
+    switch (info.menuItemId) {
+      case "fx-private-relay-generate-alias":
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-generate-alias",
+          dimension5: currentBrowser,
+          dimension7: "add-on",
+        });
+        await relayContextMenus.listeners.onMakeRelayAddressForTargetElement(
+          info,
+          tab
         );
-      }
-      break;
-  }
+        break;
+      case "fx-private-relay-get-unlimited-aliases":
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-get-unlimited-aliases",
+          dimension5: currentBrowser,
+          dimension7: "add-on",
+        });
+        await browser.tabs.create({ url: urlPremium });
+        break;
+      case "fx-private-relay-manage-aliases":
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-relay-manage-aliases",
+          dimension5: currentBrowser,
+          dimension7: "add-on",
+        });
+        await browser.tabs.create({ url: urlManageAliases });
+        break;
+      case staticMenuData.insertPhoneMask.id:
+        sendMetricsEvent({
+          category: "Extension: Context Menu",
+          action: "click",
+          label: "context-menu-insert-phone-mask",
+          dimension5: currentBrowser,
+          dimension7: "add-on",
+        });
+        if (phoneMask) {
+          browser.tabs.sendMessage(
+            tab.id,
+            {
+              type: "fillTargetWithRelayNumber",
+              targetElementId: info.targetElementId,
+              relayNumber: phoneMask,
+            },
+            {
+              frameId: info.frameId,
+            }
+          );
+        }
+        break;
+    }
 
-  if (info.menuItemId.startsWith(reuseAliasMenuIdPrefix)) {
-    sendMetricsEvent({
-      category: "Extension: Context Menu",
-      action: "click",
-      label: "context-menu-" + info.parentMenuItemId,
-      dimension5: currentBrowser,
-      dimension7: "add-on",
-    });
-    await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
-  }
-});
+    if (info.menuItemId.startsWith(reuseAliasMenuIdPrefix)) {
+      sendMetricsEvent({
+        category: "Extension: Context Menu",
+        action: "click",
+        label: "context-menu-" + info.parentMenuItemId,
+        dimension5: currentBrowser,
+        dimension7: "add-on",
+      });
+      await relayContextMenus.listeners.onFillInAddressWithAliasId(info, tab);
+    }
+  });
+}
 
-(async () => {
-  await relayContextMenus.init();
-})();
+
+
