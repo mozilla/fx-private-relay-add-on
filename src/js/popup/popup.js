@@ -1618,10 +1618,14 @@
         const isEuCountryExpansion = await checkWaffleFlag(
           "eu_country_expansion"
         );
-        const countryCode = (
-          await browser.storage.local.get("periodicalPremiumPlans")
-        ).periodicalPremiumPlans?.PERIODICAL_PREMIUM_PLANS.country_code;
+        const getPeriodicalPremiumPlans = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans.PERIODICAL_PREMIUM_PLANS;
+        const getPeriodicalPremiumProductId = (await browser.storage.local.get("periodicalPremiumProductId")).periodicalPremiumProductId.PERIODICAL_PREMIUM_PRODUCT_ID;
+        const premiumAvailability = getPeriodicalPremiumPlans.available_in_country;
+        const countryCode = getPeriodicalPremiumPlans.country_code;
         const premium = (await browser.storage.local.get("premium")).premium;
+        const isHolidayPromo2023Available = await checkWaffleFlag(
+          "holiday_promo_2023"
+        );
 
         if (
           !premium &&
@@ -1734,6 +1738,36 @@
             fullCtaEventLabel: "panel-news-bundle-cta",
             fullCtaEventAction: "click",
           },)
+        }
+
+        const currentDate = new Date();
+        const holidayPromoExpires = new Date('2023-11-31');
+        const isHolidayPromo2023Active = currentDate <= holidayPromoExpires;
+
+        // Show if promo is available, if active and if premium is availble in user's region
+        if (isHolidayPromo2023Available && isHolidayPromo2023Active && premiumAvailability) {
+          const getPeriodicalPremiumPlanYearlyId = getPeriodicalPremiumPlans.plan_country_lang_mapping[getPeriodicalPremiumPlans.country_code]["*"].yearly.id;
+          const fxaOrigin = (await browser.storage.local.get("fxaOrigin")).fxaOrigin.FXA_ORIGIN;
+          const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/${getPeriodicalPremiumProductId}?plan=${getPeriodicalPremiumPlanYearlyId}&coupon=HOLIDAY20`;
+
+          sessionState.newsContent.push({
+            id: "holiday-promo-2023",
+            dateAdded: "20231121", // YYYYMMDD
+            waffle: "holiday_promo_2023",
+            locale: "us",
+            audience: "free",
+            headlineString: "popupHolidayPromo2023Headline",
+            bodyString: "popupHolidayPromo2023Body",
+            teaserImg:
+              "/images/panel-images/announcements/panel-announcement-holiday-promo-2023-square-illustration.svg",
+            fullImg:
+              "/images/panel-images/announcements/panel-announcement-holiday-promo-2023-illustration.svg",
+            fullCta: "popupHolidayPromo2023CTA",
+            fullCtaRelayURL: false,
+            fullCtaHref: holidayPromo2023Url,
+            fullCtaEventLabel: "panel-news-holiday-promo-2023-cta",
+            fullCtaEventAction: "click",
+          });
         }
 
         // Remove news nav link if there's no news items to display to user
