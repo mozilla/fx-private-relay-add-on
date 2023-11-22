@@ -156,6 +156,10 @@ async function storeRuntimeData(opts={forceUpdate: false}) {
       WAFFLE_FLAGS: runtimeData.WAFFLE_FLAGS,
       fetchedAt: Date.now(),
     },
+    fxaOrigin: {
+      FXA_ORIGIN: runtimeData.FXA_ORIGIN,
+      fetchedAt: Date.now(),
+    },
     bundlePlans: {
       BUNDLE_PLANS: runtimeData.BUNDLE_PLANS,
       fetchedAt: Date.now(),
