@@ -1619,6 +1619,7 @@
           "eu_country_expansion"
         );
         const getPeriodicalPremiumPlans = (await browser.storage.local.get("periodicalPremiumPlans")).periodicalPremiumPlans.PERIODICAL_PREMIUM_PLANS;
+        const getPeriodicalPremiumProductId = (await browser.storage.local.get("periodicalPremiumProductId")).periodicalPremiumProductId.PERIODICAL_PREMIUM_PRODUCT_ID;
         const premiumAvailability = getPeriodicalPremiumPlans.available_in_country;
         const countryCode = getPeriodicalPremiumPlans.country_code;
         const premium = (await browser.storage.local.get("premium")).premium;
@@ -1739,11 +1740,15 @@
           },)
         }
 
-        // Show Holiday Promo 2023 News if the waffle flag is active and premium is available in user's country
-        if (isHolidayPromo2023Available && premiumAvailability) {
-          const getPeriodicalPremiumPlanId = getPeriodicalPremiumPlans.plan_country_lang_mapping[getPeriodicalPremiumPlans.country_code]["*"].yearly.id;
+        const currentDate = new Date();
+        const holidayPromoExpires = new Date('2023-11-31');
+        const isHolidayPromo2023Active = currentDate <= holidayPromoExpires;
+
+        // Show if promo is available, if active and if premium is availble in user's region
+        if (isHolidayPromo2023Available && isHolidayPromo2023Active && premiumAvailability) {
+          const getPeriodicalPremiumPlanYearlyId = getPeriodicalPremiumPlans.plan_country_lang_mapping[getPeriodicalPremiumPlans.country_code]["*"].yearly.id;
           const fxaOrigin = (await browser.storage.local.get("fxaOrigin")).fxaOrigin.FXA_ORIGIN;
-          const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/?plan=${getPeriodicalPremiumPlanId}&coupon=HOLIDAY20`;
+          const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/${getPeriodicalPremiumProductId}?plan=${getPeriodicalPremiumPlanYearlyId}&coupon=HOLIDAY20`;
 
           sessionState.newsContent.push({
             id: "holiday-promo-2023",

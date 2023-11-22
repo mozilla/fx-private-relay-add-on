@@ -172,6 +172,10 @@ async function storeRuntimeData(opts={forceUpdate: false}) {
       PERIODICAL_PREMIUM_PLANS: runtimeData.PERIODICAL_PREMIUM_PLANS,
       fetchedAt: Date.now(),
     },
+    periodicalPremiumProductId: {
+      PERIODICAL_PREMIUM_PRODUCT_ID: runtimeData.PERIODICAL_PREMIUM_PRODUCT_ID,
+      fetchedAt: Date.now(),
+    }
   })
 }
 
