@@ -223,7 +223,7 @@ async function populateFreeMaskList(maskList, masks) {
     .querySelector(".fx-relay-menu-masks-lists")
     ?.classList.add("is-visible");
 
-  await browser.runtime.sendMessage({
+  browser.runtime.sendMessage({
     method: "updateIframeHeight",
     height: document.getElementById("fxRelayMenuBody").scrollHeight,
   });
@@ -276,7 +276,7 @@ async function populatePremiumMaskList(maskList, masks) {
     .querySelector(".fx-relay-menu-masks-lists")
     ?.classList.add("is-visible");
 
-  await browser.runtime.sendMessage({
+  browser.runtime.sendMessage({
     method: "updateIframeHeight",
     height: document.getElementById("fxRelayMenuBody").scrollHeight,
   });
@@ -488,7 +488,7 @@ const buildContent = {
       fxRelayMenuBody.classList.remove("is-premium");
       signedInContentFree?.classList.remove("is-hidden");
 
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: fxRelayMenuBody.scrollHeight,
       });
@@ -509,7 +509,7 @@ const buildContent = {
       signedInContentFree?.remove();
 
       // Resize iframe
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: fxRelayMenuBody.scrollHeight,
       });
@@ -640,7 +640,7 @@ const buildContent = {
         ".fx-relay-menu-generate-alias-btn"
       );
 
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: fxRelayMenuBody.scrollHeight,
       });
@@ -699,7 +699,7 @@ const buildContent = {
 
     // Bug: There's a race condition on how fast to detect the iframe being loaded. The setTimeout solves it for now.
     setTimeout(async () => {
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: document.getElementById("fxRelayMenuBody").scrollHeight,
       });
@@ -738,7 +738,7 @@ const buildContent = {
       button.classList.add("is-active");
 
       // Resize iframe
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "updateIframeHeight",
         height: document.getElementById("fxRelayMenuBody").scrollHeight,
       });
@@ -853,7 +853,7 @@ const buildContent = {
         );
 
         // Resize iframe
-        await browser.runtime.sendMessage({
+        browser.runtime.sendMessage({
           method: "updateIframeHeight",
           height: document.getElementById("fxRelayMenuBody").scrollHeight,
         });
@@ -900,7 +900,7 @@ const buildContent = {
         });
 
         // Resize iframe
-        await browser.runtime.sendMessage({
+        browser.runtime.sendMessage({
           method: "updateIframeHeight",
           height: document.getElementById("fxRelayMenuBody").scrollHeight,
         });
