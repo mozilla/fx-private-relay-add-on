@@ -1744,8 +1744,8 @@
         const holidayPromoExpires = new Date('2023-11-31');
         const isHolidayPromo2023Active = currentDate <= holidayPromoExpires;
 
-        // Show if promo is available, if active and if premium is availble in user's region
-        if (isHolidayPromo2023Available && isHolidayPromo2023Active && premiumAvailability) {
+        // Show if promo is available, if user does not have premium, if active and if premium is availble in user's region
+        if (isHolidayPromo2023Available && !premium && isHolidayPromo2023Active && premiumAvailability) {
           const getPeriodicalPremiumPlanYearlyId = getPeriodicalPremiumPlans.plan_country_lang_mapping[getPeriodicalPremiumPlans.country_code]["*"].yearly.id;
           const fxaOrigin = (await browser.storage.local.get("fxaOrigin")).fxaOrigin.FXA_ORIGIN;
           const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/${getPeriodicalPremiumProductId}?plan=${getPeriodicalPremiumPlanYearlyId}&coupon=HOLIDAY20`;
