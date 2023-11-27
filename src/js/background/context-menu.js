@@ -519,12 +519,10 @@ const relayContextMenus = {
   },
 };
 
-(async () => {
-  // Only show is platform support context menus
-  if (browser.menus || browser.contextMenus) {
-    await relayContextMenus.init();
-  }
-})();
+// Only run if on platform that supports context menus 
+if (browser.menus || browser.contextMenus) {
+  relayContextMenus.init();
+}
 
 // COMPATIBILITY NOTE: The onShown event is not available on the Chrome contextMenus API
 if (browser.menus) {
