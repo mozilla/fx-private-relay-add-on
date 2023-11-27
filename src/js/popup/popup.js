@@ -1741,7 +1741,7 @@
         }
 
         const currentDate = new Date();
-        const holidayPromoExpires = new Date('2023-11-31');
+        const holidayPromoExpires = new Date('2023-12-31');
         const isHolidayPromo2023Active = currentDate <= holidayPromoExpires;
 
         // Show if promo is available, if user does not have premium, if active and if premium is availble in user's region
