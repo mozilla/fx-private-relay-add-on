@@ -93,6 +93,8 @@
     }
   ],
 
+  "content_security_policy": "object-src data: 'unsafe-eval'",
+
   "permissions": [
     "<all_urls>",
     "storage",
