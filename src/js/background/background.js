@@ -489,11 +489,11 @@ async function displayBrowserActionBadge() {
 }
 
 browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
-  let response = (async () => {
+  (async () => {
     let response = null;
-    
+
     const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
-    
+
     switch (m.method) {
       case "displayBrowserActionBadge":
         await displayBrowserActionBadge();
@@ -554,10 +554,9 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
     if (response) {
       sendResponse(response);
     }
-    return response;
   })();
 
-  return response;
+  return true;
 });
 
 (async () => {
