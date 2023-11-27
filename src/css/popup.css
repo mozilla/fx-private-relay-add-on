@@ -1262,3 +1262,8 @@ sign-up-panel::after {
 .fx-relay-masks-search-form.is-visible {
   display: block;
 }
+
+/* Android custom sizing */
+.fx-relay-panel-wrapper.is-android {
+  --panelWidth: 100%;
+}

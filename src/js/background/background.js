@@ -8,10 +8,13 @@ function startupInit() {
 
 browser.runtime.onStartup.addListener(startupInit);
 
-
 browser.runtime.onInstalled.addListener((details) => {
   (async () => {
     const { firstRunShown } = await browser.storage.local.get("firstRunShown");
+
+    // Check if Firefox for Android to set custom pop-up width
+    const platformInfo = await browser.runtime.getPlatformInfo();
+    browser.storage.local.set({ isAndroid: (platformInfo.os === "android") });
 
     if (details.reason == "update") {
       // Force storeRuntimeData update

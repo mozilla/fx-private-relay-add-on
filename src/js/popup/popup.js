@@ -161,6 +161,16 @@
       }
     },
     init: async () => {
+
+      const { isAndroid } = await browser.storage.local.get(
+        "isAndroid"
+      );
+
+      // Add CSS class for custom Firefox for Android styles to the panel
+      if (isAndroid) {
+        document.body.classList.add("is-android")
+      }
+      
       // Set Navigation Listeners
       const navigationButtons = document.querySelectorAll(".js-internal-link");
       navigationButtons.forEach((button) => {
