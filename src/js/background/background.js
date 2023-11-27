@@ -9,25 +9,27 @@ function startupInit() {
 browser.runtime.onStartup.addListener(startupInit);
 
 
-browser.runtime.onInstalled.addListener(async (details) => {
-  const { firstRunShown } = await browser.storage.local.get("firstRunShown");
+browser.runtime.onInstalled.addListener((details) => {
+  (async () => {
+    const { firstRunShown } = await browser.storage.local.get("firstRunShown");
 
-  if (details.reason == "update") {
-    // Force storeRuntimeData update
-    await storeRuntimeData({forceUpdate: true});
-  }
-  
-  
-  if (firstRunShown || details.reason !== "install") {
-    return;
-  }
-  const userApiToken = await browser.storage.local.get("apiToken");
-  const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
-  const url = browser.runtime.getURL("/first-run.html");
-  if (!apiKeyInStorage) {
-    await browser.tabs.create({ url });
-    browser.storage.local.set({ firstRunShown: true });
-  }
+    if (details.reason == "update") {
+      // Force storeRuntimeData update
+      storeRuntimeData({forceUpdate: true});
+    }
+    
+    
+    if (firstRunShown || details.reason !== "install") {
+      return;
+    }
+    const userApiToken = await browser.storage.local.get("apiToken");
+    const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
+    const url = browser.runtime.getURL("/first-run.html");
+    if (!apiKeyInStorage) {
+      await browser.tabs.create({ url });
+      browser.storage.local.set({ firstRunShown: true });
+    }
+  })();
 });
 
 // This function is defined as global in the ESLint config _because_ it is created here:
@@ -570,5 +572,5 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
 (async () => {
   startupInit();
   await displayBrowserActionBadge();
-  await storeRuntimeData();
+  storeRuntimeData();
 })();
