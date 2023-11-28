@@ -501,6 +501,7 @@ async function displayBrowserActionBadge() {
   }
 }
 
+// NOTE: (#545) When using `browser.runtime.sendMessage` as an async function - you must return a response or the message will timeout/fail
 browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
   (async () => {
     let response = null;
@@ -554,7 +555,7 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
         await refreshAccountPages();
         break;
       case "sendMetricsEvent":
-        response = await sendMetricsEvent(m.eventData);
+        sendMetricsEvent(m.eventData);
         break;
       case "updateAddOnAuthStatus":
         await updateAddOnAuthStatus(m.status);

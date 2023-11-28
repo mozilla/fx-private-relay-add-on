@@ -1508,7 +1508,7 @@
             "disable-input-icon"
               ? "hide-input-icons"
               : "show-input-icons";
-          await browser.runtime.sendMessage({
+          browser.runtime.sendMessage({
             method: "updateInputIconPref",
             iconPref: userIconPreference,
           });

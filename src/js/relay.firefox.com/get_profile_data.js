@@ -322,11 +322,11 @@
       }
     });
 
-    await browser.runtime.sendMessage({
+    browser.runtime.sendMessage({
       method: "updateAddOnAuthStatus",
       status: true,
     });
-    await browser.runtime.sendMessage({
+    browser.runtime.sendMessage({
       method: "rebuildContextMenuUpgrade",
     });
   }
