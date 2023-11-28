@@ -1748,7 +1748,7 @@
         if (isHolidayPromo2023Available && !premium && isHolidayPromo2023Active && premiumAvailability) {
           const getPeriodicalPremiumPlanYearlyId = getPeriodicalPremiumPlans.plan_country_lang_mapping[getPeriodicalPremiumPlans.country_code]["*"].yearly.id;
           const fxaOrigin = (await browser.storage.local.get("fxaOrigin")).fxaOrigin.FXA_ORIGIN;
-          const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/${getPeriodicalPremiumProductId}?plan=${getPeriodicalPremiumPlanYearlyId}&coupon=HOLIDAY20&utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-holiday-promo-2023-cta`;
+          const holidayPromo2023Url =  `${fxaOrigin}/subscriptions/products/${getPeriodicalPremiumProductId}?plan=${getPeriodicalPremiumPlanYearlyId}&coupon=HOLIDAY20&utm_campaign=relay-holiday-promo-2023&utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-news-holiday-promo-2023-cta`;
 
           sessionState.newsContent.push({
             id: "holiday-promo-2023",
