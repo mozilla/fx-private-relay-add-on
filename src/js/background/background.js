@@ -554,7 +554,7 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
         await refreshAccountPages();
         break;
       case "sendMetricsEvent":
-        response = await sendMetricsEvent(m.eventData);
+        sendMetricsEvent(m.eventData);
         break;
       case "updateAddOnAuthStatus":
         await updateAddOnAuthStatus(m.status);
