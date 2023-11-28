@@ -17,6 +17,10 @@
       "gecko": {
           "id": "private-relay@firefox.com",
           "strict_min_version": "79.0"
+      },
+      "gecko_android": {
+          "id": "private-relay@firefox.com",
+          "strict_min_version": "113.0"
       }
   },
 
@@ -26,7 +30,8 @@
         "js/shared/utils.js",
         "js/background/background.js",
         "js/background/context-menu.js"
-      ]
+      ],
+      "persistent": false
   },
 
   "browser_action": {
@@ -34,7 +39,8 @@
       "default_icon": {
           "32": "icons/icon_32.png"
       },
-      "default_popup": "popup.html"
+      "default_popup": "popup.html",
+      "default_area": "navbar"
   },
 
   "content_scripts": [
@@ -88,9 +94,10 @@
   ],
 
   "permissions": [
-      "<all_urls>",
-      "storage",
-      "menus"
+    "<all_urls>",
+    "storage",
+    "menus",
+    "contextMenus"
   ],
 
   "web_accessible_resources": [

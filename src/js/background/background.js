@@ -1,28 +1,38 @@
-const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
+function startupInit() {
+  const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
+  browser.storage.local.set({ RELAY_SITE_ORIGIN });
+  browser.storage.local.set({ maxNumAliases: 5 });
+  browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
+  browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
+}
 
-browser.storage.local.set({ maxNumAliases: 5 });
-browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
-browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
+browser.runtime.onStartup.addListener(startupInit);
 
-browser.runtime.onInstalled.addListener(async (details) => {
-  const { firstRunShown } = await browser.storage.local.get("firstRunShown");
+browser.runtime.onInstalled.addListener((details) => {
+  (async () => {
+    const { firstRunShown } = await browser.storage.local.get("firstRunShown");
 
-  if (details.reason == "update") {
-    // Force storeRuntimeData update
-    await storeRuntimeData({forceUpdate: true});
-  }
-  
-  
-  if (firstRunShown || details.reason !== "install") {
-    return;
-  }
-  const userApiToken = await browser.storage.local.get("apiToken");
-  const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
-  const url = browser.runtime.getURL("/first-run.html");
-  if (!apiKeyInStorage) {
-    await browser.tabs.create({ url });
-    browser.storage.local.set({ firstRunShown: true });
-  }
+    // Check if Firefox for Android to set custom pop-up width
+    const platformInfo = await browser.runtime.getPlatformInfo();
+    browser.storage.local.set({ isAndroid: (platformInfo.os === "android") });
+
+    if (details.reason == "update") {
+      // Force storeRuntimeData update
+      storeRuntimeData({forceUpdate: true});
+    }
+    
+    
+    if (firstRunShown || details.reason !== "install") {
+      return;
+    }
+    const userApiToken = await browser.storage.local.get("apiToken");
+    const apiKeyInStorage = Object.prototype.hasOwnProperty.call(userApiToken, "apiToken");
+    const url = browser.runtime.getURL("/first-run.html");
+    if (!apiKeyInStorage) {
+      await browser.tabs.create({ url });
+      browser.storage.local.set({ firstRunShown: true });
+    }
+  })();
 });
 
 // This function is defined as global in the ESLint config _because_ it is created here:
@@ -257,6 +267,7 @@ async function sendMetricsEvent(eventData) {
 
   const ga_uuid = await getOrMakeGAUUID();
   const eventDataWithGAUUID = Object.assign({ ga_uuid }, eventData);
+  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
   const sendMetricsEventUrl = `${RELAY_SITE_ORIGIN}/metrics-event`;
   fetch(sendMetricsEventUrl, {
     method: "POST",
@@ -302,6 +313,8 @@ async function refreshAccountPages() {
 async function makeDomainAddress(address, block_list_emails, description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
 
+  const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+  
   if (!apiToken.apiToken) {
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
@@ -368,8 +381,10 @@ async function makeDomainAddress(address, block_list_emails, description = null)
 // eslint-disable-next-line no-redeclare
 async function makeRelayAddress(description = null) {
   const apiToken = await browser.storage.local.get("apiToken");
-
+  
   if (!apiToken.apiToken) {
+    const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+    
     browser.tabs.create({
       url: RELAY_SITE_ORIGIN,
     });
@@ -486,70 +501,79 @@ async function displayBrowserActionBadge() {
   }
 }
 
-browser.runtime.onMessage.addListener(async (m, sender, _sendResponse) => {
-  let response;
+browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
+  (async () => {
+    let response = null;
 
-  switch (m.method) {
-    case "displayBrowserActionBadge":
-      await displayBrowserActionBadge();
-      break;
-    case "iframeCloseRelayInPageMenu":
-      browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
-      break;
-    case "fillInputWithAlias":
-      browser.tabs.sendMessage(sender.tab.id, m.message);
-      break;
-    case "updateIframeHeight":
-      browser.tabs.sendMessage(sender.tab.id, m);
-      break;
-    case "getServerStoragePref":
-      response = await getServerStoragePref();
-      break;
-    case "getAliasesFromServer":
-      response = await getAliasesFromServer("GET", m.options);
-      break;
-    case "patchMaskInfo":
-      await patchMaskInfo("PATCH", m.id, m.data, m.options);
-      break;
-    case "getCurrentPageHostname":
-      // Only capture the page hostanme if the active tab is an non-internal (about:) page.
-      response = await getCurrentPageHostname();
-      break;
-    case "makeDomainAddress":
-      response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
-      break;
-    case "makeRelayAddress":
-      response = await makeRelayAddress(m.description);
-      break;
-    case "postReportWebcompatIssue":
-      response = await postReportWebcompatIssue(m.description);
-      break;
-    case "openRelayHomepage":
-      browser.tabs.create({
-        url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
-      });
-      break;
-    case "rebuildContextMenuUpgrade":
-      await relayContextMenus.init();
-      break;
-    case "refreshAccountPages":
-      await refreshAccountPages();
-      break;
-    case "sendMetricsEvent":
-      response = await sendMetricsEvent(m.eventData);
-      break;
-    case "updateAddOnAuthStatus":
-      await updateAddOnAuthStatus(m.status);
-      break;
-    case "updateInputIconPref":
-      browser.storage.local.set({ showInputIcons: m.iconPref });
-      break;
-  }
-  return response;
+    const { RELAY_SITE_ORIGIN } = await browser.storage.local.get("RELAY_SITE_ORIGIN");
+
+    switch (m.method) {
+      case "displayBrowserActionBadge":
+        await displayBrowserActionBadge();
+        break;
+      case "iframeCloseRelayInPageMenu":
+        browser.tabs.sendMessage(sender.tab.id, {message: "iframeCloseRelayInPageMenu"});
+        break;
+      case "fillInputWithAlias":
+        browser.tabs.sendMessage(sender.tab.id, m.message);
+        break;
+      case "updateIframeHeight":
+        browser.tabs.sendMessage(sender.tab.id, m);
+        break;
+      case "getServerStoragePref":
+        response = await getServerStoragePref();
+        break;
+      case "getAliasesFromServer":
+        response = await getAliasesFromServer("GET", m.options);
+        break;
+      case "patchMaskInfo":
+        await patchMaskInfo("PATCH", m.id, m.data, m.options);
+        break;
+      case "getCurrentPageHostname":
+        // Only capture the page hostanme if the active tab is an non-internal (about:) page.
+        response = await getCurrentPageHostname();
+        break;
+      case "makeDomainAddress":
+        response = await makeDomainAddress(m.address, m.block_list_emails, m.description);
+        break;
+      case "makeRelayAddress":
+        response = await makeRelayAddress(m.description);
+        break;
+      case "postReportWebcompatIssue":
+        response = await postReportWebcompatIssue(m.description);
+        break;
+      case "openRelayHomepage":
+        browser.tabs.create({
+          url: `${RELAY_SITE_ORIGIN}?utm_source=fx-relay-addon&utm_medium=input-menu&utm_content=go-to-fx-relay`,
+        });
+        break;
+      case "rebuildContextMenuUpgrade":
+        await relayContextMenus.init();
+        break;
+      case "refreshAccountPages":
+        await refreshAccountPages();
+        break;
+      case "sendMetricsEvent":
+        response = await sendMetricsEvent(m.eventData);
+        break;
+      case "updateAddOnAuthStatus":
+        await updateAddOnAuthStatus(m.status);
+        break;
+      case "updateInputIconPref":
+        browser.storage.local.set({ showInputIcons: m.iconPref });
+        break;
+    }
+    
+    if (response) {
+      sendResponse(response);
+    }
+  })();
+
+  return true;
 });
 
-
 (async () => {
+  startupInit();
   await displayBrowserActionBadge();
-  await storeRuntimeData();
+  storeRuntimeData();
 })();
