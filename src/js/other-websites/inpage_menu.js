@@ -3,7 +3,7 @@ let masks = {};
 
 async function iframeCloseRelayInPageMenu() {
   document.removeEventListener("keydown", handleKeydownEvents);
-  await browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
+  browser.runtime.sendMessage({ method: "iframeCloseRelayInPageMenu" });
 }
 
 function getRelayMenuEl() {
@@ -30,7 +30,7 @@ async function handleKeydownEvents(e) {
 
   if (e.key === "Escape") {
     preventDefaultBehavior(e);
-    await iframeCloseRelayInPageMenu();
+    iframeCloseRelayInPageMenu();
   }
 
   if (clickableElsInMenu[activeElemIndex] !== undefined && watchedKeyClicked) {
@@ -166,7 +166,7 @@ async function fillTargetWithRelayAddress(generateClickEvt) {
 
   // TODO: Add telemetry event (?)
 
-  await browser.runtime.sendMessage({
+  browser.runtime.sendMessage({
     method: "fillInputWithAlias",
     message: {
       filter: "fillInputWithAlias",
@@ -683,11 +683,11 @@ const buildContent = {
 
     signUpButton.addEventListener("click", async (clickEvt) => {
       preventDefaultBehavior(clickEvt);
-      await browser.runtime.sendMessage({
+      browser.runtime.sendMessage({
         method: "openRelayHomepage",
       });
       sendInPageEvent("click", "input-menu-sign-up-btn");
-      await iframeCloseRelayInPageMenu();
+      iframeCloseRelayInPageMenu();
     });
 
     sendInPageEvent("viewed-menu", "unauthenticated-user-input-menu");
@@ -780,7 +780,7 @@ const buildContent = {
           );
         }
 
-        await browser.runtime.sendMessage({
+        browser.runtime.sendMessage({
           method: "fillInputWithAlias",
           message: {
             filter: "fillInputWithAlias",
@@ -820,7 +820,7 @@ const buildContent = {
       getUnlimitedAliasesBtn.target = "_blank";
       getUnlimitedAliasesBtn.addEventListener("click", async () => {
         sendInPageEvent("click", unlimitedInPageEventId);
-        await iframeCloseRelayInPageMenu();
+        iframeCloseRelayInPageMenu();
       });
     },
     setManageLink: (relaySiteOrigin) => {
@@ -842,7 +842,7 @@ const buildContent = {
 
       relayMenuDashboardLink.addEventListener("click", async () => {
         sendInPageEvent("click", "input-menu-manage-all-aliases-btn");
-        await iframeCloseRelayInPageMenu();
+        iframeCloseRelayInPageMenu();
       });
     },
     search: {
