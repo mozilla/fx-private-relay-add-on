@@ -363,7 +363,7 @@
 }
 
 .fx-relay-menu-masks-search .fx-relay-menu-masks-list.t-no-search-bar ul {
-  max-height: none;
+  height: 100%; 
   overflow: visible;
 }
 
