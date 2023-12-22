@@ -29,7 +29,8 @@
         "js/libs/browser-polyfill.min.js",
         "js/shared/utils.js",
         "js/background/background.js",
-        "js/background/context-menu.js"
+        "js/background/context-menu.js",
+        "js/background/otp_notification.js"
       ],
       "persistent": false
   },
@@ -46,32 +47,32 @@
   "content_scripts": [
     {
       "matches": [
-        "http://127.0.0.1/"
+        "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/track_logout.js"]
     },
     {
       "matches": [
-        "http://127.0.0.1/**"
+        "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/inject_addon_data.js"]
     },
     {
       "matches": [
-        "http://127.0.0.1/**"
+        "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/**"
       ],
       "css": ["css/relay-website.css"],
       "run_at": "document_start"
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/profile/**"
+          "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/accounts/profile/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/get_profile_data.js"]
     },
     {
       "matches": [
-          "http://127.0.0.1/accounts/settings/**"
+          "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/accounts/settings/**"
       ],
       "js": ["js/libs/browser-polyfill.min.js", "js/relay.firefox.com/settings_refresh.js"]
     },
@@ -97,7 +98,8 @@
     "<all_urls>",
     "storage",
     "menus",
-    "contextMenus"
+    "contextMenus",
+    "notifications"
   ],
 
   "web_accessible_resources": [

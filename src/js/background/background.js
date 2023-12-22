@@ -1,5 +1,5 @@
 function startupInit() {
-  const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
+  const RELAY_SITE_ORIGIN = "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net";
   browser.storage.local.set({ RELAY_SITE_ORIGIN });
   browser.storage.local.set({ maxNumAliases: 5 });
   browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
@@ -297,7 +297,7 @@ async function createNewHeadersObject(opts) {
 }
 
 async function refreshAccountPages() {
-  browser.tabs.query({url: "http://127.0.0.1/*"}).then(tabs => {
+  browser.tabs.query({url: "https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/*"}).then(tabs => {
     for (let tab of tabs) {
       const tabUrl = new URL(tab.url);
       if (tabUrl.pathname.startsWith("/accounts/settings")) {
@@ -563,6 +563,10 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
       case "updateInputIconPref":
         browser.storage.local.set({ showInputIcons: m.iconPref });
         break;
+      case "updateOtpNotificationsPref":
+        browser.storage.local.set({ receiveOtpNotifications: m.notifyPref });
+        poll(); // Re-run poll function from otp_notification.js
+        break; 
     }
     
     if (response) {

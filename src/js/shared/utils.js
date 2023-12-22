@@ -10,6 +10,16 @@ async function areInputIconsEnabled() {
   return (showInputIcons === "show-input-icons");
 }
 
+async function areOtpNotificationsDisabled() {
+  const { receiveOtpNotifications } = await browser.storage.local.get("receiveOtpNotifications");
+  if (!receiveOtpNotifications) {
+    // Default is to disable
+    browser.storage.local.set({ "receiveOtpNotifications" : "otp-notifications-disabled"})
+    return true;
+  }
+  return (receiveOtpNotifications === "otp-notifications-disabled");
+}
+
 // This function is defined as global in the ESLint config _because_ it is created here:
 // eslint-disable-next-line no-redeclare
 async function setCustomFonts() {

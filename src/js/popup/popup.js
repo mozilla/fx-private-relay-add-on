@@ -906,7 +906,7 @@
       settings: {
         init: () => {
           popup.utilities.enableInputIconDisabling();
-
+          popup.utilities.toggleOtpNotifications();
           // Function is imported from data-opt-out-toggle.js
           enableDataOptOut();
 
@@ -1478,6 +1478,39 @@
           browser.browserAction.setBadgeBackgroundColor({ color: null });
           browser.browserAction.setBadgeText({ text: "" });
         }
+      },
+      toggleOtpNotifications: async () => {
+        const otpNotificationsToggle = document.querySelector(
+          ".otp-notifications-toggle"
+        );
+        const stylePrefToggle = (userPref) => {
+          if (userPref === "otp-notifications-enabled") {
+            otpNotificationsToggle.dataset.iconVisibilityOption =
+              "disable-input-icon";
+            otpNotificationsToggle.classList.remove("input-icons-disabled");
+            return;
+          }
+          otpNotificationsToggle.dataset.iconVisibilityOption =
+          "enable-input-icon";
+          otpNotificationsToggle.classList.add("input-icons-disabled");
+        };
+
+        const otpDisabled = await areOtpNotificationsDisabled();
+        const userPref = otpDisabled ? "otp-notifications-disabled" : "otp-notifications-enabled";
+        stylePrefToggle(userPref)
+       
+        otpNotificationsToggle.addEventListener("click", async (e) => {
+          const preference =
+            otpNotificationsToggle.dataset.iconVisibilityOption ===
+            "disable-input-icon"
+              ? "otp-notifications-disabled"
+              : "otp-notifications-enabled";
+          browser.runtime.sendMessage({
+            method: "updateOtpNotificationsPref",
+            notifyPref: preference,
+          });
+          return stylePrefToggle(preference);
+        });
       },
       enableInputIconDisabling: async () => {
         const inputIconVisibilityToggle = document.querySelector(
