@@ -113,6 +113,13 @@
   gap: var(--spacingXs);
 }
 
+.fx-relay-footer-nav {
+  border-top: 1px solid var(--colorGrey10);
+  padding: var(--spacingMd);
+  display: flex;
+  justify-content: space-between;
+}
+
 .fx-relay-menu-dashboard-link {
   display: flex;
   align-items: center;
@@ -127,6 +134,14 @@
   border: none;
   background-color: transparent;
   cursor: pointer;
+}
+
+.fx-relay-menu-dashboard-link.footer {
+  width: 90px;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: var(--fontStackBase);
+  gap: 8px;
 }
 
 .fx-relay-menu-dashboard-link .news-count {
@@ -203,8 +218,34 @@
   padding: 0 var(--spacingXl);
 }
 
+.fx-relay-primary-dashboard-switcher {
+  display: flex;
+}
+.fx-relay-primary-dashboard-switcher-btn {
+  position: relative;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: var(--spacingMd);
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--fontStackBase);
+  text-align: center;
+  width: 100%;
+  color: var(--colorGrey40);
+  border-bottom: 2px solid var(--colorGrey10);
+}
+
+.fx-relay-primary-dashboard-switcher-btn.is-active {
+  color: var(--colorPurple70);
+  font-weight: 600;
+  border-bottom: 2px solid var(--colorPurple70);
+}
+
+
 .fx-relay-panel-header-btn-back {
-  position: absolute;
+  position: relative;
   left: var(--spacingSm);
   appearance: none;
   background-color: transparent;

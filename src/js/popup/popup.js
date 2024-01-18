@@ -22,7 +22,11 @@
 
         if (backNavLevel === "root") {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks").classList.add("is-active");
         }
+
+        // TODO: Get context of history and check is backNavLevel is "phones" tab
+
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
@@ -235,6 +239,10 @@
           case "masks": 
             popup.panel.masks.init();
             break;
+          
+          case "phones": 
+            popup.panel.phones.init();
+            break;
 
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
@@ -267,6 +275,17 @@
             popup.panel.webcompat.init();
             break;
         }
+      },
+      phones: {
+        init: async () => {
+          // TODO: Any initialization needed (see masks.init)
+          popup.panel.phones.utilities.buildPhonesPanel();
+        }, 
+        utilities: {
+          buildPhonesPanel: async (opts = null) => {
+            // TODO: Check if user is premium, set respective contents based on that
+          },
+        },
       },
       masks: {
         custom: {
