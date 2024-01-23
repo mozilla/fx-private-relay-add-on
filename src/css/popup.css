@@ -45,15 +45,13 @@
 #masks-panel[data-account-level="free"] .fx-relay-panel-content {
   min-height: 344px;
   max-height: 344px;
-  margin-bottom: 50px;
   overflow: auto;
 }
 
 #masks-panel[data-account-level="premium"] .fx-relay-panel-content {
-  min-height: 336px;
-  max-height: 336px;
+  min-height: 315px;
+  max-height: 315px;
   overflow: auto;
-  margin-bottom: 100px;
 }
 
 /* Custom fix for Firefox bug where changing panel size from large to small does not trigger refresh */
@@ -115,9 +113,13 @@
 
 .fx-relay-footer-nav {
   border-top: 1px solid var(--colorGrey10);
-  padding: var(--spacingMd);
+  padding: var(--spacingSm);
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
+}
+
+.fx-relay-footer-nav.left-align {
+  justify-content: start;
 }
 
 .fx-relay-menu-dashboard-link {
@@ -139,9 +141,9 @@
 .fx-relay-menu-dashboard-link.footer {
   width: 90px;
   font-weight: 600;
-  font-size: 12px;
+  font-size: var(--fontSizeBodyXs);
   font-family: var(--fontStackBase);
-  gap: 8px;
+  gap: var(--spacingSm);
 }
 
 .fx-relay-menu-dashboard-link .news-count {
@@ -245,14 +247,18 @@
 
 
 .fx-relay-panel-header-btn-back {
-  position: relative;
-  left: var(--spacingSm);
   appearance: none;
   background-color: transparent;
   border: none;
-  margin: 0;
-  padding: var(--spacingXs);
+  padding: var(--spacingMd);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-weight: 600;
+  font-size: var(--fontSizeBodyXs);
+  font-family: var(--fontStackBase);
+  gap: var(--spacingSm);
 }
 
 .fx-relay-panel-header-btn-back:focus,
@@ -263,8 +269,8 @@
 
 .fx-relay-panel-header-btn-back img {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
 }
 
@@ -942,10 +948,7 @@ sign-up-panel::after {
 
 .fx-relay-generate-mask-buttons {
   border-top: 1px solid var(--colorGrey10);
-  position: fixed;
-  bottom: 0;
   width: 100%;
-  left: 0;
   padding: var(--spacingMd);
   background-color: var(--colorGrey05);
   display: flex;

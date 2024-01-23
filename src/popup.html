@@ -87,6 +87,10 @@
             </div>            
         </sign-up-panel>
 
+        <!-- Panel: Phones -->
+        <phones-panel data-panel-id="phones" class="is-hidden fx-relay-panel" id="phones-panel">
+          <!-- TODO: Add content and initialize in popup.js -->
+        </phones-panel>
         <!-- Panel: Masks (Default once logged in) -->
         <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
           <div class="fx-relay-panel-content">
@@ -140,30 +144,22 @@
 
             <!-- This list is dynamically generated from popup via buildMasksList utils function -->
             <ul class="fx-relay-mask-list"></ul>
-
-            <!-- Mask Creation Section -->
-            <div class="fx-relay-generate-mask-buttons">
-              <!-- Generate Custom Mask -->
-              <button class="i18n-content fx-relay-c-button t-primary js-generate-custom-mask is-hidden" data-i18n-message-id="pageInputIconGenerateCustomMask"></button>              
-              <!-- Generate Random Mask -->
-              <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
-              <!-- Upgrade Button -->
-              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
-              <!-- Register Subdomain -->
-              <button data-href="accounts/profile/#mpp-choose-subdomain" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-regsiter-subdomain-button is-hidden" data-relay-internal="true" data-i18n-message-id="popupGetDomainButton"></button>
-            </div>
-            
           </div>
-          
+            <!-- Mask Creation Section -->
+          <div data-panel-id="masks" class="fx-relay-panel fx-relay-generate-mask-buttons">
+            <!-- Generate Custom Mask -->
+            <button class="i18n-content fx-relay-c-button t-primary js-generate-custom-mask is-hidden" data-i18n-message-id="pageInputIconGenerateCustomMask"></button>              
+            <!-- Generate Random Mask -->
+            <button class="i18n-content fx-relay-c-button t-primary js-generate-random-mask is-hidden" data-i18n-message-id="pageInputIconGenerateNewAlias_mask"></button>              
+            <!-- Upgrade Button -->
+            <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-mask-upgrade-button is-hidden" data-relay-internal="true" data-i18n-message-id="pageInputIconGetUnlimitedAliases_mask"></button>
+            <!-- Register Subdomain -->
+            <button data-href="accounts/profile/#mpp-choose-subdomain" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-secondary js-external-link fx-relay-regsiter-subdomain-button is-hidden" data-relay-internal="true" data-i18n-message-id="popupGetDomainButton"></button>
+          </div>
         </masks-panel>
 
         <custom-panel data-panel-id="custom" class="is-hidden fx-relay-panel" id="custom-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-id="custom" data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button>
-             -->
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupCreateCustomMaskTitle"></h2>
 
@@ -202,11 +198,6 @@
         <!-- Panel: Settings -->
         <settings-panel data-panel-id="settings" class="is-hidden fx-relay-panel" id="settings-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsTitle"></h2>
           </header>
@@ -240,11 +231,6 @@
          <!-- Panel: CSAT Survey -->
          <survey-panel data-panel-id="survey" class="is-hidden fx-relay-panel" id="survey-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSurveyLink" />
 
@@ -287,11 +273,6 @@
         <!-- Panel: Report Issue -->
         <webcompat-panel data-panel-id="webcompat" class="is-hidden fx-relay-panel" id="webcompat-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-id="webcompat" data-nav-level="child" data-back-target="settings" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupSettingsReportIssue"></h2>
 
@@ -359,14 +340,11 @@
         <!-- Panel: Stats -->
         <stats-panel data-panel-id="stats" class="is-hidden fx-relay-panel" id="stats-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupStatsTitle"></h2>
           </header>
+
+          <!-- TODO: Stats for phones, MPP-3690. -->
 
           <!-- Stats are dynamically generated from popup via stats.init function -->
           <div class="fx-relay-panel-content">
@@ -409,11 +387,6 @@
         <!-- Panel: News -->
         <news-feed-panel data-panel-id="news" class="is-hidden fx-relay-panel" id="news-feed-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-            <!-- <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupNewsTitle"></h2>
           </header>
@@ -429,11 +402,6 @@
         <!-- Panel: News Item -->
         <news-item-panel data-panel-id="newsItem" class="is-hidden fx-relay-panel" id="news-item-panel">
           <header class="fx-relay-panel-header">
-            <!-- Back Button -->
-             <!-- <button data-nav-id="newsItem" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
-              <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-            </button> -->
-            
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupNewsTitle"></h2>
           </header>
@@ -442,16 +410,12 @@
             <!-- News items are dynamically generated from popup via storyPanel.update function -->
             <article class="fx-relay-news-story"></article>
           </div>
-          
+        
         </news-item-panel>
         
     </panel-content>
 
     <footer class="fx-relay-footer-nav">
-      <!-- Back Button -->
-      <button data-nav-id="newsItem" data-nav-level="child" data-back-target="news" class="fx-relay-panel-header-btn-back">
-        <img class="i18n-alt-tag" data-i18n-message-id="returnToPreviousPanel" src="/icons/nebula-back-arrow.svg" alt="">
-      </button>
        <!-- Stats -->
        <button data-panel-id="stats" class="fx-relay-menu-dashboard-link footer js-internal-link is-hidden" href="#">
         See stats
