@@ -8,6 +8,7 @@
 
   const sessionState = {
     currentPanel: null,
+    primaryPanel: "masks",
     newsItemsCount: null,
     loggedIn: false,
     newsContent: []
@@ -17,16 +18,16 @@
     events: {
       backClick: (e) => {
         e.preventDefault();
-        const backTarget = e.target.dataset.backTarget;
+        let backTarget = e.target.dataset.backTarget;
         const backNavLevel = e.target.dataset.navLevel;
-
+        let data;
         if (backNavLevel === "root") {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
-          document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks").classList.add("is-active");
+          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
+          
+          backTarget = sessionState.primaryPanel;
+          data = { backTarget: true }
         }
-
-        // TODO: Get context of history and check is backNavLevel is "phones" tab
-
 
         // Custom rule to send "Closed Report Issue" event
         if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
@@ -51,7 +52,7 @@
           return;
         }
 
-        popup.panel.update(backTarget);
+        popup.panel.update(backTarget, data);
       },
       dismissErrorClick: async (e) => {
         e.preventDefault();
@@ -185,10 +186,6 @@
       const backButtons = document.querySelectorAll(
         ".fx-relay-panel-header-btn-back"
       );
-      
-      backButtons.forEach((button) => {
-        button.addEventListener("click", popup.events.backClick, false);
-      });
 
       sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
@@ -218,7 +215,19 @@
     },
     panel: {
       update: (panelId, data) => {
+        document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.add("is-hidden");
+        document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.add("is-hidden");
+
+        if (sessionState.currentPanel === "stats" && (panelId === "phones" || panelId === "masks") && !data?.backTarget) {
+          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${panelId}`).classList.add("is-active");
+          
+          sessionState.primaryPanel = panelId;
+          popup.panel.init("stats", data);
+          return;
+        } 
         const panels = document.querySelectorAll(".fx-relay-panel");
+
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
 
@@ -231,48 +240,71 @@
         sessionState.currentPanel = panelId;
       },
       init: (panelId, data) => {
+        let backBtn = document.querySelector('.fx-relay-panel-header-btn-back');
+        backBtn?.parentNode.removeChild(backBtn);
+        let footer = document.querySelector(".fx-relay-footer-nav");
+        footer?.classList.remove('left-align');
+
         switch (panelId) {
           case "custom": 
             popup.panel.masks.custom.init();
+            popup.utilities.buildBackButton("custom", "root", "masks");
             break;
 
-          case "masks": 
+          case "masks":
             popup.panel.masks.init();
+            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+            document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
+            sessionState.primaryPanel = panelId;
             break;
           
-          case "phones": 
+          case "phones":
             popup.panel.phones.init();
+            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+            document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
+            sessionState.primaryPanel = panelId;
             break;
 
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
+            popup.utilities.buildBackButton("", "root", "masks");
             break;
 
           case "survey":
             sendRelayEvent("Panel", "click", "opened-CSAT");
             popup.panel.survey.init();
+            popup.utilities.buildBackButton("", "root", "masks");
             break;
 
           case "newsItem":
             sendRelayEvent("Panel", "click", "opened-news-item");
             popup.panel.news.item.update(data.newsItemId);
+            popup.utilities.buildBackButton("newsItem", "child", "news");
+            
             break;
 
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
             popup.panel.settings.init();
+            popup.utilities.buildBackButton("", "root", "masks");
             break;
 
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
+            popup.utilities.buildBackButton("", "root", "masks");
+            // Make primary tab active
+            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+            document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+            document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
             break;
 
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
+            popup.utilities.buildBackButton("webcompat", "child", "settings");
             break;
         }
       },
@@ -944,6 +976,14 @@
       },
       stats: {
         init: async () => {
+
+          // TODO: If phones, show phone stats
+          if (sessionState.primaryPanel === "phones") {
+            // Build phone stats here.
+           
+            return;
+          }
+
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
@@ -1483,6 +1523,29 @@
       },
     },
     utilities: {
+      buildBackButton: (navId, navLevel, backTarget) => {
+        let button = document.createElement("button");
+
+        button.setAttribute("data-nav-id", navId);
+        button.setAttribute("data-nav-level", navLevel);
+        button.setAttribute("data-back-target", backTarget);
+        button.className = "fx-relay-panel-header-btn-back";
+      
+        let img = document.createElement("img");
+        img.className = "i18n-alt-tag";
+        img.setAttribute("data-i18n-message-id", "returnToPreviousPanel");
+        img.src = "/icons/nebula-back-arrow.svg";
+        img.alt = "";
+
+        button.appendChild(img);
+        button.appendChild(document.createTextNode("Go back"));
+
+        button.addEventListener("click", popup.events.backClick, false);
+        
+        let footer = document.querySelector(".fx-relay-footer-nav");
+        footer?.appendChild(button);
+        footer?.classList.add('left-align');
+      },
       checkIfAnyMasksWereGeneratedOnCurrentWebsite: (masks, domain) => {
         return masks.some((mask) => {
           return domain === mask.generated_for;
