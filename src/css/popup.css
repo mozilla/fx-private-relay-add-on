@@ -139,11 +139,26 @@
 }
 
 .fx-relay-menu-dashboard-link.footer {
-  width: 90px;
+  width: fit-content;
   font-weight: 600;
   font-size: var(--fontSizeBodyXs);
   font-family: var(--fontStackBase);
   gap: var(--spacingSm);
+  padding: 4px 16px;
+}
+
+.fx-relay-menu-dashboard-link.footer:hover, 
+.fx-relay-menu-dashboard-link.footer:focus, 
+.fx-relay-menu-dashboard-link.footer.is-active {
+  border-radius: 4px;
+}
+
+.fx-relay-menu-dashboard-link.footer:focus {
+  border: 2px solid var(--colorBlue50);
+}
+
+.fx-relay-menu-dashboard-link.footer.is-active {
+  background-color: var(--colorGrey20);
 }
 
 .fx-relay-menu-dashboard-link .news-count {

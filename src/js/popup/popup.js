@@ -218,10 +218,15 @@
         document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.add("is-hidden");
         document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.add("is-hidden");
 
+        // TODO change to statsInit fn
         if (sessionState.currentPanel === "stats" && (panelId === "phones" || panelId === "masks") && !data?.backTarget) {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
           document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${panelId}`).classList.add("is-active");
           
+          const primaryBtn = document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${panelId}`) 
+          popup.ariaControls.setSelected(primaryBtn);
+          popup.ariaControls.setControls(primaryBtn, panelId);
+
           sessionState.primaryPanel = panelId;
           popup.panel.init("stats", data);
           return;
@@ -253,16 +258,22 @@
 
           case "masks":
             popup.panel.masks.init();
-            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
-            document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
-            sessionState.primaryPanel = panelId;
+            popup.utilities.setPrimaryPanel(panelId);
+            
+            const masksBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks") 
+            popup.ariaControls.setSelected(masksBtn);
+            popup.ariaControls.setControls(masksBtn, panelId);
+
             break;
           
           case "phones":
             popup.panel.phones.init();
-            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
-            document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
-            sessionState.primaryPanel = panelId;
+            popup.utilities.setPrimaryPanel(panelId);
+
+            const phonesBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.phones") 
+            popup.ariaControls.setSelected(phonesBtn);
+            popup.ariaControls.setControls(phonesBtn, panelId);
+
             break;
 
           case "news":
@@ -371,8 +382,7 @@
             customMaskDomainSubmitButton.disabled = !(customMaskDomainInput.value)
           }
         },
-        init: async () => {
-          
+        init: async () => { 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
           const { dataCollection } = await browser.storage.local.get(
@@ -1523,13 +1533,18 @@
       },
     },
     utilities: {
+      setPrimaryPanel: (panelId) => {
+        document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+        document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
+        sessionState.primaryPanel = panelId;
+      },
       buildBackButton: (navId, navLevel, backTarget) => {
         let button = document.createElement("button");
 
         button.setAttribute("data-nav-id", navId);
         button.setAttribute("data-nav-level", navLevel);
         button.setAttribute("data-back-target", backTarget);
-        button.className = "fx-relay-panel-header-btn-back";
+        button.className = "fx-relay-menu-dashboard-link footer js-internal-link fx-relay-panel-header-btn-back";
       
         let img = document.createElement("img");
         img.className = "i18n-alt-tag";
@@ -1977,6 +1992,27 @@
           dismissalInstance.dismiss();
       } 
      },
+    },
+    ariaControls: {
+      setSelected: (element) => {
+        if (!(element instanceof Element)) {
+          return;
+        }
+        const prevSelected = document.querySelector("[aria-selected]");
+        prevSelected.removeAttribute("aria-selected");
+
+        element.setAttribute("aria-selected", true);
+
+      },
+      setControls: (element, panelId) => {
+        if (!(element instanceof Element) || !(typeof panelId === 'string')) {
+          return;
+        }
+        const prevSelected = document.querySelector("[aria-controls]");
+        prevSelected.removeAttribute("aria-controls");
+
+        element.setAttribute("aria-controls", panelId);
+      }
     },
   };
 
