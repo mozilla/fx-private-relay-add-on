@@ -80,6 +80,82 @@
             </div>            
         </sign-up-panel>
 
+        <!-- Panel: Phone Masks (Secondary to Email masks) -->
+        <phone-masks-panel data-panel-id="phone-masks" class="is-hidden fx-relay-panel" id="phone-masks-panel">
+          <div class="fx-relay-panel-content">
+            
+            <div class="fx-relay-phone-default-view is-hidden">
+              <div class="fx-relay-phone-container"> 
+                  <p id="fx-relay-user-phone-country">
+                    <img class="i18n-alt-tag" data-i18n-message-id="popupSurveyLink" alt="" src="/icons/us-flag.svg">
+                    <span class="fx-relay-phone-with-country-code">+1 U.S.A</span>
+                  </p> 
+                 <div class="fx-relay-phone-details">
+                    <p id="fx-relay-user-phone-number">
+                      (305) 555 - 5555 
+                    </p> 
+                    <button id="fx-relay-phone-mask-copy-button" class="fx-relay-mask-item-address-copy" data-event-action="click" data-event-label="panel-copy-btn"></button>
+                 </div>
+              </div>
+
+              <div class="fx-relay-phone-forwarding"> 
+                <div id="fx-relay-input-container"> 
+                  <!-- forwarding controls for phone mask -->
+                    <div class="fx-relay-segmented-control">
+                      <div class="fx-relay-segmented-control-group">
+                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-forwarding" checked /> 
+                        <label class="fx-relay-label i18n-content" 
+                        id="fx-relay-phone-forwarding-button-label"
+                        data-i18n-message-id="popupPhoneMasksForwardingButton"
+                        for="fx-relay-phone-forwarding"></label>
+                      </div>
+                      <div class="fx-relay-segmented-control-group">
+                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-blocking" /> 
+                        <label class="fx-relay-label i18n-content" 
+                        id="fx-relay-phone-blocking-button-label"
+                        data-i18n-message-id="popupPhoneMasksBlockingButton"
+                        for="fx-relay-phone-blocking"></label>
+                      </div> 
+                    </div> 
+                </div> 
+              </div>
+
+              <div class="fx-relay-phone-meta-container">
+                <p class="i18n-content fx-relay-phone-meta-description" 
+                data-i18n-message-id="popupPhoneMasksMetaDescription"></p>
+
+                <div class="fx-relay-phone-meta-details">
+                  <div class="fx-relay-phone-forward-to">
+                    <p class="i18n-content" data-i18n-message-id="popupPhoneMasksMetaForwardTo"></p>
+                    <p id="fx-relay-meta-forwarding-to">
+                      (954) 555-5555
+                    </p>
+                  </div>
+                  <div class="fx-relay-phone-created">
+                    <p class="i18n-content" data-i18n-message-id="popupPhoneMasksMetaCreated"></p>
+                    <p id="fx-relay-meta-created-date">
+                      Oct 15, 2023
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="fx-relay-phone-dynamic-view is-hidden">
+              <div class="fx-relay-phone-content">
+                <h1 class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskTitle"></h1>
+                <p class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskBody"></p>
+              </div>
+
+              <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/images/panel-images/phone-masking/phone-mask-illustration.svg">
+              
+              <!-- TODO: Get URL for CTA -->
+              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-primary js-external-link" data-relay-internal="true" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskCTA"></button>
+            </div>
+          </div>
+        </phone-masks-panel>
+
         <!-- Panel: Masks (Default once logged in) -->
         <masks-panel data-panel-id="masks" class="is-hidden fx-relay-panel" id="masks-panel">
           <div class="fx-relay-panel-content">
@@ -231,7 +307,7 @@
         </settings-panel>
 
          <!-- Panel: CSAT Survey -->
-         <survey-panel data-panel-id="survey" class="is-hidden fx-relay-panel" id="survey-panel">
+        <survey-panel data-panel-id="survey" class="is-hidden fx-relay-panel" id="survey-panel">
           <header class="fx-relay-panel-header">
             <!-- Back Button -->
             <button data-nav-level="root" data-back-target="masks" class="fx-relay-panel-header-btn-back">

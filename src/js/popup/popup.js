@@ -189,11 +189,13 @@
       sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (sessionState.loggedIn) {
-        popup.panel.update("masks");
+      if (sessionState.loggedIn) { // TODO: Put back
+        // popup.panel.update("masks");
+        popup.panel.update("phone-masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
         // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
+        document.body.classList.remove("is-loading");
       } else {
         popup.panel.update("sign-up");
         document.body.classList.remove("is-loading");
@@ -234,6 +236,10 @@
 
           case "masks": 
             popup.panel.masks.init();
+            break;
+
+          case "phone-masks":
+            popup.panel.phoneMasks.init();
             break;
 
           case "news":
@@ -698,6 +704,130 @@
             }
           }
         },
+      },
+      phoneMasks: {
+        init: async () => {  
+          const hasPhone = await browser.storage.local.get("has_phone");
+          const premium = await browser.storage.local.get("premium");
+          const getNumber = await browser.storage.local.get("relayNumbers");
+          const getPlans = await browser.storage.local.get("phonePlans");
+          const relayNumberData = getNumber.relayNumbers.length !== 0 ? getNumber.relayNumbers[0] : false;
+          const defaultView = document.querySelector(".fx-relay-phone-default-view");
+
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+
+          // If there is number data and its enabled, show the default view
+          if (relayNumberData && relayNumberData.enabled) { 
+            defaultView.classList.remove("is-hidden");
+          } else { 
+            dynamicView.classList.remove("is-hidden");
+          }
+
+          // If user has premium and has phone, but number is not enabled
+          if (premium.premium && hasPhone.has_phone && !relayNumberData.enabled) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
+              panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
+              panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
+              panelCtaHref: ""
+            })
+          }
+
+           // If user has premium but not phone, show upgrade CTA
+           if (premium.premium && !hasPhone.has_phone) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+              panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+              panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+              panelCtaHref: ""
+            })
+          }
+ 
+          // If phone plan is not available in country, show waitlist
+          if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popUpPhoneMasksNotAvailableTitle", 
+              panelDescription: "popUpPhoneMasksNotAvailableBody",
+              panelCtaText: "popUpPhoneMasksNotAvailableCta",
+              panelCtaHref: ""
+            })
+          }
+
+          console.log(await browser.storage.local.get());
+          
+          // adds icons to segmented controls for blocking and forwarding
+          const blockingButtonLabelElement = document.getElementById("fx-relay-phone-blocking-button-label");
+          const forwardingButtonLabelElement = document.getElementById("fx-relay-phone-forwarding-button-label");
+
+          if (blockingButtonLabelElement) { 
+            const iconElement = document.createElement("img"); 
+
+            iconElement.src = "/icons/block-icon.svg"; 
+
+            blockingButtonLabelElement.insertBefore(iconElement, blockingButtonLabelElement.firstChild);
+          }
+
+          if (forwardingButtonLabelElement) { 
+            const iconElement = document.createElement("img"); 
+
+            iconElement.src = "/icons/redo-icon.svg"; 
+
+            forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
+          } 
+ 
+          popup.panel.phoneMasks.utils.forwardingControls();
+ 
+          const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
+          const radios = segmentedControlGroup.querySelectorAll('input');
+          let i = 1;
+
+          // set CSS Var to number of radios we have
+          segmentedControlGroup.style.setProperty('--options',radios.length);
+
+          // loop through radio elements
+          radios.forEach((input)=>{
+             // store position as data attribute
+            input.setAttribute('data-pos',i);
+
+            // add click handler to change position
+            input.addEventListener('click',(e)=>{
+              popup.panel.phoneMasks.utils.forwardingControls();
+              segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
+            });
+ 
+            i++;
+          });
+
+          // add class to enable the sliding pill animation, otherwise it uses a fallback
+          segmentedControlGroup.classList.add('useSlidingAnimation');
+ 
+        },
+        utils: {
+          forwardingControls: () => {
+            const controlGroups = document.querySelectorAll('.fx-relay-segmented-control-group');
+
+            controlGroups.forEach(controlGroup => { 
+              const input = controlGroup.querySelector('input[type="radio"]:checked');
+               
+              controlGroup.classList.toggle('fx-relay-selected-segmented-group', !!input); 
+              controlGroup.classList.toggle('fx-relay-unselected-segmented-group', !input);
+            });
+          },
+          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}) => {
+            const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+
+            const title = dynamicView.querySelector("h1");
+            const description = dynamicView.querySelector("p"); 
+            const cta = dynamicView.querySelector("button");
+
+            title.textContent = browser.i18n.getMessage(panelTitle);
+            description.textContent = browser.i18n.getMessage(panelDescription); 
+            cta.textContent = browser.i18n.getMessage(panelCtaText);
+            cta.dataset.href = panelCtaHref;
+            cta.dataset.eventLabel = panelCtaEvenLabel;
+            cta.addEventListener("click", popup.events.externalClick, true);
+          }
+        }
       },
       news: {
         init: async () => {
