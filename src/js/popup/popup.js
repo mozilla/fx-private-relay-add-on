@@ -182,19 +182,16 @@
         button.addEventListener("click", popup.events.navigationClick, false);
       });
 
-      // Set Back Button Listeners
-      const backButtons = document.querySelectorAll(
-        ".fx-relay-panel-header-btn-back"
-      );
-
       sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (sessionState.loggedIn) {
+      if (sessionState.loggedIn) { // TODO: Put back
         popup.panel.update("masks");
+        // popup.panel.update("phone-masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
         // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
+        document.body.classList.remove("is-loading");
       } else {
         popup.panel.update("sign-up");
         document.body.classList.remove("is-loading");
@@ -214,23 +211,50 @@
       //   If premium tier: focused in search bar
     },
     panel: {
-      update: (panelId, data) => {
+      initializePanelContext: () => {
+        // Remove any existing back buttons, there should only be one once the panel is built
+        let backBtn = document.querySelector('.fx-relay-panel-header-btn-back');
+        backBtn?.parentNode.removeChild(backBtn);
+        let footer = document.querySelector(".fx-relay-footer-nav");
+        footer?.classList.remove('left-align'); // Left alignment is only re-added when buildBackButton runs
+
+        // Hide primary masks/phones dashboard tabs and "stats" button in footer
         document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.add("is-hidden");
-        document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.add("is-hidden");
+        document.querySelector(".fx-relay-menu-dashboard-link.footer.stats")?.classList.add("is-hidden");
 
-        // TODO change to statsInit fn
-        if (sessionState.currentPanel === "stats" && (panelId === "phones" || panelId === "masks") && !data?.backTarget) {
+      },
+      setPanelContextTabs: (panelId, data) => {
+        // This function is for panels that have independent primary "emails" and "phones" tabs
+        // The initial email and phones tab context is already set as the default.
+        // For all other panels that need independent tabs, set them here. 
+
+        // Set independent stats tab
+        const activeTab = panelId === "stats" ? sessionState.primaryPanel : panelId;
+        const initializeStats = sessionState.currentPanel === "stats" && (panelId === "phone-masks" || panelId === "masks")  && !data?.backTarget;
+        if (panelId === "stats" || initializeStats) {
+          document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
-          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${panelId}`).classList.add("is-active");
+          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${activeTab}`).classList.add("is-active");
           
-          const primaryBtn = document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${panelId}`) 
+          const primaryBtn = document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${activeTab}`) 
           popup.ariaControls.setSelected(primaryBtn);
-          popup.ariaControls.setControls(primaryBtn, panelId);
+          popup.ariaControls.setControls(primaryBtn, activeTab);
 
-          sessionState.primaryPanel = panelId;
-          popup.panel.init("stats", data);
-          return;
+          if (initializeStats) {
+            sessionState.primaryPanel = panelId; // Update primary panel if it changed
+            popup.panel.init("stats", data);
+            return true;
+          } 
         } 
+
+        return false;
+      },
+      update: (panelId, data) => {
+        popup.panel.initializePanelContext();
+        if (popup.panel.setPanelContextTabs(panelId, data)) {
+          return;
+        }
+       
         const panels = document.querySelectorAll(".fx-relay-panel");
 
         panels.forEach((panel) => {
@@ -245,10 +269,8 @@
         sessionState.currentPanel = panelId;
       },
       init: (panelId, data) => {
-        let backBtn = document.querySelector('.fx-relay-panel-header-btn-back');
-        backBtn?.parentNode.removeChild(backBtn);
-        let footer = document.querySelector(".fx-relay-footer-nav");
-        footer?.classList.remove('left-align');
+        const phonesBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.phone-masks");
+        const masksBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks");
 
         switch (panelId) {
           case "custom": 
@@ -259,21 +281,15 @@
           case "masks":
             popup.panel.masks.init();
             popup.utilities.setPrimaryPanel(panelId);
-            
-            const masksBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks") 
             popup.ariaControls.setSelected(masksBtn);
             popup.ariaControls.setControls(masksBtn, panelId);
-
             break;
-          
-          case "phones":
-            popup.panel.phones.init();
-            popup.utilities.setPrimaryPanel(panelId);
 
-            const phonesBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.phones") 
+          case "phone-masks":
+            popup.panel.phoneMasks.init();
+            popup.utilities.setPrimaryPanel(panelId);
             popup.ariaControls.setSelected(phonesBtn);
             popup.ariaControls.setControls(phonesBtn, panelId);
-
             break;
 
           case "news":
@@ -306,10 +322,11 @@
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
             popup.utilities.buildBackButton("", "root", "masks");
-            // Make primary tab active
-            document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
-            document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
-            document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
+
+            // // Make primary tab active
+            // document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+            // document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+            // document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
             break;
 
           case "webcompat":
@@ -318,17 +335,6 @@
             popup.utilities.buildBackButton("webcompat", "child", "settings");
             break;
         }
-      },
-      phones: {
-        init: async () => {
-          // TODO: Any initialization needed (see masks.init)
-          popup.panel.phones.utilities.buildPhonesPanel();
-        }, 
-        utilities: {
-          buildPhonesPanel: async (opts = null) => {
-            // TODO: Check if user is premium, set respective contents based on that
-          },
-        },
       },
       masks: {
         custom: {
@@ -760,6 +766,130 @@
           }
         },
       },
+      phoneMasks: {
+        init: async () => {  
+          const hasPhone = await browser.storage.local.get("has_phone");
+          const premium = await browser.storage.local.get("premium");
+          const getNumber = await browser.storage.local.get("relayNumbers");
+          const getPlans = await browser.storage.local.get("phonePlans");
+          const relayNumberData = getNumber.relayNumbers.length !== 0 ? getNumber.relayNumbers[0] : false;
+          const defaultView = document.querySelector(".fx-relay-phone-default-view");
+
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+
+          // If there is number data and its enabled, show the default view
+          if (relayNumberData && relayNumberData.enabled) { 
+            defaultView.classList.remove("is-hidden");
+          } else { 
+            dynamicView.classList.remove("is-hidden");
+          }
+
+          // If user has premium and has phone, but number is not enabled
+          if (premium.premium && hasPhone.has_phone && !relayNumberData.enabled) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
+              panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
+              panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
+              panelCtaHref: ""
+            })
+          }
+
+           // If user has premium but not phone, show upgrade CTA
+           if (premium.premium && !hasPhone.has_phone) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+              panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+              panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+              panelCtaHref: ""
+            })
+          }
+ 
+          // If phone plan is not available in country, show waitlist
+          if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+            popup.panel.phoneMasks.utils.setDynamicView({
+              panelTitle: "popUpPhoneMasksNotAvailableTitle", 
+              panelDescription: "popUpPhoneMasksNotAvailableBody",
+              panelCtaText: "popUpPhoneMasksNotAvailableCta",
+              panelCtaHref: ""
+            })
+          }
+
+          console.log(await browser.storage.local.get());
+          
+          // adds icons to segmented controls for blocking and forwarding
+          const blockingButtonLabelElement = document.getElementById("fx-relay-phone-blocking-button-label");
+          const forwardingButtonLabelElement = document.getElementById("fx-relay-phone-forwarding-button-label");
+
+          if (blockingButtonLabelElement) { 
+            const iconElement = document.createElement("img"); 
+
+            iconElement.src = "/icons/block-icon.svg"; 
+
+            blockingButtonLabelElement.insertBefore(iconElement, blockingButtonLabelElement.firstChild);
+          }
+
+          if (forwardingButtonLabelElement) { 
+            const iconElement = document.createElement("img"); 
+
+            iconElement.src = "/icons/redo-icon.svg"; 
+
+            forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
+          } 
+ 
+          popup.panel.phoneMasks.utils.forwardingControls();
+ 
+          const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
+          const radios = segmentedControlGroup.querySelectorAll('input');
+          let i = 1;
+
+          // set CSS Var to number of radios we have
+          segmentedControlGroup.style.setProperty('--options',radios.length);
+
+          // loop through radio elements
+          radios.forEach((input)=>{
+             // store position as data attribute
+            input.setAttribute('data-pos',i);
+
+            // add click handler to change position
+            input.addEventListener('click',(e)=>{
+              popup.panel.phoneMasks.utils.forwardingControls();
+              segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
+            });
+ 
+            i++;
+          });
+
+          // add class to enable the sliding pill animation, otherwise it uses a fallback
+          segmentedControlGroup.classList.add('useSlidingAnimation');
+ 
+        },
+        utils: {
+          forwardingControls: () => {
+            const controlGroups = document.querySelectorAll('.fx-relay-segmented-control-group');
+
+            controlGroups.forEach(controlGroup => { 
+              const input = controlGroup.querySelector('input[type="radio"]:checked');
+               
+              controlGroup.classList.toggle('fx-relay-selected-segmented-group', !!input); 
+              controlGroup.classList.toggle('fx-relay-unselected-segmented-group', !input);
+            });
+          },
+          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}) => {
+            const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+
+            const title = dynamicView.querySelector("h1");
+            const description = dynamicView.querySelector("p"); 
+            const cta = dynamicView.querySelector("button");
+
+            title.textContent = browser.i18n.getMessage(panelTitle);
+            description.textContent = browser.i18n.getMessage(panelDescription); 
+            cta.textContent = browser.i18n.getMessage(panelCtaText);
+            cta.dataset.href = panelCtaHref;
+            cta.dataset.eventLabel = panelCtaEvenLabel;
+            cta.addEventListener("click", popup.events.externalClick, true);
+          }
+        }
+      },
       news: {
         init: async () => {
 
@@ -986,13 +1116,18 @@
       },
       stats: {
         init: async () => {
-
+          console.log(sessionState.primaryPanel)
           // TODO: If phones, show phone stats
-          if (sessionState.primaryPanel === "phones") {
+          if (sessionState.primaryPanel === "phone-masks") {
             // Build phone stats here.
-           
+      
+            // TEMP for testing purposes
+            const statSet = document.querySelector(".dashboard-stats-list.global-stats");
+            const aliasesUsedValEl = statSet.querySelector(".aliases-used");
+            
+            aliasesUsedValEl.textContent = "PHONES PANEL";
             return;
-          }
+          } 
 
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
@@ -1534,6 +1669,7 @@
     },
     utilities: {
       setPrimaryPanel: (panelId) => {
+        // Show the tabs and the footers in a primary panel
         document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
         document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
         sessionState.primaryPanel = panelId;
