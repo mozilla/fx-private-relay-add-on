@@ -145,6 +145,7 @@
   font-family: var(--fontStackBase);
   gap: var(--spacingSm);
   padding: 4px 16px;
+  border: 2px solid transparent;
 }
 
 .fx-relay-menu-dashboard-link.footer:hover, 
@@ -597,9 +598,18 @@ sign-up-panel::after {
   color: var(--colorBlack)
 }
 
+.dashboard-stats-list.phones-stats li:first-child {
+  font-weight: lighter;
+}
+
 .dashboard-stats-list li:not(:first-child){
   padding-left: var(--spacingLg);
   color: var(--colorGrey50)
+}
+
+.dashboard-stats-list.phones-stats li:not(:first-child){
+  padding-left: 0; 
+  color: var(--colorBlack);
 }
 
 .dashboard-info {
@@ -608,6 +618,7 @@ sign-up-panel::after {
   justify-content: space-between;
   padding: var(--spacingMd) 0;
 }
+
 
 .dashboard-info + .dashboard-info {
   border-top: 1px solid var(--colorGrey10);

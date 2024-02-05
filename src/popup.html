@@ -49,12 +49,11 @@
     <primary-dashboard-switcher class="fx-relay-primary-dashboard-switcher">
       <!-- Emails -->
       <button data-panel-id="masks" data-back-target="masks" class="fx-relay-primary-dashboard-switcher-btn masks js-internal-link is-active" aria-selected="true" aria-controls="masks" role="tab">
-        Emails
+        <span class="i18n-content" data-i18n-message-id="emailsTabText"></span>
       </button>
       <!-- Phones -->
       <button data-panel-id="phone-masks" data-back-target="phone-masks" class="fx-relay-primary-dashboard-switcher-btn phone-masks js-internal-link" role="tab">
-        <!-- TODO: Add to messages.json  -->
-        Phones
+        <span class="i18n-content" data-i18n-message-id="phonesTabText"></span>
       </button>
     </primary-dashboard-switcher>
 
@@ -414,11 +413,42 @@
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupStatsTitle"></h2>
           </header>
-
-          <!-- TODO: Stats for phones, MPP-3690. -->
-
+          <!-- Phones stats -->
+          <div class="fx-relay-panel-content phones-stats">
+            <div class="dashboard-stats-list phones-stats">
+              <ul>
+                <li class="dashboard-info phones">
+                  <span class="remaining-minutes i18n-content" data-i18n-message-id="phoneRemainingMinutes"></span>
+                  <div class="dashboard-stats remaining-minutes"></div>
+                </li>
+                <li class="dashboard-info phones">
+                  <span class="remaining-texts i18n-content" data-i18n-message-id="phoneRemainingTexts"></span>
+                  <div class="dashboard-stats remaining-texts"></div>
+                </li>
+                <li class="dashboard-info phones">
+                  <span class="forwarded-calls-texts i18n-content" data-i18n-message-id="phoneForwardedCallsTexts"></span>
+                  <div class="dashboard-stats forwarded-calls-texts"></div>
+                </li>
+                <li class="dashboard-info phones">
+                  <span class="blocked-calls-texts i18n-content" data-i18n-message-id="phoneBlockedCallsTexts"></span>
+                  <div class="dashboard-stats blocked-calls-texts"></div>
+                </li>
+              </ul>
+            </div>
+            <div class="fx-relay-phone-dynamic-view stats is-hidden">
+              <div class="fx-relay-phone-content">
+                <h1 class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskTitle"></h1>
+                <p class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskBody"></p>
+              </div>
+  
+              <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/images/panel-images/phone-masking/phone-mask-illustration.svg">
+              
+              <!-- TODO: Get URL for CTA -->
+              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-primary js-external-link" data-relay-internal="true" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskCTA"></button>
+            </div>
+          </div>
           <!-- Stats are dynamically generated from popup via stats.init function -->
-          <div class="fx-relay-panel-content">
+          <div class="fx-relay-panel-content emails-stats">
             <div class="dashboard-stats-list global-stats">
               <ul>
                 <li class="dashboard-info">
@@ -452,7 +482,6 @@
               </ul>
             </div>
           </div>
-          
         </stats-panel>
 
         <!-- Panel: News -->
@@ -488,9 +517,8 @@
 
     <footer class="fx-relay-footer-nav">
        <!-- Stats -->
-       <button data-panel-id="stats" class="fx-relay-menu-dashboard-link footer stats js-internal-link is-hidden" href="#">
-        See stats
-        <!-- <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupStatsTitle"></span> -->
+       <button data-panel-id="stats" class="fx-relay-menu-dashboard-link footer stats js-internal-link">
+        <span class="i18n-content" data-i18n-message-id="seeStatsText"></span> 
         <img src="/icons/nebula-stats-purple.svg" alt="" />
       </button>
     </footer>
