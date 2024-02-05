@@ -145,6 +145,7 @@
   font-family: var(--fontStackBase);
   gap: var(--spacingSm);
   padding: 4px 16px;
+  border: 2px solid transparent;
 }
 
 .fx-relay-menu-dashboard-link.footer:hover, 
