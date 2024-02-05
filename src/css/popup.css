@@ -1331,7 +1331,7 @@ sign-up-panel::after {
 
 .fx-relay-phone-container {
   display: flex; 
-  padding: var(--spacingMd) var(--spacingMd);
+  padding: var(--spacingMd) var(--spacingXl);
   flex-direction: column;  
   border-radius: 6px;
   background: linear-gradient(86deg, rgba(231, 223, 255, 0.80) -3.48%, rgba(227, 255, 243, 0.80) 104.03%);
@@ -1359,7 +1359,7 @@ font-weight: bold;
 .fx-relay-phone-details {
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: var(--spacingLg);
   align-items: center;
   max-height: 40px;
 }
@@ -1385,6 +1385,42 @@ font-weight: bold;
   filter: grayscale(1);
   cursor: pointer;
 }
+
+#fx-relay-number-copy-success {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s;
+    background-color: var(--colorGreen50);
+    border-radius: var(--borderRadiusSm);
+    padding: var(--spacingXs) var(--spacingSm);
+    font-size: var(--fontSizeBodyXs);
+    font-weight: 500;
+    position: absolute;
+    right: 55px;
+    margin-top: 70px;
+    /* message should overlap copy button */
+    z-index: 1;
+}
+
+#fx-relay-number-copy-success::before {
+  content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 10px solid  var(--colorGreen50);
+}
+
+#fx-relay-number-copy-success.is-shown {
+  pointer-events: auto;
+  opacity: 1;
+  /* Don't fade in when appearing: */
+  transition: opacity 0s;
+}
  
  
 #fx-relay-input-container { 
@@ -1394,8 +1430,7 @@ font-weight: bold;
   border-radius: 40px;
 }
  
-.fx-relay-label {
-  text-transform: uppercase;
+.fx-relay-label { 
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1411,9 +1446,9 @@ font-weight: bold;
   display: flex;
   flex-flow: row;
   justify-content: flex-start;
-  border: 3px solid lightgray;
+  border: 2px solid var(--colorGrey10);
   border-radius: 40px;
-  background-color: var(--colorWhite);
+  background-color: var(--colorGrey05);
 }
 .fx-relay-segmented-control .fx-relay-segmented-control-group {
   flex: 0 0 auto;
@@ -1437,9 +1472,11 @@ font-weight: bold;
   text-align: center;
   -webkit-tap-highlight-color: transparent;
   z-index: 1;
+  color: var(--colorPurple90);
 } 
 .fx-relay-unselected-segmented-group {
   border: 1px solid var(--colorGrey10);
+  background-color: var(--colorWhite);
   border-radius: 40px;
 }
 .fx-relay-unselected-segmented-group:hover img {
@@ -1539,6 +1576,16 @@ font-weight: bold;
   left: -4px;
 }
 
+#fx-relay-phone-forwarding-button-label:hover,
+#fx-relay-phone-blocking-button-label:hover {
+  color: var(--colorWhite);
+}
+
+#fx-relay-phone-forwarding-button-label:hover img,
+#fx-relay-phone-blocking-button-label:hover img {
+  filter: grayscale(1) invert(1) brightness(2);
+}
+
 .fx-relay-phone-default-view {
   padding: 0 var(--spacingMd);
 }
@@ -1550,10 +1597,15 @@ font-weight: bold;
   padding: 0 var(--spacingMd) var(--spacingMd) var(--spacingMd);
 }
 
+.fx-relay-phone-forwarding {
+  padding: var(--spacingSm) 0;
+}
+
 .fx-relay-phone-meta-details {
   display: flex;
   flex-direction: row; 
   justify-content: flex-start;
+  gap: var(--spacingMd);
 }
 
 .fx-relay-phone-meta-details div {
@@ -1569,7 +1621,7 @@ font-weight: bold;
 }
 
 .fx-relay-phone-forward-to p,
-.fx-relay-phone-created p {
+.fx-relay-phone-registered p {
   font-family: var(--fontStackBase);
   font-size: var(--fontSizeBodySm);
   font-style: normal;
@@ -1580,7 +1632,7 @@ font-weight: bold;
 }
 
 .fx-relay-phone-forward-to p:first-child,
-.fx-relay-phone-created p:first-child { 
+.fx-relay-phone-registered p:first-child { 
   color: var(--colorGrey40);
   font-weight: 500;
 }

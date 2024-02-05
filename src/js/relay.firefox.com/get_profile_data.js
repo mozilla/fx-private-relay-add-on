@@ -1,3 +1,5 @@
+/* global formatPhone */
+
 /**
  * @typedef {object} RandomMask
  * @property {boolean} enabled
@@ -53,6 +55,7 @@
     const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
     const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
     const relayApiUrlRelayNumbers = `${relayApiSource}/relaynumber/`;
+    const relayApiUrlRealPhoneNumbers = `${relayApiSource}/realphone/`;
 
     async function apiRequest(url, method = "GET", body = null, opts=null) {
 
@@ -110,11 +113,28 @@
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
     const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+
     if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
       browser.storage.local.set({
-        relayNumbers: relayNumbers,
-      });
-    }
+        relayNumbers: relayNumbers.map((number) => ({
+          ...number,  
+          formattedNumber: formatPhone({ phoneNumber: number.number }),
+          copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
+        })),
+      })
+    } 
+
+    const realPhoneNumbers = await apiRequest(relayApiUrlRealPhoneNumbers);
+    if (Array.isArray(realPhoneNumbers) && realPhoneNumbers.length > 0) {
+      browser.storage.local.set({
+        realPhoneNumbers: realPhoneNumbers.map((number) => ({
+          ...number,  
+          formattedNumber: formatPhone({ phoneNumber: number.number }),
+          copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
+        })),
+      })
+    } 
+
 
     /**
      * Fetch the current list of random masks from the server, while preserving local labels if present

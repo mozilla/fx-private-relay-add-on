@@ -94,13 +94,12 @@
             <div class="fx-relay-phone-default-view is-hidden">
               <div class="fx-relay-phone-container"> 
                   <p id="fx-relay-user-phone-country">
-                    <img class="i18n-alt-tag" data-i18n-message-id="popupSurveyLink" alt="" src="/icons/us-flag.svg">
+                    <img class="i18n-alt-tag" alt="" src="/icons/us-flag.svg">
                     <span class="fx-relay-phone-with-country-code">+1 U.S.A</span>
                   </p> 
                  <div class="fx-relay-phone-details">
-                    <p id="fx-relay-user-phone-number">
-                      (305) 555 - 5555 
-                    </p> 
+                    <p id="fx-relay-user-phone-number"></p> 
+                    <span id="fx-relay-number-copy-success" class="i18n-content" data-i18n-message-id="popupCopyMaskButtonCopied"></span>
                     <button id="fx-relay-phone-mask-copy-button" class="fx-relay-mask-item-address-copy" data-event-action="click" data-event-label="panel-copy-btn"></button>
                  </div>
               </div>
@@ -110,14 +109,14 @@
                   <!-- forwarding controls for phone mask -->
                     <div class="fx-relay-segmented-control">
                       <div class="fx-relay-segmented-control-group">
-                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-forwarding" checked /> 
+                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-forwarding" data-forwarding="true" /> 
                         <label class="fx-relay-label i18n-content" 
                         id="fx-relay-phone-forwarding-button-label"
                         data-i18n-message-id="popupPhoneMasksForwardingButton"
                         for="fx-relay-phone-forwarding"></label>
                       </div>
                       <div class="fx-relay-segmented-control-group">
-                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-blocking" /> 
+                        <input type="radio" name="fx-relay-phone" id="fx-relay-phone-blocking" data-forwarding="false" /> 
                         <label class="fx-relay-label i18n-content" 
                         id="fx-relay-phone-blocking-button-label"
                         data-i18n-message-id="popupPhoneMasksBlockingButton"
@@ -138,9 +137,9 @@
                       (954) 555-5555
                     </p>
                   </div>
-                  <div class="fx-relay-phone-created">
-                    <p class="i18n-content" data-i18n-message-id="popupPhoneMasksMetaCreated"></p>
-                    <p id="fx-relay-meta-created-date">
+                  <div class="fx-relay-phone-registered">
+                    <p class="i18n-content" data-i18n-message-id="popupPhoneMasksMetaRegistered"></p>
+                    <p id="fx-relay-meta-registered-date">
                       Oct 15, 2023
                     </p>
                   </div>

@@ -770,22 +770,35 @@
         init: async () => {  
           const hasPhone = await browser.storage.local.get("has_phone");
           const premium = await browser.storage.local.get("premium");
-          const getNumber = await browser.storage.local.get("relayNumbers");
+          const getRelayNumber = await browser.storage.local.get("relayNumbers");
+          const getRealPhoneNumber = await browser.storage.local.get("realPhoneNumbers");
           const getPlans = await browser.storage.local.get("phonePlans");
-          const relayNumberData = getNumber.relayNumbers.length !== 0 ? getNumber.relayNumbers[0] : false;
+          const relayNumberData = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
+          const realPhoneNumberData = getRealPhoneNumber.realPhoneNumbers.length !== 0 ? getRealPhoneNumber.realPhoneNumbers[0] : false;
           const defaultView = document.querySelector(".fx-relay-phone-default-view");
-
           const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
 
-          // If there is number data and its enabled, show the default view
-          if (relayNumberData && relayNumberData.enabled) { 
+          // If there is number data, show the default view
+          if (relayNumberData && !realPhoneNumberData) { 
             defaultView.classList.remove("is-hidden");
+
+            // Show relay number 
+            const relayNumberContainer = document.getElementById("fx-relay-user-phone-number");
+            relayNumberContainer.innerText = relayNumberData.formattedNumber; 
+
+            const realPhoneNumberContainer = document.getElementById("fx-relay-meta-forwarding-to");
+            realPhoneNumberContainer.innerText = realPhoneNumberData.formattedNumber;
+
+            const dateRegisteredContainer = document.getElementById("fx-relay-meta-registered-date");
+            dateRegisteredContainer.innerText = popup.panel.phoneMasks.utils.formatRegisteredDate(realPhoneNumberData.verified_date);
+
+            popup.panel.phoneMasks.utils.setRelayNumberCounryDetails(relayNumberData);
           } else { 
             dynamicView.classList.remove("is-hidden");
-          }
+          } 
 
-          // If user has premium and has phone, but number is not enabled
-          if (premium.premium && hasPhone.has_phone && !relayNumberData.enabled) {
+          // If user has premium and has phone, but real phone number is not verified
+          if (premium.premium && !hasPhone.has_phone && realPhoneNumberData.verified) {
             popup.panel.phoneMasks.utils.setDynamicView({
               panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
               panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
@@ -795,7 +808,7 @@
           }
 
            // If user has premium but not phone, show upgrade CTA
-           if (premium.premium && !hasPhone.has_phone) {
+           if (!premium.premium && !hasPhone.has_phone) {
             popup.panel.phoneMasks.utils.setDynamicView({
               panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
               panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
@@ -805,7 +818,7 @@
           }
  
           // If phone plan is not available in country, show waitlist
-          if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+          if ( getPlans.phonePlans.PHONE_PLANS.available_in_country) {
             popup.panel.phoneMasks.utils.setDynamicView({
               panelTitle: "popUpPhoneMasksNotAvailableTitle", 
               panelDescription: "popUpPhoneMasksNotAvailableBody",
@@ -814,29 +827,11 @@
             })
           }
 
-          console.log(await browser.storage.local.get());
-          
-          // adds icons to segmented controls for blocking and forwarding
-          const blockingButtonLabelElement = document.getElementById("fx-relay-phone-blocking-button-label");
-          const forwardingButtonLabelElement = document.getElementById("fx-relay-phone-forwarding-button-label");
-
-          if (blockingButtonLabelElement) { 
-            const iconElement = document.createElement("img"); 
-
-            iconElement.src = "/icons/block-icon.svg"; 
-
-            blockingButtonLabelElement.insertBefore(iconElement, blockingButtonLabelElement.firstChild);
-          }
-
-          if (forwardingButtonLabelElement) { 
-            const iconElement = document.createElement("img"); 
-
-            iconElement.src = "/icons/redo-icon.svg"; 
-
-            forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
-          } 
+          popup.panel.phoneMasks.utils.loadSegmentedControlIcons();
  
-          popup.panel.phoneMasks.utils.forwardingControls();
+          // Pull fresh relay number data and set forwarding state
+          await popup.panel.phoneMasks.utils.getRelayNumberData();
+          popup.panel.phoneMasks.utils.setForwardingState();
  
           const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
           const radios = segmentedControlGroup.querySelectorAll('input');
@@ -849,10 +844,12 @@
           radios.forEach((input)=>{
              // store position as data attribute
             input.setAttribute('data-pos',i);
-
+             
             // add click handler to change position
-            input.addEventListener('click',(e)=>{
-              popup.panel.phoneMasks.utils.forwardingControls();
+            input.addEventListener('click', async (e)=>{ 
+              await popup.panel.phoneMasks.utils.updateForwardingState(relayNumberData.id, e.target.getAttribute('data-forwarding') === "true");
+              await popup.panel.phoneMasks.utils.getRelayNumberData();
+              popup.panel.phoneMasks.utils.setForwardingState( );
               segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
             });
  
@@ -861,18 +858,105 @@
 
           // add class to enable the sliding pill animation, otherwise it uses a fallback
           segmentedControlGroup.classList.add('useSlidingAnimation');
+
+          const copyRelayNumberButton = document.getElementById("fx-relay-phone-mask-copy-button");
+          const copyRelayNumberSuccessMessage = document.getElementById("fx-relay-number-copy-success");
+
+          copyRelayNumberButton.addEventListener("click", (e)=> {
+            e.preventDefault(); 
+
+            // Copy relay number to clipboard, remove first 2 characters (country code). 
+            navigator.clipboard.writeText(relayNumberData.number.substring(2, relayNumberData.number.length));
+
+            // Show success message
+            copyRelayNumberSuccessMessage.classList.add("is-shown");
+            setTimeout(() => {
+              copyRelayNumberSuccessMessage.classList.remove("is-shown")
+            }, 1000);
+          }, false); 
  
         },
         utils: {
-          forwardingControls: () => {
-            const controlGroups = document.querySelectorAll('.fx-relay-segmented-control-group');
+          setRelayNumberCounryDetails: (data) => {
+            const locationContainer = document.getElementById("fx-relay-user-phone-country");
+            const countryImage = locationContainer.querySelector("img");
+            const countryDetails = locationContainer.querySelector("span");
+            const countryCode = data.number.substring(0, 2);
+            const formattedCountryLabel = {
+              "US": "U.S.A",
+            };
+            const countryLabel = formattedCountryLabel[data.country_code] ? formattedCountryLabel[data.country_code] : data.country_code;
+            countryImage.src = `/icons/${data.country_code.toLowerCase()}-flag.svg`;
+            countryDetails.textContent = `${countryCode} ${countryLabel}`;
 
-            controlGroups.forEach(controlGroup => { 
-              const input = controlGroup.querySelector('input[type="radio"]:checked');
-               
-              controlGroup.classList.toggle('fx-relay-selected-segmented-group', !!input); 
-              controlGroup.classList.toggle('fx-relay-unselected-segmented-group', !input);
-            });
+          },
+          formatRegisteredDate: (dateRegistered) => {
+            // format date into something like Oct 15, 2023
+            const date = (new Date(dateRegistered)).toDateString().split(' ');
+            console.log(date);
+            
+            return `${date[1]} ${date[2]}, ${date[3]}`; 
+          },
+          setForwardingState: async () => {
+            // get a fresh copy of the relay numbers
+            const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
+            const data = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
+            const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
+            const forwardingButton = document.getElementById("fx-relay-phone-forwarding");
+            const blockingButton = document.getElementById("fx-relay-phone-blocking");
+            
+            const setSegmentedControlGroup = (optionsActive, forwardingClass, blockingClass) => {
+                segmentedControlGroup.style.setProperty('--options-active', optionsActive);
+                forwardingButton.checked = forwardingClass === "fx-relay-selected-segmented-group";
+                blockingButton.checked = blockingClass === "fx-relay-selected-segmented-group";
+                
+                forwardingButton.parentElement.classList = `fx-relay-segmented-control-group ${forwardingClass}`;
+                blockingButton.parentElement.classList = `fx-relay-segmented-control-group ${blockingClass}`;
+            };
+            
+            if (data.enabled) { 
+                setSegmentedControlGroup(1, "fx-relay-selected-segmented-group", "fx-relay-unselected-segmented-group");
+            } else { 
+                setSegmentedControlGroup(2, "fx-relay-unselected-segmented-group", "fx-relay-selected-segmented-group");
+            }
+          },
+          updateForwardingState: async (id, enabled) => { 
+            await browser.runtime.sendMessage({
+              method: "setRelayNumberForwardingState",
+              id,
+              enabled,
+            });  
+          },
+          getRelayNumberData: async () => {
+            await browser.runtime.sendMessage({
+              method: "getRelayNumberData", 
+            });   
+          },
+          loadSegmentedControlIcons: () => {
+            // adds icons to segmented controls for blocking and forwarding
+            const blockingButtonLabelElement = document.getElementById("fx-relay-phone-blocking-button-label");
+            const forwardingButtonLabelElement = document.getElementById("fx-relay-phone-forwarding-button-label");
+            const hasBlockingIcon = document.getElementById("fx-relay-phone-blocking-button-icon");
+            const hasForwardingIcon = document.getElementById("fx-relay-phone-forwarding-button-icon");
+
+            if (blockingButtonLabelElement && !hasBlockingIcon) { 
+              const iconElement = document.createElement("img"); 
+
+              iconElement.src = "/icons/block-icon.svg"; 
+              iconElement.id = "fx-relay-phone-blocking-button-icon";
+
+              blockingButtonLabelElement.insertBefore(iconElement, blockingButtonLabelElement.firstChild);
+            }
+
+
+            if (forwardingButtonLabelElement && !hasForwardingIcon) { 
+              const iconElement = document.createElement("img"); 
+
+              iconElement.src = "/icons/redo-icon.svg"; 
+              iconElement.id = "fx-relay-phone-forwarding-button-icon";
+
+              forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
+            } 
           },
           setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}) => {
             const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
