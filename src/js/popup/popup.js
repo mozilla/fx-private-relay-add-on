@@ -313,7 +313,6 @@
             sendRelayEvent("Panel", "click", "opened-news-item");
             popup.panel.news.item.update(data.newsItemId);
             popup.utilities.buildBackButton("newsItem", "child", "news");
-            
             break;
 
           case "settings":
@@ -327,10 +326,6 @@
             popup.panel.stats.init();
             popup.utilities.buildBackButton("", "root", "masks");
 
-            // // Make primary tab active
-            // document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
-            // document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
-            // document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
             break;
 
           case "webcompat":
@@ -962,8 +957,8 @@
               forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
             } 
           },
-          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}) => {
-            const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}, panelId) => {
+            const dynamicView = document.querySelector(`.fx-relay-phone-dynamic-view${panelId ? `.${panelId}` : ""}`);
 
             const title = dynamicView.querySelector("h1");
             const description = dynamicView.querySelector("p"); 
@@ -975,7 +970,51 @@
             cta.dataset.href = panelCtaHref;
             cta.dataset.eventLabel = panelCtaEvenLabel;
             cta.addEventListener("click", popup.events.externalClick, true);
-          }
+            console.log(dynamicView)
+          }, 
+          setPhonesStatusView: (premiumStatus, phonesStatus, relayNumberData, plans, panelId) => {
+            // TODO: Fix logic here. 
+            
+            // Not premium / has no phones
+            if (!premiumStatus.premium) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+                panelCtaHref: ""
+              }, panelId)
+            }
+
+            // If user has premium and has phone, but number is not enabled
+            if (premiumStatus.premium && phonesStatus.has_phone && !relayNumberData.enabled) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+
+            // If user has premium but not phone, show upgrade CTA
+            if (premiumStatus.premium && !phonesStatus.has_phone) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+  
+            // If phone plan is not available in country, show waitlist
+            if (!plans.phonePlans.PHONE_PLANS.available_in_country) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popUpPhoneMasksNotAvailableTitle", 
+                panelDescription: "popUpPhoneMasksNotAvailableBody",
+                panelCtaText: "popUpPhoneMasksNotAvailableCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+          },
         }
       },
       news: {
@@ -1204,22 +1243,64 @@
       },
       stats: {
         init: async () => {
-          // TODO: If phones, show phone stats
-          if (sessionState.primaryPanel === "phone-masks") {
-            // Build phone stats here.
-      
-            // TEMP for testing purposes
-            const statSet = document.querySelector(".dashboard-stats-list.global-stats");
-            const aliasesUsedValEl = statSet.querySelector(".aliases-used");
-            
-            aliasesUsedValEl.textContent = "PHONES PANEL";
-            return;
-          } 
+          const emailStatsPanel = document.querySelector(".fx-relay-panel-content.emails-stats");
+          const phonesStatsPanel = document.querySelector(".fx-relay-panel-content.phones-stats");
+          const phonesStatsList = document.querySelector(".dashboard-stats-list.phones-stats");
+          const statsHeader = document.getElementById("stats-panel").firstElementChild;
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view.stats");
 
+          const { relayNumbers } = await browser.storage.local.get("relayNumbers");
+          const relayNumberData = relayNumbers && relayNumbers.length !== 0 ? relayNumbers[0] : false;
+          const hasPhone = await browser.storage.local.get("has_phone");
+          const getPlans = await browser.storage.local.get("phonePlans");
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
           let getMasksOptions = { fetchCustomMasks: false };
+
+          const missingPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            phonesStatsList.classList.add("is-hidden");
+            statsHeader.classList.add("is-hidden");
+
+            dynamicView.classList.remove("is-hidden");
+            phonesStatsPanel.classList.remove("is-hidden");
+          };
+
+          const hasPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            dynamicView.classList.add("is-hidden");
+
+            phonesStatsPanel.classList.remove("is-hidden");
+            phonesStatsList.classList.remove("is-hidden");
+            statsHeader.classList.remove("is-hidden");
+          }; 
+
+          // Show phone mask stats panel
+          if (sessionState.primaryPanel === "phone-masks") {
+            if (relayNumberData && relayNumberData.enabled) {
+              hasPhonesPanelInit();
+            } else {  
+              missingPhonesPanelInit();
+              popup.panel.phoneMasks.utils.setPhonesStatusView(premium, hasPhone, relayNumberData, getPlans, "stats");
+            }
+
+            const remainingMinutes = document.querySelector(".dashboard-stats.remaining-minutes");
+            const remainingTexts = document.querySelector(".dashboard-stats.remaining-texts");
+            const forwardedCallsTexts = document.querySelector(".dashboard-stats.forwarded-calls-texts");
+            const blockedCallsTexts = document.querySelector(".dashboard-stats.blocked-calls-texts");
+            
+            remainingMinutes.textContent = relayNumberData.remaining_minutes;
+            remainingTexts.textContent = relayNumberData.remaining_texts;
+            forwardedCallsTexts.textContent = relayNumberData.calls_and_texts_forwarded;
+            blockedCallsTexts.textContent =  relayNumberData.calls_and_texts_blocked;
+
+            return;
+          } 
+
+          // Show emails stats panel
+          phonesStatsPanel?.classList.add("is-hidden");
+          emailStatsPanel?.classList.remove("is-hidden");
 
           if (premium) {
             // Check if user may have custom domain masks

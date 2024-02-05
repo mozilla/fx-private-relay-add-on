@@ -113,6 +113,7 @@
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
     const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+    console.log(relayNumbers)
 
     if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
       browser.storage.local.set({
@@ -122,9 +123,13 @@
           copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
         })),
       })
-    } 
+    } else {
+      // If a user with no relayNumbers signs in after a previous user signed out, we need to reset their local storage. 
+      browser.storage.local.remove("relayNumbers");
+    }
 
     const realPhoneNumbers = await apiRequest(relayApiUrlRealPhoneNumbers);
+
     if (Array.isArray(realPhoneNumbers) && realPhoneNumbers.length > 0) {
       browser.storage.local.set({
         realPhoneNumbers: realPhoneNumbers.map((number) => ({
@@ -133,7 +138,10 @@
           copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
         })),
       })
-    } 
+    } else {
+      // Persist local storage incase of multiple users signing in and out of the same browser. 
+      browser.storage.local.remove("realPhoneNumbers");
+    }
 
 
     /**
