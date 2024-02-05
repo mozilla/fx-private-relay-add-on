@@ -188,9 +188,8 @@
       sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (sessionState.loggedIn) { // TODO: Put back
+      if (sessionState.loggedIn) { 
         popup.panel.update("masks");
-        // popup.panel.update("phone-masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
         // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
@@ -313,7 +312,6 @@
             sendRelayEvent("Panel", "click", "opened-news-item");
             popup.panel.news.item.update(data.newsItemId);
             popup.utilities.buildBackButton("newsItem", "child", "news");
-            
             break;
 
           case "settings":
@@ -327,10 +325,6 @@
             popup.panel.stats.init();
             popup.utilities.buildBackButton("", "root", "masks");
 
-            // // Make primary tab active
-            // document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
-            // document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
-            // document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
             break;
 
           case "webcompat":
@@ -772,13 +766,10 @@
       },
       phoneMasks: {
         init: async () => {  
-          const hasPhone = await browser.storage.local.get("has_phone");
-          const premium = await browser.storage.local.get("premium");
           const getRelayNumber = await browser.storage.local.get("relayNumbers");
           const getRealPhoneNumber = await browser.storage.local.get("realPhoneNumbers");
-          const getPlans = await browser.storage.local.get("phonePlans");
-          const relayNumberData = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
-          const realPhoneNumberData = getRealPhoneNumber.realPhoneNumbers.length !== 0 ? getRealPhoneNumber.realPhoneNumbers[0] : false;
+          const relayNumberData = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
+          const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
           const defaultView = document.querySelector(".fx-relay-phone-default-view");
           const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
 
@@ -796,42 +787,15 @@
             const dateRegisteredContainer = document.getElementById("fx-relay-meta-registered-date");
             dateRegisteredContainer.innerText = popup.panel.phoneMasks.utils.formatRegisteredDate(realPhoneNumberData.verified_date);
 
-            popup.panel.phoneMasks.utils.setRelayNumberCounryDetails(relayNumberData);
+            popup.panel.phoneMasks.utils.setRelayNumberCountryDetails(relayNumberData);
              
             popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
           } else { 
             dynamicView.classList.remove("is-hidden");
+            // Show appropriate plan upgrade view
+            popup.panel.phoneMasks.utils.setPhonesStatusView();
+            return;
           } 
-
-          // If user has premium and has phone, but real phone number is not verified
-          if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
-            popup.panel.phoneMasks.utils.setDynamicView({
-              panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
-              panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
-              panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
-              panelCtaHref: ""
-            })
-          }
-
-           // If user has premium but not phone, show upgrade CTA
-           if (!premium.premium && !hasPhone.has_phone) {
-            popup.panel.phoneMasks.utils.setDynamicView({
-              panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
-              panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
-              panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
-              panelCtaHref: ""
-            })
-          }
- 
-          // If phone plan is not available in country, show waitlist
-          if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
-            popup.panel.phoneMasks.utils.setDynamicView({
-              panelTitle: "popUpPhoneMasksNotAvailableTitle", 
-              panelDescription: "popUpPhoneMasksNotAvailableBody",
-              panelCtaText: "popUpPhoneMasksNotAvailableCta",
-              panelCtaHref: ""
-            })
-          }
 
           popup.panel.phoneMasks.utils.loadSegmentedControlIcons();
  
@@ -886,11 +850,11 @@
         utils: {
           updateRelayNumberStateDescription: async () => {
             const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
-            const data = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
+            const data = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
             const forwardingStateDescription = document.querySelector(".fx-relay-phone-meta-description");  
             forwardingStateDescription.textContent = data.enabled ? browser.i18n.getMessage("popupPhoneMasksMetaForwardingDescription") : browser.i18n.getMessage("popupPhoneMasksMetaBlockingDescription");
           },
-          setRelayNumberCounryDetails: (data) => {
+          setRelayNumberCountryDetails: (data) => {
             const locationContainer = document.getElementById("fx-relay-user-phone-country");
             const countryImage = locationContainer.querySelector("img");
             const countryDetails = locationContainer.querySelector("span");
@@ -906,14 +870,13 @@
           formatRegisteredDate: (dateRegistered) => {
             // format date into something like Oct 15, 2023
             const date = (new Date(dateRegistered)).toDateString().split(' ');
-            console.log(date);
             
             return `${date[1]} ${date[2]}, ${date[3]}`; 
           },
           setForwardingState: async () => {
             // get a fresh copy of the relay numbers
             const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
-            const data = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
+            const data = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
             const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
             const forwardingButton = document.getElementById("fx-relay-phone-forwarding");
             const blockingButton = document.getElementById("fx-relay-phone-blocking");
@@ -971,8 +934,8 @@
               forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
             } 
           },
-          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}) => {
-            const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}, panelId) => {
+            const dynamicView = document.querySelector(`.fx-relay-phone-dynamic-view${panelId ? `.${panelId}` : ""}`);
 
             const title = dynamicView.querySelector("h1");
             const description = dynamicView.querySelector("p"); 
@@ -984,7 +947,49 @@
             cta.dataset.href = panelCtaHref;
             cta.dataset.eventLabel = panelCtaEvenLabel;
             cta.addEventListener("click", popup.events.externalClick, true);
-          }
+          }, 
+          setPhonesStatusView: async (panelId) => {
+            /**
+             * panelId (string): Optional variable to select the correct dynamic view.
+             */
+            const hasPhone = await browser.storage.local.get("has_phone");
+            const premium = await browser.storage.local.get("premium");
+            const getRealPhoneNumber = await browser.storage.local.get("realPhoneNumbers");
+            const getPlans = await browser.storage.local.get("phonePlans");
+            const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
+
+              // If user has premium and has phone, but real phone number is not verified
+            if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+            
+            // If user does not have premium and no phones (free user), show upgrade CTA
+            const freeUser = !premium.premium && !hasPhone.has_phone;
+            const premiumUserWithNoPhonesPlan = premium.premium && !hasPhone.has_phone;
+            if (freeUser || premiumUserWithNoPhonesPlan) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+            
+            // If phone plan is not available in country, show waitlist
+            if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popUpPhoneMasksNotAvailableTitle", 
+                panelDescription: "popUpPhoneMasksNotAvailableBody",
+                panelCtaText: "popUpPhoneMasksNotAvailableCta",
+                panelCtaHref: ""
+              }, panelId);
+            }
+          },
         }
       },
       news: {
@@ -1213,23 +1218,69 @@
       },
       stats: {
         init: async () => {
-          // TODO: If phones, show phone stats
-          if (sessionState.primaryPanel === "phone-masks") {
-            // Build phone stats here.
-      
-            // TEMP for testing purposes
-            const statSet = document.querySelector(".dashboard-stats-list.global-stats");
-            const aliasesUsedValEl = statSet.querySelector(".aliases-used");
-            
-            aliasesUsedValEl.textContent = "PHONES PANEL";
-            return;
-          } 
+          const emailStatsPanel = document.querySelector(".fx-relay-panel-content.emails-stats");
+          const phonesStatsPanel = document.querySelector(".fx-relay-panel-content.phones-stats");
+          const phonesStatsList = document.querySelector(".dashboard-stats-list.phones-stats");
+          const statsHeader = document.getElementById("stats-panel").firstElementChild;
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view.stats");
+
+          const { relayNumbers } = await browser.storage.local.get("relayNumbers");
+          const relayNumberData = popup.utilities.isNumberDataValid(relayNumbers);
+          const { realPhoneNumbers } = await browser.storage.local.get("realPhoneNumbers");
+          const realPhoneNumberData = popup.utilities.isNumberDataValid(realPhoneNumbers);
 
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
           let getMasksOptions = { fetchCustomMasks: false };
 
+          const missingPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            phonesStatsList.classList.add("is-hidden");
+            statsHeader.classList.add("is-hidden");
+
+            dynamicView.classList.remove("is-hidden");
+            phonesStatsPanel.classList.remove("is-hidden");
+          };
+
+          const hasPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            dynamicView.classList.add("is-hidden");
+
+            phonesStatsPanel.classList.remove("is-hidden");
+            phonesStatsList.classList.remove("is-hidden");
+            statsHeader.classList.remove("is-hidden");
+          }; 
+
+          // Show phone mask stats panel
+          if (sessionState.primaryPanel === "phone-masks") {
+            if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) {
+              hasPhonesPanelInit();
+            } else {  
+              missingPhonesPanelInit();
+              // Show appropriate plan upgrade view
+              popup.panel.phoneMasks.utils.setPhonesStatusView("stats");
+              return;
+            }
+
+            const remainingMinutes = document.querySelector(".dashboard-stats.remaining-minutes");
+            const remainingTexts = document.querySelector(".dashboard-stats.remaining-texts");
+            const forwardedCallsTexts = document.querySelector(".dashboard-stats.forwarded-calls-texts");
+            const blockedCallsTexts = document.querySelector(".dashboard-stats.blocked-calls-texts");
+            
+            remainingMinutes.textContent = relayNumberData.remaining_minutes;
+            remainingTexts.textContent = relayNumberData.remaining_texts;
+            forwardedCallsTexts.textContent = relayNumberData.calls_and_texts_forwarded;
+            blockedCallsTexts.textContent =  relayNumberData.calls_and_texts_blocked;
+
+            return;
+          } 
+
+          // Show emails stats panel
+          phonesStatsPanel?.classList.add("is-hidden");
+          emailStatsPanel?.classList.remove("is-hidden");
+          statsHeader.classList.remove("is-hidden");
+          
           if (premium) {
             // Check if user may have custom domain masks
             const { premiumSubdomainSet } = await browser.storage.local.get(
@@ -1585,7 +1636,7 @@
           successMessage: () => document.querySelector(".fx-relay-survey-success"),
           surveyDismiss: () => document.querySelector(".fx-relay-survey-dismiss"),
           externalSurveyLink: () => document.querySelector(".fx-relay-external-survey-link"),
-        },
+        }
       },
       webcompat: {
         handleReportIssueFormSubmission: async (event, formData) => {          
@@ -1764,6 +1815,9 @@
       },
     },
     utilities: {
+      isNumberDataValid: (relayNumberData) => {
+        return relayNumberData && relayNumberData.length !== 0 ? relayNumberData[0] : false;
+      },
       setPrimaryPanel: (panelId) => {
         // Show the tabs and the footers in a primary panel
         document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")

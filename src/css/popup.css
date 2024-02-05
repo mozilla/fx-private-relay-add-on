@@ -40,6 +40,11 @@
   margin-bottom: 0;
 }
 
+.fx-relay-panel-content.phones-stats, 
+.fx-relay-panel-content.emails-stats {
+  padding: var(--spacingSm) var(--spacingMd);
+}
+
 /* FIXME: Refactor to account for height dynamically */
 /* Magic Number: Custom max-height for masks panel */
 #masks-panel[data-account-level="free"] .fx-relay-panel-content {
@@ -297,7 +302,7 @@
   text-align: center;
   line-height: 1.2;
   width: 100%;
-  
+  margin: var(--spacingMd) 0 0 0;
 }
 
 /* Sign Up/In Panel */
@@ -598,9 +603,32 @@ sign-up-panel::after {
   color: var(--colorBlack)
 }
 
+.dashboard-stats-list.phones-stats li:first-child {
+  font-weight: lighter;
+}
+
 .dashboard-stats-list li:not(:first-child){
   padding-left: var(--spacingLg);
   color: var(--colorGrey50)
+}
+
+/* Phones dashboard stats styling */
+.dashboard-stats-list.phones-stats li {
+  padding-left: 0; 
+  color: var(--colorBlack);
+}
+
+.dashboard-info.forwarded-calls-texts,
+.dashboard-info.blocked-calls-texts {
+  padding-left: var(--spacingLg) !important; 
+}
+
+.dashboard-info.blocked-calls-texts::before {
+  background-image: url("/icons/blocked-icon.svg");
+}
+
+.dashboard-info.forwarded-calls-texts::before {
+  background-image: url("/icons/forward-icon.svg");
 }
 
 .dashboard-info {
@@ -609,6 +637,7 @@ sign-up-panel::after {
   justify-content: space-between;
   padding: var(--spacingMd) 0;
 }
+
 
 .dashboard-info + .dashboard-info {
   border-top: 1px solid var(--colorGrey10);
