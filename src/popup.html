@@ -413,11 +413,42 @@
             <!-- Panel Title -->
             <h2 class="fx-relay-panel-header-title i18n-content" data-i18n-message-id="popupStatsTitle"></h2>
           </header>
-
-          <!-- TODO: Stats for phones, MPP-3690. -->
-
+          <!-- Phones stats -->
+          <div class="fx-relay-panel-content phones-stats">
+            <div class="dashboard-stats-list phones-stats">
+              <ul>
+                <li class="dashboard-info remaining-minutes">
+                  <span class="remaining-minutes i18n-content" data-i18n-message-id="phoneRemainingMinutes"></span>
+                  <div class="dashboard-stats remaining-minutes"></div>
+                </li>
+                <li class="dashboard-info remaining-texts">
+                  <span class="remaining-texts i18n-content" data-i18n-message-id="phoneRemainingTexts"></span>
+                  <div class="dashboard-stats remaining-texts"></div>
+                </li>
+                <li class="dashboard-info forwarded-calls-texts">
+                  <span class="forwarded-calls-texts i18n-content" data-i18n-message-id="phoneForwardedCallsTexts"></span>
+                  <div class="dashboard-stats forwarded-calls-texts"></div>
+                </li>
+                <li class="dashboard-info blocked-calls-texts">
+                  <span class="blocked-calls-texts i18n-content" data-i18n-message-id="phoneBlockedCallsTexts"></span>
+                  <div class="dashboard-stats blocked-calls-texts"></div>
+                </li>
+              </ul>
+            </div>
+            <div class="fx-relay-phone-dynamic-view stats is-hidden">
+              <div class="fx-relay-phone-content">
+                <h1 class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskTitle"></h1>
+                <p class="i18n-content" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskBody"></p>
+              </div>
+  
+              <img class="i18n-alt-tag" data-i18n-message-id="close"  alt="" src="/images/panel-images/phone-masking/phone-mask-illustration.svg">
+              
+              <!-- TODO: Get URL for CTA -->
+              <button data-href="premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-mask-limit-cta#pricing" data-event-action="click" data-event-label="panel-upgrade-mask-limit-cta" class="i18n-content fx-relay-c-button t-primary js-external-link" data-relay-internal="true" data-i18n-message-id="popupPhoneMasksActivateYourPhoneMaskCTA"></button>
+            </div>
+          </div>
           <!-- Stats are dynamically generated from popup via stats.init function -->
-          <div class="fx-relay-panel-content">
+          <div class="fx-relay-panel-content emails-stats">
             <div class="dashboard-stats-list global-stats">
               <ul>
                 <li class="dashboard-info">
@@ -451,7 +482,6 @@
               </ul>
             </div>
           </div>
-          
         </stats-panel>
 
         <!-- Panel: News -->
