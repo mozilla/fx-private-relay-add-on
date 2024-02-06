@@ -856,7 +856,7 @@
               await popup.panel.phoneMasks.utils.updateForwardingState(relayNumberData.id, e.target.getAttribute('data-forwarding') === "true");
               await popup.panel.phoneMasks.utils.getRelayNumberData();
               popup.panel.phoneMasks.utils.setForwardingState();
-              await popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
+              await popup.panel.phoneMasks.utils.updateRelayNumberStateDescription();
               segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
             });
  
