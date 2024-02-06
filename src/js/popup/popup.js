@@ -779,7 +779,7 @@
           const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
 
           // If there is number data, show the default view
-          if (relayNumberData && !realPhoneNumberData) { 
+          if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) { 
             defaultView.classList.remove("is-hidden");
 
             // Show relay number 
@@ -793,12 +793,14 @@
             dateRegisteredContainer.innerText = popup.panel.phoneMasks.utils.formatRegisteredDate(realPhoneNumberData.verified_date);
 
             popup.panel.phoneMasks.utils.setRelayNumberCounryDetails(relayNumberData);
+             
+            popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
           } else { 
             dynamicView.classList.remove("is-hidden");
           } 
 
           // If user has premium and has phone, but real phone number is not verified
-          if (premium.premium && !hasPhone.has_phone && realPhoneNumberData.verified) {
+          if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
             popup.panel.phoneMasks.utils.setDynamicView({
               panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
               panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
@@ -818,7 +820,7 @@
           }
  
           // If phone plan is not available in country, show waitlist
-          if ( getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+          if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
             popup.panel.phoneMasks.utils.setDynamicView({
               panelTitle: "popUpPhoneMasksNotAvailableTitle", 
               panelDescription: "popUpPhoneMasksNotAvailableBody",
@@ -849,7 +851,8 @@
             input.addEventListener('click', async (e)=>{ 
               await popup.panel.phoneMasks.utils.updateForwardingState(relayNumberData.id, e.target.getAttribute('data-forwarding') === "true");
               await popup.panel.phoneMasks.utils.getRelayNumberData();
-              popup.panel.phoneMasks.utils.setForwardingState( );
+              popup.panel.phoneMasks.utils.setForwardingState();
+              await popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
               segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
             });
  
@@ -877,6 +880,12 @@
  
         },
         utils: {
+          updateRelayNumberStateDescription: async () => {
+            const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
+            const data = getRelayNumber.relayNumbers.length !== 0 ? getRelayNumber.relayNumbers[0] : false;
+            const forwardingStateDescription = document.querySelector(".fx-relay-phone-meta-description");  
+            forwardingStateDescription.textContent = data.enabled ? browser.i18n.getMessage("popupPhoneMasksMetaForwardingDescription") : browser.i18n.getMessage("popupPhoneMasksMetaBlockingDescription");
+          },
           setRelayNumberCounryDetails: (data) => {
             const locationContainer = document.getElementById("fx-relay-user-phone-country");
             const countryImage = locationContainer.querySelector("img");
