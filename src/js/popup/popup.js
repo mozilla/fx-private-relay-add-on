@@ -18,8 +18,10 @@
     events: {
       backClick: (e) => {
         e.preventDefault();
-        let backTarget = e.target.dataset.backTarget;
-        const backNavLevel = e.target.dataset.navLevel;
+        const target = e.currentTarget; 
+
+        let backTarget = target.dataset.backTarget;
+        const backNavLevel = target.dataset.navLevel;
         let data;
         if (backNavLevel === "root") {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
@@ -30,13 +32,13 @@
         }
 
         // Custom rule to send "Closed Report Issue" event
-        if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
+        if (target.dataset.navId && target.dataset.navId === "webcompat") {
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
         // Custom rule to fix Firefox bug where popup does not 
         // resize from larger sized panels to smaller sized panels
-        if (e.target.dataset.navId && e.target.dataset.navId === "custom") {
+        if (target.dataset.navId && target.dataset.navId === "custom") {
           const maskPanel = document.querySelector("masks-panel");
           maskPanel.classList.add("custom-return");
           
@@ -75,10 +77,10 @@
         document
           .querySelector(".js-internal-link.is-active")
           ?.classList.remove("is-active");
-        e.target.classList.add("is-active");
-        const panelId = e.target.dataset.panelId;
+        e.currentTarget.classList.add("is-active");
+        const panelId = e.currentTarget.dataset.panelId;
         popup.panel.update(panelId);
-        e.target.blur();
+        e.currentTarget.blur();
       },
       generateMask: async (event, type = "random", data = null) => {
         
@@ -178,6 +180,7 @@
       
       // Set Navigation Listeners
       const navigationButtons = document.querySelectorAll(".js-internal-link");
+     
       navigationButtons.forEach((button) => {
         button.addEventListener("click", popup.events.navigationClick, false);
       });
@@ -230,7 +233,8 @@
 
         // Set independent stats tab
         const activeTab = panelId === "stats" ? sessionState.primaryPanel : panelId;
-        const initializeStats = sessionState.currentPanel === "stats" && (panelId === "phone-masks" || panelId === "masks")  && !data?.backTarget;
+        const initializeStats = sessionState.currentPanel === "stats" && (panelId === "phone-masks" || panelId === "masks") && !data?.backTarget;
+
         if (panelId === "stats" || initializeStats) {
           document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
@@ -1209,7 +1213,6 @@
       },
       stats: {
         init: async () => {
-          console.log(sessionState.primaryPanel)
           // TODO: If phones, show phone stats
           if (sessionState.primaryPanel === "phone-masks") {
             // Build phone stats here.
@@ -1769,21 +1772,26 @@
       },
       buildBackButton: (navId, navLevel, backTarget) => {
         let button = document.createElement("button");
+        let goBackText = document.createElement("span");
+        let img = document.createElement("img");
 
         button.setAttribute("data-nav-id", navId);
         button.setAttribute("data-nav-level", navLevel);
         button.setAttribute("data-back-target", backTarget);
         button.className = "fx-relay-menu-dashboard-link footer js-internal-link fx-relay-panel-header-btn-back";
       
-        let img = document.createElement("img");
+        goBackText.className = "i18n-content";
+        goBackText.setAttribute("data-i18n-message-id", "goBackText");
+        goBackText.textContent = browser.i18n.getMessage("goBackText");
+
         img.className = "i18n-alt-tag";
         img.setAttribute("data-i18n-message-id", "returnToPreviousPanel");
         img.src = "/icons/nebula-back-arrow.svg";
         img.alt = "";
 
         button.appendChild(img);
-        button.appendChild(document.createTextNode("Go back"));
-
+        button.appendChild(goBackText);
+        
         button.addEventListener("click", popup.events.backClick, false);
         
         let footer = document.querySelector(".fx-relay-footer-nav");

@@ -49,12 +49,11 @@
     <primary-dashboard-switcher class="fx-relay-primary-dashboard-switcher">
       <!-- Emails -->
       <button data-panel-id="masks" data-back-target="masks" class="fx-relay-primary-dashboard-switcher-btn masks js-internal-link is-active" aria-selected="true" aria-controls="masks" role="tab">
-        Emails
+        <span class="i18n-content" data-i18n-message-id="emailsTabText"></span>
       </button>
       <!-- Phones -->
       <button data-panel-id="phone-masks" data-back-target="phone-masks" class="fx-relay-primary-dashboard-switcher-btn phone-masks js-internal-link" role="tab">
-        <!-- TODO: Add to messages.json  -->
-        Phones
+        <span class="i18n-content" data-i18n-message-id="phonesTabText"></span>
       </button>
     </primary-dashboard-switcher>
 
@@ -488,9 +487,8 @@
 
     <footer class="fx-relay-footer-nav">
        <!-- Stats -->
-       <button data-panel-id="stats" class="fx-relay-menu-dashboard-link footer stats js-internal-link is-hidden" href="#">
-        See stats
-        <!-- <span class="fx-relay-menu-dashboard-link-tooltip i18n-content" data-i18n-message-id="popupStatsTitle"></span> -->
+       <button data-panel-id="stats" class="fx-relay-menu-dashboard-link footer stats js-internal-link">
+        <span class="i18n-content" data-i18n-message-id="seeStatsText"></span> 
         <img src="/icons/nebula-stats-purple.svg" alt="" />
       </button>
     </footer>
