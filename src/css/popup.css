@@ -258,6 +258,8 @@
   width: 100%;
   color: var(--colorGrey40);
   border-bottom: 2px solid var(--colorGrey10);
+  overflow-wrap: break-word;
+  max-width: 50%;
 }
 
 .fx-relay-primary-dashboard-switcher-btn.is-active {
