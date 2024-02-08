@@ -265,6 +265,7 @@
 
           if (panel.dataset.panelId === panelId) {
             panel.classList.remove("is-hidden");
+            document.querySelector(".fx-relay-footer-nav").classList.remove("is-hidden");
             popup.panel.init(panelId, data);
           }
         });
@@ -792,6 +793,8 @@
             popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
           } else { 
             dynamicView.classList.remove("is-hidden");
+            // Don't show footer in dynamic view (stats button)
+            document.querySelector(".fx-relay-footer-nav").classList.add("is-hidden");
             // Show appropriate plan upgrade view
             popup.panel.phoneMasks.utils.setPhonesStatusView();
             return;
@@ -958,7 +961,7 @@
             const getPlans = await browser.storage.local.get("phonePlans");
             const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
 
-              // If user has premium and has phone, but real phone number is not verified
+            // If user has premium and has phone, but real phone number is not verified
             if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
               popup.panel.phoneMasks.utils.setDynamicView({
                 panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
