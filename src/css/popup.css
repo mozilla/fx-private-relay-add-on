@@ -252,7 +252,7 @@
   margin: 0;
   padding: var(--spacingMd);
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--fontSizeBodyMd);
   font-family: var(--fontStackBase);
   text-align: center;
   width: 100%;
@@ -1365,7 +1365,7 @@ sign-up-panel::after {
   display: flex; 
   padding: var(--spacingMd) var(--spacingXl);
   flex-direction: column;  
-  border-radius: 6px;
+  border-radius: var(--borderRadiusSm);
   background: linear-gradient(86deg, rgba(231, 223, 255, 0.80) -3.48%, rgba(227, 255, 243, 0.80) 104.03%);
   align-items: flex-start; 
   gap: var(--spacingXs);
@@ -1377,7 +1377,7 @@ sign-up-panel::after {
   display: flex;
   align-items: center;
   flex-direction: row;
-  gap: 4px;
+  gap: var(--spacingXs);
 }
 
 .fx-relay-phone-with-country-code {
@@ -1385,7 +1385,7 @@ sign-up-panel::after {
 font-family: var(--fontStackBase);
 font-size: var(--fontSizeBodySm);
 font-style: normal;
-font-weight: bold; 
+font-weight: 700; 
 }
 
 .fx-relay-phone-details {
@@ -1459,7 +1459,7 @@ font-weight: bold;
   display: flex;
   flex-flow: column;
   background-color: var(--colorGrey05);
-  border-radius: 40px;
+  border-radius: var(--borderRadius3xl);
 }
  
 .fx-relay-label { 
@@ -1467,7 +1467,7 @@ font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--spacingXs);
 }
 
 .fx-relay-segmented-control {
@@ -1479,7 +1479,7 @@ font-weight: bold;
   flex-flow: row;
   justify-content: flex-start;
   border: 2px solid var(--colorGrey10);
-  border-radius: 40px;
+  border-radius: var(--borderRadius3xl);
   background-color: var(--colorGrey05);
 }
 .fx-relay-segmented-control .fx-relay-segmented-control-group {
@@ -1499,7 +1499,7 @@ font-weight: bold;
   flex: 1;
   font-size: var(--fontSizeBodyXs);
   font-family: var(--fontStackBase);
-  padding: 8px 0;
+  padding: var(--spacingSm) 0;
   position: relative;
   text-align: center;
   -webkit-tap-highlight-color: transparent;
@@ -1509,7 +1509,7 @@ font-weight: bold;
 .fx-relay-unselected-segmented-group {
   border: 1px solid var(--colorGrey10);
   background-color: var(--colorWhite);
-  border-radius: 40px;
+  border-radius: var(--borderRadius3xl);
 }
 .fx-relay-unselected-segmented-group:hover img {
   filter: grayscale(1) invert(1) brightness(2);
@@ -1535,7 +1535,7 @@ font-weight: bold;
 }
 .fx-relay-segmented-control .fx-relay-segmented-control-group input ~ label::before {
   background: var(--colorViolet30);
-  border-radius: 40px;
+  border-radius: var(--borderRadius3xl);
   transition: opacity 0.15s ease;
 } 
 .fx-relay-segmented-control .fx-relay-segmented-control-group input ~ label::after {
@@ -1559,7 +1559,7 @@ font-weight: bold;
 .fx-relay-segmented-control .fx-relay-segmented-control-group input:checked ~ label {
   background: var(--colorGrey10);
   color: var(--colorWhite); 
-  border-radius: 40px;
+  border-radius: var(--borderRadius3xl);
 }
 .fx-relay-segmented-control .fx-relay-segmented-control-group input:checked ~ label::after {
   opacity: 1;
@@ -1579,7 +1579,7 @@ font-weight: bold;
   }
   .fx-relay-segmented-control.useSlidingAnimation::before {
     background: var(--colorViolet70);
-    border-radius: 40px; 
+    border-radius: var(--borderRadius3xl); 
     content: "";
     display: block;
     height: calc(100% - (var(--options-gap)*2));

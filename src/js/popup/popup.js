@@ -299,13 +299,13 @@
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
-            popup.utilities.buildBackButton("", "root", "masks");
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "survey":
             sendRelayEvent("Panel", "click", "opened-CSAT");
             popup.panel.survey.init();
-            popup.utilities.buildBackButton("", "root", "masks");
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "newsItem":
@@ -317,13 +317,13 @@
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
             popup.panel.settings.init();
-            popup.utilities.buildBackButton("", "root", "masks");
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
-            popup.utilities.buildBackButton("", "root", "masks");
+            popup.utilities.buildBackButton(null, "root", "masks");
 
             break;
 
@@ -1829,7 +1829,9 @@
         let goBackText = document.createElement("span");
         let img = document.createElement("img");
 
-        button.setAttribute("data-nav-id", navId);
+        if (navId) {
+          button.setAttribute("data-nav-id", navId);
+        }
         button.setAttribute("data-nav-level", navLevel);
         button.setAttribute("data-back-target", backTarget);
         button.className = "fx-relay-menu-dashboard-link footer js-internal-link fx-relay-panel-header-btn-back";
