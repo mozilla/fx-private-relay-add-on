@@ -775,7 +775,7 @@
           const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
 
           // If there is number data, show the default view
-          if (!relayNumberData && !realPhoneNumberData && !realPhoneNumberData.verified) { 
+          if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) { 
             defaultView.classList.remove("is-hidden");
 
             // Show relay number 
@@ -943,7 +943,7 @@
             const title = dynamicView.querySelector("h1");
             const description = dynamicView.querySelector("p"); 
             const cta = dynamicView.querySelector("a");
-            
+
             title.textContent = browser.i18n.getMessage(panelTitle);
             description.textContent = browser.i18n.getMessage(panelDescription); 
             cta.textContent = browser.i18n.getMessage(panelCtaText);
@@ -963,7 +963,7 @@
             const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
 
             // If user has premium and has phone, but real phone number is not verified
-            if (premium.premium && hasPhone.has_phone &&  realPhoneNumberData.verified) {
+            if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
               popup.panel.phoneMasks.utils.setDynamicView({
                 panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
                 panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
