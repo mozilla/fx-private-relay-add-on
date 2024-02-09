@@ -775,7 +775,7 @@
           const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
 
           // If there is number data, show the default view
-          if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) { 
+          if (!relayNumberData && !realPhoneNumberData && !realPhoneNumberData.verified) { 
             defaultView.classList.remove("is-hidden");
 
             // Show relay number 
@@ -942,11 +942,12 @@
 
             const title = dynamicView.querySelector("h1");
             const description = dynamicView.querySelector("p"); 
-            const cta = dynamicView.querySelector("button");
-
+            const cta = dynamicView.querySelector("a");
+            
             title.textContent = browser.i18n.getMessage(panelTitle);
             description.textContent = browser.i18n.getMessage(panelDescription); 
             cta.textContent = browser.i18n.getMessage(panelCtaText);
+            cta.href = panelCtaHref;
             cta.dataset.href = panelCtaHref;
             cta.dataset.eventLabel = panelCtaEvenLabel;
             cta.addEventListener("click", popup.events.externalClick, true);
@@ -962,12 +963,13 @@
             const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
 
             // If user has premium and has phone, but real phone number is not verified
-            if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
+            if (premium.premium && hasPhone.has_phone &&  realPhoneNumberData.verified) {
               popup.panel.phoneMasks.utils.setDynamicView({
                 panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
                 panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
                 panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
-                panelCtaHref: ""
+                panelCtaHref: `${relaySiteOrigin}/phone/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-activate-addon-phone-mask`,
+                panelCtaEvenLabel: "fx-addon-activate-phone-mask"
               }, panelId);
             }
             
@@ -979,7 +981,8 @@
                 panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
                 panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
                 panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
-                panelCtaHref: ""
+                panelCtaHref: `${relaySiteOrigin}/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-addon-phone-mask#pricing`,
+                panelCtaEvenLabel: "fx-addon-upgrade-phone-mask"
               }, panelId);
             }
             
@@ -989,7 +992,8 @@
                 panelTitle: "popUpPhoneMasksNotAvailableTitle", 
                 panelDescription: "popUpPhoneMasksNotAvailableBody",
                 panelCtaText: "popUpPhoneMasksNotAvailableCta",
-                panelCtaHref: ""
+                panelCtaHref: `${relaySiteOrigin}/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-waitlist-addon-phone-mask#pricing`,
+                panelCtaEvenLabel: "fx-addon-waitlist-phone-mask"
               }, panelId);
             }
           },

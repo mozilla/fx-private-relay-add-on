@@ -1363,7 +1363,7 @@ sign-up-panel::after {
 
 .fx-relay-phone-container {
   display: flex; 
-  padding: var(--spacingMd) var(--spacingXl);
+  padding: var(--spacingMd) var(--spacingLg);
   flex-direction: column;  
   border-radius: var(--borderRadiusSm);
   background: linear-gradient(86deg, rgba(231, 223, 255, 0.80) -3.48%, rgba(227, 255, 243, 0.80) 104.03%);
