@@ -262,6 +262,10 @@
   max-width: 50%;
 }
 
+.fx-relay-primary-dashboard-switcher-btn:hover {
+  background-color: var(--colorGrey10);
+}
+
 .fx-relay-primary-dashboard-switcher-btn.is-active {
   color: var(--colorPurple70);
   font-weight: 600;
@@ -790,7 +794,7 @@ sign-up-panel::after {
   display: flex;
   justify-content: center;
   gap: var(--spacingLg);
-  margin-bottom: var(--spacingSm);
+  margin: var(--spacingSm);
 }
 /* TODO: down to 730 - reuse */
 

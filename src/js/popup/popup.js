@@ -213,7 +213,7 @@
       //   If premium tier: focused in search bar
     },
     panel: {
-      initializePanelContext: () => {
+      initializePanelContext: (panelId) => {
         // Remove any existing back buttons, there should only be one once the panel is built
         let backBtn = document.querySelector('.fx-relay-panel-header-btn-back');
         backBtn?.parentNode.removeChild(backBtn);
@@ -223,7 +223,54 @@
         // Hide primary masks/phones dashboard tabs and "stats" button in footer
         document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.add("is-hidden");
         document.querySelector(".fx-relay-menu-dashboard-link.footer.stats")?.classList.add("is-hidden");
+        
+        if (panelId === "survey") {
+           // Hide CSAT button element on this panel.
+           document.querySelector(".fx-relay-csat-survey-link-container")?.classList.add("is-hidden");
+        } else {
+          popup.panel.showCsatSurveyLink();
+        }
+      },
+      showCsatSurveyLink: async () => {
+        // Logic to show survey is found in shouldShowSurvey function
+        const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
+        const csatSurveyFlag = await checkWaffleFlag('csat_survey');
+        const { dataCollection } = await browser.storage.local.get(
+          "dataCollection"
+        );
+        
+        // Check whether we should show the CSAT survey link
+        if (shouldShowCSAT && csatSurveyFlag && dataCollection === "data-enabled") {
+          const survey = popup.panel.survey;
 
+          survey.utils.showSurveyLink();
+
+          // Show the survey panel when the link is clicked
+          survey.select
+            .surveyLink()
+            .addEventListener("click", async () =>
+              popup.panel.update("survey")
+            );
+
+          survey.select
+            .viewSurveyLinkButton()
+            .addEventListener("click", async () => {
+              popup.panel.update("survey")
+          });
+
+          // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
+          survey.select
+            .surveyDismiss()
+            .addEventListener("click", async () => {
+              const { profileID } = await browser.storage.local.get("profileID"); 
+              const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
+
+              await popup.utilities.dismissByReason(reasonToShow, profileID);
+
+              sendRelayEvent("CSAT Survey", "click", "dismissed-CSAT");
+              window.close();
+            });
+        } 
       },
       setPanelContextTabs: (panelId, data) => {
         // This function is for panels that have independent primary "emails" and "phones" tabs
@@ -253,7 +300,7 @@
         return false;
       },
       update: (panelId, data) => {
-        popup.panel.initializePanelContext();
+        popup.panel.initializePanelContext(panelId);
         if (popup.panel.setPanelContextTabs(panelId, data)) {
           return;
         }
@@ -390,47 +437,9 @@
         init: async () => { 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
-          const { dataCollection } = await browser.storage.local.get(
-            "dataCollection"
-          );
+      
           const maskPanel = document.getElementById("masks-panel");
           let getMasksOptions = { fetchCustomMasks: false };
-
-          // logic to show survey is found in shouldShowSurvey function
-          const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
-          const csatSurveyFlag = await checkWaffleFlag('csat_survey');
-          
-          if (shouldShowCSAT && csatSurveyFlag && dataCollection === "data-enabled") {
-            const survey = popup.panel.survey;
-
-            survey.utils.showSurveyLink();
-
-            // Show the survey panel when the link is clicked
-            survey.select
-              .surveyLink()
-              .addEventListener("click", async () =>
-                popup.panel.update("survey")
-              );
-
-            survey.select
-              .viewSurveyLinkButton()
-              .addEventListener("click", async () => {
-                popup.panel.update("survey")
-            });
-
-            // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
-            survey.select
-              .surveyDismiss()
-              .addEventListener("click", async () => {
-                const { profileID } = await browser.storage.local.get("profileID"); 
-                const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
-
-                await popup.utilities.dismissByReason(reasonToShow, profileID);
-
-                sendRelayEvent("CSAT Survey", "click", "dismissed-CSAT");
-                window.close();
-              });
-          }
 
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
