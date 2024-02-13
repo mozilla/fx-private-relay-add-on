@@ -485,9 +485,10 @@ sign-up-panel::after {
 }
 
 #report-feedback-container {
+  /* scroll vertically to give space for new footer */
   max-height: 210px;
   overflow: auto;
-  padding-right: 8px;
+  padding-right: var(--spacingSm);
   width: 100%;
 }
 
