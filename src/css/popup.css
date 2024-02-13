@@ -484,6 +484,13 @@ sign-up-panel::after {
   background: var(--colorInformationalDisabled);
 }
 
+#report-feedback-container {
+  max-height: 210px;
+  overflow: auto;
+  padding-right: 8px;
+  width: 100%;
+}
+
 .report-success {
   padding: var(--spacingMd);
   padding-top: 0;
