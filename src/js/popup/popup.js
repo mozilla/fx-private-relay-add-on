@@ -8,6 +8,7 @@
 
   const sessionState = {
     currentPanel: null,
+    primaryPanel: "masks",
     newsItemsCount: null,
     loggedIn: false,
     newsContent: []
@@ -17,21 +18,27 @@
     events: {
       backClick: (e) => {
         e.preventDefault();
-        const backTarget = e.target.dataset.backTarget;
-        const backNavLevel = e.target.dataset.navLevel;
+        const target = e.currentTarget; 
 
+        let backTarget = target.dataset.backTarget;
+        const backNavLevel = target.dataset.navLevel;
+        let data;
         if (backNavLevel === "root") {
           document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${sessionState.primaryPanel}`).classList.add("is-active");
+          
+          backTarget = sessionState.primaryPanel;
+          data = { backTarget: true }
         }
 
         // Custom rule to send "Closed Report Issue" event
-        if (e.target.dataset.navId && e.target.dataset.navId === "webcompat") {
+        if (target.dataset.navId && target.dataset.navId === "webcompat") {
           sendRelayEvent("Panel", "click", "closed-report-issue");
         }
 
         // Custom rule to fix Firefox bug where popup does not 
         // resize from larger sized panels to smaller sized panels
-        if (e.target.dataset.navId && e.target.dataset.navId === "custom") {
+        if (target.dataset.navId && target.dataset.navId === "custom") {
           const maskPanel = document.querySelector("masks-panel");
           maskPanel.classList.add("custom-return");
           
@@ -47,7 +54,7 @@
           return;
         }
 
-        popup.panel.update(backTarget);
+        popup.panel.update(backTarget, data);
       },
       dismissErrorClick: async (e) => {
         e.preventDefault();
@@ -70,10 +77,10 @@
         document
           .querySelector(".js-internal-link.is-active")
           ?.classList.remove("is-active");
-        e.target.classList.add("is-active");
-        const panelId = e.target.dataset.panelId;
+        e.currentTarget.classList.add("is-active");
+        const panelId = e.currentTarget.dataset.panelId;
         popup.panel.update(panelId);
-        e.target.blur();
+        e.currentTarget.blur();
       },
       generateMask: async (event, type = "random", data = null) => {
         
@@ -173,27 +180,20 @@
       
       // Set Navigation Listeners
       const navigationButtons = document.querySelectorAll(".js-internal-link");
+     
       navigationButtons.forEach((button) => {
         button.addEventListener("click", popup.events.navigationClick, false);
-      });
-
-      // Set Back Button Listeners
-      const backButtons = document.querySelectorAll(
-        ".fx-relay-panel-header-btn-back"
-      );
-      
-      backButtons.forEach((button) => {
-        button.addEventListener("click", popup.events.backClick, false);
       });
 
       sessionState.loggedIn = await popup.utilities.isUserSignedIn();
 
       // Check if user is signed in to show default/sign-in panel
-      if (sessionState.loggedIn) {
+      if (sessionState.loggedIn) { 
         popup.panel.update("masks");
         popup.utilities.unhideNavigationItemsOnceLoggedIn();
         // populateNewsFeed Also sets Notification Bug for Unread News Items
         popup.utilities.populateNewsFeed();
+        document.body.classList.remove("is-loading");
       } else {
         popup.panel.update("sign-up");
         document.body.classList.remove("is-loading");
@@ -213,13 +213,106 @@
       //   If premium tier: focused in search bar
     },
     panel: {
+      initializePanelContext: (panelId) => {
+        // Remove any existing back buttons, there should only be one once the panel is built
+        let backBtn = document.querySelector('.fx-relay-panel-header-btn-back');
+        backBtn?.parentNode.removeChild(backBtn);
+        let footer = document.querySelector(".fx-relay-footer-nav");
+        footer?.classList.remove('left-align'); // Left alignment is only re-added when buildBackButton runs
+
+        // Hide primary masks/phones dashboard tabs and "stats" button in footer
+        document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.add("is-hidden");
+        document.querySelector(".fx-relay-menu-dashboard-link.footer.stats")?.classList.add("is-hidden");
+        
+        if (panelId === "survey") {
+           // Hide CSAT button element on this panel.
+           document.querySelector(".fx-relay-csat-survey-link-container")?.classList.add("is-hidden");
+        } else {
+          popup.panel.showCsatSurveyLink();
+        }
+      },
+      showCsatSurveyLink: async () => {
+        // Logic to show survey is found in shouldShowSurvey function
+        const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
+        const csatSurveyFlag = await checkWaffleFlag('csat_survey');
+        const { dataCollection } = await browser.storage.local.get(
+          "dataCollection"
+        );
+        
+        // Check whether we should show the CSAT survey link
+        if (shouldShowCSAT && csatSurveyFlag && dataCollection === "data-enabled") {
+          const survey = popup.panel.survey;
+
+          survey.utils.showSurveyLink();
+
+          // Show the survey panel when the link is clicked
+          survey.select
+            .surveyLink()
+            .addEventListener("click", async () =>
+              popup.panel.update("survey")
+            );
+
+          survey.select
+            .viewSurveyLinkButton()
+            .addEventListener("click", async () => {
+              popup.panel.update("survey")
+          });
+
+          // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
+          survey.select
+            .surveyDismiss()
+            .addEventListener("click", async () => {
+              const { profileID } = await browser.storage.local.get("profileID"); 
+              const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
+
+              await popup.utilities.dismissByReason(reasonToShow, profileID);
+
+              sendRelayEvent("CSAT Survey", "click", "dismissed-CSAT");
+              window.close();
+            });
+        } 
+      },
+      setPanelContextTabs: (panelId, data) => {
+        // This function is for panels that have independent primary "emails" and "phones" tabs
+        // The initial email and phones tab context is already set as the default.
+        // For all other panels that need independent tabs, set them here. 
+
+        // Set independent stats tab
+        const activeTab = panelId === "stats" ? sessionState.primaryPanel : panelId;
+        const initializeStats = sessionState.currentPanel === "stats" && (panelId === "phone-masks" || panelId === "masks") && !data?.backTarget;
+
+        if (panelId === "stats" || initializeStats) {
+          document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+          document.querySelector(".js-internal-link.is-active")?.classList.remove("is-active");
+          document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${activeTab}`).classList.add("is-active");
+          
+          const primaryBtn = document.querySelector(`.fx-relay-primary-dashboard-switcher-btn.${activeTab}`) 
+          popup.ariaControls.setSelected(primaryBtn);
+          popup.ariaControls.setControls(primaryBtn, activeTab);
+
+          if (initializeStats) {
+            sessionState.primaryPanel = panelId; // Update primary panel if it changed
+            popup.panel.init("stats", data);
+            return true;
+          } 
+        } 
+
+        return false;
+      },
       update: (panelId, data) => {
+        popup.panel.initializePanelContext(panelId);
+        if (popup.panel.setPanelContextTabs(panelId, data)) {
+          return;
+        }
+       
         const panels = document.querySelectorAll(".fx-relay-panel");
+
         panels.forEach((panel) => {
           panel.classList.add("is-hidden");
 
           if (panel.dataset.panelId === panelId) {
             panel.classList.remove("is-hidden");
+            document.querySelector(".fx-relay-footer-nav").classList.remove("is-hidden");
             popup.panel.init(panelId, data);
           }
         });
@@ -227,44 +320,65 @@
         sessionState.currentPanel = panelId;
       },
       init: (panelId, data) => {
+        const phonesBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.phone-masks");
+        const masksBtn = document.querySelector(".fx-relay-primary-dashboard-switcher-btn.masks");
+
         switch (panelId) {
           case "custom": 
             popup.panel.masks.custom.init();
+            popup.utilities.buildBackButton("custom", "root", "masks");
             break;
 
-          case "masks": 
+          case "masks":
             popup.panel.masks.init();
+            popup.utilities.setPrimaryPanel(panelId);
+            popup.ariaControls.setSelected(masksBtn);
+            popup.ariaControls.setControls(masksBtn, panelId);
+            break;
+
+          case "phone-masks":
+            popup.panel.phoneMasks.init();
+            popup.utilities.setPrimaryPanel(panelId);
+            popup.ariaControls.setSelected(phonesBtn);
+            popup.ariaControls.setControls(phonesBtn, panelId);
             break;
 
           case "news":
             sendRelayEvent("Panel", "click", "opened-news");
             popup.panel.news.init();
             popup.panel.news.utilities.updateNewsItemCountNotification(true);
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "survey":
             sendRelayEvent("Panel", "click", "opened-CSAT");
             popup.panel.survey.init();
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "newsItem":
             sendRelayEvent("Panel", "click", "opened-news-item");
             popup.panel.news.item.update(data.newsItemId);
+            popup.utilities.buildBackButton("newsItem", "child", "news");
             break;
 
           case "settings":
             sendRelayEvent("Panel", "click", "opened-settings");
             popup.panel.settings.init();
+            popup.utilities.buildBackButton(null, "root", "masks");
             break;
 
           case "stats":
             sendRelayEvent("Panel", "click", "opened-stats");
             popup.panel.stats.init();
+            popup.utilities.buildBackButton(null, "root", "masks");
+
             break;
 
           case "webcompat":
             sendRelayEvent("Panel", "click", "opened-report-issue");
             popup.panel.webcompat.init();
+            popup.utilities.buildBackButton("webcompat", "child", "settings");
             break;
         }
       },
@@ -320,51 +434,12 @@
             customMaskDomainSubmitButton.disabled = !(customMaskDomainInput.value)
           }
         },
-        init: async () => {
-          
+        init: async () => { 
           const generateRandomMask = document.querySelector(".js-generate-random-mask");
           const { premium } = await browser.storage.local.get("premium");
-          const { dataCollection } = await browser.storage.local.get(
-            "dataCollection"
-          );
+      
           const maskPanel = document.getElementById("masks-panel");
           let getMasksOptions = { fetchCustomMasks: false };
-
-          // logic to show survey is found in shouldShowSurvey function
-          const shouldShowCSAT = await popup.panel.survey.utils.shouldShowSurvey();
-          const csatSurveyFlag = await checkWaffleFlag('csat_survey');
-          
-          if (shouldShowCSAT && csatSurveyFlag && dataCollection === "data-enabled") {
-            const survey = popup.panel.survey;
-
-            survey.utils.showSurveyLink();
-
-            // Show the survey panel when the link is clicked
-            survey.select
-              .surveyLink()
-              .addEventListener("click", async () =>
-                popup.panel.update("survey")
-              );
-
-            survey.select
-              .viewSurveyLinkButton()
-              .addEventListener("click", async () => {
-                popup.panel.update("survey")
-            });
-
-            // Dismiss the survey panel when the user clicks on Dismiss - intentional dismissal
-            survey.select
-              .surveyDismiss()
-              .addEventListener("click", async () => {
-                const { profileID } = await browser.storage.local.get("profileID"); 
-                const reasonToShow = await popup.panel.survey.utils.getReasonToShowSurvey();
-
-                await popup.utilities.dismissByReason(reasonToShow, profileID);
-
-                sendRelayEvent("CSAT Survey", "click", "dismissed-CSAT");
-                window.close();
-              });
-          }
 
           if (!premium) {
             await popup.panel.masks.utilities.setRemainingMaskCount();
@@ -699,6 +774,240 @@
           }
         },
       },
+      phoneMasks: {
+        init: async () => {  
+          const getRelayNumber = await browser.storage.local.get("relayNumbers");
+          const getRealPhoneNumber = await browser.storage.local.get("realPhoneNumbers");
+          const relayNumberData = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
+          const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
+          const defaultView = document.querySelector(".fx-relay-phone-default-view");
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view");
+
+          // If there is number data, show the default view
+          if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) { 
+            defaultView.classList.remove("is-hidden");
+
+            // Show relay number 
+            const relayNumberContainer = document.getElementById("fx-relay-user-phone-number");
+            relayNumberContainer.innerText = relayNumberData.formattedNumber; 
+
+            const realPhoneNumberContainer = document.getElementById("fx-relay-meta-forwarding-to");
+            realPhoneNumberContainer.innerText = realPhoneNumberData.formattedNumber;
+
+            const dateRegisteredContainer = document.getElementById("fx-relay-meta-registered-date");
+            dateRegisteredContainer.innerText = popup.panel.phoneMasks.utils.formatRegisteredDate(realPhoneNumberData.verified_date);
+
+            popup.panel.phoneMasks.utils.setRelayNumberCountryDetails(relayNumberData);
+             
+            popup.panel.phoneMasks.utils.updateRelayNumberStateDescription(relayNumberData);
+          } else { 
+            dynamicView.classList.remove("is-hidden");
+            // Don't show footer in dynamic view (stats button)
+            document.querySelector(".fx-relay-footer-nav").classList.add("is-hidden");
+            // Show appropriate plan upgrade view
+            popup.panel.phoneMasks.utils.setPhonesStatusView();
+            return;
+          } 
+
+          popup.panel.phoneMasks.utils.loadSegmentedControlIcons();
+ 
+          // Pull fresh relay number data and set forwarding state
+          await popup.panel.phoneMasks.utils.getRelayNumberData();
+          popup.panel.phoneMasks.utils.setForwardingState();
+ 
+          const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
+          const radios = segmentedControlGroup.querySelectorAll('input');
+          let i = 1;
+
+          // set CSS Var to number of radios we have
+          segmentedControlGroup.style.setProperty('--options',radios.length);
+
+          // loop through radio elements
+          radios.forEach((input)=>{
+             // store position as data attribute
+            input.setAttribute('data-pos',i);
+             
+            // add click handler to change position
+            input.addEventListener('click', async (e)=>{ 
+              await popup.panel.phoneMasks.utils.updateForwardingState(relayNumberData.id, e.target.getAttribute('data-forwarding') === "true");
+              await popup.panel.phoneMasks.utils.getRelayNumberData();
+              popup.panel.phoneMasks.utils.setForwardingState();
+              await popup.panel.phoneMasks.utils.updateRelayNumberStateDescription();
+              segmentedControlGroup.style.setProperty('--options-active',e.target.getAttribute('data-pos'));
+            });
+ 
+            i++;
+          });
+
+          // add class to enable the sliding pill animation, otherwise it uses a fallback
+          segmentedControlGroup.classList.add('useSlidingAnimation');
+
+          const copyRelayNumberButton = document.getElementById("fx-relay-phone-mask-copy-button");
+          const copyRelayNumberSuccessMessage = document.getElementById("fx-relay-number-copy-success");
+
+          copyRelayNumberButton.addEventListener("click", (e)=> {
+            e.preventDefault(); 
+
+            // Copy relay number to clipboard, remove first 2 characters (country code). 
+            navigator.clipboard.writeText(relayNumberData.number.substring(2, relayNumberData.number.length));
+
+            // Show success message
+            copyRelayNumberSuccessMessage.classList.add("is-shown");
+            setTimeout(() => {
+              copyRelayNumberSuccessMessage.classList.remove("is-shown")
+            }, 1000);
+          }, false); 
+ 
+        },
+        utils: {
+          updateRelayNumberStateDescription: async () => {
+            const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
+            const data = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
+            const forwardingStateDescription = document.querySelector(".fx-relay-phone-meta-description");  
+            forwardingStateDescription.textContent = data.enabled ? browser.i18n.getMessage("popupPhoneMasksMetaForwardingDescription") : browser.i18n.getMessage("popupPhoneMasksMetaBlockingDescription");
+          },
+          setRelayNumberCountryDetails: (data) => {
+            const locationContainer = document.getElementById("fx-relay-user-phone-country");
+            const countryImage = locationContainer.querySelector("img");
+            const countryDetails = locationContainer.querySelector("span");
+            const countryCode = data.number.substring(0, 2);
+            const formattedCountryLabel = {
+              "US": "U.S.A",
+            };
+            const countryLabel = formattedCountryLabel[data.country_code] ? formattedCountryLabel[data.country_code] : data.country_code;
+            countryImage.src = `/icons/${data.country_code.toLowerCase()}-flag.svg`;
+            countryDetails.textContent = `${countryCode} ${countryLabel}`;
+
+          },
+          formatRegisteredDate: (dateRegistered) => {
+            // format date into something like Oct 15, 2023
+            const date = (new Date(dateRegistered)).toDateString().split(' ');
+            
+            return `${date[1]} ${date[2]}, ${date[3]}`; 
+          },
+          setForwardingState: async () => {
+            // get a fresh copy of the relay numbers
+            const getRelayNumber = await browser.storage.local.get("relayNumbers"); 
+            const data = popup.utilities.isNumberDataValid(getRelayNumber.relayNumbers);
+            const segmentedControlGroup = document.querySelector('.fx-relay-segmented-control');
+            const forwardingButton = document.getElementById("fx-relay-phone-forwarding");
+            const blockingButton = document.getElementById("fx-relay-phone-blocking");
+            
+            const setSegmentedControlGroup = (optionsActive, forwardingClass, blockingClass) => {
+                segmentedControlGroup.style.setProperty('--options-active', optionsActive);
+                forwardingButton.checked = forwardingClass === "fx-relay-selected-segmented-group";
+                blockingButton.checked = blockingClass === "fx-relay-selected-segmented-group";
+                
+                forwardingButton.parentElement.classList = `fx-relay-segmented-control-group ${forwardingClass}`;
+                blockingButton.parentElement.classList = `fx-relay-segmented-control-group ${blockingClass}`;
+            };
+            
+            if (data.enabled) { 
+                setSegmentedControlGroup(1, "fx-relay-selected-segmented-group", "fx-relay-unselected-segmented-group");
+            } else { 
+                setSegmentedControlGroup(2, "fx-relay-unselected-segmented-group", "fx-relay-selected-segmented-group");
+            }
+          },
+          updateForwardingState: async (id, enabled) => { 
+            await browser.runtime.sendMessage({
+              method: "setRelayNumberForwardingState",
+              id,
+              enabled,
+            });  
+          },
+          getRelayNumberData: async () => {
+            await browser.runtime.sendMessage({
+              method: "getRelayNumberData", 
+            });   
+          },
+          loadSegmentedControlIcons: () => {
+            // adds icons to segmented controls for blocking and forwarding
+            const blockingButtonLabelElement = document.getElementById("fx-relay-phone-blocking-button-label");
+            const forwardingButtonLabelElement = document.getElementById("fx-relay-phone-forwarding-button-label");
+            const hasBlockingIcon = document.getElementById("fx-relay-phone-blocking-button-icon");
+            const hasForwardingIcon = document.getElementById("fx-relay-phone-forwarding-button-icon");
+
+            if (blockingButtonLabelElement && !hasBlockingIcon) { 
+              const iconElement = document.createElement("img"); 
+
+              iconElement.src = "/icons/block-icon.svg"; 
+              iconElement.id = "fx-relay-phone-blocking-button-icon";
+
+              blockingButtonLabelElement.insertBefore(iconElement, blockingButtonLabelElement.firstChild);
+            }
+
+
+            if (forwardingButtonLabelElement && !hasForwardingIcon) { 
+              const iconElement = document.createElement("img"); 
+
+              iconElement.src = "/icons/redo-icon.svg"; 
+              iconElement.id = "fx-relay-phone-forwarding-button-icon";
+
+              forwardingButtonLabelElement.insertBefore(iconElement, forwardingButtonLabelElement.firstChild);
+            } 
+          },
+          setDynamicView: ({panelTitle, panelDescription, panelCtaText, panelCtaHref, panelCtaEvenLabel}, panelId) => {
+            const dynamicView = document.querySelector(`.fx-relay-phone-dynamic-view${panelId ? `.${panelId}` : ""}`);
+
+            const title = dynamicView.querySelector("h1");
+            const description = dynamicView.querySelector("p"); 
+            const cta = dynamicView.querySelector("a");
+
+            title.textContent = browser.i18n.getMessage(panelTitle);
+            description.textContent = browser.i18n.getMessage(panelDescription); 
+            cta.textContent = browser.i18n.getMessage(panelCtaText);
+            cta.href = panelCtaHref;
+            cta.dataset.href = panelCtaHref;
+            cta.dataset.eventLabel = panelCtaEvenLabel;
+            cta.addEventListener("click", popup.events.externalClick, true);
+          }, 
+          setPhonesStatusView: async (panelId) => {
+            /**
+             * panelId (string): Optional variable to select the correct dynamic view.
+             */
+            const hasPhone = await browser.storage.local.get("has_phone");
+            const premium = await browser.storage.local.get("premium");
+            const getRealPhoneNumber = await browser.storage.local.get("realPhoneNumbers");
+            const getPlans = await browser.storage.local.get("phonePlans");
+            const realPhoneNumberData = popup.utilities.isNumberDataValid(getRealPhoneNumber.realPhoneNumbers);
+
+            // If user has premium and has phone, but real phone number is not verified
+            if (premium.premium && hasPhone.has_phone && !realPhoneNumberData.verified) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksActivateYourPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksActivateYourPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksActivateYourPhoneMaskCta",
+                panelCtaHref: `${relaySiteOrigin}/phone/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-activate-addon-phone-mask`,
+                panelCtaEvenLabel: "fx-addon-activate-phone-mask"
+              }, panelId);
+            }
+            
+            // If user does not have premium and no phones (free user), show upgrade CTA
+            const freeUser = !premium.premium && !hasPhone.has_phone;
+            const premiumUserWithNoPhonesPlan = premium.premium && !hasPhone.has_phone;
+            if (freeUser || premiumUserWithNoPhonesPlan) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popupPhoneMasksUpgradeToPhoneMaskTitle", 
+                panelDescription: "popupPhoneMasksUpgradeToPhoneMaskBody",
+                panelCtaText: "popupPhoneMasksUpgradeToPhoneMaskCta",
+                panelCtaHref: `${relaySiteOrigin}/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-upgrade-addon-phone-mask#pricing`,
+                panelCtaEvenLabel: "fx-addon-upgrade-phone-mask"
+              }, panelId);
+            }
+            
+            // If phone plan is not available in country, show waitlist
+            if (!getPlans.phonePlans.PHONE_PLANS.available_in_country) {
+              popup.panel.phoneMasks.utils.setDynamicView({
+                panelTitle: "popUpPhoneMasksNotAvailableTitle", 
+                panelDescription: "popUpPhoneMasksNotAvailableBody",
+                panelCtaText: "popUpPhoneMasksNotAvailableCta",
+                panelCtaHref: `${relaySiteOrigin}/premium/?utm_source=fx-relay-addon&utm_medium=popup&utm_content=panel-waitlist-addon-phone-mask#pricing`,
+                panelCtaEvenLabel: "fx-addon-waitlist-phone-mask"
+              }, panelId);
+            }
+          },
+        }
+      },
       news: {
         init: async () => {
 
@@ -925,11 +1234,69 @@
       },
       stats: {
         init: async () => {
+          const emailStatsPanel = document.querySelector(".fx-relay-panel-content.emails-stats");
+          const phonesStatsPanel = document.querySelector(".fx-relay-panel-content.phones-stats");
+          const phonesStatsList = document.querySelector(".dashboard-stats-list.phones-stats");
+          const statsHeader = document.getElementById("stats-panel").firstElementChild;
+          const dynamicView = document.querySelector(".fx-relay-phone-dynamic-view.stats");
+
+          const { relayNumbers } = await browser.storage.local.get("relayNumbers");
+          const relayNumberData = popup.utilities.isNumberDataValid(relayNumbers);
+          const { realPhoneNumbers } = await browser.storage.local.get("realPhoneNumbers");
+          const realPhoneNumberData = popup.utilities.isNumberDataValid(realPhoneNumbers);
+
           // Check if user is premium (and then check if they have a domain set)
           // This is needed in order to query both random and custom masks
           const { premium } = await browser.storage.local.get("premium");
           let getMasksOptions = { fetchCustomMasks: false };
 
+          const missingPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            phonesStatsList.classList.add("is-hidden");
+            statsHeader.classList.add("is-hidden");
+
+            dynamicView.classList.remove("is-hidden");
+            phonesStatsPanel.classList.remove("is-hidden");
+          };
+
+          const hasPhonesPanelInit = () => {
+            emailStatsPanel.classList.add("is-hidden");
+            dynamicView.classList.add("is-hidden");
+
+            phonesStatsPanel.classList.remove("is-hidden");
+            phonesStatsList.classList.remove("is-hidden");
+            statsHeader.classList.remove("is-hidden");
+          }; 
+
+          // Show phone mask stats panel
+          if (sessionState.primaryPanel === "phone-masks") {
+            if (relayNumberData && realPhoneNumberData && realPhoneNumberData.verified) {
+              hasPhonesPanelInit();
+            } else {  
+              missingPhonesPanelInit();
+              // Show appropriate plan upgrade view
+              popup.panel.phoneMasks.utils.setPhonesStatusView("stats");
+              return;
+            }
+
+            const remainingMinutes = document.querySelector(".dashboard-stats.remaining-minutes");
+            const remainingTexts = document.querySelector(".dashboard-stats.remaining-texts");
+            const forwardedCallsTexts = document.querySelector(".dashboard-stats.forwarded-calls-texts");
+            const blockedCallsTexts = document.querySelector(".dashboard-stats.blocked-calls-texts");
+            
+            remainingMinutes.textContent = relayNumberData.remaining_minutes;
+            remainingTexts.textContent = relayNumberData.remaining_texts;
+            forwardedCallsTexts.textContent = relayNumberData.calls_and_texts_forwarded;
+            blockedCallsTexts.textContent =  relayNumberData.calls_and_texts_blocked;
+
+            return;
+          } 
+
+          // Show emails stats panel
+          phonesStatsPanel?.classList.add("is-hidden");
+          emailStatsPanel?.classList.remove("is-hidden");
+          statsHeader.classList.remove("is-hidden");
+          
           if (premium) {
             // Check if user may have custom domain masks
             const { premiumSubdomainSet } = await browser.storage.local.get(
@@ -1285,7 +1652,7 @@
           successMessage: () => document.querySelector(".fx-relay-survey-success"),
           surveyDismiss: () => document.querySelector(".fx-relay-survey-dismiss"),
           externalSurveyLink: () => document.querySelector(".fx-relay-external-survey-link"),
-        },
+        }
       },
       webcompat: {
         handleReportIssueFormSubmission: async (event, formData) => {          
@@ -1464,6 +1831,45 @@
       },
     },
     utilities: {
+      isNumberDataValid: (relayNumberData) => {
+        return relayNumberData && relayNumberData.length !== 0 ? relayNumberData[0] : false;
+      },
+      setPrimaryPanel: (panelId) => {
+        // Show the tabs and the footers in a primary panel
+        document.querySelector(".fx-relay-primary-dashboard-switcher")?.classList.remove("is-hidden")
+        document.querySelector(".fx-relay-menu-dashboard-link.footer")?.classList.remove("is-hidden");
+        sessionState.primaryPanel = panelId;
+      },
+      buildBackButton: (navId, navLevel, backTarget) => {
+        let button = document.createElement("button");
+        let goBackText = document.createElement("span");
+        let img = document.createElement("img");
+
+        if (navId) {
+          button.setAttribute("data-nav-id", navId);
+        }
+        button.setAttribute("data-nav-level", navLevel);
+        button.setAttribute("data-back-target", backTarget);
+        button.className = "fx-relay-menu-dashboard-link footer js-internal-link fx-relay-panel-header-btn-back";
+      
+        goBackText.className = "i18n-content";
+        goBackText.setAttribute("data-i18n-message-id", "goBackText");
+        goBackText.textContent = browser.i18n.getMessage("goBackText");
+
+        img.className = "i18n-alt-tag";
+        img.setAttribute("data-i18n-message-id", "returnToPreviousPanel");
+        img.src = "/icons/nebula-back-arrow.svg";
+        img.alt = "";
+
+        button.appendChild(img);
+        button.appendChild(goBackText);
+        
+        button.addEventListener("click", popup.events.backClick, false);
+        
+        let footer = document.querySelector(".fx-relay-footer-nav");
+        footer?.appendChild(button);
+        footer?.classList.add('left-align');
+      },
       checkIfAnyMasksWereGeneratedOnCurrentWebsite: (masks, domain) => {
         return masks.some((mask) => {
           return domain === mask.generated_for;
@@ -1895,6 +2301,27 @@
           dismissalInstance.dismiss();
       } 
      },
+    },
+    ariaControls: {
+      setSelected: (element) => {
+        if (!(element instanceof Element)) {
+          return;
+        }
+        const prevSelected = document.querySelector("[aria-selected]");
+        prevSelected.removeAttribute("aria-selected");
+
+        element.setAttribute("aria-selected", true);
+
+      },
+      setControls: (element, panelId) => {
+        if (!(element instanceof Element) || !(typeof panelId === 'string')) {
+          return;
+        }
+        const prevSelected = document.querySelector("[aria-controls]");
+        prevSelected.removeAttribute("aria-controls");
+
+        element.setAttribute("aria-controls", panelId);
+      }
     },
   };
 
