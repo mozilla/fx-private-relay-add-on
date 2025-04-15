@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser */
+/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser formatPhone */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -65,4 +65,40 @@ async function getBrowser() {
     return "Firefox";
   }
   return "Chrome";
+}
+
+// eslint-disable-next-line no-unused-vars
+function formatPhone({phoneNumber,
+  withCountryCode = false,
+  digitsOnly = false}){
+  // remove country code by default
+  // remove all none numeric characters
+  // incluse first 10 digits
+  const phone = phoneNumber
+    .replace("+1", "")
+    .replace(/\D/g, "")
+    .substring(0, 10);
+
+  // add country code to zip code block if specified
+  const zip = phone.substring(0, 3);
+  const middle = phone.substring(3, 6);
+  const last = phone.substring(6, 10);
+  const countryCode =
+    withCountryCode
+      ? digitsOnly
+        ? "+1"
+        : "+1 "
+      : "";
+
+  if (digitsOnly) {
+    return `${countryCode}${phone}`;
+  }
+
+  return phone.length > 6
+    ? `${countryCode}(${zip}) ${middle} - ${last}`
+    : phone.length > 3
+      ? `${countryCode}(${zip}) ${middle}`
+      : phone.length > 0
+        ? `${countryCode}(${zip}`
+        : "";
 }
