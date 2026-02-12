@@ -1,9 +1,16 @@
-function startupInit() {
+const DEFAULT_MAX_FREE_ALIASES = 5; // Fallback if runtime_data unavailable
+
+async function startupInit() {
   const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
   browser.storage.local.set({ RELAY_SITE_ORIGIN });
-  browser.storage.local.set({ maxNumAliases: 5 });
   browser.storage.local.set({ relaySiteOrigin: RELAY_SITE_ORIGIN });
   browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
+
+  // Set initial fallback only if not already set
+  const { maxNumAliases } = await browser.storage.local.get("maxNumAliases");
+  if (maxNumAliases === undefined) {
+    browser.storage.local.set({ maxNumAliases: DEFAULT_MAX_FREE_ALIASES });
+  }
 }
 
 browser.runtime.onStartup.addListener(startupInit);
@@ -185,7 +192,8 @@ async function storeRuntimeData(opts={forceUpdate: false}) {
     periodicalPremiumProductId: {
       PERIODICAL_PREMIUM_PRODUCT_ID: runtimeData.PERIODICAL_PREMIUM_PRODUCT_ID,
       fetchedAt: Date.now(),
-    }
+    },
+    maxNumAliases: runtimeData.MAX_NUM_FREE_ALIASES || DEFAULT_MAX_FREE_ALIASES
   })
 }
 
@@ -574,7 +582,7 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
 });
 
 (async () => {
-  startupInit();
+  await startupInit();
   await displayBrowserActionBadge();
-  storeRuntimeData();
+  await storeRuntimeData();
 })();
