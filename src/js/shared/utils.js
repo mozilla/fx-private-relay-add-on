@@ -1,4 +1,4 @@
-/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser */
+/* exported areInputIconsEnabled setCustomFonts preventDefaultBehavior checkWaffleFlag getBrowser getRelayBrowserAction */
 
 // eslint-disable-next-line no-redeclare
 async function areInputIconsEnabled() {
@@ -65,4 +65,8 @@ async function getBrowser() {
     return "Firefox";
   }
   return "Chrome";
+}
+
+function getRelayBrowserAction() {
+  return browser.action ?? browser.browserAction;
 }

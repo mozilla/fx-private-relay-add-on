@@ -1,4 +1,4 @@
-/* global getBrowser checkWaffleFlag psl */
+/* global getBrowser checkWaffleFlag getRelayBrowserAction psl */
 
 (async () => {
   // Global Data
@@ -1475,8 +1475,10 @@
         // Dismiss the browserActionBadge only when it exists
         if (browserActionBadgesClicked === false) {
           browser.storage.local.set({ browserActionBadgesClicked: true });
-          browser.browserAction.setBadgeBackgroundColor({ color: null });
-          browser.browserAction.setBadgeText({ text: "" });
+          const browserAction = getRelayBrowserAction();
+          if (browserAction) {
+            browserAction.setBadgeText({ text: "" });
+          }
         }
       },
       enableInputIconDisabling: async () => {

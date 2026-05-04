@@ -6,6 +6,8 @@ function startupInit() {
   browser.storage.local.set({ relayApiSource: `${RELAY_SITE_ORIGIN}/api/v1` });
 }
 
+/* global getRelayBrowserAction */
+
 browser.runtime.onStartup.addListener(startupInit);
 
 browser.runtime.onInstalled.addListener((details) => {
@@ -494,10 +496,15 @@ async function displayBrowserActionBadge() {
   }
 
   if (!browserActionBadgesClicked && (serverStoragePrompt !== true || privacyNoticeUpdatePromptShown !== true)) {
-    browser.browserAction.setBadgeBackgroundColor({
+    const browserAction = getRelayBrowserAction();
+    if (!browserAction) {
+      return;
+    }
+
+    browserAction.setBadgeBackgroundColor({
       color: "#00D900",
     });
-    browser.browserAction.setBadgeText({ text: "!" });
+    browserAction.setBadgeText({ text: "!" });
   }
 }
 

@@ -144,7 +144,7 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
 If you want to run the Chrome build of the add-on, use the following scripts:
  
 > [!NOTE]  
-> It runs the same scripts as above, but also edits the [`menus`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus) permission listed in the manifest.json*
+> It runs the same scripts as above, but also converts `manifest.json` to Chrome's Manifest V3 format.
  
  * `npm run build:chrome-dev`: https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/
  * `npm run build:chrome-stage`: https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net/
@@ -217,4 +217,3 @@ Finally, we also publish the release to GitHub for those followers.
    * Use the version number for "Tag version" and "Release title"
    * Release notes: copy the output of `git log --no-merges --pretty=format:"%h %s" <previous-version>..<new-version>`
    * Attach binaries: select the signed `.xpi` file
-

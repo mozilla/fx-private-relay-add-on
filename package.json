@@ -23,7 +23,7 @@
     "config:prod": "npm run build:clean && ./config-domain.sh https://relay.firefox.com",
     "dev": "npm run web-ext-run",
     "lint": "eslint src && web-ext build -s src/ -n firefox_relay.zip --overwrite-dest && web-ext lint -s web-ext-artifacts/firefox_relay.zip && rm -f web-ext-artifacts/firefox_relay.zip",
-    "package:chrome": "zip -r web-ext-artifacts/chrome_relay-${npm_package_version}.zip ./src",
+    "package:chrome": "web-ext build -s src/ -n chrome_relay-${npm_package_version}.zip --overwrite-dest",
     "test": "echo \"Error: no test specified\" && exit 1",
     "restore-locales-github": "cd src/_locales && git restore .github/workflows/update-upstream-relay-repo.yml",
     "remove-locales-github": "rm -rf src/_locales/.github",
