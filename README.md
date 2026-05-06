@@ -103,7 +103,7 @@ To run the latest translated version of the add-on, you will need to
 ##### Create a Firefox profile set to use the target language
 1. Make a new Firefox profile - e.g., "swedish"
 2. In the profile, install the [language
-   pack](https://addons.mozilla.org/en-US/firefox/language-tools/) for one of 
+   pack](https://addons.mozilla.org/firefox/language-tools/) for one of 
    the add-on's [supported
    languages](https://pontoon.mozilla.org/projects/firefox-relay-add-on/)
    * Note: language packs only work on Release & Beta channels of Firefox - not
@@ -144,7 +144,7 @@ These scripts will build the add-on to work with dev, stage, or prod servers.
 If you want to run the Chrome build of the add-on, use the following scripts:
  
 > [!NOTE]  
-> It runs the same scripts as above, but also edits the [`menus`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus) permission listed in the manifest.json*
+> It runs the same scripts as above, but also edits the [`menus`](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/menus) permission listed in the manifest.json*
  
  * `npm run build:chrome-dev`: https://dev.fxprivaterelay.nonprod.cloudops.mozgcp.net/
  * `npm run build:chrome-stage`: https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net/
@@ -196,7 +196,7 @@ to each release, under the release "Assets" section.
 
 1. After pushing the new version to GitHub, open the "continuous prerelease to GitHub" run for that tag: https://github.com/mozilla/fx-private-relay-add-on/actions/workflows/sign-and-release-to-github.yml
 2. Under "Artifacts", download `fx-private-relay-extension.zip`
-3. [Upload the `.zip` to AMO](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions/submit/)
+3. [Upload the `.zip` to AMO](https://addons.mozilla.org/developers/addon/private-relay/versions/submit/)
 
 **Note: Be sure the *"Where to Host Version"* is set to _"On this site"._**
 
@@ -211,7 +211,7 @@ to each release, under the release "Assets" section.
 #### Publish to GitHub
 Finally, we also publish the release to GitHub for those followers.
 
-1. Download the signed `.xpi` from [the addon versions page](https://addons.mozilla.org/en-US/developers/addon/private-relay/versions)
+1. Download the signed `.xpi` from [the addon versions page](https://addons.mozilla.org/developers/addon/private-relay/versions)
 2. [Make the new release on
    GitHub](https://github.com/mozilla/fx-private-relay-add-on/releases/new)
    * Use the version number for "Tag version" and "Release title"
