@@ -3,6 +3,9 @@
 </p>
 
 
+> [!IMPORTANT]
+> This add-on is now in maintenance mode as we focus on integrating its functionality more into the browser experience. No new features will be added, and only security-related bug fixes will be addressed.
+
 # Private Relay 
 <!-- Badges include: license and size of repository -->
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://raw.githubusercontent.com/mozilla/fx-private-relay-add-on/main/LICENSE)
