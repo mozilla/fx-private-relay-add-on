@@ -1,3 +1,5 @@
+/* global formatPhone */
+
 function startupInit() {
   const RELAY_SITE_ORIGIN = "http://127.0.0.1:8000";
   browser.storage.local.set({ RELAY_SITE_ORIGIN });
@@ -134,6 +136,61 @@ async function postReportWebcompatIssue(description) {
   // Returning the status is enough to run pass/fail logic for the submission
   return newReportedIssueFetch.status;
 
+}
+
+// eslint-disable-next-line no-unused-vars
+async function getRelayNumberData() {
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+
+  if (!relayApiSource) {
+    return;
+  }
+
+  const headers = await createNewHeadersObject({auth: true}); 
+
+  const relayApiUrlRelayNumbers = `${relayApiSource}/relaynumber/`;
+ 
+  const relayNumbersRequest = await fetch(relayApiUrlRelayNumbers, {
+    mode: "same-origin",
+    method: "GET",
+    headers: headers,
+  });
+
+  const relayNumbers = await relayNumbersRequest.json(); 
+
+  if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
+    browser.storage.local.set({
+      relayNumbers: relayNumbers.map((number) => ({
+        ...number,  
+        formattedNumber: formatPhone({ phoneNumber: number.number }),
+      })),
+    })
+  } 
+ 
+  return relayNumbers;
+}
+
+async function setRelayNumberForwardingState(id, enabled) {
+  const { relayApiSource } = await browser.storage.local.get("relayApiSource");  
+  const relayApiUrlRelayAddressId = `${relayApiSource}/relaynumber/${id}/`;
+
+  if (!relayApiSource) {
+    return;
+  }
+
+  const headers = await createNewHeadersObject({auth: true});
+  const apiBody = {
+    enabled: enabled,
+  };
+
+  const response = await fetch(relayApiUrlRelayAddressId, {
+    mode: "same-origin",
+    method: "PATCH",
+    headers: headers,
+    body: JSON.stringify(apiBody),
+  });
+ 
+  return await response.json();
 }
 
 async function storeRuntimeData(opts={forceUpdate: false}) {  
@@ -562,6 +619,12 @@ browser.runtime.onMessage.addListener((m, sender, sendResponse) => {
         break;
       case "updateInputIconPref":
         browser.storage.local.set({ showInputIcons: m.iconPref });
+        break;
+      case "setRelayNumberForwardingState":
+        response = await setRelayNumberForwardingState(m.id, m.enabled);
+        break;
+      case "getRelayNumberData":
+        response = await getRelayNumberData();
         break;
     }
     

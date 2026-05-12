@@ -23,6 +23,9 @@
   --borderRadiusSm: 4px;
   --borderRadiusMd: 8px;
   --borderRadiusLg: 16px;
+  --borderRadiusXl: 24px;
+  --borderRadius2xl: 32px;
+  --borderRadius3xl: 40px; 
 
   /* Width Tokens */
   --content2xs: 256px;

@@ -1,3 +1,5 @@
+/* global formatPhone */
+
 /**
  * @typedef {object} RandomMask
  * @property {boolean} enabled
@@ -53,6 +55,7 @@
     const relayApiUrlRelayAddresses = `${relayApiSource}/relayaddresses/`;
     const relayApiUrlDomainAddresses = `${relayApiSource}/domainaddresses/`;
     const relayApiUrlRelayNumbers = `${relayApiSource}/relaynumber/`;
+    const relayApiUrlRealPhoneNumbers = `${relayApiSource}/realphone/`;
 
     async function apiRequest(url, method = "GET", body = null, opts=null) {
 
@@ -110,11 +113,35 @@
     const siteStorageEnabled = serverProfileData[0].server_storage;
 
     const relayNumbers = await apiRequest(relayApiUrlRelayNumbers);
+
     if (Array.isArray(relayNumbers) && relayNumbers.length > 0) {
       browser.storage.local.set({
-        relayNumbers: relayNumbers,
-      });
+        relayNumbers: relayNumbers.map((number) => ({
+          ...number,  
+          formattedNumber: formatPhone({ phoneNumber: number.number }),
+          copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
+        })),
+      })
+    } else {
+      // If a user with no relayNumbers signs in after a previous user signed out, we need to reset their local storage. 
+      browser.storage.local.remove("relayNumbers");
     }
+
+    const realPhoneNumbers = await apiRequest(relayApiUrlRealPhoneNumbers);
+
+    if (Array.isArray(realPhoneNumbers) && realPhoneNumbers.length > 0) {
+      browser.storage.local.set({
+        realPhoneNumbers: realPhoneNumbers.map((number) => ({
+          ...number,  
+          formattedNumber: formatPhone({ phoneNumber: number.number }),
+          copyNumber: formatPhone({ phoneNumber: number.number, withCountryCode: true, digitsOnly: true }),
+        })),
+      })
+    } else {
+      // Persist local storage incase of multiple users signing in and out of the same browser. 
+      browser.storage.local.remove("realPhoneNumbers");
+    }
+
 
     /**
      * Fetch the current list of random masks from the server, while preserving local labels if present
