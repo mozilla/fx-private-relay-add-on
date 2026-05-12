@@ -208,7 +208,7 @@
           <div class="fx-relay-panel-content">
             <div class="fx-relay-settings-toggles">
               <div class="fx-relay-settings-toggle-wrapper">
-                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsShowIcon"></span>
+                <span class="fx-relay-settings-toggle-label i18n-content" data-i18n-message-id="popupSettingsShowIconInInputFields"></span>
                 <button title="" data-icon-visibility-option="disable-input-icon" class="toggle-icon-in-page-visibility fx-relay-settings-toggle"></button>
               </div>
               <div class="fx-relay-settings-toggle-wrapper">
@@ -294,18 +294,24 @@
             <form class="report-issue-content">
               <div class="report-section">
                 <label class="report-label i18n-content" for="issue_on_domain" data-i18n-attribute="title"
-                  data-i18n-message-id="popupReportIssueSiteLabelHeadline"></label>
+                  data-i18n-message-id="popupReportIssuesHeadline"></label>
                 <input autocomplete="off" type="text" id="issue_on_domain" name="issue_on_domain" value="" required />
               </div>
-              <div class="report-section">
+              <div id="report-feedback-container" class="report-section">
                 <!-- Select issue checkboxes -->
-                <label class="report-label i18n-content" data-i18n-message-id="popupReportIssueSituationHeadline"></label>
+                <label class="report-label i18n-content" data-i18n-message-id="popupReportFeedbackHeadline"></label>
                 <ul>
                   <li>
                     <!-- Case: Email not accepted -->
                     <input type="checkbox" id="email_mask_not_accepted" name="email_mask_not_accepted" />
                     <label class="i18n-content" for="email_mask_not_accepted"
                       data-i18n-message-id="popupReportIssueCaseOne"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Phone Mask Acceptance issue -->
+                    <input type="checkbox" id="phone_mask_acceptance_issue" name="phone_mask_acceptance_issue" />
+                    <label class="i18n-content" for="phone_mask_acceptance_issue"
+                      data-i18n-message-id="popupReportIssueCaseFour"></label>
                   </li>
                   <li>
                     <!-- Case: Add on visual issue -->
@@ -318,6 +324,12 @@
                     <input type="checkbox" id="email_not_received" name="email_not_received" />
                     <label class="i18n-content" for="email_not_received"
                       data-i18n-message-id="popupReportIssueCaseThree"></label>
+                  </li>
+                  <li>
+                    <!-- Case: Text/Call not received -->
+                    <input type="checkbox" id="text_or_call_not_received" name="text_or_call_not_received" />
+                    <label class="i18n-content" for="text_or_call_not_received"
+                      data-i18n-message-id="popupReportIssueCaseFive"></label>
                   </li>
                   <li>
                     <!-- Case: Other -->
